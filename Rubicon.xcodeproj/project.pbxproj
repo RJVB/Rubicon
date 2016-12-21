@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1117D32101E764CAA2DE0E6B /* GNUstep.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D3DD6898F2EDE30CA103 /* GNUstep.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1117D6E85E4673C780D1C3FF /* Rubicon.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DB4FEBB7782769750FB9 /* Rubicon.m */; };
 		83CC44961E0B037700DDE50D /* Rubicon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83CC448C1E0B037700DDE50D /* Rubicon.framework */; };
 		83CC449B1E0B037700DDE50D /* RubiconTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 83CC449A1E0B037700DDE50D /* RubiconTests.m */; };
 		83CC449D1E0B037700DDE50D /* Rubicon.h in Headers */ = {isa = PBXBuildFile; fileRef = 83CC448F1E0B037700DDE50D /* Rubicon.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -26,6 +28,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1117D3DD6898F2EDE30CA103 /* GNUstep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GNUstep.h; sourceTree = "<group>"; };
+		1117DB4FEBB7782769750FB9 /* Rubicon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Rubicon.m; sourceTree = "<group>"; };
 		83CC448C1E0B037700DDE50D /* Rubicon.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Rubicon.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		83CC448F1E0B037700DDE50D /* Rubicon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Rubicon.h; sourceTree = "<group>"; };
 		83CC44901E0B037700DDE50D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -83,6 +87,8 @@
 				83CC44AB1E0B041700DDE50D /* CMakeLists.txt */,
 				83CC448F1E0B037700DDE50D /* Rubicon.h */,
 				83CC44901E0B037700DDE50D /* Info.plist */,
+				1117DB4FEBB7782769750FB9 /* Rubicon.m */,
+				1117D3DD6898F2EDE30CA103 /* GNUstep.h */,
 			);
 			path = Rubicon;
 			sourceTree = "<group>";
@@ -105,6 +111,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				83CC449D1E0B037700DDE50D /* Rubicon.h in Headers */,
+				1117D32101E764CAA2DE0E6B /* GNUstep.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -211,6 +218,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1117D6E85E4673C780D1C3FF /* Rubicon.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -409,6 +417,7 @@
 				83CC44A21E0B037700DDE50D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		83CC44A31E0B037700DDE50D /* Build configuration list for PBXNativeTarget "RubiconTests" */ = {
 			isa = XCConfigurationList;
@@ -417,6 +426,7 @@
 				83CC44A51E0B037700DDE50D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

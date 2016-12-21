@@ -1,10 +1,9 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: Rubicon.h
+ *    FILENAME: Rubicon.m
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
  *        DATE: 12/21/16 3:19 PM
- *  VISIBILITY: Public
  * DESCRIPTION:
  *
  * Copyright © 2016 Galen Rhodes All rights reserved.
@@ -22,13 +21,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import <Cocoa/Cocoa.h>
-
-//! Project version number for Rubicon.
-FOUNDATION_EXPORT double RubiconVersionNumber;
-
-//! Project version string for Rubicon.
-FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
-
-#import <Rubicon/GNUstep.h>
-
+#ifndef __APPLE__
+double RubiconVersionNumber = 1.0;
+const unsigned char RubiconVersionString[] = "1.0";
+#endif

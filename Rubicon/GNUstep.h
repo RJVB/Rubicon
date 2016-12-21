@@ -1,6 +1,6 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: Rubicon.h
+ *    FILENAME: GNUstep.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
  *        DATE: 12/21/16 3:19 PM
@@ -22,13 +22,45 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
+#ifndef __Rubicon_GNUstep_H_
+#define __Rubicon_GNUstep_H_
+
 #import <Cocoa/Cocoa.h>
 
-//! Project version number for Rubicon.
-FOUNDATION_EXPORT double RubiconVersionNumber;
+#ifndef FOUNDATION_EXTERN
+	#if defined(__cplusplus)
+		#define FOUNDATION_EXTERN extern "C"
+	#else
+		#define FOUNDATION_EXTERN extern
+	#endif
+#endif
 
-//! Project version string for Rubicon.
-FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
+#ifndef NS_INLINE
+	#if defined(__GNUC__)
+		#define NS_INLINE static __inline__ __attribute__((always_inline))
+	#elif defined(__MWERKS__) || defined(__cplusplus)
+		#define NS_INLINE static inline
+	#elif defined(_MSC_VER)
+		#define NS_INLINE static __inline
+	#elif TARGET_OS_WIN32
+		#define NS_INLINE static __inline__
+	#endif
+#endif
 
-#import <Rubicon/GNUstep.h>
+#ifndef FOUNDATION_STATIC_INLINE
+	#define FOUNDATION_STATIC_INLINE static __inline__
+#endif
 
+#ifndef FOUNDATION_EXTERN_INLINE
+	#define FOUNDATION_EXTERN_INLINE extern __inline__
+#endif
+
+#ifndef OS_INLINE
+	#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+		#define OS_INLINE static inline
+	#else
+		#define OS_INLINE static __inline__
+	#endif
+#endif
+
+#endif //__Rubicon_GNUstep_H_
