@@ -10,6 +10,9 @@
 		83CC44961E0B037700DDE50D /* Rubicon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83CC448C1E0B037700DDE50D /* Rubicon.framework */; };
 		83CC449B1E0B037700DDE50D /* RubiconTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 83CC449A1E0B037700DDE50D /* RubiconTests.m */; };
 		83CC449D1E0B037700DDE50D /* Rubicon.h in Headers */ = {isa = PBXBuildFile; fileRef = 83CC448F1E0B037700DDE50D /* Rubicon.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		83CC44A81E0B03F700DDE50D /* fetch_and_config.sh in Resources */ = {isa = PBXBuildFile; fileRef = 83CC44A71E0B03F700DDE50D /* fetch_and_config.sh */; };
+		83CC44AA1E0B040D00DDE50D /* CMakeLists.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83CC44A91E0B040D00DDE50D /* CMakeLists.txt */; };
+		83CC44AC1E0B041700DDE50D /* CMakeLists.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83CC44AB1E0B041700DDE50D /* CMakeLists.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +32,10 @@
 		83CC44951E0B037700DDE50D /* RubiconTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RubiconTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		83CC449A1E0B037700DDE50D /* RubiconTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RubiconTests.m; sourceTree = "<group>"; };
 		83CC449C1E0B037700DDE50D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		83CC44A61E0B03EA00DDE50D /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		83CC44A71E0B03F700DDE50D /* fetch_and_config.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = fetch_and_config.sh; sourceTree = "<group>"; };
+		83CC44A91E0B040D00DDE50D /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		83CC44AB1E0B041700DDE50D /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +60,8 @@
 		83CC44821E0B037600DDE50D = {
 			isa = PBXGroup;
 			children = (
+				83CC44A71E0B03F700DDE50D /* fetch_and_config.sh */,
+				83CC44A61E0B03EA00DDE50D /* CMakeLists.txt */,
 				83CC448E1E0B037700DDE50D /* Rubicon */,
 				83CC44991E0B037700DDE50D /* RubiconTests */,
 				83CC448D1E0B037700DDE50D /* Products */,
@@ -71,6 +80,7 @@
 		83CC448E1E0B037700DDE50D /* Rubicon */ = {
 			isa = PBXGroup;
 			children = (
+				83CC44AB1E0B041700DDE50D /* CMakeLists.txt */,
 				83CC448F1E0B037700DDE50D /* Rubicon.h */,
 				83CC44901E0B037700DDE50D /* Info.plist */,
 			);
@@ -80,6 +90,7 @@
 		83CC44991E0B037700DDE50D /* RubiconTests */ = {
 			isa = PBXGroup;
 			children = (
+				83CC44A91E0B040D00DDE50D /* CMakeLists.txt */,
 				83CC449A1E0B037700DDE50D /* RubiconTests.m */,
 				83CC449C1E0B037700DDE50D /* Info.plist */,
 			);
@@ -180,6 +191,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				83CC44AC1E0B041700DDE50D /* CMakeLists.txt in Resources */,
+				83CC44A81E0B03F700DDE50D /* fetch_and_config.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -187,6 +200,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				83CC44AA1E0B040D00DDE50D /* CMakeLists.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
