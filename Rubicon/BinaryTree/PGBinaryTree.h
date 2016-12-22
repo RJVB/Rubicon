@@ -1,13 +1,13 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: Rubicon.h
+ *    FILENAME: PGBinaryTree.h
  *         IDE: AppCode
- *      AUTHOR: Galen Rhodes
- *        DATE: 12/21/16 3:19 PM
- *  VISIBILITY: Public
+ *      AUTHOR:  Galen Rhodes
+ *        DATE: 12/22/16 1:03 PM
+ *  VISIBILITY: Private
  * DESCRIPTION:
  *
- * Copyright © 2016 Galen Rhodes All rights reserved.
+ * Copyright © 2016  Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,14 +22,26 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
+#ifndef __Rubicon_PGBinaryTree_H_
+#define __Rubicon_PGBinaryTree_H_
+
 #import <Cocoa/Cocoa.h>
 
-//! Project version number for Rubicon.
-FOUNDATION_EXPORT double RubiconVersionNumber;
+@interface PGBinaryTree : NSObject
 
-//! Project version string for Rubicon.
-FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
+	@property(nonatomic, readonly) NSUInteger   count;
+	@property(nonatomic, readonly) NSComparator comparator;
 
-#import <Rubicon/GNUstep.h>
-#import <Rubicon/NSObject+PGObject.h>
-#import <Rubicon/PGBinaryTreeKVNode.h>
+	-(instancetype)init;
+
+	-(instancetype)initWithComparator:(NSComparator)comparator;
+
+	-(void)addValue:(id)value forKey:(id<NSCopying>)key;
+
+	-(id)valueForKey:(id)key;
+
+	-(void)removeValueForKey:(id)key;
+
+@end
+
+#endif //__Rubicon_PGBinaryTree_H_
