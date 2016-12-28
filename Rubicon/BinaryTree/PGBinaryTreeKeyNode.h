@@ -30,7 +30,7 @@
 
 @interface PGBinaryTreeKeyNode : PGBinaryTreeNode
 
-	-(instancetype)initWithKey:(id<NSCopying>)key value:(id)value comparator:(NSComparator)comparator;
+	-(instancetype)initWithValue:(id)value forKey:(id<NSCopying>)key;
 
 @end
 

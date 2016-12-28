@@ -27,16 +27,16 @@
 		id _key;
 	}
 
-	-(instancetype)initWithKey:(id<NSCopying>)key value:(id)value comparator:(NSComparator)comparator {
-		return (self = [super initWithKey:key value:value comparator:comparator]);
+	-(instancetype)initWithValue:(id)value forKey:(id<NSCopying>)key {
+		return (self = [super initWithValue:value forKey:key]);
 	}
 
 	-(id)key {
 		return _key;
 	}
 
-	-(void)setKey:(id)key {
-		_key = [key copy];
+	-(void)setKey:(id<NSCopying>)key {
+		_key = [((id)key) copy];
 	}
 
 @end

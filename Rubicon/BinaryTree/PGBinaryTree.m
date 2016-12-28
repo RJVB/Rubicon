@@ -45,27 +45,28 @@
 
 		if(self) {
 			_root       = nil;
-			_comparator = (comparator ? comparator : [PGBinaryTree defaultComparator]);
+			_comparator = [(comparator ? comparator : [PGBinaryTree defaultComparator]) copy];
 		}
 
 		return self;
 	}
 
 	-(void)addValue:(id)value forKey:(id<NSCopying>)key {
-		if(_root) {
-			_root = [_root insertValue:value forKey:key].root;
-		}
-		else {
-			_root = [[PGBinaryTreeKVNode alloc] initWithKey:key value:value comparator:self.comparator];
-		}
+		_root = (_root ? [_root insertValue:value forKey:key withComparator:^NSComparisonResult(id obj1, id obj2) {
+			return NSOrderedSame;
+		}].root : [[PGBinaryTreeKVNode alloc] initWithValue:value forKey:key]);
 	}
 
 	-(id)valueForKey:(id)key {
-		return [_root find:key].value;
+		return [_root find:key withComparator:^NSComparisonResult(id obj1, id obj2) {
+			return NSOrderedSame;
+		}].value;
 	}
 
 	-(void)removeValueForKey:(id)key {
-		PGBinaryTreeLeaf *node = [_root find:key];
+		PGBinaryTreeLeaf *node = [_root find:key withComparator:^NSComparisonResult(id obj1, id obj2) {
+			return NSOrderedSame;
+		}];
 
 		if(node) {
 			PGBinaryTreeLeaf *z = (node.parent ? node.parent : (node.left.isLeaf ? node.right : node.left));

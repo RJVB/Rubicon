@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1117D140C70D8958D54A7B7A /* PGBinaryTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D4FD1350CA2BECAEBED3 /* PGBinaryTree.h */; };
+		1117D140C70D8958D54A7B7A /* PGBinaryTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D4FD1350CA2BECAEBED3 /* PGBinaryTree.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D17BAC406C2DEE3810BD /* PGBinaryTreeKeyNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D2B421790811B6AE0ED9 /* PGBinaryTreeKeyNode.m */; };
 		1117D23DDA179F6759CC86AF /* fetch_and_config.sh in Resources */ = {isa = PBXBuildFile; fileRef = 1117DBCB8D70DB67DE4B6825 /* fetch_and_config.sh */; };
 		1117D25574B6B804D25B64F3 /* PGBinaryTreeKeyNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D0858C01386AF5B54B6A /* PGBinaryTreeKeyNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -193,11 +193,11 @@
 				83CC449D1E0B037700DDE50D /* Rubicon.h in Headers */,
 				1117D32101E764CAA2DE0E6B /* GNUstep.h in Headers */,
 				1117DFF7B174C687488C51A8 /* NSObject+PGObject.h in Headers */,
+				1117D140C70D8958D54A7B7A /* PGBinaryTree.h in Headers */,
 				1117D58276E3E3D0D2B45BEC /* PGBinaryTreeLeaf.h in Headers */,
 				1117D986A0EF6079D015C458 /* PGBinaryTreeNode.h in Headers */,
 				1117D25574B6B804D25B64F3 /* PGBinaryTreeKeyNode.h in Headers */,
 				1117DE159EBB6098156AA0AC /* PGBinaryTreeKVNode.h in Headers */,
-				1117D140C70D8958D54A7B7A /* PGBinaryTree.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

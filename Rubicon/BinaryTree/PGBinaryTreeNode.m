@@ -23,19 +23,29 @@
 
 #import "PGBinaryTreeNode.h"
 
+@interface PGBinaryTreeLeaf()
+
+	-(PGBinaryTreeLeaf *)makeOrphan;
+
+	-(PGBinaryTreeLeaf *)adoptMe:(PGBinaryTreeLeaf *)newParent;
+
+@end
+
 @implementation PGBinaryTreeNode {
 		BOOL             _isRed;
+		NSUInteger _count;
 		PGBinaryTreeLeaf *_left;
 		PGBinaryTreeLeaf *_right;
 	}
 
-	-(instancetype)initWithKey:(id<NSCopying>)key value:(id)value comparator:(NSComparator)comparator {
-		self = [super initWithKey:key value:value comparator:comparator];
+	-(instancetype)initWithValue:(id)value forKey:(id<NSCopying>)key {
+		self = [super initWithValue:value forKey:key];
 
 		if(self) {
 			self.isRed = NO;
 			self.left  = [[PGBinaryTreeLeaf alloc] init];
 			self.right = [[PGBinaryTreeLeaf alloc] init];
+			_count = 0;
 		}
 
 		return self;
@@ -61,78 +71,26 @@
 		return _right;
 	}
 
-	-(void)setLeft:(PGBinaryTreeLeaf *)left {
-		/*
-		 * Don't bother if nothing is changing.
-		 */
-		if(_left != left) {
-			if(_left) {
-				/*
-				 * Unlink the existing left child.
-				 */
-				_left.parent = nil;
-				_left = nil;
-			}
-
-			if(left) {
-				PGBinaryTreeLeaf *lparent = left.parent;
-
-				/*
-				 * Unlink the new left child from it's existing parent if it has one.
-				 */
-				if(lparent) {
-					if(left == lparent.right) {
-						lparent.right = nil;
-					}
-					else if(left == lparent.left) {
-						lparent.left = nil;
-					}
-					else {
-						left.parent = nil;
-					}
-				}
-
-				_left = left;
-				_left.parent = self;
-			}
+	-(void)setLeft:(PGBinaryTreeLeaf *)child {
+		if(_left != child) {
+			_count -= _left.count;
+			_left.parent = nil;
+			_left = [child adoptMe:self];
+			_count += _left.count;
 		}
 	}
 
-	-(void)setRight:(PGBinaryTreeLeaf *)right {
-		/*
-		 * Don't bother if nothing is changing.
-		 */
-		if(_right != right) {
-			if(_right) {
-				/*
-				 * Unlink the existing right child.
-				 */
-				_right.parent = nil;
-				_right = nil;
-			}
-
-			if(right) {
-				PGBinaryTreeLeaf *rparent = right.parent;
-
-				/*
-				 * Unlink the new right child from it's existing parent if it has one.
-				 */
-				if(rparent) {
-					if(right == rparent.right) {
-						rparent.right = nil;
-					}
-					else if(right == rparent.left) {
-						rparent.left = nil;
-					}
-					else {
-						right.parent = nil;
-					}
-				}
-
-				_right = right;
-				_right.parent = self;
-			}
+	-(void)setRight:(PGBinaryTreeLeaf *)child {
+		if(_right != child) {
+			_count -= _right.count;
+			_right.parent = nil;
+			_right = [child adoptMe:self];
+			_count += _right.count;
 		}
+	}
+
+	-(NSUInteger)count {
+		return (1 + _count);
 	}
 
 @end

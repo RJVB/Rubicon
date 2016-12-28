@@ -49,9 +49,7 @@
 
 	-(instancetype)init;
 
-	-(instancetype)initWithKey:(id<NSCopying>)key value:(id)value comparator:(NSComparator)comparator;
-
-	-(NSComparator)comparator;
+	-(instancetype)initWithValue:(id)value forKey:(id<NSCopying>)key;
 
 	-(void)rotateLeft;
 
@@ -61,11 +59,23 @@
 
 	-(instancetype)find:(id)key;
 
+	-(instancetype)find:(id)key withComparator:(NSComparator)comparator;
+
 	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key;
+
+	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key withComparator:(NSComparator)comparator;
 
 	-(void)remove;
 
+	-(void)clearNode;
+
 	-(void)draw;
+
+	-(BOOL)isEqual:(id)other;
+
+	-(BOOL)isEqualToLeaf:(PGBinaryTreeLeaf *)leaf;
+
+	-(NSUInteger)hash;
 
 @end
 

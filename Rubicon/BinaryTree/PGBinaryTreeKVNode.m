@@ -27,8 +27,8 @@
 		id _value;
 	}
 
-	-(instancetype)initWithKey:(id<NSCopying>)key value:(id)value comparator:(NSComparator)comparator {
-		return (self = [super initWithKey:key value:value comparator:comparator]);
+	-(instancetype)initWithValue:(id)value forKey:(id<NSCopying>)key {
+		return (self = [super initWithValue:value forKey:key]);
 	}
 
 	-(id)value {

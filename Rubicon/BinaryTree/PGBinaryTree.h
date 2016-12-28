@@ -30,7 +30,7 @@
 @interface PGBinaryTree : NSObject
 
 	@property(nonatomic, readonly) NSUInteger   count;
-	@property(nonatomic, readonly) NSComparator comparator;
+	@property(nonatomic, copy) NSComparator comparator;
 
 	-(instancetype)init;
 

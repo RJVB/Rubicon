@@ -42,6 +42,24 @@
 	-(Class)baseClassInCommonWith:(id)obj;
 
 	/**************************************************************************************************//**
+	 * Created because the definition of isKindOf:(Class) and isMemberOf:(Class) is hard for me to
+	 * remember for some reason.
+	 *
+	 * @param clazz the class to compare to.
+	 * @return YES if this object is an instance of clazz or one of it's subclasses.
+	 ******************************************************************************************************/
+	-(BOOL)isInstanceOf:(Class)clazz;
+
+	/**************************************************************************************************//**
+	 * Created because the definition of isKindOf:(Class) and isMemberOf:(Class) is hard for me to
+	 * remember for some reason.
+	 *
+	 * @param clazz the class to compare to.
+	 * @return YES if this object is an instance of clazz.
+	 ******************************************************************************************************/
+	-(BOOL)isExactInstanceOf:(Class)clazz;
+
+	/**************************************************************************************************//**
 	 * Returns a default generic comparator that will make a best attempt at comparing this object with
 	 * another object.
 	 ******************************************************************************************************/
