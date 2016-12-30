@@ -26,6 +26,46 @@
 		[super tearDown];
 	}
 
+	-(void)testCompareWithClass:(id)obj {
+		NSLog(@"Class %@ responds to \"compare:\": %@", NSStringFromClass([obj class]), @([obj respondsToSelector:@selector(compare:)]));
+	}
+
+	-(void)testSimpleWindow {
+		NSApplication *app = [NSApplication sharedApplication];
+
+		NSRect   frame   = NSMakeRect(0, 0, 200, 200);
+		NSWindow *window = [[NSWindow alloc] initWithContentRect:frame styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO];
+
+		XCTAssertNotNil(window, @"Window not created.");
+
+		[window setBackgroundColor:[NSColor blueColor]];
+		[window makeKeyAndOrderFront:NSApp];
+
+		struct timespec ts = { .tv_sec = 20, .tv_nsec = 0 };
+		nanosleep(&ts, NULL);
+	}
+
+	-(void)testFontCreation {
+		NSString *fontName = @".HelveticaNeueDeskInterface-MediumP4";
+		NSFont   *aFont    = [NSFont fontWithName:fontName size:12];
+
+		if(aFont) {
+			NSLog(@"Font %@ created.", aFont.fontName);
+		}
+		else {
+			XCTAssertNotNil(aFont, @"Font %@ not created.", fontName);
+		}
+	}
+
+	-(void)testCompare {
+		[self testCompareWithClass:[[NSObject alloc] init]];
+		[self testCompareWithClass:@(123)];
+		[self testCompareWithClass:@"Galen"];
+		[self testCompareWithClass:[NSString stringWithFormat:@"My name is %@!", @"Galen"]];
+		[self testCompareWithClass:@[ @"a", @"b", @"c" ]];
+		[self testCompareWithClass:[[PGBinaryTreeLeaf alloc] initWithValue:@"Rhodes" forKey:@"Galen"]];
+	}
+
 	-(void)testCommonBaseClass {
 		Subclass1D *c1 = [[Subclass1D alloc] init];
 		Subclass2C *c2 = [[Subclass2C alloc] init];
@@ -36,24 +76,21 @@
 		Class cClass2 = [s1 baseClassInCommonWith:s2];
 		Class cClass3 = [s1 baseClassInCommonWith:c1];
 
+		NSString *c1Name = NSStringFromClass([c1 class]);
+		NSString *c2Name = NSStringFromClass([c2 class]);
+		NSString *s1Name = NSStringFromClass([s1 class]);
+		NSString *s2Name = NSStringFromClass([s2 class]);
+
 		if(cClass1) {
-			NSLog(@"Class %@ and class %@ share a common base class: %@",
-				  NSStringFromClass([c1 class]),
-				  NSStringFromClass([c2 class]),
-				  NSStringFromClass(cClass1));
-			NSLog(@"Class %@ and class %@ share a common base class: %@",
-				  NSStringFromClass([s1 class]),
-				  NSStringFromClass([s2 class]),
-				  NSStringFromClass(cClass2));
-			NSLog(@"Class %@ and class %@ share a common base class: %@",
-				  NSStringFromClass([s1 class]),
-				  NSStringFromClass([c1 class]),
-				  NSStringFromClass(cClass3));
+			NSString *fmt = @"Class %@ and class %@ share a common base class: %@";
+			NSLog(fmt, c1Name, c2Name, NSStringFromClass(cClass1));
+			NSLog(fmt, s1Name, s2Name, NSStringFromClass(cClass2));
+			NSLog(fmt, s1Name, c1Name, NSStringFromClass(cClass3));
 		}
 		else {
-			XCTFail(@"Class %@ and class %@ do not have a common base class.", NSStringFromClass([c1 class]), NSStringFromClass([c2 class]));
-			XCTFail(@"Class %@ and class %@ do not have a common base class.", NSStringFromClass([s1 class]), NSStringFromClass([s2 class]));
-			XCTFail(@"Class %@ and class %@ do not have a common base class.", NSStringFromClass([s1 class]), NSStringFromClass([c1 class]));
+			XCTFail(@"Class %@ and class %@ do not have a common base class.", c1Name, c2Name);
+			XCTFail(@"Class %@ and class %@ do not have a common base class.", s1Name, s2Name);
+			XCTFail(@"Class %@ and class %@ do not have a common base class.", s1Name, c1Name);
 		}
 	}
 

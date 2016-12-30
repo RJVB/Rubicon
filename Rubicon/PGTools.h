@@ -1,13 +1,13 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: Rubicon.h
+ *    FILENAME: PGTools.h
  *         IDE: AppCode
- *      AUTHOR: Galen Rhodes
- *        DATE: 12/21/16 3:19 PM
- *  VISIBILITY: Public
+ *      AUTHOR:  Galen Rhodes
+ *        DATE: 12/30/16 11:03 AM
+ *  VISIBILITY: Private
  * DESCRIPTION:
  *
- * Copyright © 2016 Galen Rhodes All rights reserved.
+ * Copyright © 2016  Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,15 +22,17 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
+#ifndef __Rubicon_PGTools_H_
+#define __Rubicon_PGTools_H_
+
 #import <Cocoa/Cocoa.h>
-
-//! Project version number for Rubicon.
-FOUNDATION_EXPORT double RubiconVersionNumber;
-
-//! Project version string for Rubicon.
-FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
-
 #import <Rubicon/GNUstep.h>
-#import <Rubicon/NSObject+PGObject.h>
-#import <Rubicon/PGBinaryTreeKVNode.h>
-#import <Rubicon/PGBinaryTree.h>
+
+#define PGBitsPerField   (8)
+#define PGFieldsPerPixel (4)
+
+NSBitmapImageRep *PGCreateARGBImage(CGFloat width, CGFloat height);
+
+BOOL PGSaveImageAsPNG(NSBitmapImageRep *image, NSString *filename, NSError **error);
+
+#endif //__Rubicon_PGTools_H_

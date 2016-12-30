@@ -27,6 +27,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <Rubicon/PGBinaryTreeNode.h>
+#import <Rubicon/GNUstep.h>
 
 @interface PGBinaryTreeKeyNode : PGBinaryTreeNode
 
