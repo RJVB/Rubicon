@@ -1,12 +1,13 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: Rubicon.m
+ *    FILENAME: CommonBaseClass.h
  *         IDE: AppCode
- *      AUTHOR: Galen Rhodes
- *        DATE: 12/21/16 3:19 PM
+ *      AUTHOR:  Galen Rhodes
+ *        DATE: 12/29/16 4:37 PM
+ *  VISIBILITY: Private
  * DESCRIPTION:
  *
- * Copyright © 2016 Galen Rhodes All rights reserved.
+ * Copyright © 2016  Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,9 +22,35 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __APPLE__
+#ifndef __Rubicon_CommonBaseClass_H_
+#define __Rubicon_CommonBaseClass_H_
 
-double RubiconVersionNumber = 1.0;
-const unsigned char RubiconVersionString[] = "1.0";
+#import <Cocoa/Cocoa.h>
 
-#endif
+@interface CommonBaseClass : NSObject
+
+	-(NSString *)description;
+@end
+
+@interface Subclass1A : CommonBaseClass
+@end
+
+@interface Subclass1B : Subclass1A
+@end
+
+@interface Subclass1C : Subclass1B
+@end
+
+@interface Subclass1D : Subclass1C
+@end
+
+@interface Subclass2A : CommonBaseClass
+@end
+
+@interface Subclass2B : Subclass2A
+@end
+
+@interface Subclass2C : Subclass2B
+@end
+
+#endif //__Rubicon_CommonBaseClass_H_

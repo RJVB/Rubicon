@@ -245,9 +245,7 @@ void removeStep3(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL);
 		return self;
 	}
 
-	-(BOOL)isEqual:(id)other {
-		return (other && ((self == other) || ([other isKindOfClass:[self class]] && [self isEqualToLeaf:(PGBinaryTreeLeaf *)other])));
-	}
+	-(BOOL)isEqual:(id)other { return (other && ((self == other) || ([other isInstanceOfObject:self] && [self isEqualToLeaf:(PGBinaryTreeLeaf *)other]))); }
 
 	-(BOOL)isEqualToLeaf:(PGBinaryTreeLeaf *)leaf { return (self == leaf); }
 

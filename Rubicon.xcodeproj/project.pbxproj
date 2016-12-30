@@ -12,6 +12,7 @@
 		1117D23DDA179F6759CC86AF /* fetch_and_config.sh in Resources */ = {isa = PBXBuildFile; fileRef = 1117DBCB8D70DB67DE4B6825 /* fetch_and_config.sh */; };
 		1117D25574B6B804D25B64F3 /* PGBinaryTreeKeyNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D0858C01386AF5B54B6A /* PGBinaryTreeKeyNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D32101E764CAA2DE0E6B /* GNUstep.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D3DD6898F2EDE30CA103 /* GNUstep.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1117D374C586597A78BFA654 /* CommonBaseClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D2C4AA253F903B9C6E4C /* CommonBaseClass.m */; };
 		1117D40BCD517465096C77BB /* PGBinaryTreeKVNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D6D84CB0A236722B9FED /* PGBinaryTreeKVNode.m */; };
 		1117D58276E3E3D0D2B45BEC /* PGBinaryTreeLeaf.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D10A1BC019F5DABBFAC1 /* PGBinaryTreeLeaf.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D5CA09C8728AD73965A9 /* NSObject+PGObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D17716B981854614504A /* NSObject+PGObject.m */; };
@@ -46,6 +47,7 @@
 		1117D17716B981854614504A /* NSObject+PGObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+PGObject.m"; sourceTree = "<group>"; };
 		1117D20482A8727B50EB52E8 /* PGBinaryTreeNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBinaryTreeNode.m; sourceTree = "<group>"; };
 		1117D2B421790811B6AE0ED9 /* PGBinaryTreeKeyNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBinaryTreeKeyNode.m; sourceTree = "<group>"; };
+		1117D2C4AA253F903B9C6E4C /* CommonBaseClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonBaseClass.m; sourceTree = "<group>"; };
 		1117D3DD6898F2EDE30CA103 /* GNUstep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GNUstep.h; sourceTree = "<group>"; };
 		1117D4F5141FA28E3D53EF7F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.info; path = Info.plist; sourceTree = "<group>"; };
 		1117D4FD1350CA2BECAEBED3 /* PGBinaryTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBinaryTree.h; sourceTree = "<group>"; };
@@ -53,6 +55,7 @@
 		1117D6B32FC0E11216D8EC0B /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		1117D6D84CB0A236722B9FED /* PGBinaryTreeKVNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBinaryTreeKVNode.m; sourceTree = "<group>"; };
 		1117D71562821908FD8E4A08 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.info; path = Info.plist; sourceTree = "<group>"; };
+		1117D7595FEBE635E87E8D8D /* CommonBaseClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonBaseClass.h; sourceTree = "<group>"; };
 		1117D901396108BF30F751E9 /* PGBinaryTree.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBinaryTree.m; sourceTree = "<group>"; };
 		1117D9CDCBCAF89573089F98 /* PGBinaryTreeKVNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBinaryTreeKVNode.h; sourceTree = "<group>"; };
 		1117DACEBD2AB185DF4D9C30 /* PGBinaryTreeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBinaryTreeNode.h; sourceTree = "<group>"; };
@@ -179,6 +182,8 @@
 			children = (
 				83CC449A1E0B037700DDE50D /* RubiconTests.m */,
 				1117DC356666B01EDEA8FF86 /* SupportingFiles */,
+				1117D2C4AA253F903B9C6E4C /* CommonBaseClass.m */,
+				1117D7595FEBE635E87E8D8D /* CommonBaseClass.h */,
 			);
 			path = RubiconTests;
 			sourceTree = "<group>";
@@ -319,6 +324,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				83CC449B1E0B037700DDE50D /* RubiconTests.m in Sources */,
+				1117D374C586597A78BFA654 /* CommonBaseClass.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

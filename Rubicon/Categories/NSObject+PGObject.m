@@ -24,8 +24,6 @@
 #import "NSObject+PGObject.h"
 #import <objc/runtime.h>
 
-Class _commonBaseClass(Class c1, Class c2);
-
 @implementation NSObject(PGObject)
 
 	/**************************************************************************************************//**
@@ -39,7 +37,7 @@ Class _commonBaseClass(Class c1, Class c2);
 	 * @return the first superclass that both this object and the given class have in common.
 	 ******************************************************************************************************/
 	-(Class)baseClassInCommonWith:(id)obj {
-		return (obj ? _commonBaseClass([self class], [obj class]) : nil);
+		return (obj ? PGCommonBaseClass([self class], [obj class]) : nil);
 	}
 
 	/**************************************************************************************************//**
@@ -53,6 +51,10 @@ Class _commonBaseClass(Class c1, Class c2);
 		return [self isKindOfClass:clazz];
 	}
 
+	-(BOOL)isInstanceOfObject:(id)obj {
+		return [self isInstanceOf:[obj class]];
+	}
+
 	/**************************************************************************************************//**
 	 * Created because the definition of isKindOf:(Class) and isMemberOf:(Class) is hard for me to
 	 * remember for some reason.
@@ -62,6 +64,10 @@ Class _commonBaseClass(Class c1, Class c2);
 	 ******************************************************************************************************/
 	-(BOOL)isExactInstanceOf:(Class)clazz {
 		return [self isMemberOfClass:clazz];
+	}
+
+	-(BOOL)isExactInstanceOfObject:(id)obj {
+		return [self isExactInstanceOf:[obj class]];
 	}
 
 	/**************************************************************************************************//**
@@ -89,7 +95,7 @@ Class _commonBaseClass1(Class c1, Class c2, Class c3) {
 	return (c1 ? (c2 ? ((c1 == c2) ? c1 : _commonBaseClass1(c1, class_getSuperclass(c2), c3)) : _commonBaseClass1(class_getSuperclass(c1), c3, c3)) : nil);
 }
 
-Class _commonBaseClass(Class c1, Class c2) {
+Class PGCommonBaseClass(Class c1, Class c2) {
 	return _commonBaseClass1(c1, c2, c2);
 }
 

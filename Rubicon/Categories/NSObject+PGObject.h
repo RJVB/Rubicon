@@ -27,6 +27,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+Class PGCommonBaseClass(Class c1, Class c2);
+
 @interface NSObject(PGObject)
 
 	/**************************************************************************************************//**
@@ -50,6 +52,8 @@
 	 ******************************************************************************************************/
 	-(BOOL)isInstanceOf:(Class)clazz;
 
+	-(BOOL)isInstanceOfObject:(id)obj;
+
 	/**************************************************************************************************//**
 	 * Created because the definition of isKindOf:(Class) and isMemberOf:(Class) is hard for me to
 	 * remember for some reason.
@@ -58,6 +62,8 @@
 	 * @return YES if this object is an instance of clazz.
 	 ******************************************************************************************************/
 	-(BOOL)isExactInstanceOf:(Class)clazz;
+
+	-(BOOL)isExactInstanceOfObject:(id)obj;
 
 	/**************************************************************************************************//**
 	 * Returns a default generic comparator that will make a best attempt at comparing this object with
