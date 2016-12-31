@@ -24,8 +24,8 @@
 #import "PGTools.h"
 
 NSBitmapImageRep *PGCreateARGBImage(CGFloat width, CGFloat height) {
-	NSInteger iWidth  = (NSInteger)(width + 0.9);
-	NSInteger iHeight = (NSInteger)(height + 0.9);
+	NSInteger iWidth  = (NSInteger)ceil(width);
+	NSInteger iHeight = (NSInteger)ceil(height);
 
 	return [[NSBitmapImageRep alloc]
 							  initWithBitmapDataPlanes:NULL

@@ -1,13 +1,12 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: NSString(PGString).h
+ *    FILENAME: PGSplitView.m
  *         IDE: AppCode
- *      AUTHOR:  Galen Rhodes
- *        DATE: 12/29/16 8:17 PM
- *  VISIBILITY: Private
+ *      AUTHOR: Galen Rhodes
+ *        DATE: 12/30/16 4:14 PM
  * DESCRIPTION:
  *
- * Copyright © 2016  Project Galen. All rights reserved.
+ * Copyright © 2016 Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,22 +21,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_NSString_PGString__H_
-#define __Rubicon_NSString_PGString__H_
+#import "PGSplitView.h"
 
-#import <Cocoa/Cocoa.h>
-#import <Rubicon/GNUstep.h>
-
-@interface NSString(PGString)
-
-	-(NSString *)trim;
-
-	-(void)drawDeadCentered:(NSRect)textRect fontName:(NSString *)fontName fontSize:(CGFloat)fontSize fontColor:(NSColor *)fontColor;
-
-	-(void)drawDeadCentered:(NSRect)textRect font:(NSFont *)font fontColor:(NSColor *)fontColor;
-
-	-(void)drawDeadCentered:(NSRect)textRect fontAttributes:(NSDictionary *)fontAttribs;
-
+@implementation PGSplitView {
+	}
 @end
-
-#endif // __Rubicon_NSString_PGString__H_

@@ -32,5 +32,6 @@ FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
 
 #import <Rubicon/GNUstep.h>
 #import <Rubicon/NSObject+PGObject.h>
+#import <Rubicon/NSString+PGString.h>
 #import <Rubicon/PGBinaryTreeKVNode.h>
 #import <Rubicon/PGBinaryTree.h>

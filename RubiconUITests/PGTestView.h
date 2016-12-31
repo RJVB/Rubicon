@@ -1,9 +1,9 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: NSString(PGString).h
+ *    FILENAME: PGTestView.h
  *         IDE: AppCode
  *      AUTHOR:  Galen Rhodes
- *        DATE: 12/29/16 8:17 PM
+ *        DATE: 12/30/16 1:35 PM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
@@ -22,22 +22,15 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_NSString_PGString__H_
-#define __Rubicon_NSString_PGString__H_
+#ifndef __Rubicon_PGTestView_H_
+#define __Rubicon_PGTestView_H_
 
 #import <Cocoa/Cocoa.h>
-#import <Rubicon/GNUstep.h>
 
-@interface NSString(PGString)
+@interface PGTestView : NSView
 
-	-(NSString *)trim;
-
-	-(void)drawDeadCentered:(NSRect)textRect fontName:(NSString *)fontName fontSize:(CGFloat)fontSize fontColor:(NSColor *)fontColor;
-
-	-(void)drawDeadCentered:(NSRect)textRect font:(NSFont *)font fontColor:(NSColor *)fontColor;
-
-	-(void)drawDeadCentered:(NSRect)textRect fontAttributes:(NSDictionary *)fontAttribs;
+	@property(nonatomic, assign) CGFloat fontSize;
 
 @end
 
-#endif // __Rubicon_NSString_PGString__H_
+#endif //__Rubicon_PGTestView_H_

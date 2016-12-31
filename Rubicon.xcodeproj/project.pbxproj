@@ -14,8 +14,11 @@
 		1117D32101E764CAA2DE0E6B /* GNUstep.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D3DD6898F2EDE30CA103 /* GNUstep.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D374C586597A78BFA654 /* CommonBaseClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D2C4AA253F903B9C6E4C /* CommonBaseClass.m */; };
 		1117D40BCD517465096C77BB /* PGBinaryTreeKVNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D6D84CB0A236722B9FED /* PGBinaryTreeKVNode.m */; };
+		1117D5134D391E189F84ABF3 /* PGTestView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D4FFD90ED7502EA2A871 /* PGTestView.m */; };
+		1117D5452A4357171D4A7F61 /* PGSplitView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D8D7FA877AB382169852 /* PGSplitView.m */; };
 		1117D58276E3E3D0D2B45BEC /* PGBinaryTreeLeaf.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D10A1BC019F5DABBFAC1 /* PGBinaryTreeLeaf.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D5CA09C8728AD73965A9 /* NSObject+PGObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D17716B981854614504A /* NSObject+PGObject.m */; };
+		1117D63E9D2E4D166A347214 /* NSString+PGString.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D82A3FCEF61B52811265 /* NSString+PGString.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D6E85E4673C780D1C3FF /* Rubicon.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DB4FEBB7782769750FB9 /* Rubicon.m */; };
 		1117D6F87144C1FE5099FB9D /* PGTools.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D53E8A1C9EBF660B3966 /* PGTools.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D75C55203D078131EBE1 /* PGTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D7F20554007299DA9626 /* PGTools.m */; };
@@ -23,17 +26,30 @@
 		1117D986A0EF6079D015C458 /* PGBinaryTreeNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DACEBD2AB185DF4D9C30 /* PGBinaryTreeNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117DA0455958C9AC0270447 /* CMakeLists.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1117DF142B39004BD5A5EB74 /* CMakeLists.txt */; };
 		1117DAA3D7CC2E0A4C768206 /* PGBinaryTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D901396108BF30F751E9 /* PGBinaryTree.m */; };
-		1117DBBE70B2F1D0AFCE0813 /* NSString+PGString.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D0903BA71BEB8EA0F955 /* NSString+PGString.m */; };
+		1117DD76914D702AFED62966 /* NSString+PGString.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D0903BA71BEB8EA0F955 /* NSString+PGString.m */; };
 		1117DE159EBB6098156AA0AC /* PGBinaryTreeKVNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D9CDCBCAF89573089F98 /* PGBinaryTreeKVNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117DE3C5833023308A20538 /* CMakeLists.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1117DB0549D6F46C7A61E94D /* CMakeLists.txt */; };
 		1117DF785F2B2CC69B0F73A4 /* PGBinaryTreeNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D20482A8727B50EB52E8 /* PGBinaryTreeNode.m */; };
 		1117DFF7B174C687488C51A8 /* NSObject+PGObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D14313B2B59A54127601 /* NSObject+PGObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		83B587761E16DC17009FEE50 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B587751E16DC17009FEE50 /* AppDelegate.m */; };
+		83B587791E16DC17009FEE50 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B587781E16DC17009FEE50 /* main.m */; };
+		83B5877B1E16DC17009FEE50 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83B5877A1E16DC17009FEE50 /* Assets.xcassets */; };
+		83B5877E1E16DC17009FEE50 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83B5877C1E16DC17009FEE50 /* MainMenu.xib */; };
+		83B587851E16DC48009FEE50 /* Rubicon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83CC448C1E0B037700DDE50D /* Rubicon.framework */; };
+		83B587881E16DE4A009FEE50 /* WindowDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B587871E16DE4A009FEE50 /* WindowDelegate.m */; };
 		83CC44961E0B037700DDE50D /* Rubicon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83CC448C1E0B037700DDE50D /* Rubicon.framework */; };
 		83CC449B1E0B037700DDE50D /* RubiconTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 83CC449A1E0B037700DDE50D /* RubiconTests.m */; };
 		83CC449D1E0B037700DDE50D /* Rubicon.h in Headers */ = {isa = PBXBuildFile; fileRef = 83CC448F1E0B037700DDE50D /* Rubicon.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		83B587831E16DC28009FEE50 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CC44831E0B037600DDE50D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 83CC448B1E0B037600DDE50D;
+			remoteInfo = Rubicon;
+		};
 		83CC44971E0B037700DDE50D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 83CC44831E0B037600DDE50D /* Project object */;
@@ -55,6 +71,7 @@
 		1117D3DD6898F2EDE30CA103 /* GNUstep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GNUstep.h; sourceTree = "<group>"; };
 		1117D4F5141FA28E3D53EF7F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.info; path = Info.plist; sourceTree = "<group>"; };
 		1117D4FD1350CA2BECAEBED3 /* PGBinaryTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBinaryTree.h; sourceTree = "<group>"; };
+		1117D4FFD90ED7502EA2A871 /* PGTestView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTestView.m; sourceTree = "<group>"; };
 		1117D53E8A1C9EBF660B3966 /* PGTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTools.h; sourceTree = "<group>"; };
 		1117D69BF8A568DE6BCF63C0 /* PGBinaryTreeLeaf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBinaryTreeLeaf.m; sourceTree = "<group>"; };
 		1117D6B32FC0E11216D8EC0B /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
@@ -63,15 +80,27 @@
 		1117D7595FEBE635E87E8D8D /* CommonBaseClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonBaseClass.h; sourceTree = "<group>"; };
 		1117D7F20554007299DA9626 /* PGTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTools.m; sourceTree = "<group>"; };
 		1117D82A3FCEF61B52811265 /* NSString+PGString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+PGString.h"; sourceTree = "<group>"; };
+		1117D8D7FA877AB382169852 /* PGSplitView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGSplitView.m; sourceTree = "<group>"; };
 		1117D901396108BF30F751E9 /* PGBinaryTree.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBinaryTree.m; sourceTree = "<group>"; };
 		1117D9CDCBCAF89573089F98 /* PGBinaryTreeKVNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBinaryTreeKVNode.h; sourceTree = "<group>"; };
 		1117DACEBD2AB185DF4D9C30 /* PGBinaryTreeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBinaryTreeNode.h; sourceTree = "<group>"; };
+		1117DADBF8762107CBC48012 /* PGTestView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTestView.h; sourceTree = "<group>"; };
 		1117DB0549D6F46C7A61E94D /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		1117DB4FEBB7782769750FB9 /* Rubicon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Rubicon.m; sourceTree = "<group>"; };
 		1117DBCB8D70DB67DE4B6825 /* fetch_and_config.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = fetch_and_config.sh; sourceTree = "<group>"; };
 		1117DCCC597057A2315B1AC8 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		1117DD0B79903344E5C7ABB4 /* PGSplitView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGSplitView.h; sourceTree = "<group>"; };
 		1117DE79E4A8E257C25DE703 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		1117DF142B39004BD5A5EB74 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		83B587721E16DC17009FEE50 /* RubiconUITests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RubiconUITests.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		83B587741E16DC17009FEE50 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		83B587751E16DC17009FEE50 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		83B587781E16DC17009FEE50 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		83B5877A1E16DC17009FEE50 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		83B5877D1E16DC17009FEE50 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		83B5877F1E16DC17009FEE50 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		83B587861E16DE4A009FEE50 /* WindowDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowDelegate.h; sourceTree = "<group>"; };
+		83B587871E16DE4A009FEE50 /* WindowDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WindowDelegate.m; sourceTree = "<group>"; };
 		83CC448C1E0B037700DDE50D /* Rubicon.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Rubicon.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		83CC448F1E0B037700DDE50D /* Rubicon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Rubicon.h; sourceTree = "<group>"; };
 		83CC44951E0B037700DDE50D /* RubiconTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RubiconTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -79,6 +108,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		83B5876F1E16DC16009FEE50 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				83B587851E16DC48009FEE50 /* Rubicon.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		83CC44881E0B037600DDE50D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -154,11 +191,39 @@
 			path = BinaryTree;
 			sourceTree = "<group>";
 		};
+		83B587731E16DC17009FEE50 /* RubiconUITests */ = {
+			isa = PBXGroup;
+			children = (
+				83B587741E16DC17009FEE50 /* AppDelegate.h */,
+				83B587751E16DC17009FEE50 /* AppDelegate.m */,
+				83B587861E16DE4A009FEE50 /* WindowDelegate.h */,
+				83B587871E16DE4A009FEE50 /* WindowDelegate.m */,
+				1117DADBF8762107CBC48012 /* PGTestView.h */,
+				1117D4FFD90ED7502EA2A871 /* PGTestView.m */,
+				83B5877A1E16DC17009FEE50 /* Assets.xcassets */,
+				83B5877C1E16DC17009FEE50 /* MainMenu.xib */,
+				83B5877F1E16DC17009FEE50 /* Info.plist */,
+				83B587771E16DC17009FEE50 /* Supporting Files */,
+				1117D8D7FA877AB382169852 /* PGSplitView.m */,
+				1117DD0B79903344E5C7ABB4 /* PGSplitView.h */,
+			);
+			path = RubiconUITests;
+			sourceTree = "<group>";
+		};
+		83B587771E16DC17009FEE50 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				83B587781E16DC17009FEE50 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		83CC44821E0B037600DDE50D = {
 			isa = PBXGroup;
 			children = (
 				83CC448E1E0B037700DDE50D /* Rubicon */,
 				83CC44991E0B037700DDE50D /* RubiconTests */,
+				83B587731E16DC17009FEE50 /* RubiconUITests */,
 				83CC448D1E0B037700DDE50D /* Products */,
 				1117DCDB154DA26365CAEF76 /* SupportingFiles */,
 			);
@@ -169,6 +234,7 @@
 			children = (
 				83CC448C1E0B037700DDE50D /* Rubicon.framework */,
 				83CC44951E0B037700DDE50D /* RubiconTests.xctest */,
+				83B587721E16DC17009FEE50 /* RubiconUITests.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -209,6 +275,7 @@
 				83CC449D1E0B037700DDE50D /* Rubicon.h in Headers */,
 				1117D32101E764CAA2DE0E6B /* GNUstep.h in Headers */,
 				1117D6F87144C1FE5099FB9D /* PGTools.h in Headers */,
+				1117D63E9D2E4D166A347214 /* NSString+PGString.h in Headers */,
 				1117DFF7B174C687488C51A8 /* NSObject+PGObject.h in Headers */,
 				1117D140C70D8958D54A7B7A /* PGBinaryTree.h in Headers */,
 				1117D58276E3E3D0D2B45BEC /* PGBinaryTreeLeaf.h in Headers */,
@@ -221,6 +288,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		83B587711E16DC16009FEE50 /* RubiconUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 83B587801E16DC17009FEE50 /* Build configuration list for PBXNativeTarget "RubiconUITests" */;
+			buildPhases = (
+				83B5876E1E16DC16009FEE50 /* Sources */,
+				83B5876F1E16DC16009FEE50 /* Frameworks */,
+				83B587701E16DC16009FEE50 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				83B587841E16DC28009FEE50 /* PBXTargetDependency */,
+			);
+			name = RubiconUITests;
+			productName = RubiconUITests;
+			productReference = 83B587721E16DC17009FEE50 /* RubiconUITests.app */;
+			productType = "com.apple.product-type.application";
+		};
 		83CC448B1E0B037600DDE50D /* Rubicon */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 83CC44A01E0B037700DDE50D /* Build configuration list for PBXNativeTarget "Rubicon" */;
@@ -266,6 +351,11 @@
 				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = "Project Galen";
 				TargetAttributes = {
+					83B587711E16DC16009FEE50 = {
+						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = Q5XWZ7S7E9;
+						ProvisioningStyle = Automatic;
+					};
 					83CC448B1E0B037600DDE50D = {
 						CreatedOnToolsVersion = 8.2;
 						DevelopmentTeam = Q5XWZ7S7E9;
@@ -284,6 +374,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 83CC44821E0B037600DDE50D;
 			productRefGroup = 83CC448D1E0B037700DDE50D /* Products */;
@@ -292,11 +383,21 @@
 			targets = (
 				83CC448B1E0B037600DDE50D /* Rubicon */,
 				83CC44941E0B037700DDE50D /* RubiconTests */,
+				83B587711E16DC16009FEE50 /* RubiconUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		83B587701E16DC16009FEE50 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				83B5877B1E16DC17009FEE50 /* Assets.xcassets in Resources */,
+				83B5877E1E16DC17009FEE50 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		83CC448A1E0B037600DDE50D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -317,6 +418,18 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		83B5876E1E16DC16009FEE50 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				83B587881E16DE4A009FEE50 /* WindowDelegate.m in Sources */,
+				83B587791E16DC17009FEE50 /* main.m in Sources */,
+				83B587761E16DC17009FEE50 /* AppDelegate.m in Sources */,
+				1117D5134D391E189F84ABF3 /* PGTestView.m in Sources */,
+				1117D5452A4357171D4A7F61 /* PGSplitView.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		83CC44871E0B037600DDE50D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -329,6 +442,7 @@
 				1117D40BCD517465096C77BB /* PGBinaryTreeKVNode.m in Sources */,
 				1117DAA3D7CC2E0A4C768206 /* PGBinaryTree.m in Sources */,
 				1117D75C55203D078131EBE1 /* PGTools.m in Sources */,
+				1117DD76914D702AFED62966 /* NSString+PGString.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -338,13 +452,17 @@
 			files = (
 				83CC449B1E0B037700DDE50D /* RubiconTests.m in Sources */,
 				1117D374C586597A78BFA654 /* CommonBaseClass.m in Sources */,
-				1117DBBE70B2F1D0AFCE0813 /* NSString+PGString.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		83B587841E16DC28009FEE50 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 83CC448B1E0B037600DDE50D /* Rubicon */;
+			targetProxy = 83B587831E16DC28009FEE50 /* PBXContainerItemProxy */;
+		};
 		83CC44981E0B037700DDE50D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 83CC448B1E0B037600DDE50D /* Rubicon */;
@@ -352,7 +470,44 @@
 		};
 /* End PBXTargetDependency section */
 
+/* Begin PBXVariantGroup section */
+		83B5877C1E16DC17009FEE50 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				83B5877D1E16DC17009FEE50 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
+		83B587811E16DC17009FEE50 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = Q5XWZ7S7E9;
+				INFOPLIST_FILE = RubiconUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.projectgalen.RubiconUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		83B587821E16DC17009FEE50 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = Q5XWZ7S7E9;
+				INFOPLIST_FILE = RubiconUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.projectgalen.RubiconUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		83CC449E1E0B037700DDE50D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -513,6 +668,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		83B587801E16DC17009FEE50 /* Build configuration list for PBXNativeTarget "RubiconUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				83B587811E16DC17009FEE50 /* Debug */,
+				83B587821E16DC17009FEE50 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		83CC44861E0B037600DDE50D /* Build configuration list for PBXProject "Rubicon" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

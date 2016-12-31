@@ -30,6 +30,19 @@
 		NSLog(@"Class %@ responds to \"compare:\": %@", NSStringFromClass([obj class]), @([obj respondsToSelector:@selector(compare:)]));
 	}
 
+	-(void)testAlertWindow {
+		NSApplication *app;  // Without these 2 lines, seg fault may occur
+		app = [NSApplication sharedApplication];
+
+		NSAlert *alert = [[NSAlert alloc] init];
+		[alert setMessageText:@"Hello alert"];
+		[alert addButtonWithTitle:@"All done"];
+		NSModalResponse result = [alert runModal];
+		if(result == NSAlertFirstButtonReturn) {
+			NSLog(@"First button pressed");
+		}
+	}
+
 	-(void)testSimpleWindow {
 		NSApplication *app = [NSApplication sharedApplication];
 
