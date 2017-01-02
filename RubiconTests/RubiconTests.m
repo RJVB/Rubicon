@@ -43,21 +43,6 @@
 		}
 	}
 
-	-(void)testSimpleWindow {
-		NSApplication *app = [NSApplication sharedApplication];
-
-		NSRect   frame   = NSMakeRect(0, 0, 200, 200);
-		NSWindow *window = [[NSWindow alloc] initWithContentRect:frame styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO];
-
-		XCTAssertNotNil(window, @"Window not created.");
-
-		[window setBackgroundColor:[NSColor blueColor]];
-		[window makeKeyAndOrderFront:NSApp];
-
-		struct timespec ts = { .tv_sec = 20, .tv_nsec = 0 };
-		nanosleep(&ts, NULL);
-	}
-
 	-(void)testFontCreation {
 		NSString *fontName = @".HelveticaNeueDeskInterface-MediumP4";
 		NSFont   *aFont    = [NSFont fontWithName:fontName size:12];

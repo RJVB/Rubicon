@@ -15,8 +15,7 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
             <connections>
-                <outlet property="slider" destination="KKC-Mk-yqR" id="xMf-md-aWr"/>
-                <outlet property="view" destination="4Gn-37-Ci7" id="j2w-iE-1tg"/>
+                <outlet property="view" destination="U1H-E5-sZD" id="gpV-je-eEC"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -89,31 +88,31 @@
                 <rect key="frame" x="0.0" y="0.0" width="942" height="455"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <splitView fixedFrame="YES" arrangesAllSubviews="NO" dividerStyle="thin" translatesAutoresizingMaskIntoConstraints="NO" id="LzQ-qm-WSW">
-                        <rect key="frame" x="0.0" y="0.0" width="942" height="455"/>
+                    <scrollView fixedFrame="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eVh-mM-sS9">
+                        <rect key="frame" x="-1" y="-1" width="944" height="457"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <customView fixedFrame="YES" id="4Gn-37-Ci7" customClass="PGTestView">
-                                <rect key="frame" x="0.0" y="0.0" width="942" height="432"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                            </customView>
-                            <slider verticalHuggingPriority="750" fixedFrame="YES" id="KKC-Mk-yqR">
-                                <rect key="frame" x="-2" y="433" width="946" height="24"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <sliderCell key="cell" continuous="YES" alignment="left" minValue="10" maxValue="70" doubleValue="40" tickMarkPosition="above" numberOfTickMarks="59" sliderType="linear" id="DVx-Fa-pjQ"/>
-                                <connections>
-                                    <action selector="sliderAction:" target="Voe-Tx-rLC" id="U0W-nn-utC"/>
-                                </connections>
-                            </slider>
-                        </subviews>
-                        <holdingPriorities>
-                            <real value="250"/>
-                            <real value="250"/>
-                        </holdingPriorities>
-                    </splitView>
+                        <clipView key="contentView" ambiguous="YES" id="vOH-4m-yem">
+                            <rect key="frame" x="1" y="1" width="927" height="440"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <view fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U1H-E5-sZD" customClass="PGNodeView">
+                                    <rect key="frame" x="0.0" y="0.0" width="912" height="425"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                </view>
+                            </subviews>
+                        </clipView>
+                        <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="iGl-a6-doH">
+                            <rect key="frame" x="1" y="441" width="927" height="15"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="8i9-Yc-iNt">
+                            <rect key="frame" x="928" y="1" width="15" height="440"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="82" y="84.5"/>
+            <point key="canvasLocation" x="132" y="94"/>
         </window>
     </objects>
 </document>

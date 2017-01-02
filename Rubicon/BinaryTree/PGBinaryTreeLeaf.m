@@ -24,6 +24,17 @@
 #import "PGBinaryTreeLeaf.h"
 #import "NSObject+PGObject.h"
 
+NSColor *_redNodeFillColor     = nil;
+NSColor *_redNodeStrokeColor   = nil;
+NSColor *_blackNodeFillColor   = nil;
+NSColor *_blackNodeStrokeColor = nil;
+NSColor *_redNodeFontColor     = nil;
+NSColor *_blackNodeFontColor   = nil;
+NSColor *_nodeShadowColor      = nil;
+NSColor *_childLineColor       = nil;
+
+NSShadow *_nodeShadow = nil;
+
 PGBinaryTreeLeaf *removeStep2(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL);
 
 void removeStep3(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL);
@@ -250,6 +261,171 @@ void removeStep3(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL);
 	-(BOOL)isEqualToLeaf:(PGBinaryTreeLeaf *)leaf { return (self == leaf); }
 
 	-(NSUInteger)hash { return super.hash; }
+
+	-(NSColor *)childLineColor {
+		@synchronized([self class]) {
+			if(_childLineColor == nil) {
+				_childLineColor = [NSColor colorWithCalibratedRed:0.419 green:0.32 blue:0.8 alpha:1];
+			}
+
+			return _childLineColor;
+		}
+	}
+
+	-(void)drawLeftChildLine:(NSRect)nodeRect {
+		if(self.left && !self.left.isLeaf) {
+			NSBezierPath *bezierPath = [NSBezierPath bezierPath];
+			NSRect       ovalRect    = [self nodeOvalRect:nodeRect];
+			// NSRect       cOvalRect   = NSMakeRect(0, 0, 0, 0);
+			NSPoint      point1      = NSMakePoint(NSMidX(ovalRect), NSMidY(ovalRect));   // Center of node / control point 1.
+			NSPoint      point2      = NSMakePoint(254, 276);   // Center of child node.
+			NSPoint      point3      = NSMakePoint(107.9, 201); // Control point 2.
+
+			[bezierPath moveToPoint:point1];
+			[bezierPath curveToPoint:point2 controlPoint1:point1 controlPoint2:point3];
+			[bezierPath setLineCapStyle:NSRoundLineCapStyle];
+			[bezierPath setLineJoinStyle:NSRoundLineJoinStyle];
+			[self.childLineColor setStroke];
+			[bezierPath setLineWidth:PGNodeLineWidth];
+			[bezierPath stroke];
+		}
+	}
+
+	-(void)drawNode:(NSRect)nodeRect {
+		NSRect rect = [self nodeOvalRect:nodeRect];
+
+		[NSGraphicsContext saveGraphicsState];
+		NSBezierPath *ovalPath = [self nodePath:rect];
+		[ovalPath fill];
+		[ovalPath stroke];
+		[NSGraphicsContext restoreGraphicsState];
+	}
+
+	-(NSBezierPath *)nodePath:(NSRect)rect {
+		NSBezierPath *ovalPath = [NSBezierPath bezierPathWithOvalInRect:rect];
+		[self.nodeShadow set];
+		[self.nodeFillColor setFill];
+		[self.nodeStrokeColor setStroke];
+		[ovalPath setLineWidth:PGNodeLineWidth];
+		return ovalPath;
+	}
+
+	-(NSRect)nodeOvalRect:(NSRect)containingRect {
+		CGFloat nx = (NSMidX(containingRect) - (PGNodeDiameter * 0.5) + (PGNodePadding * 0.5));
+		CGFloat ny = (NSMaxY(containingRect) - PGNodeDiameter + (PGNodePadding * 0.5));
+		return NSMakeRect(nx, ny, PGNodeDiameter - PGNodePadding, PGNodeDiameter - PGNodePadding);
+	}
+
+	-(NSShadow *)nodeShadow {
+		@synchronized([self class]) {
+			//// Shadow Declarations
+			if(_nodeShadow == nil) {
+				_nodeShadow = [[NSShadow alloc] init];
+				[_nodeShadow setShadowColor:[self nodeShadowColor]];
+				[_nodeShadow setShadowOffset:NSMakeSize(PGNodeShadowOffset, (0 - PGNodeShadowOffset))];
+				[_nodeShadow setShadowBlurRadius:PGNodeShadowBlurRadius];
+			}
+
+			return _nodeShadow;
+		}
+	}
+
+	-(NSColor *)nodeShadowColor {
+		@synchronized([self class]) {
+			if(_nodeShadowColor == nil) {
+				_nodeShadowColor = [NSColor colorWithCalibratedRed:0 green:0 blue:0 alpha:1];
+			}
+
+			return _nodeShadowColor;
+		}
+	}
+
+	-(NSColor *)redNodeFontColor {
+		@synchronized([self class]) {
+			if(_redNodeFontColor == nil) {
+				_redNodeFontColor = [NSColor colorWithCalibratedRed:1 green:1 blue:1 alpha:1];
+			}
+
+			return _redNodeFontColor;
+		}
+	}
+
+	-(NSColor *)blackNodeFontColor {
+		@synchronized([self class]) {
+			if(_blackNodeFontColor) {
+				_blackNodeFontColor = [NSColor colorWithCalibratedRed:1 green:1 blue:1 alpha:1];
+			}
+
+			return _blackNodeFontColor;
+		}
+	}
+
+	-(NSColor *)nodeFontColor {
+		return (self.isBlack ? self.blackNodeFontColor : self.redNodeFontColor);
+	}
+
+	-(NSColor *)redNodeStrokeColor {
+		@synchronized([self class]) {
+			if(_redNodeStrokeColor == nil) {
+				_redNodeStrokeColor = [NSColor colorWithCalibratedRed:0 green:0 blue:0 alpha:1];
+			}
+
+			return _redNodeStrokeColor;
+		}
+	}
+
+	-(NSColor *)blackNodeStrokeColor {
+		@synchronized([self class]) {
+			if(_blackNodeStrokeColor) {
+				_blackNodeStrokeColor = [NSColor colorWithCalibratedRed:0.976 green:1 blue:0.016 alpha:1];
+			}
+
+			return _blackNodeStrokeColor;
+		}
+	}
+
+	-(NSColor *)blackNodeFillColor {
+		@synchronized([self class]) {
+			if(_blackNodeFillColor == nil) {
+				_blackNodeFillColor = [NSColor colorWithCalibratedRed:0 green:0 blue:0 alpha:1];
+			}
+
+			return _blackNodeFillColor;
+		}
+	}
+
+	-(NSColor *)redNodeFillColor {
+		@synchronized([self class]) {
+			if(_redNodeFillColor == nil) {
+				_redNodeFillColor = [NSColor colorWithCalibratedRed:0.8 green:0.32 blue:0.32 alpha:1];
+			}
+
+			return _redNodeFillColor;
+		}
+	}
+
+	-(NSColor *)nodeFillColor {
+		return (self.isBlack ? self.blackNodeFillColor : self.redNodeFillColor);
+	}
+
+	-(NSColor *)nodeStrokeColor {
+		return (self.isBlack ? self.blackNodeStrokeColor : self.redNodeStrokeColor);
+	}
+
+	-(NSRect)nodeBounds {
+		return NSMakeRect(0, 0, 0, 0);
+	}
+
+	-(void)calculateBounds {
+	}
+
+	-(NSRect)calculateBoundsWithX:(CGFloat)x Y:(CGFloat)y {
+		return NSMakeRect(0, 0, 0, 0);
+	}
+
+	-(NSUInteger)depth {
+		return (self.isLeaf ? 0 : (1 + MAX(self.left.depth, self.right.depth)));
+	}
 
 @end
 

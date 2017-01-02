@@ -1,13 +1,13 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: Rubicon.h
+ *    FILENAME: PGISize.h
  *         IDE: AppCode
- *      AUTHOR: Galen Rhodes
- *        DATE: 12/21/16 3:19 PM
- *  VISIBILITY: Public
+ *      AUTHOR:  Galen Rhodes
+ *        DATE: 1/1/17 1:26 PM
+ *  VISIBILITY: Private
  * DESCRIPTION:
  *
- * Copyright © 2016 Galen Rhodes All rights reserved.
+ * Copyright © 2017  Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,25 +22,34 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
+#ifndef __Rubicon_PGISize_H_
+#define __Rubicon_PGISize_H_
+
 #import <Cocoa/Cocoa.h>
 
-//! Project version number for Rubicon.
-FOUNDATION_EXPORT double RubiconVersionNumber;
+@interface PGISize : NSObject<NSCopying>
 
-//! Project version string for Rubicon.
-FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
+	@property(nonatomic, readonly) NSInteger width;
+	@property(nonatomic, readonly) NSInteger height;
 
-#import <Rubicon/GNUstep.h>
-#import <Rubicon/PGTools.h>
-#import <Rubicon/PGTime.h>
-#import <Rubicon/NSObject+PGObject.h>
-#import <Rubicon/NSString+PGString.h>
-#import <Rubicon/PGBinaryTreeKVNode.h>
-#import <Rubicon/PGBinaryTree.h>
-#import <Rubicon/PGIPoint.h>
-#import <Rubicon/PGISize.h>
-#import <Rubicon/PGIRect.h>
-#import <Rubicon/PGPoint.h>
-#import <Rubicon/PGSize.h>
-#import <Rubicon/PGRect.h>
-#import <Rubicon/PGDivideRectResults.h>
+	-(instancetype)initWithWidth:(NSInteger)width height:(NSInteger)height;
+
+	+(instancetype)sizeWithNSSize:(NSSize)size;
+
+	-(id)copyWithZone:(NSZone *)zone;
+
+	-(NSString *)description;
+
+	-(BOOL)isEqual:(id)other;
+
+	-(BOOL)isEqualToSize:(PGISize *)size;
+
+	-(NSUInteger)hash;
+
+	-(NSSize)toNSSize;
+
+	+(instancetype)sizeWithWidth:(NSInteger)width height:(NSInteger)height;
+
+@end
+
+#endif //__Rubicon_PGISize_H_

@@ -7,15 +7,13 @@
 //
 
 #import "AppDelegate.h"
-#import "PGTestView.h"
+#import "PGNodeView.h"
 
 @interface AppDelegate()
 
 	@property(weak) IBOutlet NSWindow   *window;
-	@property(weak) IBOutlet PGTestView *view;
+	@property(weak) IBOutlet PGNodeView *view;
 	@property(weak) IBOutlet NSSlider   *slider;
-
-	-(IBAction)sliderAction:(id)sender;
 
 @end
 
@@ -24,19 +22,16 @@
 
 	@synthesize window = _window;
 	@synthesize view = _view;
-	@synthesize slider = _slider;
-
-	-(IBAction)sliderAction:(id)sender {
-		self.view.fontSize     = self.slider.doubleValue;
-		self.view.needsDisplay = YES;
-	}
 
 	-(void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-		self.slider.integerValue = (NSInteger)self.view.fontSize;
 	}
 
 	-(void)applicationWillTerminate:(NSNotification *)aNotification {
 		// Insert code here to tear down your application
+	}
+
+	-(BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
+		return YES;
 	}
 
 @end

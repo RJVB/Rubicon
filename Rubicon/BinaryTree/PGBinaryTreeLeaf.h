@@ -27,6 +27,12 @@
 
 #import <Rubicon/GNUstep.h>
 
+#define PGNodeDiameter         ((CGFloat)(100))
+#define PGNodeShadowBlurRadius ((CGFloat)(10))
+#define PGNodeShadowOffset     ((CGFloat)(4.1))
+#define PGNodeLineWidth        ((CGFloat)(2))
+#define PGNodePadding          ((CGFloat)(10))
+
 @interface PGBinaryTreeLeaf : NSObject
 
 	@property(nonatomic, retain) id               value;
@@ -46,6 +52,8 @@
 	@property(nonatomic, readonly) BOOL             isRight;
 	@property(nonatomic, readonly) BOOL             isLeaf;
 	@property(nonatomic, readonly) NSUInteger       count;
+	@property(nonatomic, readonly) NSUInteger depth;
+	@property(nonatomic, readonly) NSRect     nodeBounds;
 
 	-(instancetype)init;
 
@@ -76,6 +84,8 @@
 	-(BOOL)isEqualToLeaf:(PGBinaryTreeLeaf *)leaf;
 
 	-(NSUInteger)hash;
+
+	-(void)calculateBounds;
 
 @end
 

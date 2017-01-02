@@ -40,11 +40,19 @@
 				fontAttribs = [NSDictionary dictionaryWithDictionary:dict];
 			}
 
+#if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 101200)
 			style.alignment = NSCenterTextAlignment;
+#else
+			style.alignment = NSTextAlignmentCenter;
+#endif
 		}
 		else {
 			NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
+#if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 101200)
 			style.alignment = NSCenterTextAlignment;
+#else
+			style.alignment = NSTextAlignmentCenter;
+#endif
 			fontAttribs = @{
 					NSFontAttributeName           :[NSFont systemFontOfSize:13], // Font
 					NSForegroundColorAttributeName:[NSColor blackColor],         // Color
@@ -76,12 +84,17 @@
 	-(void)_drawDeadCentered:(NSRect)textRect fontAttribs:(NSDictionary *)fontAttribs {
 		NSFont  *textFont  = fontAttribs[NSFontAttributeName];
 		CGFloat textHeight = ceil(NSHeight([self boundingRectWithSize:textRect.size options:NSStringDrawingUsesLineFragmentOrigin attributes:fontAttribs]));
-		NSRect  textRect2  = NSMakeRect(NSMinX(textRect), ceil(NSMinY(textRect) + (NSHeight(textRect) - textHeight) / 2), NSWidth(textRect), textHeight);
-		NSRect  textRect3  = NSOffsetRect(textRect2, 0, ceil(0 - textFont.descender - (textFont.ascender - textFont.capHeight) / 2.0));
+		NSRect textRect2 = NSMakeRect(NSMinX(textRect), ceil(NSMinY(textRect) + (NSHeight(textRect) - textHeight) / 2), NSWidth(textRect), textHeight);
+		double offset    = ceil(0 - textFont.descender - (textFont.ascender - textFont.capHeight) / 2.0);
 
 		[NSGraphicsContext saveGraphicsState];
+
+		if([NSGraphicsContext currentContext].isFlipped) {
+			offset *= -1;
+		}
+
 		NSRectClip(textRect);
-		[self drawInRect:textRect3 withAttributes:fontAttribs];
+		[self drawInRect:NSOffsetRect(textRect2, 0, offset) withAttributes:fontAttribs];
 		[NSGraphicsContext restoreGraphicsState];
 	}
 
