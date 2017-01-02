@@ -33,6 +33,8 @@
 
 	@property(nonatomic, readonly) CGFloat x;
 	@property(nonatomic, readonly) CGFloat y;
+	@property(nonatomic, readonly) CGFloat angle;
+	@property(nonatomic, readonly) CGFloat magnitude;
 
 	-(instancetype)initWithX:(CGFloat)x Y:(CGFloat)y;
 
@@ -45,6 +47,8 @@
 	+(instancetype)pointWithPGIPoint:(PGIPoint *)point;
 
 	+(instancetype)pointWithNSPoint:(NSPoint)point;
+
+	+(instancetype)pointWithAngle:(CGFloat)angle magnitude:(CGFloat)magnitude;
 
 	-(NSPoint)toNSPoint;
 

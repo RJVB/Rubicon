@@ -62,6 +62,27 @@
 		return [(PGPoint *)[self alloc] initWithNSPoint:point];
 	}
 
+	+(instancetype)pointWithAngle:(CGFloat)angle magnitude:(CGFloat)magnitude {
+		CGFloat x, y;
+#if defined(__APPLE__)
+		__sincos(angle, &y, &x);
+#elif defined(LINUX)
+		sincos(angle, &y, &x);
+#else
+		x = cos(angle);
+		y = sin(angle);
+#endif
+		return [(PGPoint *)[self alloc] initWithX:(magnitude * x) Y:(magnitude * y)];
+	}
+
+	-(CGFloat)angle {
+		return atan2(self.y, self.x);
+	}
+
+	-(CGFloat)magnitude {
+		return sqrt((self.x * self.x) + (self.y * self.y));
+	}
+
 	-(NSPoint)toNSPoint {
 		return NSMakePoint(self.x, self.y);
 	}
