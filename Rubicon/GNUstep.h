@@ -27,40 +27,74 @@
 
 #import <Cocoa/Cocoa.h>
 
-#ifndef FOUNDATION_EXTERN
+#import <sys/cdefs.h>
+#import <sys/types.h>
+#import <stddef.h>
+#import <stdint.h>
+#import <stdbool.h>
+#import <stdarg.h>
+#import <unistd.h>
+#import <fcntl.h>
+#import <errno.h>
+#import <string.h>
+#import <time.h>
+
+#ifndef PG_ARC
+	#if defined(__has_feature) && __has_feature(objc_arc)
+		#define PG_ARC 1
+	#else
+		#define PG_ARC 0
+	#endif
+#endif
+
+/* @formatter:off */
+#ifdef __GNUSTEP_RUNTIME__
+	#if PG_ARC && !defined(OS_OBJECT_USE_OBJC_RETAIN_RELEASE)
+		#define OS_OBJECT_USE_OBJC_RETAIN_RELEASE 0
+	#endif
+
 	#if defined(__cplusplus)
 		#define FOUNDATION_EXTERN extern "C"
 	#else
 		#define FOUNDATION_EXTERN extern
 	#endif
-#endif
 
-#ifndef NS_INLINE
-	#if defined(__GNUC__)
-		#define NS_INLINE static __inline__ __attribute__((always_inline))
-	#elif defined(__MWERKS__) || defined(__cplusplus)
-		#define NS_INLINE static inline
-	#elif defined(_MSC_VER)
-		#define NS_INLINE static __inline
-	#elif TARGET_OS_WIN32
-		#define NS_INLINE static __inline__
+	#if !defined(NS_INLINE)
+		#if defined(__GNUC__)
+			#define NS_INLINE static __inline__ __attribute__((always_inline))
+		#elif defined(__MWERKS__) || defined(__cplusplus)
+			#define NS_INLINE static inline
+		#elif defined(_MSC_VER)
+			#define NS_INLINE static __inline
+		#elif TARGET_OS_WIN32
+			#define NS_INLINE static __inline__
+		#endif
+	#endif
+
+	#ifndef OS_INLINE
+		#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+			#define OS_INLINE static inline
+		#else
+			#define OS_INLINE static __inline__
+		#endif
+	#endif
+
+	#ifndef NS_DESIGNATED_INITIALIZER
+		#if __has_attribute(objc_designated_initializer)
+			#define NS_DESIGNATED_INITIALIZER __attribute__((objc_designated_initializer))
+		#else
+			#define NS_DESIGNATED_INITIALIZER
+		#endif
+	#endif
+
+	#ifndef FOUNDATION_STATIC_INLINE
+		#define FOUNDATION_STATIC_INLINE static __inline__
+	#endif
+
+	#ifndef FOUNDATION_EXTERN_INLINE
+		#define FOUNDATION_EXTERN_INLINE extern __inline__
 	#endif
 #endif
-
-#ifndef FOUNDATION_STATIC_INLINE
-	#define FOUNDATION_STATIC_INLINE static __inline__
-#endif
-
-#ifndef FOUNDATION_EXTERN_INLINE
-	#define FOUNDATION_EXTERN_INLINE extern __inline__
-#endif
-
-#ifndef OS_INLINE
-	#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-		#define OS_INLINE static inline
-	#else
-		#define OS_INLINE static __inline__
-	#endif
-#endif
+/* @formatter:on */
 
 #endif //__Rubicon_GNUstep_H_
