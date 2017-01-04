@@ -72,7 +72,7 @@
 
 	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key withComparator:(NSComparator)comparator;
 
-	-(void)remove;
+	-(PGBinaryTreeLeaf *)remove;
 
 	-(void)clearNode;
 

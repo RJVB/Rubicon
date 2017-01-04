@@ -25,13 +25,14 @@
 #import "NSObject+PGObject.h"
 #import "NSString+PGString.h"
 
-#define PGNodeDiameter         ((CGFloat)(100))
-#define PGNodeShadowBlurRadius ((CGFloat)(10))
-#define PGNodeShadowOffset     ((CGFloat)(4.1))
-#define PGNodeLineWidth        ((CGFloat)(2))
-#define PGNodePadding          ((CGFloat)(10))
-#define PGNodeFontSize         ((CGFloat)(40))
-#define PGNodeFontName         @"AmericanTypewriter-Light"
+#define PGNodeDiameter         ((CGFloat)(60))
+#define PGNodeShadowBlurRadius ((CGFloat)(3))
+#define PGNodeShadowOffset     ((CGFloat)(2))
+#define PGNodeLineWidth        ((CGFloat)(1))
+#define PGNodePadding          ((CGFloat)(6))
+#define PGNodeFontSize         ((CGFloat)(12))
+// #define PGNodeFontName         @"AmericanTypewriter-Light"
+#define PGNodeFontName         @"ArialNarrow"
 
 NSColor *_redNodeFillColor     = nil;
 NSColor *_redNodeStrokeColor   = nil;
@@ -66,6 +67,10 @@ NSShadow *_nodeShadow = nil;
 
 	-(instancetype)farLeft {
 		return (self.isLeaf ? self.parent : self.left.farLeft);
+	}
+
+	-(instancetype)farRight {
+		return (self.isLeaf ? self.parent : self.right.farRight);
 	}
 
 	-(instancetype)child:(BOOL)left {
@@ -222,6 +227,9 @@ NSShadow *_nodeShadow = nil;
 		}
 	}
 
+	-(void)recount {
+	}
+
 	-(NSUInteger)count {
 		return (self.isLeaf ? 0 : (1 + self.left.count + self.right.count));
 	}
@@ -340,7 +348,7 @@ NSShadow *_nodeShadow = nil;
 		return [self insertValue:value forKey:key withComparator:[NSObject defaultComparator]];
 	}
 
-	-(void)remove {
+	-(PGBinaryTreeLeaf *)remove {
 		PGBinaryTreeLeaf *childL = self.left;
 		PGBinaryTreeLeaf *childR = self.right;
 		BOOL             leafL   = childL.isLeaf;
@@ -362,12 +370,14 @@ NSShadow *_nodeShadow = nil;
 
 			[nodeP setChild:nodeC onLeft:isL];
 			[self clearNode];
+			return (nodeP ? nodeP.root : (nodeC ? (nodeC.isLeaf ? nil : nodeC.root) : nil));
 		}
 		else {
-			PGBinaryTreeLeaf *successor = childR.farLeft;
+			NSUInteger       ss         = (self.root.count % 2);
+			PGBinaryTreeLeaf *successor = (ss ? childR.farLeft : childL.farRight);
 			self.key   = successor.key;
 			self.value = successor.value;
-			[successor remove];
+			return [successor remove];
 		}
 	}
 

@@ -41,7 +41,6 @@
 		NSString *aKey = self.textField.stringValue;
 
 		if(aKey.trim.length) {
-			NSLog(@"Insert Text: %@", aKey);
 			PGBinaryTreeLeaf *node = self.view.rootNode;
 
 			if(node) {
@@ -53,6 +52,7 @@
 				self.view.rootNode = [[PGBinaryTreeKVNode alloc] initWithValue:aKey forKey:aKey];
 			}
 
+			NSLog(@"Insert Text: %@; count = %@", aKey, @(self.view.rootNode.root.count));
 			self.textField.stringValue = @"";
 		}
 	}
@@ -61,19 +61,17 @@
 		NSString *key = self.textField.stringValue;
 
 		if(key.trim.length) {
-			NSLog(@"Remove Text: %@", key);
 
 			PGBinaryTreeLeaf *node = [self.view.rootNode find:key withComparator:^NSComparisonResult(id obj1, id obj2) {
 				return [(NSString *)obj1 compare:(NSString *)obj2];
 			}];
 
 			if(node && !node.isLeaf) {
-				PGBinaryTreeLeaf *n = (node.parent ? node.parent : (node.left.isLeaf ? node.right : node.left));
-				[node remove];
-				n = n.root;
-				self.view.rootNode = (n.isLeaf ? nil : n);
+				NSLog(@"Removing node %@", node);
+				self.view.rootNode = [node remove];
 			}
 
+			NSLog(@"Remove Text: %@; count = %@", key, @(self.view.rootNode.root.count));
 			self.textField.stringValue = @"";
 		}
 	}

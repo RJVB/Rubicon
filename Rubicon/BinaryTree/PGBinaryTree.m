@@ -68,10 +68,8 @@
 			return NSOrderedSame;
 		}];
 
-		if(node) {
-			PGBinaryTreeLeaf *z = (node.parent ? node.parent : (node.left.isLeaf ? node.right : node.left));
-			[node remove];
-			_root = (z.isLeaf ? nil : [z root]);
+		if(node && !node.isLeaf) {
+			_root = [node remove];
 		}
 	}
 
