@@ -37,34 +37,19 @@
 		NSRect nframe = self.minimumFrame;
 		NSRect aframe = self.superview.frame;
 		NSRect pframe = NSOffsetRect(aframe, 0 - NSMinX(aframe), 0 - NSMinY(aframe));
-		NSRect dframe = NSMakeRect(0, 0, MAX(NSWidth(nframe), NSWidth(pframe)), MAX(NSHeight(nframe), NSHeight(pframe)));
-
-		NSLog(@"pframe = %@", NSStringFromRect(pframe));
-		NSLog(@"nframe = %@", NSStringFromRect(nframe));
-		NSLog(@"---------------------------------------------------------");
-		NSLog(@"dframe = %@", NSStringFromRect(dframe));
-		NSLog(@"=========================================================");
-
-		return dframe;
+		return NSMakeRect(0, 0, MAX(NSWidth(nframe), NSWidth(pframe)), MAX(NSHeight(nframe), NSHeight(pframe)));
 	}
 
 	-(void)setRootNode:(PGBinaryTreeLeaf *)rootNode {
 		_rootNode = rootNode;
-
-		if(_rootNode) {
-			[self setFrame:self.desiredFrame];
-		}
-
+		if(_rootNode) [self setFrame:self.desiredFrame];
 		self.needsDisplay = YES;
 	}
 
 	-(void)setFrame:(NSRect)frame {
 		if(self.rootNode) {
 			NSRect dframe = self.desiredFrame;
-
-			if(!NSContainsRect(frame, dframe)) {
-				frame = dframe;
-			}
+			if(!NSContainsRect(frame, dframe)) frame = dframe;
 		}
 
 		[super setFrame:frame];
