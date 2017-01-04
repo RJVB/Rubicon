@@ -27,16 +27,13 @@
 
 #import <Rubicon/GNUstep.h>
 
-#define PGNodeDiameter         ((CGFloat)(100))
-#define PGNodeShadowBlurRadius ((CGFloat)(10))
-#define PGNodeShadowOffset     ((CGFloat)(4.1))
-#define PGNodeLineWidth        ((CGFloat)(2))
-#define PGNodePadding          ((CGFloat)(10))
+@class PGSize;
+@class PGRect;
 
 @interface PGBinaryTreeLeaf : NSObject
 
 	@property(nonatomic, retain) id               value;
-	@property(nonatomic, retain) id               key;
+	@property(nonatomic, copy) id key;
 	@property(nonatomic, assign) BOOL             isRed;
 	@property(nonatomic, assign) BOOL             isBlack;
 	@property(nonatomic, retain) PGBinaryTreeLeaf *parent;
@@ -52,12 +49,14 @@
 	@property(nonatomic, readonly) BOOL             isRight;
 	@property(nonatomic, readonly) BOOL             isLeaf;
 	@property(nonatomic, readonly) NSUInteger       count;
-	@property(nonatomic, readonly) NSUInteger depth;
-	@property(nonatomic, readonly) NSRect     nodeBounds;
 
 	-(instancetype)init;
 
 	-(instancetype)initWithValue:(id)value forKey:(id<NSCopying>)key;
+
+	-(NSString *)shortDescription;
+
+	-(NSString *)description;
 
 	-(void)rotateLeft;
 
@@ -77,15 +76,15 @@
 
 	-(void)clearNode;
 
-	-(void)draw;
+	-(void)draw:(NSRect)clipRect;
+
+	-(NSSize)drawSize;
 
 	-(BOOL)isEqual:(id)other;
 
 	-(BOOL)isEqualToLeaf:(PGBinaryTreeLeaf *)leaf;
 
 	-(NSUInteger)hash;
-
-	-(void)calculateBounds;
 
 @end
 

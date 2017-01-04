@@ -10,5 +10,9 @@
 
 @interface AppDelegate : NSObject<NSApplicationDelegate>
 
+	-(IBAction)insertText:(id)sender;
+
+	-(IBAction)removeText:(id)sender;
+
 @end
 

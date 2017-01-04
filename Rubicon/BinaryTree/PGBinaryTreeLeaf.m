@@ -23,6 +23,15 @@
 
 #import "PGBinaryTreeLeaf.h"
 #import "NSObject+PGObject.h"
+#import "NSString+PGString.h"
+
+#define PGNodeDiameter         ((CGFloat)(100))
+#define PGNodeShadowBlurRadius ((CGFloat)(10))
+#define PGNodeShadowOffset     ((CGFloat)(4.1))
+#define PGNodeLineWidth        ((CGFloat)(2))
+#define PGNodePadding          ((CGFloat)(10))
+#define PGNodeFontSize         ((CGFloat)(40))
+#define PGNodeFontName         @"AmericanTypewriter-Light"
 
 NSColor *_redNodeFillColor     = nil;
 NSColor *_redNodeStrokeColor   = nil;
@@ -35,16 +44,14 @@ NSColor *_childLineColor       = nil;
 
 NSShadow *_nodeShadow = nil;
 
-PGBinaryTreeLeaf *removeStep2(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL);
-
-void removeStep3(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL);
-
 @implementation PGBinaryTreeLeaf {
 	}
 
 	@synthesize parent = _parent;
 
-	-(instancetype)init { return (self = [self initWithValue:nil forKey:nil]); }
+	-(instancetype)init {
+		return (self = [self initWithValue:nil forKey:nil]);
+	}
 
 	-(instancetype)initWithValue:(id)value forKey:(id<NSCopying>)key {
 		self = [super init];
@@ -57,12 +64,19 @@ void removeStep3(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL);
 		return self;
 	}
 
-	-(instancetype)farLeft { return (self.isLeaf ? self.parent : self.left.farLeft); }
+	-(instancetype)farLeft {
+		return (self.isLeaf ? self.parent : self.left.farLeft);
+	}
 
-	-(instancetype)child:(BOOL)left { return (left ? self.left : self.right); }
+	-(instancetype)child:(BOOL)left {
+		return (left ? self.left : self.right);
+	}
 
 	-(instancetype)_find:(id)key withComparator:(NSComparator)comparator {
-		if(self.isLeaf || self.key == key) {
+		if(self.isLeaf) {
+			return self;
+		}
+		else if(self.key == key) {
 			return self;
 		}
 		else if(comparator) {
@@ -83,7 +97,7 @@ void removeStep3(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL);
 
 	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key withReferenceNode:(PGBinaryTreeLeaf *)n {
 		if(n.isLeaf) {
-			PGBinaryTreeLeaf *c = [(PGBinaryTreeLeaf *)[[self class] alloc] initWithValue:value forKey:key];
+			PGBinaryTreeLeaf *c = [(PGBinaryTreeLeaf *)[[n.parent class] alloc] initWithValue:value forKey:key];
 			[n.parent setChild:c onLeft:n.isLeft];
 			[c setIsRed:YES];
 			[c insertStep1];
@@ -93,6 +107,38 @@ void removeStep3(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL);
 			n.value = value;
 			return n;
 		}
+	}
+
+	-(NSString *)shortDescription {
+		return [self description:NO];
+	}
+
+	-(NSString *)description {
+		return [self description:YES];
+	}
+
+	-(NSString *)description:(BOOL)full {
+		NSMutableString *str = [NSMutableString stringWithFormat:@"%@ {", NSStringFromClass([self class])];
+
+		if(self.isLeaf) {
+			[str appendString:@" leaf = YES;"];
+		}
+		else {
+			[str appendFormat:@" key = \"%@\";", self.key];
+
+			if(full) {
+				if(self.parent) {
+					[str appendFormat:@" root: NO; parentKey = \"%@\";", self.parent.key];
+				}
+				else {
+					[str appendString:@" root: YES;"];
+				}
+
+				[str appendFormat:@" left = %@; right = %@;", self.left.shortDescription, self.right.shortDescription];
+			}
+		}
+
+		return [str stringByAppendingString:@" }"];
 	}
 
 	-(void)insertStep1 {
@@ -131,56 +177,137 @@ void removeStep3(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL);
 		PGBinaryTreeLeaf *nodeP = self.parent;
 
 		if(nodeP) {
-			BOOL isL = self.isLeft;
-			removeStep3(nodeP, removeStep2(nodeP, self.sibling, isL), isL);
+			BOOL             isL    = (self == nodeP.left);
+			PGBinaryTreeLeaf *nodeS = (isL ? nodeP.right : nodeP.left);
+
+			if(nodeS.isRed) {
+				nodeP.isRed   = YES;
+				nodeS.isBlack = YES;
+				[nodeP rotate:isL];
+				nodeS = (isL ? nodeP.right : nodeP.left);
+			}
+
+			if(nodeS.isBlack && nodeS.left.isBlack && nodeS.right.isBlack) {
+				nodeS.isRed = YES;
+				if(nodeP.isBlack) [nodeP removeStep1]; else nodeP.isBlack = YES;
+			}
+			else {
+				if(nodeS.isBlack) {
+					if(isL) {
+						if(nodeS.right.isBlack) {
+							nodeS.isRed = nodeS.left.isBlack = YES;
+							[nodeS rotateRight];
+							nodeS = nodeP.right;
+						}
+					}
+					else if(nodeS.left.isBlack) {
+						nodeS.isRed = nodeS.right.isBlack = YES;
+						[nodeS rotateLeft];
+						nodeS = nodeP.left;
+					}
+				}
+
+				nodeS.isBlack = nodeP.isBlack;
+				nodeP.isBlack = YES;
+
+				if(isL) {
+					nodeS.right.isBlack = YES;
+					[nodeP rotateLeft];
+				}
+				else {
+					nodeS.left.isBlack = YES;
+					[nodeP rotateRight];
+				}
+			}
 		}
 	}
 
-	-(NSUInteger)count { return (self.isLeaf ? 0 : (1 + self.left.count + self.right.count)); }
+	-(NSUInteger)count {
+		return (self.isLeaf ? 0 : (1 + self.left.count + self.right.count));
+	}
 
-	-(PGBinaryTreeLeaf *)root { return (self.isRoot ? self : self.parent.root); }
+	-(PGBinaryTreeLeaf *)root {
+		return (self.isRoot ? self : self.parent.root);
+	}
 
-	-(PGBinaryTreeLeaf *)grandparent { return self.parent.parent; }
+	-(PGBinaryTreeLeaf *)grandparent {
+		return self.parent.parent;
+	}
 
-	-(PGBinaryTreeLeaf *)uncle { return self.parent.sibling; }
+	-(PGBinaryTreeLeaf *)uncle {
+		return self.parent.sibling;
+	}
 
-	-(PGBinaryTreeLeaf *)sibling { return (self.isLeft ? self.parent.right : (self.isRight ? self.parent.left : nil)); }
+	-(PGBinaryTreeLeaf *)sibling {
+		return (self.isLeft ? self.parent.right : (self.isRight ? self.parent.left : nil));
+	}
 
-	-(BOOL)isRoot { return (self.parent == nil); }
+	-(BOOL)isRoot {
+		return (self.parent == nil);
+	}
 
-	-(BOOL)isLeft { return (self == self.parent.left); }
+	-(BOOL)isLeft {
+		return (self == self.parent.left);
+	}
 
-	-(BOOL)isRight { return (self == self.parent.right); }
+	-(BOOL)isRight {
+		return (self == self.parent.right);
+	}
 
-	-(BOOL)isRed { return NO; }
+	-(BOOL)isRed {
+		return NO;
+	}
 
-	-(void)setIsRed:(BOOL)isRed {}
+	-(void)setIsRed:(BOOL)isRed {
+	}
 
-	-(BOOL)isBlack { return !self.isRed; }
+	-(BOOL)isBlack {
+		return !self.isRed;
+	}
 
-	-(void)setIsBlack:(BOOL)isBlack { self.isRed = !isBlack; }
+	-(void)setIsBlack:(BOOL)isBlack {
+		self.isRed = !isBlack;
+	}
 
-	-(BOOL)isLeaf { return YES; }
+	-(BOOL)isLeaf {
+		return YES;
+	}
 
-	-(id)value { return nil; }
+	-(id)value {
+		return nil;
+	}
 
-	-(void)setValue:(id)value {}
+	-(void)setValue:(id)value {
+	}
 
-	-(id)key { return nil; }
+	-(id)key {
+		return nil;
+	}
 
-	-(void)setKey:(id<NSCopying>)key {}
+	-(void)setKey:(id<NSCopying>)key {
+	}
 
-	-(PGBinaryTreeLeaf *)left { return nil; }
+	-(PGBinaryTreeLeaf *)left {
+		return nil;
+	}
 
-	-(void)setLeft:(PGBinaryTreeLeaf *)left {}
+	-(void)setLeft:(PGBinaryTreeLeaf *)left {
+	}
 
-	-(PGBinaryTreeLeaf *)right { return nil; }
+	-(PGBinaryTreeLeaf *)right {
+		return nil;
+	}
 
-	-(void)setRight:(PGBinaryTreeLeaf *)right {}
+	-(void)setRight:(PGBinaryTreeLeaf *)right {
+	}
 
-	-(void)setChild:(PGBinaryTreeLeaf *)child onLeft:(BOOL)onLeft { if(onLeft) self.left = child; else self.right = child; }
+	-(void)setChild:(PGBinaryTreeLeaf *)child onLeft:(BOOL)onLeft {
+		if(onLeft) self.left = child; else self.right = child;
+	}
 
-	-(void)rotate:(BOOL)left { if(left) [self rotateLeft]; else [self rotateRight]; }
+	-(void)rotate:(BOOL)left {
+		if(left) [self rotateLeft]; else [self rotateRight];
+	}
 
 	-(void)rotateLeft {
 		PGBinaryTreeLeaf *nodeD = self.right;
@@ -224,7 +351,15 @@ void removeStep3(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL);
 			PGBinaryTreeLeaf *nodeC = (leafL ? childR : childL);
 			BOOL             isL    = (self == nodeP.left);
 
-			if(self.isBlack) { if(nodeC.isBlack) [self removeStep1]; else nodeC.isBlack = YES; }
+			if(self.isBlack) {
+				if(nodeC.isBlack) {
+					[self removeStep1];
+				}
+				else {
+					nodeC.isBlack = YES;
+				}
+			}
+
 			[nodeP setChild:nodeC onLeft:isL];
 			[self clearNode];
 		}
@@ -244,8 +379,6 @@ void removeStep3(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL);
 		self.left   = nil;
 	}
 
-	-(void)draw {}
-
 	-(PGBinaryTreeLeaf *)makeOrphan {
 		if(self.isRight) self.parent.right = nil; else if(self.isLeft) self.parent.left = nil;
 		return self;
@@ -256,69 +389,119 @@ void removeStep3(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL);
 		return self;
 	}
 
-	-(BOOL)isEqual:(id)other { return (other && ((self == other) || ([other isInstanceOfObject:self] && [self isEqualToLeaf:(PGBinaryTreeLeaf *)other]))); }
+	-(BOOL)isEqual:(id)other {
+		return (other && ((self == other) || ([other isInstanceOfObject:self] && [self isEqualToLeaf:(PGBinaryTreeLeaf *)other])));
+	}
 
-	-(BOOL)isEqualToLeaf:(PGBinaryTreeLeaf *)leaf { return (self == leaf); }
+	-(BOOL)isEqualToLeaf:(PGBinaryTreeLeaf *)leaf {
+		return (self == leaf);
+	}
 
-	-(NSUInteger)hash { return super.hash; }
+	-(NSUInteger)hash {
+		return super.hash;
+	}
 
-	-(NSColor *)childLineColor {
-		@synchronized([self class]) {
-			if(_childLineColor == nil) {
-				_childLineColor = [NSColor colorWithCalibratedRed:0.419 green:0.32 blue:0.8 alpha:1];
+	-(void)resetSize {
+		[self.parent resetSize];
+	}
+
+	-(void)draw:(NSRect)clipRect {
+		if(self.parent) {
+			[self.parent draw:clipRect];
+		}
+		else {
+			NSSize neededSize = self.drawSize;
+			NSRect neededRect = NSMakeRect(0, 0, neededSize.width, neededSize.height);
+			[self draw:neededRect clip:clipRect parentCenter:NSZeroPoint];
+		}
+	}
+
+	-(void)draw:(NSRect)rect clip:(NSRect)clip parentCenter:(NSPoint)pCenter {
+		if(!self.isLeaf) {
+			NSSize  lSize = self.left.drawSize;
+			NSSize  rSize = self.right.drawSize;
+			CGFloat ch    = MAX(lSize.height, rSize.height);
+			CGFloat hd    = (PGNodeDiameter * (CGFloat)0.5);
+			CGFloat hp    = (PGNodePadding * (CGFloat)0.5);
+			CGFloat od    = (PGNodeDiameter - PGNodePadding);
+			CGFloat ny    = NSMinY(rect);
+			CGFloat cy    = (ny + PGNodeDiameter);
+
+			NSRect  lRect   = NSMakeRect(NSMinX(rect), cy, MAX(lSize.width, hd), ch);
+			NSRect  rRect   = NSMakeRect(NSMaxX(lRect), cy, MAX(rSize.width, hd), ch);
+			NSRect  nRect   = NSMakeRect(NSMaxX(lRect) - hd + hp, ny + hp, od, od);
+			NSPoint nCenter = NSMakePoint(NSMidX(nRect), NSMidY(nRect));
+
+			[self.left draw:lRect clip:clip parentCenter:nCenter];
+			[self.right draw:rRect clip:clip parentCenter:nCenter];
+
+			if(self.parent) {
+				[self drawChildCurve:pCenter childCenter:nCenter];
 			}
 
-			return _childLineColor;
+			[self drawNodeOval:nRect];
 		}
 	}
 
-	-(void)drawLeftChildLine:(NSRect)nodeRect {
-		if(self.left && !self.left.isLeaf) {
-			NSBezierPath *bezierPath = [NSBezierPath bezierPath];
-			NSRect       ovalRect    = [self nodeOvalRect:nodeRect];
-			// NSRect       cOvalRect   = NSMakeRect(0, 0, 0, 0);
-			NSPoint      point1      = NSMakePoint(NSMidX(ovalRect), NSMidY(ovalRect));   // Center of node / control point 1.
-			NSPoint      point2      = NSMakePoint(254, 276);   // Center of child node.
-			NSPoint      point3      = NSMakePoint(107.9, 201); // Control point 2.
-
-			[bezierPath moveToPoint:point1];
-			[bezierPath curveToPoint:point2 controlPoint1:point1 controlPoint2:point3];
-			[bezierPath setLineCapStyle:NSRoundLineCapStyle];
-			[bezierPath setLineJoinStyle:NSRoundLineJoinStyle];
-			[self.childLineColor setStroke];
-			[bezierPath setLineWidth:PGNodeLineWidth];
-			[bezierPath stroke];
-		}
-	}
-
-	-(void)drawNode:(NSRect)nodeRect {
-		NSRect rect = [self nodeOvalRect:nodeRect];
-
+	-(void)drawNodeOval:(NSRect)rect {
 		[NSGraphicsContext saveGraphicsState];
-		NSBezierPath *ovalPath = [self nodePath:rect];
-		[ovalPath fill];
-		[ovalPath stroke];
-		[NSGraphicsContext restoreGraphicsState];
-	}
-
-	-(NSBezierPath *)nodePath:(NSRect)rect {
-		NSBezierPath *ovalPath = [NSBezierPath bezierPathWithOvalInRect:rect];
+		NSBezierPath *path = [NSBezierPath bezierPathWithOvalInRect:rect];
 		[self.nodeShadow set];
 		[self.nodeFillColor setFill];
 		[self.nodeStrokeColor setStroke];
-		[ovalPath setLineWidth:PGNodeLineWidth];
-		return ovalPath;
+		[path setLineWidth:PGNodeLineWidth];
+		[path fill];
+		[path stroke];
+		[NSGraphicsContext restoreGraphicsState];
+		[self.key drawDeadCentered:rect fontName:PGNodeFontName fontSize:PGNodeFontSize fontColor:self.nodeFontColor];
 	}
 
-	-(NSRect)nodeOvalRect:(NSRect)containingRect {
-		CGFloat nx = (NSMidX(containingRect) - (PGNodeDiameter * 0.5) + (PGNodePadding * 0.5));
-		CGFloat ny = (NSMaxY(containingRect) - PGNodeDiameter + (PGNodePadding * 0.5));
-		return NSMakeRect(nx, ny, PGNodeDiameter - PGNodePadding, PGNodeDiameter - PGNodePadding);
+	-(void)drawChildCurve:(NSPoint)pCenter childCenter:(NSPoint)cCenter {
+		if(self.parent) {
+			NSBezierPath *path = [NSBezierPath bezierPath];
+			[path moveToPoint:pCenter];
+			[path curveToPoint:cCenter controlPoint1:pCenter controlPoint2:NSMakePoint(cCenter.x, pCenter.y)];
+			[path setLineCapStyle:NSRoundLineCapStyle];
+			[path setLineJoinStyle:NSRoundLineJoinStyle];
+			[self.childLineColor setStroke];
+			[path setLineWidth:PGNodeLineWidth];
+			[path stroke];
+		}
+	}
+
+	-(NSRect)nodeOvalRect:(NSRect)rect {
+		CGFloat hp = (PGNodePadding * 0.5);
+		CGFloat aw = (PGNodeDiameter - PGNodePadding);
+		CGFloat nx = (NSMidX(rect) - (PGNodeDiameter * 0.5) + hp);
+		CGFloat ny = (NSMinY(rect) + hp);
+		return NSMakeRect(nx, ny, aw, aw);
+	}
+
+	-(NSSize)drawSize {
+		if(self.isLeaf) {
+			return NSZeroSize;
+		}
+		else {
+			NSSize  leftSize  = self.left.drawSize;
+			NSSize  rightSize = self.right.drawSize;
+			CGFloat width     = PGNodeDiameter;
+			CGFloat height    = (PGNodeDiameter + MAX(leftSize.height, rightSize.height));
+			CGFloat halfWidth = (PGNodeDiameter * (CGFloat)0.5);
+
+			if(leftSize.width > 0) {
+				width = ((width - halfWidth) + leftSize.width);
+			}
+
+			if(rightSize.width > 0) {
+				width = ((width - halfWidth) + rightSize.width);
+			}
+
+			return NSMakeSize(width, height);
+		}
 	}
 
 	-(NSShadow *)nodeShadow {
 		@synchronized([self class]) {
-			//// Shadow Declarations
 			if(_nodeShadow == nil) {
 				_nodeShadow = [[NSShadow alloc] init];
 				[_nodeShadow setShadowColor:[self nodeShadowColor]];
@@ -352,16 +535,12 @@ void removeStep3(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL);
 
 	-(NSColor *)blackNodeFontColor {
 		@synchronized([self class]) {
-			if(_blackNodeFontColor) {
+			if(_blackNodeFontColor == nil) {
 				_blackNodeFontColor = [NSColor colorWithCalibratedRed:1 green:1 blue:1 alpha:1];
 			}
 
 			return _blackNodeFontColor;
 		}
-	}
-
-	-(NSColor *)nodeFontColor {
-		return (self.isBlack ? self.blackNodeFontColor : self.redNodeFontColor);
 	}
 
 	-(NSColor *)redNodeStrokeColor {
@@ -376,7 +555,7 @@ void removeStep3(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL);
 
 	-(NSColor *)blackNodeStrokeColor {
 		@synchronized([self class]) {
-			if(_blackNodeStrokeColor) {
+			if(_blackNodeStrokeColor == nil) {
 				_blackNodeStrokeColor = [NSColor colorWithCalibratedRed:0.976 green:1 blue:0.016 alpha:1];
 			}
 
@@ -404,6 +583,10 @@ void removeStep3(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL);
 		}
 	}
 
+	-(NSColor *)nodeFontColor {
+		return (self.isBlack ? self.blackNodeFontColor : self.redNodeFontColor);
+	}
+
 	-(NSColor *)nodeFillColor {
 		return (self.isBlack ? self.blackNodeFillColor : self.redNodeFillColor);
 	}
@@ -412,58 +595,15 @@ void removeStep3(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL);
 		return (self.isBlack ? self.blackNodeStrokeColor : self.redNodeStrokeColor);
 	}
 
-	-(NSRect)nodeBounds {
-		return NSMakeRect(0, 0, 0, 0);
-	}
+	-(NSColor *)childLineColor {
+		@synchronized([self class]) {
+			if(_childLineColor == nil) {
+				_childLineColor = [NSColor colorWithCalibratedRed:0.419 green:0.32 blue:0.8 alpha:1];
+			}
 
-	-(void)calculateBounds {
-	}
-
-	-(NSRect)calculateBoundsWithX:(CGFloat)x Y:(CGFloat)y {
-		return NSMakeRect(0, 0, 0, 0);
-	}
-
-	-(NSUInteger)depth {
-		return (self.isLeaf ? 0 : (1 + MAX(self.left.depth, self.right.depth)));
+			return _childLineColor;
+		}
 	}
 
 @end
 
-void removeStep5(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL, BOOL isR) {
-	nodeS.isRed   = nodeP.isRed;
-	nodeP.isBlack = [nodeS child:isR].isBlack = YES;
-	[nodeP rotate:isL];
-}
-
-PGBinaryTreeLeaf *removeStep4(PGBinaryTreeLeaf *nodeS, BOOL isL, BOOL isR) {
-	if([nodeS child:isR].isBlack) {
-		nodeS.isRed = [nodeS child:isL].isBlack = YES;
-		[nodeS rotate:isR];
-		return nodeS.parent;
-	}
-	else {
-		return nodeS;
-	}
-}
-
-void removeStep3(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL) {
-	if(nodeS.right.isBlack && nodeS.left.isBlack) {
-		nodeS.isRed = YES;
-		if(nodeP.isRed) [nodeP removeStep1]; else nodeP.isBlack = YES;
-	}
-	else {
-		BOOL isR = !isL;
-		removeStep5(nodeP, removeStep4(nodeS, isL, isR), isL, isR);
-	}
-}
-
-PGBinaryTreeLeaf *removeStep2(PGBinaryTreeLeaf *nodeP, PGBinaryTreeLeaf *nodeS, BOOL isL) {
-	if(nodeS.isRed) {
-		nodeP.isRed = nodeS.isBlack = YES;
-		[nodeP rotate:isL];
-		return (isL ? nodeP.right : nodeP.left);
-	}
-	else {
-		return nodeS;
-	}
-}

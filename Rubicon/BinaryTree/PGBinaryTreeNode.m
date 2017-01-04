@@ -29,6 +29,8 @@
 
 	-(PGBinaryTreeLeaf *)adoptMe:(PGBinaryTreeLeaf *)newParent;
 
+	-(void)resetSize;
+
 @end
 
 @implementation PGBinaryTreeNode {
@@ -36,6 +38,8 @@
 		NSUInteger _count;
 		PGBinaryTreeLeaf *_left;
 		PGBinaryTreeLeaf *_right;
+		NSSize     _desiredSize;
+		BOOL       _desiredSizeDirty;
 	}
 
 	-(instancetype)initWithValue:(id)value forKey:(id<NSCopying>)key {
@@ -45,7 +49,9 @@
 			self.isRed = NO;
 			self.left  = [[PGBinaryTreeLeaf alloc] init];
 			self.right = [[PGBinaryTreeLeaf alloc] init];
-			_count = 0;
+			_count            = 0;
+			_desiredSize      = NSZeroSize;
+			_desiredSizeDirty = YES;
 		}
 
 		return self;
@@ -71,12 +77,30 @@
 		return _right;
 	}
 
+	-(NSSize)drawSize {
+		@synchronized(self) {
+			if(_desiredSizeDirty) {
+				_desiredSize      = [super drawSize];
+				_desiredSizeDirty = NO;
+			}
+
+			return _desiredSize;
+		}
+	}
+
+	-(void)resetSize {
+		_desiredSizeDirty = YES;
+		_desiredSize      = NSZeroSize;
+		[super resetSize];
+	}
+
 	-(void)setLeft:(PGBinaryTreeLeaf *)child {
 		if(_left != child) {
 			_count -= _left.count;
 			_left.parent = nil;
 			_left = [child adoptMe:self];
 			_count += _left.count;
+			[self resetSize];
 		}
 	}
 
@@ -86,6 +110,7 @@
 			_right.parent = nil;
 			_right = [child adoptMe:self];
 			_count += _right.count;
+			[self resetSize];
 		}
 	}
 

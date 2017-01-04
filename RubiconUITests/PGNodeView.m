@@ -27,32 +27,46 @@
 	}
 
 	@synthesize rootNode = _rootNode;
-	@synthesize minimumFrame = _minimumFrame;
 
-	-(instancetype)initWithFrame:(NSRect)frameRect {
-		self = [super initWithFrame:frameRect];
+	-(NSRect)minimumFrame {
+		NSSize size = (_rootNode ? _rootNode.drawSize : NSZeroSize);
+		return NSMakeRect(0, 0, (size.width + 20.0), (size.height + 20.0));
+	}
 
-		if(self) {
-			_minimumFrame = frameRect;
-		}
+	-(NSRect)desiredFrame {
+		NSRect nframe = self.minimumFrame;
+		NSRect aframe = self.superview.frame;
+		NSRect pframe = NSOffsetRect(aframe, 0 - NSMinX(aframe), 0 - NSMinY(aframe));
+		NSRect dframe = NSMakeRect(0, 0, MAX(NSWidth(nframe), NSWidth(pframe)), MAX(NSHeight(nframe), NSHeight(pframe)));
 
-		return self;
+		NSLog(@"pframe = %@", NSStringFromRect(pframe));
+		NSLog(@"nframe = %@", NSStringFromRect(nframe));
+		NSLog(@"---------------------------------------------------------");
+		NSLog(@"dframe = %@", NSStringFromRect(dframe));
+		NSLog(@"=========================================================");
+
+		return dframe;
 	}
 
 	-(void)setRootNode:(PGBinaryTreeLeaf *)rootNode {
 		_rootNode = rootNode;
 
 		if(_rootNode) {
-			[super setFrame:NSMakeRect(0, 0, 1000, 1000)];
+			[self setFrame:self.desiredFrame];
 		}
+
+		self.needsDisplay = YES;
 	}
 
 	-(void)setFrame:(NSRect)frame {
 		if(self.rootNode) {
-			frame.size = NSMakeSize(1000, 1000);
+			NSRect dframe = self.desiredFrame;
+
+			if(!NSContainsRect(frame, dframe)) {
+				frame = dframe;
+			}
 		}
 
-		NSLog(@"setFrame:%@", NSStringFromRect(frame));
 		[super setFrame:frame];
 	}
 
@@ -65,6 +79,7 @@
 		[NSBezierPath fillRect:dirtyRect];
 
 		if(self.rootNode) {
+			[self.rootNode draw:self.frame];
 		}
 		else {
 			[@"Nothing to show" drawDeadCentered:dirtyRect fontName:@"AmericanTypewriter-Light" fontSize:18 fontColor:[NSColor blackColor]];
