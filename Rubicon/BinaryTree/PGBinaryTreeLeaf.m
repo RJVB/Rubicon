@@ -281,6 +281,10 @@ NSShadow *_nodeShadow = nil;
 		return YES;
 	}
 
+	-(BOOL)isNode {
+		return !self.isLeaf;
+	}
+
 	-(id)value {
 		return nil;
 	}
@@ -415,6 +419,28 @@ NSShadow *_nodeShadow = nil;
 		[self.parent resetSize];
 	}
 
+	-(instancetype)nextNode {
+		PGBinaryTreeLeaf *nodeP = self.parent;
+
+		if(nodeP && (self == nodeP.left)) {
+			PGBinaryTreeLeaf *nodeS = nodeP.right;
+			return ((nodeS && nodeS.isNode) ? nodeS.farLeft : nodeP);
+		}
+
+		return nil;
+	}
+
+	-(instancetype)prevNode {
+		PGBinaryTreeLeaf *nodeP = self.parent;
+
+		if(nodeP && (self == nodeP.right)) {
+			PGBinaryTreeLeaf *nodeS = nodeP.left;
+			return ((nodeS && nodeS.isNode) ? nodeS.farRight : nodeP);
+		}
+
+		return nil;
+	}
+
 	-(void)draw:(NSRect)clipRect {
 		if(self.parent) {
 			[self.parent draw:clipRect];
@@ -427,7 +453,7 @@ NSShadow *_nodeShadow = nil;
 	}
 
 	-(void)draw:(NSRect)rect clip:(NSRect)clip parentCenter:(NSPoint)pCenter {
-		if(!self.isLeaf) {
+		if(self.isNode) {
 			NSSize  lSize = self.left.drawSize;
 			NSSize  rSize = self.right.drawSize;
 			CGFloat ch    = MAX(lSize.height, rSize.height);

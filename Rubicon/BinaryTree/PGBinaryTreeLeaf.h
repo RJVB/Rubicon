@@ -62,6 +62,8 @@
 
 	-(void)rotateRight;
 
+	-(BOOL)isNode;
+
 	-(void)rotate:(BOOL)left;
 
 	-(instancetype)find:(id)key;

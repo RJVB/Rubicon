@@ -31,6 +31,10 @@
 
 	-(void)resetSize;
 
+	-(instancetype)nextNode;
+
+	-(instancetype)prevNode;
+
 	-(void)recount;
 
 @end

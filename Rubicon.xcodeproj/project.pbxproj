@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		1117D0A959B4E0DAC27E52D2 /* PGDivideRectResults.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D5F57701D8A864D425E3 /* PGDivideRectResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D0BDCACC742C18E53BE1 /* PGTime.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D30F56E7C1E34332F7AB /* PGTime.m */; };
-		1117D140C70D8958D54A7B7A /* PGBinaryTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D4FD1350CA2BECAEBED3 /* PGBinaryTree.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1117D140C70D8958D54A7B7A /* PGBinaryTreeDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D4FD1350CA2BECAEBED3 /* PGBinaryTreeDictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D1743DC5EF45CA9869B1 /* PGTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D08BDB7E4A79C30AC920 /* PGTools.m */; };
 		1117D17BAC406C2DEE3810BD /* PGBinaryTreeKeyNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D2B421790811B6AE0ED9 /* PGBinaryTreeKeyNode.m */; };
 		1117D23DDA179F6759CC86AF /* fetch_and_config.sh in Resources */ = {isa = PBXBuildFile; fileRef = 1117DBCB8D70DB67DE4B6825 /* fetch_and_config.sh */; };
@@ -20,6 +20,7 @@
 		1117D40BCD517465096C77BB /* PGBinaryTreeKVNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D6D84CB0A236722B9FED /* PGBinaryTreeKVNode.m */; };
 		1117D4109F53C3E5910994B6 /* PGISize.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DB10E1A25B61C00409B9 /* PGISize.m */; };
 		1117D43A0D1A8FC2E08604C8 /* GNUstep.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D613575E1934C599AC49 /* GNUstep.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1117D4E1BF4F48CAB542887A /* NSMutableDictionary+PGBinaryTreeDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DEC87AF841DB78526D39 /* NSMutableDictionary+PGBinaryTreeDictionary.m */; };
 		1117D4FEF6BF1FC0C3AF0E94 /* PGISize.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D562C23312ACC707F226 /* PGISize.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D5134D391E189F84ABF3 /* PGTestView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D4FFD90ED7502EA2A871 /* PGTestView.m */; };
 		1117D5452A4357171D4A7F61 /* PGSplitView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D8D7FA877AB382169852 /* PGSplitView.m */; };
@@ -35,11 +36,12 @@
 		1117D986A0EF6079D015C458 /* PGBinaryTreeNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DACEBD2AB185DF4D9C30 /* PGBinaryTreeNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D9DFDF93B2CB454EADB4 /* PGIPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D5A8AB2C58EA8AA21131 /* PGIPoint.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117DA0455958C9AC0270447 /* CMakeLists.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1117DF142B39004BD5A5EB74 /* CMakeLists.txt */; };
-		1117DAA3D7CC2E0A4C768206 /* PGBinaryTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D901396108BF30F751E9 /* PGBinaryTree.m */; };
+		1117DAA3D7CC2E0A4C768206 /* PGBinaryTreeDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D901396108BF30F751E9 /* PGBinaryTreeDictionary.m */; };
 		1117DC141CAC8DD9C559C676 /* PGIRect.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DC99A8066B8D7D7F5BBE /* PGIRect.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117DC5053953DDC561F1BAE /* PGIPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DB02C47FD456329DEF4D /* PGIPoint.m */; };
 		1117DCA22CAFA3F2375069BE /* PGRect.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D5102C222D0380448EAC /* PGRect.m */; };
 		1117DCD8E7DE63B6AAFA6C5C /* PGRect.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DE21E661B8F4387EA8F5 /* PGRect.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1117DD6D2AE66C8435687D67 /* NSMutableDictionary+PGBinaryTreeDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DB1F284C58C383A2A869 /* NSMutableDictionary+PGBinaryTreeDictionary.h */; };
 		1117DD76914D702AFED62966 /* NSString+PGString.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D0903BA71BEB8EA0F955 /* NSString+PGString.m */; };
 		1117DD7B85513CF3195F4953 /* PGDivideRectResults.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D46DABCEB24C472DB8D9 /* PGDivideRectResults.m */; };
 		1117DE159EBB6098156AA0AC /* PGBinaryTreeKVNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D9CDCBCAF89573089F98 /* PGBinaryTreeKVNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -92,7 +94,7 @@
 		1117D3C2D6F21016997CC7A7 /* PGNodeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGNodeView.m; sourceTree = "<group>"; };
 		1117D46DABCEB24C472DB8D9 /* PGDivideRectResults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDivideRectResults.m; sourceTree = "<group>"; };
 		1117D4F5141FA28E3D53EF7F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.info; path = Info.plist; sourceTree = "<group>"; };
-		1117D4FD1350CA2BECAEBED3 /* PGBinaryTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBinaryTree.h; sourceTree = "<group>"; };
+		1117D4FD1350CA2BECAEBED3 /* PGBinaryTreeDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBinaryTreeDictionary.h; sourceTree = "<group>"; };
 		1117D4FFD90ED7502EA2A871 /* PGTestView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTestView.m; sourceTree = "<group>"; };
 		1117D5102C222D0380448EAC /* PGRect.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGRect.m; sourceTree = "<group>"; };
 		1117D562C23312ACC707F226 /* PGISize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGISize.h; sourceTree = "<group>"; };
@@ -110,7 +112,7 @@
 		1117D8D6E9DF2BD0472EB655 /* PGSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGSize.h; sourceTree = "<group>"; };
 		1117D8D7FA877AB382169852 /* PGSplitView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGSplitView.m; sourceTree = "<group>"; };
 		1117D8DAB9EA6F96191C2EC0 /* PGNodeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGNodeView.h; sourceTree = "<group>"; };
-		1117D901396108BF30F751E9 /* PGBinaryTree.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBinaryTree.m; sourceTree = "<group>"; };
+		1117D901396108BF30F751E9 /* PGBinaryTreeDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBinaryTreeDictionary.m; sourceTree = "<group>"; };
 		1117D96AC9AAF96394E7BA36 /* PGTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTools.h; sourceTree = "<group>"; };
 		1117D9CDCBCAF89573089F98 /* PGBinaryTreeKVNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBinaryTreeKVNode.h; sourceTree = "<group>"; };
 		1117DACEBD2AB185DF4D9C30 /* PGBinaryTreeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBinaryTreeNode.h; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 		1117DB02C47FD456329DEF4D /* PGIPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGIPoint.m; sourceTree = "<group>"; };
 		1117DB0549D6F46C7A61E94D /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		1117DB10E1A25B61C00409B9 /* PGISize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGISize.m; sourceTree = "<group>"; };
+		1117DB1F284C58C383A2A869 /* NSMutableDictionary+PGBinaryTreeDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableDictionary+PGBinaryTreeDictionary.h"; sourceTree = "<group>"; };
 		1117DB4FEBB7782769750FB9 /* Rubicon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Rubicon.m; sourceTree = "<group>"; };
 		1117DBCB8D70DB67DE4B6825 /* fetch_and_config.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = fetch_and_config.sh; sourceTree = "<group>"; };
 		1117DC99A8066B8D7D7F5BBE /* PGIRect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGIRect.h; sourceTree = "<group>"; };
@@ -126,6 +129,7 @@
 		1117DE21E661B8F4387EA8F5 /* PGRect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGRect.h; sourceTree = "<group>"; };
 		1117DE4B3295D1558CFF389D /* PGIRect.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGIRect.m; sourceTree = "<group>"; };
 		1117DE79E4A8E257C25DE703 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		1117DEC87AF841DB78526D39 /* NSMutableDictionary+PGBinaryTreeDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableDictionary+PGBinaryTreeDictionary.m"; sourceTree = "<group>"; };
 		1117DF142B39004BD5A5EB74 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		83B587721E16DC17009FEE50 /* RubiconUITests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RubiconUITests.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		83B587741E16DC17009FEE50 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -197,6 +201,8 @@
 				1117D17716B981854614504A /* NSObject+PGObject.m */,
 				1117D0903BA71BEB8EA0F955 /* NSString+PGString.m */,
 				1117D82A3FCEF61B52811265 /* NSString+PGString.h */,
+				1117DEC87AF841DB78526D39 /* NSMutableDictionary+PGBinaryTreeDictionary.m */,
+				1117DB1F284C58C383A2A869 /* NSMutableDictionary+PGBinaryTreeDictionary.h */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -245,8 +251,8 @@
 				1117D0858C01386AF5B54B6A /* PGBinaryTreeKeyNode.h */,
 				1117D6D84CB0A236722B9FED /* PGBinaryTreeKVNode.m */,
 				1117D9CDCBCAF89573089F98 /* PGBinaryTreeKVNode.h */,
-				1117D901396108BF30F751E9 /* PGBinaryTree.m */,
-				1117D4FD1350CA2BECAEBED3 /* PGBinaryTree.h */,
+				1117D901396108BF30F751E9 /* PGBinaryTreeDictionary.m */,
+				1117D4FD1350CA2BECAEBED3 /* PGBinaryTreeDictionary.h */,
 			);
 			path = BinaryTree;
 			sourceTree = "<group>";
@@ -352,7 +358,7 @@
 				83CC449D1E0B037700DDE50D /* Rubicon.h in Headers */,
 				1117D63E9D2E4D166A347214 /* NSString+PGString.h in Headers */,
 				1117DFF7B174C687488C51A8 /* NSObject+PGObject.h in Headers */,
-				1117D140C70D8958D54A7B7A /* PGBinaryTree.h in Headers */,
+				1117D140C70D8958D54A7B7A /* PGBinaryTreeDictionary.h in Headers */,
 				1117D58276E3E3D0D2B45BEC /* PGBinaryTreeLeaf.h in Headers */,
 				1117D986A0EF6079D015C458 /* PGBinaryTreeNode.h in Headers */,
 				1117D25574B6B804D25B64F3 /* PGBinaryTreeKeyNode.h in Headers */,
@@ -367,6 +373,7 @@
 				1117D43A0D1A8FC2E08604C8 /* GNUstep.h in Headers */,
 				1117DF39AE5A963DD7174B91 /* PGTime.h in Headers */,
 				1117DE54512876B454A00C72 /* PGTools.h in Headers */,
+				1117DD6D2AE66C8435687D67 /* NSMutableDictionary+PGBinaryTreeDictionary.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -526,7 +533,7 @@
 				1117DF785F2B2CC69B0F73A4 /* PGBinaryTreeNode.m in Sources */,
 				1117D17BAC406C2DEE3810BD /* PGBinaryTreeKeyNode.m in Sources */,
 				1117D40BCD517465096C77BB /* PGBinaryTreeKVNode.m in Sources */,
-				1117DAA3D7CC2E0A4C768206 /* PGBinaryTree.m in Sources */,
+				1117DAA3D7CC2E0A4C768206 /* PGBinaryTreeDictionary.m in Sources */,
 				1117DD76914D702AFED62966 /* NSString+PGString.m in Sources */,
 				1117DC5053953DDC561F1BAE /* PGIPoint.m in Sources */,
 				1117D4109F53C3E5910994B6 /* PGISize.m in Sources */,
@@ -537,6 +544,7 @@
 				1117DD7B85513CF3195F4953 /* PGDivideRectResults.m in Sources */,
 				1117D0BDCACC742C18E53BE1 /* PGTime.m in Sources */,
 				1117D1743DC5EF45CA9869B1 /* PGTools.m in Sources */,
+				1117D4E1BF4F48CAB542887A /* NSMutableDictionary+PGBinaryTreeDictionary.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

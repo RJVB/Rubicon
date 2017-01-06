@@ -28,21 +28,25 @@
 #import <Cocoa/Cocoa.h>
 #import <Rubicon/GNUstep.h>
 
-@interface PGBinaryTree : NSObject
+@interface PGBinaryTreeDictionary : NSMutableDictionary
 
-	@property(nonatomic, readonly) NSUInteger         count;
 	@property(nonatomic, copy, readonly) NSComparator comparator;
 
 	-(instancetype)init;
 
 	-(instancetype)initWithComparator:(NSComparator)comparator;
 
-	-(void)addValue:(id)value forKey:(id<NSCopying>)key;
+	-(NSEnumerator *)keyEnumerator;
 
-	-(id)valueForKey:(id)key;
+	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt;
 
-	-(void)removeValueForKey:(id)key;
+	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt comparator:(NSComparator)comparator;
 
+	-(void)setObject:(id)anObject forKey:(id<NSCopying>)aKey;
+
+	-(id)objectForKey:(id)aKey;
+
+	-(void)removeObjectForKey:(id)aKey;
 @end
 
 #endif //__Rubicon_PGBinaryTree_H_
