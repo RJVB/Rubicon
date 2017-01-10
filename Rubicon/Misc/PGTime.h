@@ -25,7 +25,7 @@
 #ifndef __Rubicon_PGTime_H_
 #define __Rubicon_PGTime_H_
 
-#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGDefines.h>
 
 typedef long long       NSLong;
 typedef struct timespec TimeSpec;

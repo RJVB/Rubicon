@@ -30,28 +30,21 @@
 		NSLog(@"Class %@ responds to \"compare:\": %@", NSStringFromClass([obj class]), @([obj respondsToSelector:@selector(compare:)]));
 	}
 
-	-(void)testAlertWindow {
-		NSApplication *app;  // Without these 2 lines, seg fault may occur
-		app = [NSApplication sharedApplication];
+	-(void)testMacros {
+		PGMacros *macros = [PGMacros macrosWithHandler:^NSString *(NSString *label, NSString *whole, NSRange range) {
+			NSLog(@"Found Macro: %@", label);
+			return [NSString stringWithFormat:@"*** %@%@ ***", label, NSStringFromRange(range)];
+		}];
 
-		NSAlert *alert = [[NSAlert alloc] init];
-		[alert setMessageText:@"Hello alert"];
-		[alert addButtonWithTitle:@"All done"];
-		NSModalResponse result = [alert runModal];
-		if(result == NSAlertFirstButtonReturn) {
-			NSLog(@"First button pressed");
-		}
-	}
+		NSError  *error  = nil;
+		NSString *result = [macros stringByProcessingMacrosIn:@"Now is the ${ time_space} for all good ${men } to come to the ${ aid } of their ${country}."
+														error:&error];
 
-	-(void)testFontCreation {
-		NSString *fontName = @".HelveticaNeueDeskInterface-MediumP4";
-		NSFont   *aFont    = [NSFont fontWithName:fontName size:12];
-
-		if(aFont) {
-			NSLog(@"Font %@ created.", aFont.fontName);
+		if(error) {
+			XCTFail(@"Error: %@", [error description]);
 		}
 		else {
-			XCTAssertNotNil(aFont, @"Font %@ not created.", fontName);
+			NSLog(@"Results: \"%@\"", result);
 		}
 	}
 

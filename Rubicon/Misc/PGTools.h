@@ -25,97 +25,35 @@
 #ifndef __Rubicon_PGTools_H_
 #define __Rubicon_PGTools_H_
 
-#import <Cocoa/Cocoa.h>
-#import <Rubicon/GNUstep.h>
+#import <Rubicon/PGTime.h>
 
+/*
+ * Definitions for standard 32-bit RGBA color model.
+ */
 #define PGBitsPerField   (8)
 #define PGFieldsPerPixel (4)
 
+/**************************************************************************************************//**
+ * Creates and returns a bitmap image compatible with PNG file formats.  This allows you
+ * to create off-screen images and then save them to a PNG file.
+ *
+ * @param width the width of the image.
+ * @param height the height of the image.
+ * @return a bitmap image for off-screen drawing.
+ ******************************************************************************************************/
 NSBitmapImageRep *PGCreateARGBImage(CGFloat width, CGFloat height);
 
+/**************************************************************************************************//**
+ * Takes an off-screen image and saves it as a PNG file.
+ *
+ * @param image the off-screen bitmap image.
+ * @param filename the filename to write the image to.
+ * @param error a pointer to an error object field that will receive an error object if an error
+ *              occurs.
+ ******************************************************************************************************/
 BOOL PGSaveImageAsPNG(NSBitmapImageRep *image, NSString *filename, NSError **error);
 
-/* Tests for equality of floats/doubles.
- * WARNING assumes the values are in the standard IEEE format ...
- * this may not be true on all systems, though afaik it is the case
- * on all systems we target.
- *
- * We use integer arithmetic for speed, assigning the float/double
- * to an integer of the same size and then converting any negative
- * values to twos-complement integer values so that a simple integer
- * comparison can be done.
- *
- * MAX_ULP specified the number of Units in the Last Place by which
- * the two values may differ and still be considered equal.  A value
- * of zero means that the two numbers must be identical.
- *
- * The way that infinity is represented means that it will be considered
- * equal to MAX_FLT (or MAX_DBL) unless we are doing an exact comparison
- * with MAX_ULP set to zero.
- *
- * The implementation will also treat two NaN values as being equal, which
- * is technically wrong ... but is it worth adding a check for that?
- */
-#define MAX_ULP        0
-#define CGFLOAT_IS_DBL 1
 
-static inline BOOL almostEqual(CGFloat A, CGFloat B) {
-#if    MAX_ULP == 0
-	return (A == B) ? YES : NO;
-#else	/* MAX_UPL == 0 */
-	#if	defined(CGFLOAT_IS_DBL)
-	union {int64_t i; double d;} valA, valB;
-
-	valA.d = A;
-	valB.d = B;
-#if	GS_SIZEOF_LONG == 8
-	if (valA.i < 0)
-	  {
-		valA.i = 0x8000000000000000L - valA.i;
-	  }
-	if (valB.i < 0)
-	  {
-		valB.i = 0x8000000000000000L - valB.i;
-	  }
-	if (labs(valA.i - valB.i) <= MAX_ULP)
-	  {
-		return YES;
-	  }
-#else	/* GS_SIZEOF_LONG == 8 */
-	if (valA.i < 0)
-	  {
-		valA.i = 0x8000000000000000LL - valA.i;
-	  }
-	if (valB.i < 0)
-	  {
-		valB.i = 0x8000000000000000LL - valB.i;
-	  }
-	if (llabs(valA.i - valB.i) <= MAX_ULP)
-	  {
-		return YES;
-	  }
-#endif	/* GS_SIZEOF_LONG == 8 */
-	return NO;
-	#else	/* DEFINED(CGFLOAT_IS_DBL) */
-	union {int32_t i; float f;} valA, valB;
-
-	valA.f = A;
-	if (valA.i < 0)
-	  {
-		valA.i = 0x80000000 - valA.i;
-	  }
-	valB.f = B;
-	if (valB.i < 0)
-	  {
-		valB.i = 0x80000000 - valB.i;
-	  }
-	if (abs(valA.i - valB.i) <= MAX_ULP)
-	  {
-		return YES;
-	  }
-	return NO;
-	#endif	/* DEFINED(CGFLOAT_IS_DBL) */
-#endif	/* MAX_UPL == 0 */
-}
 
 #endif //__Rubicon_PGTools_H_
+
