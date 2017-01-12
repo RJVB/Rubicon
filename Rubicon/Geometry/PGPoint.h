@@ -25,36 +25,36 @@
 #ifndef __Rubicon_PGPoint_H_
 #define __Rubicon_PGPoint_H_
 
-#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGTools.h>
 
 @class PGIPoint;
 
 @interface PGPoint : NSObject<NSCopying>
 
-	@property(nonatomic, readonly) CGFloat x;
-	@property(nonatomic, readonly) CGFloat y;
-	@property(nonatomic, readonly) CGFloat angle;
-	@property(nonatomic, readonly) CGFloat magnitude;
+	@property(nonatomic, readonly) NSFloat x;
+	@property(nonatomic, readonly) NSFloat y;
+	@property(nonatomic, readonly) NSFloat angle;
+	@property(nonatomic, readonly) NSFloat magnitude;
 
-	-(instancetype)initWithX:(CGFloat)x Y:(CGFloat)y;
+	-(instancetype)initWithX:(NSFloat)x Y:(NSFloat)y;
 
 	-(instancetype)initWithPGIPoint:(PGIPoint *)point;
 
 	-(instancetype)initWithNSPoint:(NSPoint)point;
 
-	+(instancetype)pointWithX:(CGFloat)x Y:(CGFloat)y;
+	+(instancetype)pointWithX:(NSFloat)x Y:(NSFloat)y;
 
 	+(instancetype)pointWithPGIPoint:(PGIPoint *)point;
 
 	+(instancetype)pointWithNSPoint:(NSPoint)point;
 
-	+(instancetype)pointWithAngle:(CGFloat)angle magnitude:(CGFloat)magnitude;
+	+(instancetype)pointWithAngle:(NSFloat)angle magnitude:(NSFloat)magnitude;
 
 	-(NSPoint)toNSPoint;
 
 	-(PGIPoint *)toPGIPoint;
 
-	-(BOOL)isEqualToX:(CGFloat)other Y:(CGFloat)y;
+	-(BOOL)isEqualToX:(NSFloat)other Y:(NSFloat)y;
 
 	-(BOOL)isEqualToPoint:(PGPoint *)other;
 

@@ -30,7 +30,7 @@
 	@synthesize width = _width;
 	@synthesize height = _height;
 
-	-(instancetype)initWithWidth:(CGFloat)width height:(CGFloat)height {
+	-(instancetype)initWithWidth:(NSFloat)width height:(NSFloat)height {
 		self = [super init];
 
 		if(self) {
@@ -41,7 +41,7 @@
 		return self;
 	}
 
-	+(instancetype)sizeWithWidth:(CGFloat)width height:(CGFloat)height {
+	+(instancetype)sizeWithWidth:(NSFloat)width height:(NSFloat)height {
 		return [(PGSize *)[self alloc] initWithWidth:width height:height];
 	}
 
@@ -64,7 +64,7 @@
 		return copy;
 	}
 
-	-(BOOL)isEqualToWidth:(CGFloat)width height:(CGFloat)height {
+	-(BOOL)isEqualToWidth:(NSFloat)width height:(NSFloat)height {
 		return ((self.width == width) && (self.height == height));
 	}
 

@@ -25,12 +25,12 @@
 #import "NSObject+PGObject.h"
 #import "NSString+PGString.h"
 
-#define PGNodeDiameter         ((CGFloat)(60))
-#define PGNodeShadowBlurRadius ((CGFloat)(3))
-#define PGNodeShadowOffset     ((CGFloat)(2))
-#define PGNodeLineWidth        ((CGFloat)(1))
-#define PGNodePadding          ((CGFloat)(6))
-#define PGNodeFontSize         ((CGFloat)(12))
+#define PGNodeDiameter         ((NSFloat)(60))
+#define PGNodeShadowBlurRadius ((NSFloat)(3))
+#define PGNodeShadowOffset     ((NSFloat)(2))
+#define PGNodeLineWidth        ((NSFloat)(1))
+#define PGNodePadding          ((NSFloat)(6))
+#define PGNodeFontSize         ((NSFloat)(12))
 // #define PGNodeFontName         @"AmericanTypewriter-Light"
 #define PGNodeFontName         @"ArialNarrow"
 
@@ -456,12 +456,12 @@ NSShadow *_nodeShadow = nil;
 		if(self.isNode) {
 			NSSize  lSize = self.left.drawSize;
 			NSSize  rSize = self.right.drawSize;
-			CGFloat ch    = MAX(lSize.height, rSize.height);
-			CGFloat hd    = (PGNodeDiameter * (CGFloat)0.5);
-			CGFloat hp    = (PGNodePadding * (CGFloat)0.5);
-			CGFloat od    = (PGNodeDiameter - PGNodePadding);
-			CGFloat ny    = NSMinY(rect);
-			CGFloat cy    = (ny + PGNodeDiameter);
+			NSFloat ch = MAX(lSize.height, rSize.height);
+			NSFloat hd = (PGNodeDiameter * (NSFloat)0.5);
+			NSFloat hp = (PGNodePadding * (NSFloat)0.5);
+			NSFloat od = (PGNodeDiameter - PGNodePadding);
+			NSFloat ny = NSMinY(rect);
+			NSFloat cy = (ny + PGNodeDiameter);
 
 			NSRect  lRect   = NSMakeRect(NSMinX(rect), cy, MAX(lSize.width, hd), ch);
 			NSRect  rRect   = NSMakeRect(NSMaxX(lRect), cy, MAX(rSize.width, hd), ch);
@@ -506,10 +506,10 @@ NSShadow *_nodeShadow = nil;
 	}
 
 	-(NSRect)nodeOvalRect:(NSRect)rect {
-		CGFloat hp = (PGNodePadding * 0.5);
-		CGFloat aw = (PGNodeDiameter - PGNodePadding);
-		CGFloat nx = (NSMidX(rect) - (PGNodeDiameter * 0.5) + hp);
-		CGFloat ny = (NSMinY(rect) + hp);
+		NSFloat hp = (PGNodePadding * 0.5);
+		NSFloat aw = (PGNodeDiameter - PGNodePadding);
+		NSFloat nx = (NSMidX(rect) - (PGNodeDiameter * 0.5) + hp);
+		NSFloat ny = (NSMinY(rect) + hp);
 		return NSMakeRect(nx, ny, aw, aw);
 	}
 
@@ -520,9 +520,9 @@ NSShadow *_nodeShadow = nil;
 		else {
 			NSSize  leftSize  = self.left.drawSize;
 			NSSize  rightSize = self.right.drawSize;
-			CGFloat width     = PGNodeDiameter;
-			CGFloat height    = (PGNodeDiameter + MAX(leftSize.height, rightSize.height));
-			CGFloat halfWidth = (PGNodeDiameter * (CGFloat)0.5);
+			NSFloat width     = PGNodeDiameter;
+			NSFloat height    = (PGNodeDiameter + MAX(leftSize.height, rightSize.height));
+			NSFloat halfWidth = (PGNodeDiameter * (NSFloat)0.5);
 
 			if(leftSize.width > 0) {
 				width = ((width - halfWidth) + leftSize.width);

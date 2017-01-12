@@ -31,7 +31,7 @@
 	@synthesize x = _x;
 	@synthesize y = _y;
 
-	-(instancetype)initWithX:(CGFloat)x Y:(CGFloat)y {
+	-(instancetype)initWithX:(NSFloat)x Y:(NSFloat)y {
 		self = [super init];
 
 		if(self) {
@@ -50,7 +50,7 @@
 		return (self = [self initWithX:point.x Y:point.y]);
 	}
 
-	+(instancetype)pointWithX:(CGFloat)x Y:(CGFloat)y {
+	+(instancetype)pointWithX:(NSFloat)x Y:(NSFloat)y {
 		return [(PGPoint *)[self alloc] initWithX:x Y:y];
 	}
 
@@ -62,8 +62,8 @@
 		return [(PGPoint *)[self alloc] initWithNSPoint:point];
 	}
 
-	+(instancetype)pointWithAngle:(CGFloat)angle magnitude:(CGFloat)magnitude {
-		CGFloat x, y;
+	+(instancetype)pointWithAngle:(NSFloat)angle magnitude:(NSFloat)magnitude {
+		NSFloat x, y;
 #if defined(__APPLE__)
 		__sincos(angle, &y, &x);
 #elif defined(LINUX)
@@ -75,11 +75,11 @@
 		return [(PGPoint *)[self alloc] initWithX:(magnitude * x) Y:(magnitude * y)];
 	}
 
-	-(CGFloat)angle {
+	-(NSFloat)angle {
 		return atan2(self.y, self.x);
 	}
 
-	-(CGFloat)magnitude {
+	-(NSFloat)magnitude {
 		return sqrt((self.x * self.x) + (self.y * self.y));
 	}
 
@@ -95,7 +95,7 @@
 		return [NSString stringWithFormat:@"%@{ %lf, %lf }", NSStringFromClass([self class]), self.x, self.y];
 	}
 
-	-(BOOL)isEqualToX:(CGFloat)x Y:(CGFloat)y {
+	-(BOOL)isEqualToX:(NSFloat)x Y:(NSFloat)y {
 		return ((self.x == x) && (self.y == y));
 	}
 

@@ -27,7 +27,6 @@
 
 #import <Rubicon/PGDefines.h>
 
-typedef long long       NSLong;
 typedef struct timespec TimeSpec;
 typedef TimeSpec        *PTimeSpec;
 typedef struct timeval  TimeVal;

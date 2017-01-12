@@ -25,7 +25,7 @@
 #ifndef __Rubicon_PGBinaryTreeLeaf_H_
 #define __Rubicon_PGBinaryTreeLeaf_H_
 
-#import <Rubicon/GNUstep.h>
+#import <Rubicon/PGTools.h>
 
 @class PGSize;
 @class PGRect;

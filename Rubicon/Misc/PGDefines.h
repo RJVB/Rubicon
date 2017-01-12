@@ -27,6 +27,18 @@
 
 #import <Rubicon/GNUstep.h>
 
-#define PGErrorDomain @"com.projectgalen.Rubicon"
+typedef long long NSLong;
+typedef CGFloat   NSFloat;  // For the Sheldon Cooper in me.
+
+#if defined(__APPLE__)
+	#define PGMaxSemaphoreNameLength 30
+#else
+	#define PGMaxSemaphoreNameLength 251
+#endif
+
+FOUNDATION_EXPORT NSString *const PGErrorDomain;
+FOUNDATION_EXPORT NSString *const PGTimedWorkerException;
+FOUNDATION_EXPORT NSString *const PGSemaphoreException;
+FOUNDATION_EXPORT NSString *const PGDefaultSemaphoreNamePrefix;
 
 #endif //__Rubicon_PGDefines_H_

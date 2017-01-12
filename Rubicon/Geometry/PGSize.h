@@ -25,20 +25,20 @@
 #ifndef __Rubicon_PGSize_H_
 #define __Rubicon_PGSize_H_
 
-#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGTools.h>
 
 @class PGISize;
 
 @interface PGSize : NSObject<NSCopying>
 
-	@property(nonatomic, readonly) CGFloat width;
-	@property(nonatomic, readonly) CGFloat height;
+	@property(nonatomic, readonly) NSFloat width;
+	@property(nonatomic, readonly) NSFloat height;
 
-	-(instancetype)initWithWidth:(CGFloat)width height:(CGFloat)height;
+	-(instancetype)initWithWidth:(NSFloat)width height:(NSFloat)height;
 
 	-(id)copyWithZone:(NSZone *)zone;
 
-	-(BOOL)isEqualToWidth:(CGFloat)other height:(CGFloat)height;
+	-(BOOL)isEqualToWidth:(NSFloat)other height:(NSFloat)height;
 
 	-(BOOL)isEqual:(id)other;
 
@@ -56,7 +56,7 @@
 
 	-(NSString *)description;
 
-	+(instancetype)sizeWithWidth:(CGFloat)width height:(CGFloat)height;
+	+(instancetype)sizeWithWidth:(NSFloat)width height:(NSFloat)height;
 
 	+(instancetype)sizeWithNSSize:(NSSize)size;
 

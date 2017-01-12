@@ -63,7 +63,7 @@
 		return fontAttribs;
 	}
 
-	-(void)drawDeadCentered:(NSRect)textRect fontName:(NSString *)fontName fontSize:(CGFloat)fontSize fontColor:(NSColor *)fontColor {
+	-(void)drawDeadCentered:(NSRect)textRect fontName:(NSString *)fontName fontSize:(NSFloat)fontSize fontColor:(NSColor *)fontColor {
 		NSFont *aFont = (fontName.length ? [NSFont fontWithName:fontName size:fontSize] : [NSFont systemFontOfSize:fontSize]);
 		[self drawDeadCentered:textRect font:aFont fontColor:fontColor];
 	}
@@ -83,7 +83,7 @@
 
 	-(void)_drawDeadCentered:(NSRect)textRect fontAttribs:(NSDictionary *)fontAttribs {
 		NSFont  *textFont  = fontAttribs[NSFontAttributeName];
-		CGFloat textHeight = ceil(NSHeight([self boundingRectWithSize:textRect.size options:NSStringDrawingUsesLineFragmentOrigin attributes:fontAttribs]));
+		NSFloat textHeight = ceil(NSHeight([self boundingRectWithSize:textRect.size options:NSStringDrawingUsesLineFragmentOrigin attributes:fontAttribs]));
 		NSRect textRect2 = NSMakeRect(NSMinX(textRect), ceil(NSMinY(textRect) + (NSHeight(textRect) - textHeight) / 2), NSWidth(textRect), textHeight);
 		double offset    = ceil(0 - textFont.descender - (textFont.ascender - textFont.capHeight) / 2.0);
 

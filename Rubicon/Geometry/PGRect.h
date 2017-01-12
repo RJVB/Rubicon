@@ -25,7 +25,7 @@
 #ifndef __Rubicon_PGRect_H_
 #define __Rubicon_PGRect_H_
 
-#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGTools.h>
 
 @class PGPoint;
 @class PGSize;
@@ -36,22 +36,22 @@
 
 	@property(nonatomic, readonly) PGPoint *origin;
 	@property(nonatomic, readonly) PGSize  *size;
-	@property(nonatomic, readonly) CGFloat minX;
-	@property(nonatomic, readonly) CGFloat minY;
-	@property(nonatomic, readonly) CGFloat width;
-	@property(nonatomic, readonly) CGFloat height;
-	@property(nonatomic, readonly) CGFloat maxX;
-	@property(nonatomic, readonly) CGFloat maxY;
-	@property(nonatomic, readonly) CGFloat midX;
-	@property(nonatomic, readonly) CGFloat midY;
-	@property(nonatomic, readonly) CGFloat x;
-	@property(nonatomic, readonly) CGFloat y;
+	@property(nonatomic, readonly) NSFloat minX;
+	@property(nonatomic, readonly) NSFloat minY;
+	@property(nonatomic, readonly) NSFloat width;
+	@property(nonatomic, readonly) NSFloat height;
+	@property(nonatomic, readonly) NSFloat maxX;
+	@property(nonatomic, readonly) NSFloat maxY;
+	@property(nonatomic, readonly) NSFloat midX;
+	@property(nonatomic, readonly) NSFloat midY;
+	@property(nonatomic, readonly) NSFloat x;
+	@property(nonatomic, readonly) NSFloat y;
 
 	-(instancetype)initWithOrigin:(PGPoint *)origin size:(PGSize *)size;
 
-	-(instancetype)initWithX:(CGFloat)x Y:(CGFloat)y width:(CGFloat)width height:(CGFloat)height;
+	-(instancetype)initWithX:(NSFloat)x Y:(NSFloat)y width:(NSFloat)width height:(NSFloat)height;
 
-	-(BOOL)isEqualToX:(CGFloat)other Y:(CGFloat)y width:(CGFloat)width height:(CGFloat)height;
+	-(BOOL)isEqualToX:(NSFloat)other Y:(NSFloat)y width:(NSFloat)width height:(NSFloat)height;
 
 	-(BOOL)isEqual:(id)other;
 
@@ -63,9 +63,9 @@
 
 	-(PGIRect *)toPGIRect;
 
-	-(PGRect *)insetRectForX:(CGFloat)dx Y:(CGFloat)dy;
+	-(PGRect *)insetRectForX:(NSFloat)dx Y:(NSFloat)dy;
 
-	-(PGRect *)offsetRectWithX:(CGFloat)dx Y:(CGFloat)dy;
+	-(PGRect *)offsetRectWithX:(NSFloat)dx Y:(NSFloat)dy;
 
 	-(PGRect *)unionWithRect:(PGRect *)rect;
 
@@ -91,7 +91,7 @@
 
 	-(BOOL)containsNSPointMouse:(NSPoint)point flipped:(BOOL)flipped;
 
-	-(PGDivideRectResults *)divideRect:(CGFloat)amount edge:(NSRectEdge)edge;
+	-(PGDivideRectResults *)divideRect:(NSFloat)amount edge:(NSRectEdge)edge;
 
 	-(id)copyWithZone:(NSZone *)zone;
 
@@ -99,7 +99,7 @@
 
 	+(instancetype)rectWithNSRect:(NSRect)rect;
 
-	+(instancetype)rectWithX:(CGFloat)x Y:(CGFloat)y width:(CGFloat)width height:(CGFloat)height;
+	+(instancetype)rectWithX:(NSFloat)x Y:(NSFloat)y width:(NSFloat)width height:(NSFloat)height;
 
 	+(instancetype)rectWithOrigin:(PGPoint *)origin size:(PGSize *)size;
 

@@ -23,7 +23,7 @@
 
 #import "PGTools.h"
 
-NSBitmapImageRep *PGCreateARGBImage(CGFloat width, CGFloat height) {
+NSBitmapImageRep *PGCreateARGBImage(NSFloat width, NSFloat height) {
 	NSInteger iWidth  = (NSInteger)ceil(width);
 	NSInteger iHeight = (NSInteger)ceil(height);
 
@@ -44,4 +44,8 @@ NSBitmapImageRep *PGCreateARGBImage(CGFloat width, CGFloat height) {
 BOOL PGSaveImageAsPNG(NSBitmapImageRep *image, NSString *filename, NSError **error) {
 	NSData *pngData = [image representationUsingType:NSPNGFileType properties:@{}];
 	return [pngData writeToFile:filename options:0 error:error];
+}
+
+NSString *PGStrError(int osErrNo) {
+	return [NSString stringWithUTF8String:strerror(osErrNo)];
 }

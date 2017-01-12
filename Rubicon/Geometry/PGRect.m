@@ -44,7 +44,7 @@
 		return self;
 	}
 
-	-(instancetype)initWithX:(CGFloat)x Y:(CGFloat)y width:(CGFloat)width height:(CGFloat)height {
+	-(instancetype)initWithX:(NSFloat)x Y:(NSFloat)y width:(NSFloat)width height:(NSFloat)height {
 		self = [super init];
 
 		if(self) {
@@ -63,7 +63,7 @@
 		return [(PGRect *)[self alloc] initWithX:rect.origin.x Y:rect.origin.y width:rect.size.width height:rect.size.height];
 	}
 
-	+(instancetype)rectWithX:(CGFloat)x Y:(CGFloat)y width:(CGFloat)width height:(CGFloat)height {
+	+(instancetype)rectWithX:(NSFloat)x Y:(NSFloat)y width:(NSFloat)width height:(NSFloat)height {
 		return [(PGRect *)[self alloc] initWithX:x Y:y width:width height:height];
 	}
 
@@ -71,47 +71,47 @@
 		return [(PGRect *)[self alloc] initWithOrigin:origin size:size];
 	}
 
-	-(CGFloat)x {
+	-(NSFloat)x {
 		return self.origin.x;
 	}
 
-	-(CGFloat)y {
+	-(NSFloat)y {
 		return self.origin.y;
 	}
 
-	-(CGFloat)maxX {
+	-(NSFloat)maxX {
 		return (self.origin.x + self.size.width);
 	}
 
-	-(CGFloat)maxY {
+	-(NSFloat)maxY {
 		return (self.origin.y + self.size.height);
 	}
 
-	-(CGFloat)midX {
-		return (self.origin.x + (self.size.width * (CGFloat)0.5));
+	-(NSFloat)midX {
+		return (self.origin.x + (self.size.width * (NSFloat)0.5));
 	}
 
-	-(CGFloat)midY {
-		return (self.origin.y + (self.size.height * (CGFloat)0.5));
+	-(NSFloat)midY {
+		return (self.origin.y + (self.size.height * (NSFloat)0.5));
 	}
 
-	-(CGFloat)minX {
+	-(NSFloat)minX {
 		return self.origin.x;
 	}
 
-	-(CGFloat)minY {
+	-(NSFloat)minY {
 		return self.origin.y;
 	}
 
-	-(CGFloat)width {
+	-(NSFloat)width {
 		return self.size.width;
 	}
 
-	-(CGFloat)height {
+	-(NSFloat)height {
 		return self.size.height;
 	}
 
-	-(BOOL)isEqualToX:(CGFloat)x Y:(CGFloat)y width:(CGFloat)width height:(CGFloat)height {
+	-(BOOL)isEqualToX:(NSFloat)x Y:(NSFloat)y width:(NSFloat)width height:(NSFloat)height {
 		return ((self.x == x) && (self.y == y) && (self.width == width) && (self.height == height));
 	}
 
@@ -139,11 +139,11 @@
 		return [PGIRect rectWithX:(NSInteger)floor(self.x) Y:(NSInteger)floor(self.y) width:(NSInteger)ceil(self.width) height:(NSInteger)ceil(self.height)];
 	}
 
-	-(PGRect *)insetRectForX:(CGFloat)dx Y:(CGFloat)dy {
+	-(PGRect *)insetRectForX:(NSFloat)dx Y:(NSFloat)dy {
 		return [PGRect rectWithNSRect:NSInsetRect(self.toNSRect, dx, dy)];
 	}
 
-	-(PGRect *)offsetRectWithX:(CGFloat)dx Y:(CGFloat)dy {
+	-(PGRect *)offsetRectWithX:(NSFloat)dx Y:(NSFloat)dy {
 		return [PGRect rectWithX:(self.x + dx) Y:(self.y + dy) width:self.width height:self.height];
 	}
 
@@ -195,7 +195,7 @@
 		return NSMouseInRect(point, self.toNSRect, flipped);
 	}
 
-	-(PGDivideRectResults *)divideRect:(CGFloat)amount edge:(NSRectEdge)edge {
+	-(PGDivideRectResults *)divideRect:(NSFloat)amount edge:(NSRectEdge)edge {
 		NSRect slice = NSZeroRect;
 		NSRect rem   = NSZeroRect;
 		NSDivideRect(self.toNSRect, &slice, &rem, amount, edge);
