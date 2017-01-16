@@ -22,7 +22,8 @@
  *******************************************************************************/
 
 #import "PGSemaphore.h"
-#import <Rubicon/sem_timedwait.h>
+#import "NSString+PGString.h"
+#import "sem_timedwait.h"
 
 @implementation PGSemaphore {
 		sem_t *_semaphore;
@@ -35,23 +36,9 @@
 		self = [super init];
 
 		if(self) {
-			_semaphore = SEM_FAILED;
 			_value     = ((value < 1) ? 1 : ((value > SEM_VALUE_MAX) ? SEM_VALUE_MAX : value));
-
-			if(name.length) {
-				if(![name hasPrefix:@"/"]) {
-					_name = [NSString stringWithFormat:@"%@/%@", PGDefaultSemaphoreNamePrefix, name];
-				}
-				else {
-					_name = [name copy];
-				}
-			}
-			else {
-				NSLong realTime = PGSystemRealTime(0);
-				_name = [NSString stringWithFormat:@"%@/%@/%@", PGDefaultSemaphoreNamePrefix, @(getpid()), @(realTime)];
-			}
-
-			_semaphore = sem_open(self.name.UTF8String, O_CREAT);
+			_name      = (name.length ? [self cleanName:name] : [self makeName]);
+			_semaphore = sem_open(self.name.UTF8String, O_CREAT, (S_IRUSR | S_IWUSR), _value);
 
 			if(_semaphore == SEM_FAILED) {
 				@throw [NSException exceptionWithName:PGSemaphoreException reason:[NSString stringWithUTF8String:strerror(errno)] userInfo:nil];
@@ -61,15 +48,29 @@
 		return self;
 	}
 
+	-(NSString *)makeName {
+		return [PGFormat(@"%@%@", PGDefaultSemaphoreNamePrefix, @(PGSystemRealTime(0))) limitLength:PGMaxSemaphoreNameLength];
+	}
+
+	-(NSString *)cleanName:(NSString *)name {
+		return [name hasPrefix:@"/"] ? [name copy] : PGFormat(@"/%@", name);
+	}
+
 	-(BOOL)isOpen {
 		return (_semaphore != SEM_FAILED);
 	}
 
 	-(void)dealloc {
-		if(self.isOpen) {
-			sem_close(_semaphore);
-			_semaphore = SEM_FAILED;
-			sem_unlink(self.name.UTF8String);
+		[self close];
+	}
+
+	-(void)close {
+		@synchronized(self) {
+			if(self.isOpen) {
+				sem_close(_semaphore);
+				_semaphore = SEM_FAILED;
+				sem_unlink(self.name.UTF8String);
+			}
 		}
 	}
 

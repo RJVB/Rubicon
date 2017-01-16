@@ -49,3 +49,5 @@ FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
 #import <Rubicon/PGMacros.h>
 #import <Rubicon/PGSemaphore.h>
 #import <Rubicon/sem_timedwait.h>
+#import <Rubicon/PGReadWriteLock.h>
+

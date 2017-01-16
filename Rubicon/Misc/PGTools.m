@@ -49,3 +49,14 @@ BOOL PGSaveImageAsPNG(NSBitmapImageRep *image, NSString *filename, NSError **err
 NSString *PGStrError(int osErrNo) {
 	return [NSString stringWithUTF8String:strerror(osErrNo)];
 }
+
+NSString *PGFormat(NSString *fmt, ...) {
+	va_list  args;
+	NSString *str = nil;
+	va_start(args, fmt);
+
+	str = [[NSString alloc] initWithFormat:fmt arguments:args];
+
+	va_end(args);
+	return str;
+}

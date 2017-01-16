@@ -239,12 +239,14 @@ int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout) {
 				 *  coherent.
 				 */
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreturn-stack-address"
 				pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldCancelState);
 				timeoutThread = (pthread_t)0;
 				cleaningDetails.timedOutShort  = &timedOut;
 				cleaningDetails.threadIdAddr   = &timeoutThread;
 				cleaningDetails.sigHandlerAddr = &oldSignalAction;
-				pthread_cleanup_push (timeoutThreadCleanup, &cleaningDetails);
+				pthread_cleanup_push(timeoutThreadCleanup, &cleaningDetails);
 
 					/*  Set up the details for the thread. Clear the timeout flag,
 					 *  record the current SIGUSR2 action settings so we can restore
@@ -257,6 +259,7 @@ int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout) {
 					details.timedOutShort = &timedOut;
 					timedOut = FALSE;
 					sigaction(SIGUSR2, NULL, &oldSignalAction);
+#pragma clang diagnostic pop
 
 					/*
 					 * Start up the timeout thread. Once we've done that, we can
@@ -307,7 +310,7 @@ int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout) {
 					 *  to calling timeoutThreadCleanup().
 					 */
 
-				pthread_cleanup_pop (TRUE);
+				pthread_cleanup_pop(TRUE);
 			}
 		}
 	}
@@ -457,6 +460,10 @@ static int triggerSignal(int Signal, pthread_t Thread) {
 }
 
 /* -------------------------------------------------------------------------- */
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "UnusedValue"
+#pragma clang diagnostic ignored "-Wunused-parameter"
+
 /*
  *                     i g n o r e  S i g n a l
  *
@@ -464,10 +471,11 @@ static int triggerSignal(int Signal, pthread_t Thread) {
  *  but this has no effect and prevents a compiler warning about an unused
  *  argument.)
  */
-
 static void ignoreSignal(int Signal) {
 	Signal = 0;
 }
+
+#pragma clang diagnostic pop
 
 #endif
 

@@ -41,7 +41,7 @@
  * @param height the height of the image.
  * @return a bitmap image for off-screen drawing.
  ******************************************************************************************************/
-NSBitmapImageRep *PGCreateARGBImage(NSFloat width, NSFloat height);
+FOUNDATION_EXPORT NSBitmapImageRep *PGCreateARGBImage(NSFloat width, NSFloat height);
 
 /**************************************************************************************************//**
  * Takes an off-screen image and saves it as a PNG file.
@@ -51,7 +51,7 @@ NSBitmapImageRep *PGCreateARGBImage(NSFloat width, NSFloat height);
  * @param error a pointer to an error object field that will receive an error object if an error
  *              occurs.
  ******************************************************************************************************/
-BOOL PGSaveImageAsPNG(NSBitmapImageRep *image, NSString *filename, NSError **error);
+FOUNDATION_EXPORT BOOL PGSaveImageAsPNG(NSBitmapImageRep *image, NSString *filename, NSError **error);
 
 /**************************************************************************************************//**
  * Returns an NSString as by calling the C function strerror(int).
@@ -59,7 +59,9 @@ BOOL PGSaveImageAsPNG(NSBitmapImageRep *image, NSString *filename, NSError **err
  * @param osErrNo the C library error number usually obtained from the global variable errno.
  * @return The C library generated error message as an NSString object.
  ******************************************************************************************************/
-NSString *PGStrError(int osErrNo);
+FOUNDATION_EXPORT NSString *PGStrError(int osErrNo);
+
+FOUNDATION_EXPORT NSString *PGFormat(NSString *fmt, ...) NS_FORMAT_FUNCTION(1, 2);
 
 #endif //__Rubicon_PGTools_H_
 

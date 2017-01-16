@@ -26,6 +26,10 @@
 		[super tearDown];
 	}
 
+	-(void)testPGFormat {
+		NSLog(@"New String = \"%@\"", PGFormat(@"Galen %@", @"Rhodes"));
+	}
+
 	-(void)testCompareWithClass:(id)obj {
 		NSLog(@"Class %@ responds to \"compare:\": %@", NSStringFromClass([obj class]), @([obj respondsToSelector:@selector(compare:)]));
 	}

@@ -39,6 +39,8 @@
 
 	-(BOOL)isOpen;
 
+	-(void)close;
+
 	-(void)post;
 
 	-(void)wait;

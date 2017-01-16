@@ -40,5 +40,6 @@ FOUNDATION_EXPORT NSString *const PGErrorDomain;
 FOUNDATION_EXPORT NSString *const PGTimedWorkerException;
 FOUNDATION_EXPORT NSString *const PGSemaphoreException;
 FOUNDATION_EXPORT NSString *const PGDefaultSemaphoreNamePrefix;
+FOUNDATION_EXPORT NSString *const PGReadWriteLockException;
 
 #endif //__Rubicon_PGDefines_H_

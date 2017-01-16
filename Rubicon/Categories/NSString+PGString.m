@@ -25,6 +25,10 @@
 
 @implementation NSString(PGString)
 
+	-(NSString *)limitLength:(NSUInteger)maxLength {
+		return ((self.length > maxLength) ? [self substringWithRange:NSMakeRange(0, maxLength)] : self);
+	}
+
 	-(NSString *)trim {
 		return [[self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]
 					  stringByTrimmingCharactersInSet:[NSCharacterSet controlCharacterSet]];
