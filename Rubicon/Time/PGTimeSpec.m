@@ -113,4 +113,54 @@
 		return ((_timeSpec.tv_sec * PG_NANOS_PER_SECOND) + _timeSpec.tv_nsec);
 	}
 
+	-(BOOL)_isEqualToSpec:(PGTimeSpec *)spec {
+		return ((_timeSpec.tv_sec == spec->_timeSpec.tv_sec) && (_timeSpec.tv_nsec == spec->_timeSpec.tv_nsec));
+	}
+
+	-(BOOL)isEqual:(id)other {
+		return (other && ((self == other) || ([other isMemberOfClass:[self class]] ? [self _isEqualToSpec:other] : [super isEqual:other])));
+	}
+
+	-(BOOL)isEqualToSpec:(PGTimeSpec *)spec {
+		return (spec && ((self == spec) || ([self _isEqualToSpec:spec])));
+	}
+
+	-(NSUInteger)hash {
+		return (([@(_timeSpec.tv_sec) hash] * 31u) + [@(_timeSpec.tv_nsec) hash]);
+	}
+
+	-(id)copyWithZone:(NSZone *)zone {
+		PGTimeSpec *copy = ((PGTimeSpec *)[[[self class] allocWithZone:zone] init]);
+
+		if(copy != nil) {
+			copy->_timeSpec = _timeSpec;
+		}
+
+		return copy;
+	}
+
+	-(PGTimeSpec *)sleep {
+		TimeSpec ts = _timeSpec;
+		TimeSpec rm = { .tv_sec = 0, .tv_nsec = 0 };
+		int      rc = nanosleep(&ts, &rm);
+
+		if(rc) {
+			if(errno == EINTR) {
+				return [[PGTimeSpec alloc] initWithTimeSpec:&rm];
+			}
+			else if(errno == EINVAL) {
+				NSString     *reason   = PGFormat(@"Bad value for nanosecond field: %@", @(_timeSpec.tv_nsec));
+				NSDictionary *userInfo = @{ NSLocalizedDescriptionKey:reason };
+				@throw [NSException exceptionWithName:NSInvalidArgumentException reason:reason userInfo:userInfo];
+			}
+			else {
+				NSString     *reason   = PGFormat(@"Unknown error: %@", PGStrError(errno));
+				NSDictionary *userInfo = @{ NSLocalizedDescriptionKey:reason };
+				@throw [NSException exceptionWithName:NSInvalidArgumentException reason:reason userInfo:userInfo];
+			}
+		}
+
+		return nil;
+	}
+
 @end

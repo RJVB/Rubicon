@@ -37,7 +37,7 @@
  * value such as a certain number of nanoseconds that they nanosleep() function will suspend execution
  * of the current thread.
  ******************************************************************************************************/
-@interface PGTimeSpec : NSObject
+@interface PGTimeSpec : NSObject<NSCopying>
 
 	@property(nonatomic, readonly) NSLong years;
 	@property(nonatomic, readonly) NSLong days;
@@ -55,6 +55,16 @@
 	-(instancetype)initWithTimeVal:(PTimeVal)timeVal;
 
 	-(instancetype)initWithTimeSpec:(const PTimeSpec)timeSpec;
+
+	-(BOOL)isEqual:(id)other;
+
+	-(BOOL)isEqualToSpec:(PGTimeSpec *)spec;
+
+	-(NSUInteger)hash;
+
+	-(id)copyWithZone:(NSZone *)zone;
+
+	-(PGTimeSpec *)sleep;
 
 	+(instancetype)timeSpecWithCurrentTime;
 

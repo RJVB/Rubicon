@@ -27,9 +27,11 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class PGTimeSpec;
+
 @interface PGTimedBlocker : NSObject
 
-	@property(nonatomic, readonly) PGTimeSpec timeout;
+	@property(nonatomic, readonly) PGTimeSpec *timeout;
 
 	-(id)timedAction:(NSDictionary *)userInfo;
 
