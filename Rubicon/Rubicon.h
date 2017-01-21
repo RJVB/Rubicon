@@ -34,9 +34,6 @@ FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
 #import <Rubicon/PGTools.h>
 #import <Rubicon/PGTime.h>
 #import <Rubicon/PGDefines.h>
-#import <Rubicon/NSObject+PGObject.h>
-#import <Rubicon/NSString+PGString.h>
-#import <Rubicon/NSMutableDictionary+PGBinaryTreeDictionary.h>
 #import <Rubicon/PGBinaryTreeKVNode.h>
 #import <Rubicon/PGBinaryTreeDictionary.h>
 #import <Rubicon/PGIPoint.h>
@@ -48,6 +45,9 @@ FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
 #import <Rubicon/PGDivideRectResults.h>
 #import <Rubicon/PGMacros.h>
 #import <Rubicon/PGSemaphore.h>
-#import <Rubicon/sem_timedwait.h>
 #import <Rubicon/PGReadWriteLock.h>
-
+#import <Rubicon/PGTimeSpec.h>
+#import <Rubicon/NSObject+PGObject.h>
+#import <Rubicon/NSString+PGString.h>
+#import <Rubicon/NSMutableDictionary+PGBinaryTreeDictionary.h>
+#import <Rubicon/pthread_rwlock_timedrdlock.h>
