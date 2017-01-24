@@ -47,8 +47,7 @@ FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
 #import <Rubicon/PGSemaphore.h>
 #import <Rubicon/PGReadWriteLock.h>
 #import <Rubicon/PGTimeSpec.h>
+#import <Rubicon/PGTimedWait.h>
 #import <Rubicon/NSObject+PGObject.h>
 #import <Rubicon/NSString+PGString.h>
 #import <Rubicon/NSMutableDictionary+PGBinaryTreeDictionary.h>
-
-#import <Rubicon/pthread_rwlock_timedrdlock.h>

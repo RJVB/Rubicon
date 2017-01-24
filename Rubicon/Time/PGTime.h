@@ -25,7 +25,7 @@
 #ifndef __Rubicon_PGTime_H_
 #define __Rubicon_PGTime_H_
 
-#import <Rubicon/PGDefines.h>
+#import "PGDefines.h"
 
 typedef struct timespec TimeSpec;
 typedef TimeSpec        *PTimeSpec;

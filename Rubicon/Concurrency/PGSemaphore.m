@@ -23,7 +23,17 @@
 
 #import "PGSemaphore.h"
 #import "NSString+PGString.h"
-#import "sem_timedwait.h"
+#import "PGTimedWait.h"
+#import "PGTimeSpec.h"
+#import <semaphore.h>
+
+@interface PGTimedSemWait : PGTimedWait
+
+	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime semaphore:(sem_t *)semaphore;
+
+	-(BOOL)action:(id *)results;
+
+@end
 
 @implementation PGSemaphore {
 		sem_t *_semaphore;
@@ -41,11 +51,16 @@
 			_semaphore = sem_open(self.name.UTF8String, O_CREAT, (S_IRUSR | S_IWUSR), _value);
 
 			if(_semaphore == SEM_FAILED) {
-				@throw [NSException exceptionWithName:PGSemaphoreException reason:[NSString stringWithUTF8String:strerror(errno)] userInfo:nil];
+				NSString *reason = [NSString stringWithUTF8String:strerror(errno)];
+				@throw [NSException exceptionWithName:PGSemaphoreException reason:reason userInfo:nil];
 			}
 		}
 
 		return self;
+	}
+
+	+(instancetype)semaphoreWithName:(NSString *)name value:(NSUInteger)value {
+		return [[self alloc] initWithSemaphoreName:name value:value];
 	}
 
 	-(NSString *)makeName {
@@ -74,19 +89,17 @@
 		}
 	}
 
-	+(instancetype)semaphoreWithName:(NSString *)name value:(NSUInteger)value {
-		return [[self alloc] initWithSemaphoreName:name value:value];
-	}
-
 	-(void)post {
 		if(sem_post(_semaphore)) {
-			@throw [NSException exceptionWithName:PGSemaphoreException reason:[NSString stringWithUTF8String:strerror(errno)] userInfo:nil];
+			NSString *reason = [NSString stringWithUTF8String:strerror(errno)];
+			@throw [NSException exceptionWithName:PGSemaphoreException reason:reason userInfo:nil];
 		}
 	}
 
 	-(void)wait {
 		if(sem_wait(_semaphore)) {
-			@throw [NSException exceptionWithName:PGSemaphoreException reason:[NSString stringWithUTF8String:strerror(errno)] userInfo:nil];
+			NSString *reason = [NSString stringWithUTF8String:strerror(errno)];
+			@throw [NSException exceptionWithName:PGSemaphoreException reason:reason userInfo:nil];
 		}
 	}
 
@@ -96,7 +109,8 @@
 				return NO;
 			}
 			else {
-				@throw [NSException exceptionWithName:PGSemaphoreException reason:[NSString stringWithUTF8String:strerror(errno)] userInfo:nil];
+				NSString *reason = [NSString stringWithUTF8String:strerror(errno)];
+				@throw [NSException exceptionWithName:PGSemaphoreException reason:reason userInfo:nil];
 			}
 		}
 
@@ -104,16 +118,54 @@
 	}
 
 	-(BOOL)timedWait:(PTimeSpec)abstime {
-		if(sem_timedwait(_semaphore, abstime)) {
-			if(errno == ETIMEDOUT) {
-				return NO;
+		if(sem_trywait(_semaphore)) {
+			if(errno == EAGAIN) {
+				PGTimeSpec *_abstimeobj = [PGTimeSpec timeSpecWithTimeSpec:abstime];
+				return [[[PGTimedSemWait alloc] initWithTimeout:_abstimeobj semaphore:_semaphore] timedAction:NULL];
 			}
 			else {
-				@throw [NSException exceptionWithName:PGSemaphoreException reason:[NSString stringWithUTF8String:strerror(errno)] userInfo:nil];
+				NSString *reason = [NSString stringWithUTF8String:strerror(errno)];
+				@throw [NSException exceptionWithName:PGSemaphoreException reason:reason userInfo:nil];
 			}
 		}
 
 		return YES;
+	}
+
+@end
+
+@implementation PGTimedSemWait {
+		sem_t *_semaphore;
+	}
+
+	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime semaphore:(sem_t *)semaphore {
+		self = [super initWithTimeout:absTime];
+
+		if(self) {
+			_semaphore = semaphore;
+		}
+
+		return self;
+	}
+
+	-(BOOL)action:(id *)results {
+		*results = nil;
+
+		if(sem_wait(_semaphore)) {
+			if(errno == EINTR && self.timedOut) {
+				return NO;
+			}
+			else {
+				NSString *reason = [NSString stringWithUTF8String:strerror(errno)];
+				@throw [NSException exceptionWithName:PGSemaphoreException reason:reason userInfo:nil];
+			}
+		}
+
+		return YES;
+	}
+
+	-(void)dealloc {
+		_semaphore = SEM_FAILED;
 	}
 
 @end

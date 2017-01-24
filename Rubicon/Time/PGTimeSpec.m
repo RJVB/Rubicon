@@ -139,6 +139,10 @@
 		return copy;
 	}
 
+	-(TimeSpec)toUnixTimeSpec {
+		return _timeSpec;
+	}
+
 	-(PGTimeSpec *)sleep {
 		TimeSpec ts = _timeSpec;
 		TimeSpec rm = { .tv_sec = 0, .tv_nsec = 0 };
@@ -161,6 +165,23 @@
 		}
 
 		return nil;
+	}
+
+	-(PGTimeSpec *)remainingTimeFromAbsoluteTime {
+		struct timeval currentTime; /* Time now */
+		NSLong         dSeconds, dNanoSeconds;
+
+		gettimeofday(&currentTime, NULL);
+		dSeconds     = (_timeSpec.tv_sec - currentTime.tv_sec);
+		dNanoSeconds = (_timeSpec.tv_nsec - (currentTime.tv_usec * 1000));
+
+		while(dNanoSeconds < 0) {
+			dNanoSeconds += 1000000000;
+			dSeconds--;
+		}
+
+		BOOL timedOut = ((dSeconds < 0) || ((dSeconds == 0) && (dNanoSeconds < 0)));
+		return (timedOut ? nil : [PGTimeSpec timeSpecWithSeconds:dSeconds andNanos:dNanoSeconds]);
 	}
 
 @end

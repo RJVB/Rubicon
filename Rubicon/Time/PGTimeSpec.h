@@ -64,7 +64,11 @@
 
 	-(id)copyWithZone:(NSZone *)zone;
 
+	-(TimeSpec)toUnixTimeSpec;
+
 	-(PGTimeSpec *)sleep;
+
+	-(PGTimeSpec *)remainingTimeFromAbsoluteTime;
 
 	+(instancetype)timeSpecWithCurrentTime;
 
