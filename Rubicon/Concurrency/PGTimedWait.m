@@ -157,13 +157,21 @@ static void *objectThread(void *obj) {
 				}
 			}
 
-			if(pthread_kill(_thread1, 0) == 0) {
-				_timedOut = YES;
-				struct sigaction siginfo;
-				siginfo.sa_handler = ignoreSignal;
-				siginfo.sa_flags   = 0;
-				(void)sigemptyset(&siginfo.sa_mask);
-				if(sigaction(SIGUSR2, &siginfo, NULL) == 0) pthread_kill(_thread1, SIGUSR2);
+			[self signalAction];
+		}
+	}
+
+	-(void)signalAction {
+		if(pthread_kill(_thread1, 0) == 0) {
+			struct sigaction siginfo;
+			siginfo.sa_handler = ignoreSignal;
+			siginfo.sa_flags   = 0;
+
+			_timedOut = YES;
+			sigemptyset(&siginfo.sa_mask);
+
+			if(sigaction(SIGUSR2, &siginfo, NULL) == 0) {
+				pthread_kill(_thread1, SIGUSR2);
 			}
 		}
 	}
