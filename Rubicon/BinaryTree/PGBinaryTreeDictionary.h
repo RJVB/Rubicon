@@ -25,8 +25,7 @@
 #ifndef __Rubicon_PGBinaryTree_H_
 #define __Rubicon_PGBinaryTree_H_
 
-#import <Cocoa/Cocoa.h>
-#import <Rubicon/GNUstep.h>
+#import <Rubicon/PGTools.h>
 
 @interface PGBinaryTreeDictionary : NSMutableDictionary
 

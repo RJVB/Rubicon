@@ -25,7 +25,6 @@
 #ifndef __Rubicon_PGSemaphore_H_
 #define __Rubicon_PGSemaphore_H_
 
-#import <Cocoa/Cocoa.h>
 #import <Rubicon/PGTools.h>
 
 @interface PGSemaphore : NSObject

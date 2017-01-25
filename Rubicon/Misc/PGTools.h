@@ -25,7 +25,7 @@
 #ifndef __Rubicon_PGTools_H_
 #define __Rubicon_PGTools_H_
 
-#import "PGTime.h"
+#import <Rubicon/PGTime.h>
 
 /*
  * Definitions for standard 32-bit RGBA color model.

@@ -25,7 +25,7 @@
 #ifndef __Rubicon_PGISize_H_
 #define __Rubicon_PGISize_H_
 
-#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGTools.h>
 
 @interface PGISize : NSObject<NSCopying>
 

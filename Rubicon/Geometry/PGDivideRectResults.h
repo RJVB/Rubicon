@@ -25,7 +25,7 @@
 #ifndef __Rubicon_NSDividedRectResults_H_
 #define __Rubicon_NSDividedRectResults_H_
 
-#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGTools.h>
 
 @class PGRect;
 

@@ -28,157 +28,174 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import "PGTimedWait.h"
-#import "PGTimeSpec.h"
-
+#import <Rubicon/Rubicon.h>
 #import <pthread.h>
 
+void ignoreSignal(int _signal);
+
+void threadCleanup(void *obj);
+
+void *waitThread(void *obj);
+
 @interface PGTimedWait()
+
+	@property(atomic) pthread_t                  thread1;
+	@property(atomic) pthread_t                  thread2;
+	@property(atomic, readonly, retain) NSString *lock1;
 
 	-(void)wait;
 
 	-(void)cleanup;
 
+	-(void)setDidTimeOut:(BOOL)timedOut;
+
+	-(void)setAbsTime:(PGTimeSpec *)absTime;
+
 @end
 
-static void ignoreSignal(int _signal) {
-	_signal = 0;
-}
-
-static void threadCleanup(void *obj) {
-	[((__bridge_transfer PGTimedWait *)obj) cleanup];
-}
-
-static void *objectThread(void *obj) {
-	[((__bridge_transfer PGTimedWait *)obj) wait];
-	return NULL;
-}
-
 @implementation PGTimedWait {
-		pthread_t _thread1;
-		pthread_t _thread2;
-		// struct sigaction _action; // This may go away since we're not using it.
+		volatile BOOL _didTimeOut;
+		volatile int  _oserrno;
 	}
 
-	@synthesize timedOut = _timedOut;
-	@synthesize inUse = _inUse;
 	@synthesize absTime = _absTime;
+	@synthesize thread1 = _thread1;
+	@synthesize thread2 = _thread2;
+	@synthesize lock1 = _lock1;
 
 	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime {
 		self = [super init];
 
 		if(self) {
-			_absTime  = [absTime copy];
-			_thread1  = (pthread_t)0;
-			_thread2  = (pthread_t)0;
-			_timedOut = NO;
-			_inUse    = NO;
+			_lock1   = @"SomethingToLock1";
+			_oserrno = 0;
+
+			self.absTime    = absTime;
+			self.didTimeOut = NO;
+			self.thread1    = (pthread_t)0;
+			self.thread2    = (pthread_t)0;
 		}
 
 		return self;
 	}
 
 	-(void)dealloc {
-		_thread1 = (pthread_t)0;
-		_thread2 = (pthread_t)0;
+		self.thread1 = (pthread_t)0;
+		self.thread2 = (pthread_t)0;
 	}
 
-	-(BOOL)timedAction:(id *)actionResults {
-		@synchronized(self) {
-			BOOL       success   = NO;
-			PGTimeSpec *waitTime = self.absTime.remainingTimeFromAbsoluteTime;
+	-(void)setAbsTime:(PGTimeSpec *)absTime {
+		_absTime = [absTime copy];
+	}
 
-			if(waitTime) {
-				_inUse   = YES;
-				_thread1 = pthread_self();
+	-(void)createWaitThread {
+		self.thread1 = pthread_self();
 
-				NSException *e         = nil;
-				id          results    = nil;
-				int         savedState = 0;
+		int results = pthread_create(&_thread2, NULL, waitThread, (__bridge_retained void *)self);
 
-				#pragma clang diagnostic push
-				#pragma clang diagnostic ignored "-Wreturn-stack-address"
-				pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &savedState);
-				pthread_cleanup_push(threadCleanup, (__bridge_retained void *)self);
-
-					if([self launchWaitingThread:savedState]) {
-						/*
-						 * We'll catch any thrown exception so that we can
-						 * rethrow it after the stack is cleaned up.
-						 */
-						@try {
-							success = [self action:actionResults];
-						}
-						@catch(NSException *e1) {
-							e = e1;
-						}
-					}
-
-				pthread_cleanup_pop(1);
-				#pragma clang diagnostic pop
-
-				_inUse   = NO;
-				_thread1 = (pthread_t)0;
-				_thread2 = (pthread_t)0;
-				if(e) @throw e;
-				if(actionResults) *actionResults = results;
-			}
-
-			return success;
+		if(results) {
+			@throw [NSException exceptionWithName:@"PGTimedWaitException" reason:[NSString stringWithUTF8String:strerror(results)] userInfo:nil];
 		}
 	}
 
-	-(BOOL)launchWaitingThread:(int)savedState {
-		int aState   = 0;
-		int threadOK = pthread_create(&_thread2, NULL, objectThread, (__bridge_retained void *)self);
-		pthread_setcancelstate(savedState, &aState);
-		return (threadOK >= 0);
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreturn-stack-address"
+
+	-(BOOL)timedAction:(id *)results {
+		@synchronized(self) {
+			int         savedState    = 0;
+			int         ignoredState  = 0;
+			id          actionResults = nil;
+			BOOL        success       = NO;
+			NSException *caught       = nil;
+
+			pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &savedState);
+			pthread_cleanup_push(threadCleanup, (__bridge_retained void *)self);
+
+				[self createWaitThread];
+				pthread_setcancelstate(savedState, &ignoredState);
+
+				@try {
+					success = [self action:&actionResults];
+				}
+				@catch(NSException *e) {
+					caught = e;
+				}
+
+			pthread_cleanup_pop(1);
+
+			if(caught) @throw caught;
+			return !self.didTimeOut;
+		}
 	}
+
+#pragma clang diagnostic pop
 
 	-(BOOL)action:(id *)results {
 		*results = NULL;
 		return YES;
 	}
 
-	-(void)wait {
-		if(_thread1) {
-			struct timespec requestedDelay = self.absTime.remainingTimeFromAbsoluteTime.toUnixTimeSpec;
-			struct timespec remainingDelay = { .tv_sec = 0, .tv_nsec = 0 };
-
-			for(;;) {
-				if(nanosleep(&requestedDelay, &remainingDelay) == 0) {
-					break;
-				}
-				else if(errno == EINTR) {
-					requestedDelay = remainingDelay;
-				}
-				else {
-					break;
-				}
-			}
-
-			[self signalAction];
-		}
+	-(void)signalAction {
 	}
 
-	-(void)signalAction {
-		if(pthread_kill(_thread1, 0) == 0) {
-			struct sigaction siginfo;
-			siginfo.sa_handler = ignoreSignal;
-			siginfo.sa_flags   = 0;
+	-(void)wait {
+		if(self.thread1) {
+			PGTimeSpec *waitTime = self.absTime.remainingTimeFromAbsoluteTime;
 
-			_timedOut = YES;
-			sigemptyset(&siginfo.sa_mask);
+			if(waitTime) {
+				TimeSpec sWaitTime = waitTime.toUnixTimeSpec;
+				TimeSpec sRemTime;
+				BOOL     waiting   = YES;
 
-			if(sigaction(SIGUSR2, &siginfo, NULL) == 0) {
-				pthread_kill(_thread1, SIGUSR2);
+				while(waiting) {
+					waiting = (nanosleep(&sWaitTime, &sRemTime) != 0);
+
+					if(waiting) {
+						if(errno == EINTR) {
+							sWaitTime = sRemTime;
+						}
+						else {
+							waiting = NO;
+						}
+					}
+				}
 			}
 		}
 	}
 
 	-(void)cleanup {
-		if(!self.timedOut) pthread_cancel(_thread2);
-		pthread_join(_thread2, NULL);
+		if(self.thread2) {
+			if(!self.didTimeOut) pthread_cancel(self.thread2);
+			pthread_join(self.thread2, NULL);
+			self.thread2 = (pthread_t)0;
+		}
+	}
+
+	-(BOOL)didTimeOut {
+		@synchronized(self.lock1) {
+			return _didTimeOut;
+		}
+	}
+
+	-(void)setDidTimeOut:(BOOL)timedOut {
+		@synchronized(self.lock1) {
+			_didTimeOut = timedOut;
+		}
 	}
 
 @end
+
+void ignoreSignal(int _signal) {
+	_signal = 0;
+}
+
+void threadCleanup(void *obj) {
+	[((__bridge_transfer PGTimedWait *)obj) cleanup];
+}
+
+void *waitThread(void *obj) {
+	[((__bridge_transfer PGTimedWait *)obj) wait];
+	return NULL;
+}
+

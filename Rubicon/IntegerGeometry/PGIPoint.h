@@ -25,7 +25,7 @@
 #ifndef __Rubicon_PGIPoint_H_
 #define __Rubicon_PGIPoint_H_
 
-#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGTools.h>
 
 @interface PGIPoint : NSObject<NSCopying>
 

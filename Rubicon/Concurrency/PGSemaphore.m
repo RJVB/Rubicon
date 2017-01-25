@@ -152,7 +152,7 @@
 		*results = nil;
 
 		if(sem_wait(_semaphore)) {
-			if(errno == EINTR && self.timedOut) {
+			if(errno == EINTR && self.didTimeOut) {
 				return NO;
 			}
 			else {

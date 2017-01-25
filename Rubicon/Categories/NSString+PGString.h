@@ -25,7 +25,6 @@
 #ifndef __Rubicon_NSString_PGString__H_
 #define __Rubicon_NSString_PGString__H_
 
-#import <Cocoa/Cocoa.h>
 #import <Rubicon/PGTools.h>
 
 @interface NSString(PGString)

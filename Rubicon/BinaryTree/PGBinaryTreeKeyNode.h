@@ -25,9 +25,7 @@
 #ifndef __Rubicon_PGBinaryTreeKeyNode_H_
 #define __Rubicon_PGBinaryTreeKeyNode_H_
 
-#import <Cocoa/Cocoa.h>
 #import <Rubicon/PGBinaryTreeNode.h>
-#import <Rubicon/GNUstep.h>
 
 @interface PGBinaryTreeKeyNode : PGBinaryTreeNode
 

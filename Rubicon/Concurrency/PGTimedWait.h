@@ -25,19 +25,18 @@
 #ifndef __Rubicon_PGTimedWait_H_
 #define __Rubicon_PGTimedWait_H_
 
-#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGTools.h>
 
 @class PGTimeSpec;
 
 @interface PGTimedWait : NSObject
 
-	@property(nonatomic, readonly) BOOL             timedOut;
-	@property(nonatomic, readonly) BOOL             inUse;
-	@property(nonatomic, readonly, copy) PGTimeSpec *absTime;
+	@property(atomic, readonly) BOOL             didTimeOut;
+	@property(atomic, readonly, copy) PGTimeSpec *absTime;
 
 	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime;
 
-	-(BOOL)timedAction:(id *)actionResults;
+	-(BOOL)timedAction:(id *)results;
 
 	-(BOOL)action:(id *)results;
 

@@ -30,10 +30,6 @@ FOUNDATION_EXPORT double RubiconVersionNumber;
 //! Project version string for Rubicon.
 FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
 
-#import <Rubicon/GNUstep.h>
-#import <Rubicon/PGTools.h>
-#import <Rubicon/PGTime.h>
-#import <Rubicon/PGDefines.h>
 #import <Rubicon/PGBinaryTreeKVNode.h>
 #import <Rubicon/PGBinaryTreeDictionary.h>
 #import <Rubicon/PGIPoint.h>

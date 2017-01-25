@@ -26,7 +26,6 @@
 #define __Rubicon_PGTimeSpec_H_
 
 #import <Rubicon/PGTools.h>
-#import <Cocoa/Cocoa.h>
 
 /**************************************************************************************************//**
  * This is simply an object wrapper around the standard C timespec structure.  This class makes no

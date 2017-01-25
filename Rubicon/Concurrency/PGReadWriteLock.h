@@ -25,7 +25,7 @@
 #ifndef __Rubicon_PGReadWriteLock_H_
 #define __Rubicon_PGReadWriteLock_H_
 
-#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGTools.h>
 
 @interface PGReadWriteLock : NSObject<NSLocking>
 

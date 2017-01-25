@@ -25,8 +25,7 @@
 #ifndef __Rubicon_NSObject_PGObject__H_
 #define __Rubicon_NSObject_PGObject__H_
 
-#import <Cocoa/Cocoa.h>
-#import <Rubicon/GNUstep.h>
+#import <Rubicon/PGTools.h>
 
 Class PGCommonBaseClass(Class c1, Class c2);
 
