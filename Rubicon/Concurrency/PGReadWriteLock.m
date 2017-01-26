@@ -23,7 +23,24 @@
 
 #import <pthread.h>
 #import "PGReadWriteLock.h"
-#import "PGDefines.h"
+#import "PGTimedWait.h"
+#import "PGTimeSpec.h"
+
+@interface PGTimedReadLock : PGTimedWait
+
+	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock;
+
+	-(BOOL)action:(id *)results;
+
+	-(int)performAction:(pthread_rwlock_t *)rwlock;
+
+@end
+
+@interface PGTimedWriteLock : PGTimedReadLock
+
+	-(int)performAction:(pthread_rwlock_t *)rwlock;
+
+@end
 
 @implementation PGReadWriteLock {
 		pthread_rwlock_t _rwlock;
@@ -38,8 +55,7 @@
 			int rc = pthread_rwlock_init(&_rwlock, NULL);
 
 			if(rc) {
-				NSString *reason = [NSString stringWithUTF8String:strerror(rc)];
-				@throw [NSException exceptionWithName:PGReadWriteLockException reason:reason userInfo:nil];
+				@throw [NSException exceptionWithName:PGReadWriteLockException reason:[self errorMessageForCode:rc] userInfo:nil];
 			}
 
 			_open = YES;
@@ -103,9 +119,86 @@
 		return YES;
 	}
 
+	-(BOOL)timedWriteLock:(PGTimeSpec *)absTime {
+		int rc = pthread_rwlock_trywrlock(&_rwlock);
+
+		if(rc) {
+			if(rc == EBUSY) {
+				return [[[PGTimedWriteLock alloc] initWithTimeout:absTime readWriteLock:&_rwlock] timedAction:NULL];
+			}
+			else {
+				@throw [NSException exceptionWithName:PGReadWriteLockException reason:[self errorMessageForCode:rc] userInfo:nil];
+			}
+		}
+
+		return YES;
+	}
+
+	-(BOOL)timedReadLock:(PGTimeSpec *)absTime {
+		int rc = pthread_rwlock_tryrdlock(&_rwlock);
+
+		if(rc) {
+			if(rc == EBUSY) {
+				return [[[PGTimedReadLock alloc] initWithTimeout:absTime readWriteLock:&_rwlock] timedAction:NULL];
+			}
+			else {
+				@throw [NSException exceptionWithName:PGReadWriteLockException reason:[self errorMessageForCode:rc] userInfo:nil];
+			}
+		}
+
+		return YES;
+	}
+
 	-(void)unlock {
 		int rc = pthread_rwlock_unlock(&_rwlock);
 		if(rc) @throw [NSException exceptionWithName:PGReadWriteLockException reason:[self errorMessageForCode:rc] userInfo:nil];
 	}
 
 @end
+
+@implementation PGTimedReadLock {
+		pthread_rwlock_t *_rwlock;
+	}
+
+	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock {
+		self = [super initWithTimeout:absTime];
+
+		if(self) {
+			_rwlock = rwlock;
+		}
+
+		return self;
+	}
+
+	-(int)performAction:(pthread_rwlock_t *)rwlock {
+		return pthread_rwlock_rdlock(rwlock);
+	}
+
+	-(BOOL)action:(id *)results {
+		*results = nil;
+		int rc = [self performAction:_rwlock];
+
+		if(rc) {
+			if((rc == EINTR) && self.didTimeOut) {
+				return NO;
+			}
+			else {
+				NSString *reason = [NSString stringWithUTF8String:strerror(rc)];
+				@throw [NSException exceptionWithName:PGReadWriteLockException reason:reason userInfo:nil];
+			}
+		}
+
+		return YES;
+	}
+
+@end
+
+@implementation PGTimedWriteLock {
+	}
+
+	-(int)performAction:(pthread_rwlock_t *)rwlock {
+		return pthread_rwlock_wrlock(rwlock);
+	}
+
+@end
+

@@ -27,6 +27,8 @@
 
 #import <Rubicon/PGTools.h>
 
+@class PGTimeSpec;
+
 @interface PGReadWriteLock : NSObject<NSLocking>
 
 	-(instancetype)init;
@@ -42,6 +44,10 @@
 	-(BOOL)tryLock;
 
 	-(BOOL)tryWriteLock;
+
+	-(BOOL)timedWriteLock:(PGTimeSpec *)absTime;
+
+	-(BOOL)timedReadLock:(PGTimeSpec *)absTime;
 
 	-(void)unlock;
 

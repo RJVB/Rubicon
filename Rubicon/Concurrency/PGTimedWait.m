@@ -39,63 +39,60 @@ void *waitThread(void *obj);
 
 @interface PGTimedWait()
 
-	@property(atomic) pthread_t                  thread1;
-	@property(atomic) pthread_t                  thread2;
-	@property(atomic, readonly, retain) NSString *lock1;
-
-	-(void)wait;
+	-(NSInteger)wait;
 
 	-(void)cleanup;
-
-	-(void)setDidTimeOut:(BOOL)timedOut;
-
-	-(void)setAbsTime:(PGTimeSpec *)absTime;
 
 @end
 
 @implementation PGTimedWait {
+		pthread_t     _thread1;
+		pthread_t     _thread2;
 		volatile BOOL _didTimeOut;
-		volatile int  _oserrno;
 	}
 
 	@synthesize absTime = _absTime;
-	@synthesize thread1 = _thread1;
-	@synthesize thread2 = _thread2;
-	@synthesize lock1 = _lock1;
 
 	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime {
 		self = [super init];
 
 		if(self) {
-			_lock1   = @"SomethingToLock1";
-			_oserrno = 0;
-
-			self.absTime    = absTime;
-			self.didTimeOut = NO;
-			self.thread1    = (pthread_t)0;
-			self.thread2    = (pthread_t)0;
+			_didTimeOut = NO;
+			_absTime    = [absTime copy];
 		}
 
 		return self;
 	}
 
-	-(void)dealloc {
-		self.thread1 = (pthread_t)0;
-		self.thread2 = (pthread_t)0;
+	-(NSInteger)signalAction {
+		struct sigaction sigAction;
+		sigAction.sa_handler = ignoreSignal;
+		sigAction.sa_flags   = 0;
+		sigemptyset(&sigAction.sa_mask);
+		NSInteger success = sigaction(SIGUSR2, &sigAction, NULL);
+		return (success ? success : pthread_kill(_thread1, SIGUSR2));
 	}
 
-	-(void)setAbsTime:(PGTimeSpec *)absTime {
-		_absTime = [absTime copy];
-	}
+	-(BOOL)timedAction:(id *)results savedState:(int)savedState exception:(NSException **)exception {
+		BOOL success = (pthread_create(&_thread2, NULL, waitThread, (__bridge_retained void *)self) == 0);
+		pthread_setcancelstate(savedState, NULL);
 
-	-(void)createWaitThread {
-		self.thread1 = pthread_self();
-
-		int results = pthread_create(&_thread2, NULL, waitThread, (__bridge_retained void *)self);
-
-		if(results) {
-			@throw [NSException exceptionWithName:@"PGTimedWaitException" reason:[NSString stringWithUTF8String:strerror(results)] userInfo:nil];
+		if(success) {
+			@try {
+				success = [self action:results];
+			}
+			@catch(NSException *caughtException) {
+				success = NO;
+				*exception = caughtException;
+			}
 		}
+
+		return success;
+	}
+
+	-(BOOL)action:(id *)results {
+		*results = nil;
+		return YES;
 	}
 
 #pragma clang diagnostic push
@@ -103,99 +100,80 @@ void *waitThread(void *obj);
 
 	-(BOOL)timedAction:(id *)results {
 		@synchronized(self) {
-			int         savedState    = 0;
-			int         ignoredState  = 0;
-			id          actionResults = nil;
-			BOOL        success       = NO;
-			NSException *caught       = nil;
+			_didTimeOut            = 0;
 
+			id          actionResults = nil;
+			int         savedState = 0;
+			BOOL        success;
+			NSException *exception = nil;
+
+			_thread1 = pthread_self();
 			pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &savedState);
 			pthread_cleanup_push(threadCleanup, (__bridge_retained void *)self);
 
-				[self createWaitThread];
-				pthread_setcancelstate(savedState, &ignoredState);
-
-				@try {
-					success = [self action:&actionResults];
-				}
-				@catch(NSException *e) {
-					caught = e;
-				}
+				success = [self timedAction:&actionResults savedState:savedState exception:&exception];
 
 			pthread_cleanup_pop(1);
-
-			if(caught) @throw caught;
-			return !self.didTimeOut;
+			if((exception != nil) && !success) @throw exception;
+			if(results) *results = actionResults;
+			return success;
 		}
 	}
 
 #pragma clang diagnostic pop
 
-	-(BOOL)action:(id *)results {
-		*results = NULL;
-		return YES;
-	}
+	-(NSInteger)wait {
+		NSInteger  errorNo   = 0;
+		PGTimeSpec *waitTime = self.absTime.remainingTimeFromAbsoluteTime;
 
-	-(void)signalAction {
-	}
+		if(waitTime) {
+			TimeSpec sWaitTime = waitTime.toUnixTimeSpec;
+			TimeSpec sRemTime;
 
-	-(void)wait {
-		if(self.thread1) {
-			PGTimeSpec *waitTime = self.absTime.remainingTimeFromAbsoluteTime;
-
-			if(waitTime) {
-				TimeSpec sWaitTime = waitTime.toUnixTimeSpec;
-				TimeSpec sRemTime;
-				BOOL     waiting   = YES;
-
-				while(waiting) {
-					waiting = (nanosleep(&sWaitTime, &sRemTime) != 0);
-
-					if(waiting) {
-						if(errno == EINTR) {
-							sWaitTime = sRemTime;
-						}
-						else {
-							waiting = NO;
-						}
-					}
+			for(;;) {
+				if(nanosleep(&sWaitTime, &sRemTime) == 0) {
+					break;
+				}
+				else if(errno == EINTR) {
+					sWaitTime = sRemTime;
+				}
+				else {
+					errorNo = errno;
+					break;
 				}
 			}
 		}
+
+		if(pthread_kill(_thread1, 0) == 0) {
+			_didTimeOut = YES;
+			if(self.signalAction) errorNo = errno;
+		}
+
+		return errorNo;
 	}
 
 	-(void)cleanup {
-		if(self.thread2) {
-			if(!self.didTimeOut) pthread_cancel(self.thread2);
-			pthread_join(self.thread2, NULL);
-			self.thread2 = (pthread_t)0;
-		}
-	}
-
-	-(BOOL)didTimeOut {
-		@synchronized(self.lock1) {
-			return _didTimeOut;
-		}
-	}
-
-	-(void)setDidTimeOut:(BOOL)timedOut {
-		@synchronized(self.lock1) {
-			_didTimeOut = timedOut;
-		}
+		if(!_didTimeOut) pthread_cancel(_thread2);
+		pthread_join(_thread2, NULL);
 	}
 
 @end
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma ide diagnostic ignored "UnusedValue"
+
 void ignoreSignal(int _signal) {
 	_signal = 0;
 }
+
+#pragma clang diagnostic pop
 
 void threadCleanup(void *obj) {
 	[((__bridge_transfer PGTimedWait *)obj) cleanup];
 }
 
 void *waitThread(void *obj) {
-	[((__bridge_transfer PGTimedWait *)obj) wait];
-	return NULL;
+	return (void *)(long)[((__bridge_transfer PGTimedWait *)obj) wait];
 }
 

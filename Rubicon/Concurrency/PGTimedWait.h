@@ -31,8 +31,8 @@
 
 @interface PGTimedWait : NSObject
 
-	@property(atomic, readonly) BOOL             didTimeOut;
 	@property(atomic, readonly, copy) PGTimeSpec *absTime;
+	@property(atomic, readonly) volatile BOOL didTimeOut;
 
 	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime;
 

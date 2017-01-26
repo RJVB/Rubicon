@@ -71,7 +71,7 @@
 	 * @return YES if it was able to successfully lock the semaphore before the timeout occurred.
 	 * @see http://man7.org/linux/man-pages/man3/sem_timedwait.3p.html
 	 ******************************************************************************************************/
-	-(BOOL)timedWait:(PTimeSpec)abstime;
+	-(BOOL)timedWait:(PGTimeSpec *)abstime;
 
 @end
 
