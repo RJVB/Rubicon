@@ -120,33 +120,11 @@
 	}
 
 	-(BOOL)timedWriteLock:(PGTimeSpec *)absTime {
-		int rc = pthread_rwlock_trywrlock(&_rwlock);
-
-		if(rc) {
-			if(rc == EBUSY) {
-				return [[[PGTimedWriteLock alloc] initWithTimeout:absTime readWriteLock:&_rwlock] timedAction:NULL];
-			}
-			else {
-				@throw [NSException exceptionWithName:PGReadWriteLockException reason:[self errorMessageForCode:rc] userInfo:nil];
-			}
-		}
-
-		return YES;
+		return ([self tryWriteLock] ? [[[PGTimedWriteLock alloc] initWithTimeout:absTime readWriteLock:&_rwlock] timedAction:NULL] : YES);
 	}
 
-	-(BOOL)timedReadLock:(PGTimeSpec *)absTime {
-		int rc = pthread_rwlock_tryrdlock(&_rwlock);
-
-		if(rc) {
-			if(rc == EBUSY) {
-				return [[[PGTimedReadLock alloc] initWithTimeout:absTime readWriteLock:&_rwlock] timedAction:NULL];
-			}
-			else {
-				@throw [NSException exceptionWithName:PGReadWriteLockException reason:[self errorMessageForCode:rc] userInfo:nil];
-			}
-		}
-
-		return YES;
+	-(BOOL)timedLock:(PGTimeSpec *)absTime {
+		return ([self tryLock] ? [[[PGTimedReadLock alloc] initWithTimeout:absTime readWriteLock:&_rwlock] timedAction:NULL] : YES);
 	}
 
 	-(void)unlock {

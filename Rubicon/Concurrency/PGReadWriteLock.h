@@ -47,7 +47,7 @@
 
 	-(BOOL)timedWriteLock:(PGTimeSpec *)absTime;
 
-	-(BOOL)timedReadLock:(PGTimeSpec *)absTime;
+	-(BOOL)timedLock:(PGTimeSpec *)absTime;
 
 	-(void)unlock;
 

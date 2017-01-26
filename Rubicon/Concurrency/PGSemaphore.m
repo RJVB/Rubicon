@@ -118,17 +118,7 @@
 	}
 
 	-(BOOL)timedWait:(PGTimeSpec *)abstime {
-		if(sem_trywait(_semaphore)) {
-			if(errno == EAGAIN) {
-				return [[[PGTimedSemWait alloc] initWithTimeout:abstime semaphore:_semaphore] timedAction:NULL];
-			}
-			else {
-				NSString *reason = [NSString stringWithUTF8String:strerror(errno)];
-				@throw [NSException exceptionWithName:PGSemaphoreException reason:reason userInfo:nil];
-			}
-		}
-
-		return YES;
+		return ([self tryWait] ? [[[PGTimedSemWait alloc] initWithTimeout:abstime semaphore:_semaphore] timedAction:NULL] : YES);
 	}
 
 @end
