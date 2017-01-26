@@ -131,11 +131,7 @@
 
 	-(id)copyWithZone:(NSZone *)zone {
 		PGTimeSpec *copy = ((PGTimeSpec *)[[[self class] allocWithZone:zone] init]);
-
-		if(copy != nil) {
-			copy->_timeSpec = _timeSpec;
-		}
-
+		if(copy != nil) copy->_timeSpec = _timeSpec;
 		return copy;
 	}
 
