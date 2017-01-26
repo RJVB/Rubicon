@@ -55,17 +55,13 @@
 			int rc = pthread_rwlock_init(&_rwlock, NULL);
 
 			if(rc) {
-				@throw [NSException exceptionWithName:PGReadWriteLockException reason:[self errorMessageForCode:rc] userInfo:nil];
+				@throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
 			}
 
 			_open = YES;
 		}
 
 		return self;
-	}
-
-	-(NSString *)errorMessageForCode:(int)code {
-		return [NSString stringWithUTF8String:strerror(code)];
 	}
 
 	-(void)dealloc {
@@ -81,12 +77,16 @@
 
 	-(void)lock {
 		int rc = pthread_rwlock_rdlock(&_rwlock);
-		if(rc) @throw [NSException exceptionWithName:PGReadWriteLockException reason:[self errorMessageForCode:rc] userInfo:nil];
+		if(rc) {
+			@throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
+		}
 	}
 
 	-(void)writeLock {
 		int rc = pthread_rwlock_wrlock(&_rwlock);
-		if(rc) @throw [NSException exceptionWithName:PGReadWriteLockException reason:[self errorMessageForCode:rc] userInfo:nil];
+		if(rc) {
+			@throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
+		}
 	}
 
 	-(BOOL)tryLock {
@@ -97,7 +97,7 @@
 				return NO;
 			}
 			else {
-				@throw [NSException exceptionWithName:PGReadWriteLockException reason:[self errorMessageForCode:rc] userInfo:nil];
+				@throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
 			}
 		}
 
@@ -112,7 +112,7 @@
 				return NO;
 			}
 			else {
-				@throw [NSException exceptionWithName:PGReadWriteLockException reason:[self errorMessageForCode:rc] userInfo:nil];
+				@throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
 			}
 		}
 
@@ -129,7 +129,7 @@
 
 	-(void)unlock {
 		int rc = pthread_rwlock_unlock(&_rwlock);
-		if(rc) @throw [NSException exceptionWithName:PGReadWriteLockException reason:[self errorMessageForCode:rc] userInfo:nil];
+		if(rc) @throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
 	}
 
 @end
@@ -161,8 +161,7 @@
 				return NO;
 			}
 			else {
-				NSString *reason = [NSString stringWithUTF8String:strerror(rc)];
-				@throw [NSException exceptionWithName:PGReadWriteLockException reason:reason userInfo:nil];
+				@throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
 			}
 		}
 

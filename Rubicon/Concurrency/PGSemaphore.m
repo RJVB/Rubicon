@@ -51,8 +51,7 @@
 			_semaphore = sem_open(self.name.UTF8String, O_CREAT, (S_IRUSR | S_IWUSR), _value);
 
 			if(_semaphore == SEM_FAILED) {
-				NSString *reason = [NSString stringWithUTF8String:strerror(errno)];
-				@throw [NSException exceptionWithName:PGSemaphoreException reason:reason userInfo:nil];
+				@throw [NSException exceptionWithName:PGSemaphoreException reason:PGStrError(errno) userInfo:nil];
 			}
 		}
 
@@ -91,15 +90,13 @@
 
 	-(void)post {
 		if(sem_post(_semaphore)) {
-			NSString *reason = [NSString stringWithUTF8String:strerror(errno)];
-			@throw [NSException exceptionWithName:PGSemaphoreException reason:reason userInfo:nil];
+			@throw [NSException exceptionWithName:PGSemaphoreException reason:PGStrError(errno) userInfo:nil];
 		}
 	}
 
 	-(void)wait {
 		if(sem_wait(_semaphore)) {
-			NSString *reason = [NSString stringWithUTF8String:strerror(errno)];
-			@throw [NSException exceptionWithName:PGSemaphoreException reason:reason userInfo:nil];
+			@throw [NSException exceptionWithName:PGSemaphoreException reason:PGStrError(errno) userInfo:nil];
 		}
 	}
 
@@ -109,8 +106,7 @@
 				return NO;
 			}
 			else {
-				NSString *reason = [NSString stringWithUTF8String:strerror(errno)];
-				@throw [NSException exceptionWithName:PGSemaphoreException reason:reason userInfo:nil];
+				@throw [NSException exceptionWithName:PGSemaphoreException reason:PGStrError(errno) userInfo:nil];
 			}
 		}
 
@@ -145,8 +141,7 @@
 				return NO;
 			}
 			else {
-				NSString *reason = [NSString stringWithUTF8String:strerror(errno)];
-				@throw [NSException exceptionWithName:PGSemaphoreException reason:reason userInfo:nil];
+				@throw [NSException exceptionWithName:PGSemaphoreException reason:PGStrError(errno) userInfo:nil];
 			}
 		}
 
