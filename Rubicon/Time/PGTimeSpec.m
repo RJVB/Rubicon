@@ -34,7 +34,7 @@
 			TimeVal timeVal;
 			gettimeofday(&timeVal, NULL);
 			_timeSpec.tv_sec  = timeVal.tv_sec;
-			_timeSpec.tv_nsec = (timeVal.tv_usec * 1000);
+			_timeSpec.tv_nsec = (timeVal.tv_usec * ((NSInteger)PG_NANOS_PER_MICRO));
 		}
 
 		return self;
@@ -44,11 +44,7 @@
 		self = [super init];
 
 		if(self) {
-			if(seconds < 0 || nanos < 0 || nanos >= PG_NANOS_PER_SECOND) {
-				NSString *reason = (seconds < 0 ? @"Seconds < 0" : @"Nanoseconds not in range 0 <= ns <= 999,999,999");
-				@throw [NSException exceptionWithName:NSInvalidArgumentException reason:reason userInfo:nil];
-			}
-
+			[PGTimeSpec validateSeconds:seconds andNanos:nanos];
 			NSInteger nanosOver = (nanos / (NSInteger)PG_NANOS_PER_SECOND);
 			_timeSpec.tv_sec  = (seconds + nanosOver);
 			_timeSpec.tv_nsec = (nanos - (nanosOver * (NSInteger)PG_NANOS_PER_SECOND));
@@ -79,6 +75,25 @@
 
 	+(instancetype)timeSpecWithTimeSpec:(const PTimeSpec)timeSpec {
 		return [[self alloc] initWithTimeSpec:timeSpec];
+	}
+
+	+(instancetype)timeSpecWithFutureSeconds:(NSInteger)seconds andNanos:(NSInteger)nanos {
+		[PGTimeSpec validateSeconds:seconds andNanos:nanos];
+		TimeVal wallTime = { .tv_sec = 0, .tv_usec = 0 };
+
+		if(gettimeofday(&wallTime, NULL)) {
+			@throw [NSException exceptionWithName:PGOSErrorException reason:PGStrError(errno) userInfo:nil];
+		}
+
+		TimeSpec futTime = { .tv_sec = seconds, .tv_nsec = nanos };
+		return [[self alloc] initWithTimeSpec:PGNanosToTimeSpec(&futTime, (PGTimeValToNanos(&wallTime) + PGTimeSpecToNanos(&futTime)))];
+	}
+
+	+(void)validateSeconds:(NSInteger)seconds andNanos:(NSInteger)nanos {
+		if(seconds < 0 || nanos < 0 || nanos >= PG_NANOS_PER_SECOND) {
+			NSString *reason = (seconds < 0 ? @"Seconds < 0" : @"Nanoseconds not in range 0 <= ns <= 999,999,999");
+			@throw [NSException exceptionWithName:NSInvalidArgumentException reason:reason userInfo:nil];
+		}
 	}
 
 	-(NSLong)years {
@@ -169,10 +184,10 @@
 
 		gettimeofday(&currentTime, NULL);
 		dSeconds     = (_timeSpec.tv_sec - currentTime.tv_sec);
-		dNanoSeconds = (_timeSpec.tv_nsec - (currentTime.tv_usec * 1000));
+		dNanoSeconds = (_timeSpec.tv_nsec - (currentTime.tv_usec * PG_NANOS_PER_MICRO));
 
 		while(dNanoSeconds < 0) {
-			dNanoSeconds += 1000000000;
+			dNanoSeconds += PG_NANOS_PER_SECOND;
 			dSeconds--;
 		}
 

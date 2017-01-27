@@ -14,6 +14,11 @@
 			<key>orderHint</key>
 			<integer>1</integer>
 		</dict>
+		<key>RubiconTimedWaitTester.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>4</integer>
+		</dict>
 		<key>RubiconUITests.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -28,6 +33,11 @@
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
 		<key>830C10FF1E2B2E5D00B143DC</key>
+		<dict>
+			<key>primary</key>
+			<true />
+		</dict>
+		<key>836E18DA1E3AD67400FAEE56</key>
 		<dict>
 			<key>primary</key>
 			<true />

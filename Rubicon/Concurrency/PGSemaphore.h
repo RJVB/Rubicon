@@ -27,6 +27,8 @@
 
 #import <Rubicon/PGTools.h>
 
+@class PGTimeSpec;
+
 @interface PGSemaphore : NSObject
 
 	@property(nonatomic, readonly) NSUInteger     value;

@@ -37,9 +37,12 @@ typedef CGFloat   NSFloat;  // For the Sheldon Cooper in me.
 #endif
 
 FOUNDATION_EXPORT NSString *const PGErrorDomain;
+
 FOUNDATION_EXPORT NSString *const PGTimedWorkerException;
 FOUNDATION_EXPORT NSString *const PGSemaphoreException;
-FOUNDATION_EXPORT NSString *const PGDefaultSemaphoreNamePrefix;
 FOUNDATION_EXPORT NSString *const PGReadWriteLockException;
+FOUNDATION_EXPORT NSString *const PGOSErrorException;
+
+FOUNDATION_EXPORT NSString *const PGDefaultSemaphoreNamePrefix;
 
 #endif //__Rubicon_PGDefines_H_

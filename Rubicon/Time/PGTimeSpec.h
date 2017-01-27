@@ -77,6 +77,9 @@
 
 	+(instancetype)timeSpecWithTimeSpec:(const PTimeSpec)timeSpec;
 
+	+(instancetype)timeSpecWithFutureSeconds:(NSInteger)seconds andNanos:(NSInteger)nanos;
+
+	+(void)validateSeconds:(NSInteger)seconds andNanos:(NSInteger)nanos;
 @end
 
 #endif //__Rubicon_PGTimeSpec_H_

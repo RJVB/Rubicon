@@ -120,11 +120,11 @@
 	}
 
 	-(BOOL)timedWriteLock:(PGTimeSpec *)absTime {
-		return ([self tryWriteLock] ? [[[PGTimedWriteLock alloc] initWithTimeout:absTime readWriteLock:&_rwlock] timedAction:NULL] : YES);
+		return ([self tryWriteLock] ? YES : [[[PGTimedWriteLock alloc] initWithTimeout:absTime readWriteLock:&_rwlock] timedAction:NULL]);
 	}
 
 	-(BOOL)timedLock:(PGTimeSpec *)absTime {
-		return ([self tryLock] ? [[[PGTimedReadLock alloc] initWithTimeout:absTime readWriteLock:&_rwlock] timedAction:NULL] : YES);
+		return ([self tryLock] ? YES : [[[PGTimedReadLock alloc] initWithTimeout:absTime readWriteLock:&_rwlock] timedAction:NULL]);
 	}
 
 	-(void)unlock {

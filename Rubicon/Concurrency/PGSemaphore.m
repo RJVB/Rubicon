@@ -114,7 +114,7 @@
 	}
 
 	-(BOOL)timedWait:(PGTimeSpec *)abstime {
-		return ([self tryWait] ? [[[PGTimedSemWait alloc] initWithTimeout:abstime semaphore:_semaphore] timedAction:NULL] : YES);
+		return ([self tryWait] ? YES : [[[PGTimedSemWait alloc] initWithTimeout:abstime semaphore:_semaphore] timedAction:NULL]);
 	}
 
 @end
