@@ -27,11 +27,17 @@
 
 #import <Rubicon/PGTime.h>
 
+@class PGRect;
+
 /*
  * Definitions for standard 32-bit RGBA color model.
  */
 #define PGBitsPerField   (8)
 #define PGFieldsPerPixel (4)
+
+NS_INLINE BOOL PGObjectsEqual(id obj1, id obj2) {
+	return ((obj1 == nil) ? (obj2 == nil) : [obj1 isEqual:obj2]);
+}
 
 /**************************************************************************************************//**
  * Creates and returns a bitmap image compatible with PNG file formats.  This allows you
