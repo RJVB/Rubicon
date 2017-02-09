@@ -27,9 +27,9 @@
 
 #import <Rubicon/PGTools.h>
 
-@class PGNamedNodeMap;
-@class PGDocument;
-@class PGNodeList;
+@class PGDOMNamedNodeMap;
+@class PGDOMDocument;
+@class PGDOMNodeList;
 
 typedef enum _pg_domnodetypes {
 	PGDOMUnknownNode,
@@ -45,41 +45,41 @@ typedef enum _pg_domnodetypes {
 	PGDOMNotationNode,
 	PGDOMProcessingInstructionNode,
 	PGDOMTextNode
-} PGDOMNodeTypes;
+}                                                    PGDOMNodeTypes;
 
-@interface PGNode : NSObject<NSCopying>
+@interface PGDOMNode : NSObject<NSCopying>
 
 	@property(nonatomic, readonly) PGDOMNodeTypes nodeType;
 	@property(nonatomic, readonly) NSString       *nodeTypeName;
 	@property(nonatomic, copy) NSString           *prefix;
 	@property(nonatomic, copy) NSString           *nodeValue;
 	@property(nonatomic, copy) NSString           *textContent;
-	@property(nonatomic, readonly) PGNamedNodeMap *attributes;
-	@property(nonatomic, readonly) PGNodeList     *childNodes;
+	@property(nonatomic, readonly) PGDOMNamedNodeMap *attributes;
+	@property(nonatomic, readonly) PGDOMNodeList     *childNodes;
 	@property(nonatomic, readonly) NSString       *baseURI;
 	@property(nonatomic, readonly) NSString       *localName;
 	@property(nonatomic, readonly) NSString       *namespaceURI;
 	@property(nonatomic, readonly) NSString       *nodeName;
 	@property(nonatomic, readonly) BOOL           hasChildNodes;
 	@property(nonatomic, readonly) BOOL           hasAttributes;
-	@property(nonatomic, readonly) PGNode         *firstChild;
-	@property(nonatomic, readonly) PGNode         *lastChild;
-	@property(nonatomic, readonly) PGNode         *nextSibling;
-	@property(nonatomic, readonly) PGNode         *previousSibling;
-	@property(nonatomic, readonly) PGNode         *parentNode;
-	@property(nonatomic, readonly) PGDocument     *ownerDocument;
+	@property(nonatomic, readonly) PGDOMNode         *firstChild;
+	@property(nonatomic, readonly) PGDOMNode         *lastChild;
+	@property(nonatomic, readonly) PGDOMNode         *nextSibling;
+	@property(nonatomic, readonly) PGDOMNode         *previousSibling;
+	@property(nonatomic, readonly) PGDOMNode         *parentNode;
+	@property(nonatomic, readonly) PGDOMDocument     *ownerDocument;
 
 	-(instancetype)init;
 
-	-(NSString *)nodeTypeName:(PGDOMNodeTypes)nodeType;
+	+(NSString *)nodeTypeName:(PGDOMNodeTypes)nodeType;
 
-	-(PGNode *)appendNode:(PGNode *)newNode;
+	-(PGDOMNode *)appendNode:(PGDOMNode *)newNode;
 
 	-(id)copyWithZone:(NSZone *)zone;
 
 	-(id)copy:(BOOL)deep;
 
-	-(NSInteger)compareDocumentPosition:(PGNode *)node;
+	-(NSInteger)compareDocumentPosition:(PGDOMNode *)node;
 
 	-(NSString *)feature:(NSString *)feature version:(NSString *)version;
 
@@ -87,7 +87,7 @@ typedef enum _pg_domnodetypes {
 
 	-(void)setUserData:(id)obj forName:(NSString *)name;
 
-	-(PGNode *)insertNode:(PGNode *)newNode before:(PGNode *)referenceNode;
+	-(PGDOMNode *)insertNode:(PGDOMNode *)newNode before:(PGDOMNode *)referenceNode;
 
 	-(BOOL)isDefaultNamespace:(NSString *)namespaceURI;
 
@@ -99,15 +99,23 @@ typedef enum _pg_domnodetypes {
 
 	-(void)normalize;
 
-	-(PGNode *)removeChild:(PGNode *)oldNode;
+	-(PGDOMNode *)removeChild:(PGDOMNode *)oldNode;
 
-	-(PGNode *)replaceChild:(PGNode *)oldNode newNode:(PGNode *)newNode;
+	-(PGDOMNode *)replaceChild:(PGDOMNode *)oldNode newNode:(PGDOMNode *)newNode;
 
-	-(BOOL)isEqualNode:(PGNode *)node;
+	-(BOOL)isEqualNode:(PGDOMNode *)node;
 
-	-(BOOL)isSameNode:(PGNode *)node;
+	-(BOOL)isSameNode:(PGDOMNode *)node;
 
 	-(BOOL)isEqual:(id)other;
+
+	-(PGDOMNode *)childAfter:(PGDOMNode *)child;
+
+	-(PGDOMNode *)childBefore:(PGDOMNode *)child;
+
+@end
+
+@interface PGDOMChildNode : PGDOMNode
 
 @end
 

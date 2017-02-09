@@ -21,27 +21,26 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import "PGNode.h"
-#import "PGNamedNodeMap.h"
-#import "PGNodeList.h"
+#import "PGDOMPrivate.h"
+#import "PGDOMNamedNodeMap.h"
+#import "PGDOMNodeList.h"
 
-@interface PGNamedNodeMap()
+@interface PGDOMNamedNodeMap()
 
-	+(PGNamedNodeMap *)instance;
-
-@end
-
-@interface PGNodeList()
-
-	+(PGNodeList *)instance;
+	+(PGDOMNamedNodeMap *)instance;
 
 @end
 
-@implementation PGNode {
+@interface PGDOMNodeList()
+
+	+(PGDOMNodeList *)instance;
+
+@end
+
+@implementation PGDOMNode {
 		NSMutableDictionary *_userData;
 	}
 
-	@synthesize parentNode = _parentNode;
 	@synthesize ownerDocument = _ownerDocument;
 
 	-(instancetype)init {
@@ -54,15 +53,16 @@
 		return self;
 	}
 
-	-(PGDOMNodeTypes)nodeType {
-		return PGDOMUnknownNode;
+	-(void)setOwnerDocument:(PGDOMDocument *)ownerDocument {
+		_ownerDocument = ownerDocument;
 	}
 
-	-(NSString *)prefix {
+	-(NSString *)nodeName {
 		return nil;
 	}
 
-	-(void)setPrefix:(NSString *)prefix {
+	-(PGDOMNodeTypes)nodeType {
+		return PGDOMUnknownNode;
 	}
 
 	-(NSString *)nodeValue {
@@ -79,19 +79,18 @@
 	-(void)setTextContent:(NSString *)textContent {
 	}
 
-	-(PGNamedNodeMap *)attributes {
-		return [PGNamedNodeMap instance];
-	}
-
-	-(PGNodeList *)childNodes {
-		return [PGNodeList instance];
-	}
-
-	-(NSString *)baseURI {
+	-(NSString *)prefix {
 		return nil;
 	}
 
+	-(void)setPrefix:(NSString *)prefix {
+	}
+
 	-(NSString *)localName {
+		return nil;
+	}
+
+	-(NSString *)baseURI {
 		return nil;
 	}
 
@@ -99,35 +98,19 @@
 		return nil;
 	}
 
-	-(NSString *)nodeName {
-		return nil;
+	-(BOOL)isDefaultNamespace:(NSString *)namespaceURI {
+		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
 	}
 
-	-(BOOL)hasChildNodes {
-		return NO;
+	-(NSString *)lookupNamespaceURI:(NSString *)prefix {
+		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
 	}
 
-	-(BOOL)hasAttributes {
-		return NO;
+	-(NSString *)lookupPrefix:(NSString *)namespaceURI {
+		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
 	}
 
-	-(PGNode *)firstChild {
-		return nil;
-	}
-
-	-(PGNode *)lastChild {
-		return nil;
-	}
-
-	-(PGNode *)nextSibling {
-		return nil;
-	}
-
-	-(PGNode *)previousSibling {
-		return nil;
-	}
-
-	-(NSString *)nodeTypeName:(PGDOMNodeTypes)nodeType {
+	+(NSString *)nodeTypeName:(PGDOMNodeTypes)nodeType {
 		switch(nodeType) {
 			case PGDOMAttributeNode:
 				return @"PGDOMAttributeNode";
@@ -159,11 +142,11 @@
 	}
 
 	-(NSString *)nodeTypeName {
-		return [self nodeTypeName:self.nodeType];
+		return [[self class] nodeTypeName:self.nodeType];
 	}
 
 	-(id)copyWithZone:(NSZone *)zone {
-		PGNode *copy = ((PGNode *)[[[self class] allocWithZone:zone] init]);
+		PGDOMNode *copy = ((PGDOMNode *)[[[self class] allocWithZone:zone] init]);
 
 		if(copy != nil) {
 			copy->_ownerDocument = _ownerDocument;
@@ -176,11 +159,7 @@
 		return [self copy];
 	}
 
-	-(PGNode *)appendNode:(PGNode *)newNode {
-		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
-	}
-
-	-(NSInteger)compareDocumentPosition:(PGNode *)node {
+	-(NSInteger)compareDocumentPosition:(PGDOMNode *)node {
 		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
 	}
 
@@ -189,34 +168,14 @@
 	}
 
 	-(id)userData:(NSString *)name {
-		@synchronized(self) {
-			return _userData[name];
-		}
+		return _userData[name];
 	}
 
 	-(void)setUserData:(id)obj forName:(NSString *)name {
-		@synchronized(self) {
-			_userData[name] = obj;
-		}
-	}
-
-	-(PGNode *)insertNode:(PGNode *)newNode before:(PGNode *)referenceNode {
-		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
-	}
-
-	-(BOOL)isDefaultNamespace:(NSString *)namespaceURI {
-		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
+		_userData[name] = obj;
 	}
 
 	-(BOOL)isSupported:(NSString *)feature version:(NSString *)version {
-		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
-	}
-
-	-(NSString *)lookupNamespaceURI:(NSString *)prefix {
-		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
-	}
-
-	-(NSString *)lookupPrefix:(NSString *)namespaceURI {
 		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
 	}
 
@@ -224,15 +183,67 @@
 		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
 	}
 
-	-(PGNode *)removeChild:(PGNode *)oldNode {
+	-(PGDOMNode *)parentNode {
+		return nil;
+	}
+
+	-(PGDOMNode *)nextSibling {
+		return nil;
+	}
+
+	-(PGDOMNode *)previousSibling {
+		return nil;
+	}
+
+	-(PGDOMNode *)childAfter:(PGDOMNode *)child {
+		return nil;
+	}
+
+	-(PGDOMNode *)childBefore:(PGDOMNode *)child {
+		return nil;
+	}
+
+	-(PGDOMNamedNodeMap *)attributes {
+		return [PGDOMNamedNodeMap instance];
+	}
+
+	-(PGDOMNodeList *)childNodes {
+		return [PGDOMNodeList instance];
+	}
+
+	-(BOOL)hasChildNodes {
+		return NO;
+	}
+
+	-(BOOL)hasAttributes {
+		return NO;
+	}
+
+	-(PGDOMNode *)firstChild {
+		return nil;
+	}
+
+	-(PGDOMNode *)lastChild {
+		return nil;
+	}
+
+	-(PGDOMNode *)appendNode:(PGDOMNode *)newNode {
 		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
 	}
 
-	-(PGNode *)replaceChild:(PGNode *)oldNode newNode:(PGNode *)newNode {
+	-(PGDOMNode *)insertNode:(PGDOMNode *)newNode before:(PGDOMNode *)referenceNode {
 		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
 	}
 
-	-(BOOL)isEqualNode:(PGNode *)other {
+	-(PGDOMNode *)removeChild:(PGDOMNode *)oldNode {
+		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
+	}
+
+	-(PGDOMNode *)replaceChild:(PGDOMNode *)oldNode newNode:(PGDOMNode *)newNode {
+		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
+	}
+
+	-(BOOL)isEqualNode:(PGDOMNode *)other {
 		return (other &&
 				([self isSameNode:other] ||
 				 ((self.nodeType == other.nodeType) &&
@@ -245,7 +256,7 @@
 				  PGObjectsEqual(self.childNodes, other.childNodes))));
 	}
 
-	-(BOOL)isSameNode:(PGNode *)node {
+	-(BOOL)isSameNode:(PGDOMNode *)node {
 		return (self == node);
 	}
 
@@ -254,3 +265,26 @@
 	}
 
 @end
+
+@implementation PGDOMChildNode {
+		PGDOMNode *_parentNode;
+	}
+
+	-(PGDOMNode *)parentNode {
+		return _parentNode;
+	}
+
+	-(void)setParentNode:(PGDOMNode *)node {
+		_parentNode = node;
+	}
+
+	-(PGDOMNode *)nextSibling {
+		return [self.parentNode childAfter:self];
+	}
+
+	-(PGDOMNode *)previousSibling {
+		return [self.parentNode childBefore:self];
+	}
+
+@end
+

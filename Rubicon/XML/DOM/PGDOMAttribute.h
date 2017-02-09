@@ -1,9 +1,9 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDocument.h
+ *    FILENAME: PGDOMAttribute.h
  *         IDE: AppCode
  *      AUTHOR:  Galen Rhodes
- *        DATE: 1/31/17 8:13 PM
+ *        DATE: 2/8/17 10:23 PM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
@@ -22,16 +22,13 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGDocument_H_
-#define __Rubicon_PGDocument_H_
+#ifndef __Rubicon_PGDOMAttribute_H_
+#define __Rubicon_PGDOMAttribute_H_
 
-#import <Cocoa/Cocoa.h>
-#import <Rubicon/PGNode.h>
+#import <Rubicon/PGDOMNode.h>
+#import <Rubicon/PGDOMNamespaceAwareNode.h>
 
-@interface PGDocument : PGNode
-
-	-(PGDOMNodeTypes)nodeType;
-
+@interface PGDOMAttribute : PGDOMNamespaceAwareNode
 @end
 
-#endif //__Rubicon_PGDocument_H_
+#endif //__Rubicon_PGDOMAttribute_H_

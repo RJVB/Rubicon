@@ -21,43 +21,43 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import "PGNamedNodeMap.h"
-#import "PGNode.h"
+#import "PGDOMNamedNodeMap.h"
+#import "PGDOMNode.h"
 
 NSString *const PGDOMException = @"PGDOMException";
 
-@implementation PGNamedNodeMap {
+@implementation PGDOMNamedNodeMap {
 	}
 
 	-(NSUInteger)count {
 		return 0;
 	}
 
-	-(PGNode *)namedItem:(NSString *)name {
+	-(PGDOMNode *)namedItem:(NSString *)name {
 		return nil;
 	}
 
-	-(PGNode *)namedItem:(NSString *)name namespace:(NSString *)namespaceURI {
+	-(PGDOMNode *)namedItem:(NSString *)name namespace:(NSString *)namespaceURI {
 		return nil;
 	}
 
-	-(PGNode *)item:(NSUInteger)index {
+	-(PGDOMNode *)item:(NSUInteger)index {
 		return nil;
 	}
 
-	-(PGNode *)removeNamedItem:(NSString *)name {
+	-(PGDOMNode *)removeNamedItem:(NSString *)name {
 		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
 	}
 
-	-(PGNode *)removeNamedItem:(NSString *)name namespace:(NSString *)namespaceURI {
+	-(PGDOMNode *)removeNamedItem:(NSString *)name namespace:(NSString *)namespaceURI {
 		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
 	}
 
-	-(PGNode *)setNamedItem:(PGNode *)node {
+	-(PGDOMNode *)setNamedItem:(PGDOMNode *)node {
 		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
 	}
 
-	-(PGNode *)setNamedItemWithNamespace:(PGNode *)node {
+	-(PGDOMNode *)setNamedItemWithNamespace:(PGDOMNode *)node {
 		@throw [NSException exceptionWithName:PGDOMException reason:@"Function not implemented." userInfo:nil];
 	}
 
@@ -65,8 +65,8 @@ NSString *const PGDOMException = @"PGDOMException";
 		return (self == other);
 	}
 
-	+(PGNamedNodeMap *)instance {
-		static PGNamedNodeMap *_instance = nil;
+	+(PGDOMNamedNodeMap *)instance {
+		static PGDOMNamedNodeMap *_instance = nil;
 
 		@synchronized(self) {
 			if(_instance == nil) {

@@ -1,9 +1,9 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGNodeList.h
+ *    FILENAME: PGDOMComment.h
  *         IDE: AppCode
  *      AUTHOR:  Galen Rhodes
- *        DATE: 1/31/17 8:17 PM
+ *        DATE: 2/8/17 9:57 PM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
@@ -22,25 +22,12 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGNodeList_H_
-#define __Rubicon_PGNodeList_H_
+#ifndef __Rubicon_PGDOMComment_H_
+#define __Rubicon_PGDOMComment_H_
 
-#import <Rubicon/PGTools.h>
+#import <Rubicon/PGDOMCharacterData.h>
 
-@class PGNode;
-
-@interface PGNodeList : NSObject
-
-	@property(nonatomic, readonly) NSUInteger count;
-
-	-(PGNode *)item:(NSUInteger)index;
-
-	-(BOOL)hasNode:(PGNode *)aNode;
-
-	-(BOOL)isEqualToNodeList:(PGNodeList *)other;
-
-	-(BOOL)isEqual:(id)other;
-
+@interface PGDOMComment : PGDOMCharacterData
 @end
 
-#endif //__Rubicon_PGNodeList_H_
+#endif //__Rubicon_PGDOMComment_H_

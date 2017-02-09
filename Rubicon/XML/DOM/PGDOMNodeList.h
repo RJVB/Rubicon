@@ -1,9 +1,9 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGNamedNodeMap.h
+ *    FILENAME: PGNodeList.h
  *         IDE: AppCode
  *      AUTHOR:  Galen Rhodes
- *        DATE: 1/31/17 8:05 PM
+ *        DATE: 1/31/17 8:17 PM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
@@ -22,35 +22,25 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGNamedNodeMap_H_
-#define __Rubicon_PGNamedNodeMap_H_
+#ifndef __Rubicon_PGNodeList_H_
+#define __Rubicon_PGNodeList_H_
 
 #import <Rubicon/PGTools.h>
 
-@class PGNode;
+@class PGDOMNode;
 
-FOUNDATION_EXPORT NSString *const PGDOMException;
-
-@interface PGNamedNodeMap : NSObject
+@interface PGDOMNodeList : NSObject
 
 	@property(nonatomic, readonly) NSUInteger count;
 
-	-(PGNode *)namedItem:(NSString *)name;
+	-(PGDOMNode *)item:(NSUInteger)index;
 
-	-(PGNode *)namedItem:(NSString *)name namespace:(NSString *)namespaceURI;
+	-(BOOL)hasNode:(PGDOMNode *)aNode;
 
-	-(PGNode *)item:(NSUInteger)index;
-
-	-(PGNode *)removeNamedItem:(NSString *)name;
-
-	-(PGNode *)removeNamedItem:(NSString *)name namespace:(NSString *)namespaceURI;
-
-	-(PGNode *)setNamedItem:(PGNode *)node;
-
-	-(PGNode *)setNamedItemWithNamespace:(PGNode *)node;
+	-(BOOL)isEqualToNodeList:(PGDOMNodeList *)other;
 
 	-(BOOL)isEqual:(id)other;
 
 @end
 
-#endif //__Rubicon_PGNamedNodeMap_H_
+#endif //__Rubicon_PGNodeList_H_

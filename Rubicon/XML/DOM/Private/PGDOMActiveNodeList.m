@@ -21,16 +21,16 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import "PGActiveNodeList.h"
+#import "PGDOMActiveNodeList.h"
 
 NSString *const PGDOMChildListDidChangeNotification = @"PGDOMChildListDidChangeNotification";
 
-@implementation PGActiveNodeList {
+@implementation PGDOMActiveNodeList {
 	}
 
 	@synthesize nodeList = _nodeList;
 
-	-(instancetype)initWithParentNode:(PGNode *)parentNode {
+	-(instancetype)initWithParentNode:(PGDOMNode *)parentNode {
 		self = [super init];
 
 		if(self) {
@@ -55,7 +55,7 @@ NSString *const PGDOMChildListDidChangeNotification = @"PGDOMChildListDidChangeN
 		}
 	}
 
-	-(PGNode *)item:(NSUInteger)index {
+	-(PGDOMNode *)item:(NSUInteger)index {
 		@synchronized(self) {
 			return ((index < _nodeList.count) ? _nodeList[index] : nil);
 		}

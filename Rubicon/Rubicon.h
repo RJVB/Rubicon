@@ -47,3 +47,14 @@ FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
 #import <Rubicon/NSObject+PGObject.h>
 #import <Rubicon/NSString+PGString.h>
 #import <Rubicon/NSMutableDictionary+PGBinaryTreeDictionary.h>
+#import <Rubicon/PGDOMAttribute.h>
+#import <Rubicon/PGDOMCDataSection.h>
+#import <Rubicon/PGDOMComment.h>
+#import <Rubicon/PGDOMDocument.h>
+#import <Rubicon/PGDOMDocumentFragment.h>
+#import <Rubicon/PGDOMElement.h>
+#import <Rubicon/PGDOMNamedNodeMap.h>
+#import <Rubicon/PGDOMNode.h>
+#import <Rubicon/PGDOMNodeList.h>
+#import <Rubicon/PGDOMProcessingInstruction.h>
+#import <Rubicon/PGDOMText.h>

@@ -1,12 +1,13 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDocument.m
+ *    FILENAME: PGDOMPrivate.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 1/31/17 8:13 PM
+ *        DATE: 2/8/17 10:50 PM
+ *  VISIBILITY: Private
  * DESCRIPTION:
  *
- * Copyright © 2017 Project Galen. All rights reserved.
+ * Copyright © 2017 Galen Rhodes All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,13 +22,37 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import "PGDocument.h"
+#ifndef __Rubicon_PGDOMPrivate_H_
+#define __Rubicon_PGDOMPrivate_H_
 
-@implementation PGDocument {
-	}
+#import <Rubicon/PGDOMElement.h>
 
-	-(PGDOMNodeTypes)nodeType {
-		return PGDOMDocumentNode;
-	}
+@interface PGDOMNamespaceAwareNode()
+
+	-(void)setNodeName:(NSString *)nodeName;
+
+	-(void)setBaseURI:(NSString *)baseURI;
+
+	-(void)setNamespaceURI:(NSString *)namespaceURI;
 
 @end
+
+@interface PGDOMChildNode()
+
+	-(void)setParentNode:(PGDOMNode *)node;
+
+@end
+
+@interface PGDOMNode()
+
+	-(void)setOwnerDocument:(PGDOMDocument *)ownerDocument;
+
+@end
+
+@interface PGDOMElement()
+
+	-(void)setTagName:(NSString *)tagName;
+
+@end
+
+#endif //__Rubicon_PGDOMPrivate_H_

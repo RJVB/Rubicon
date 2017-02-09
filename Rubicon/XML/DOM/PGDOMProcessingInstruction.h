@@ -1,13 +1,13 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDefines.h
+ *    FILENAME: PGDOMProcessingInstruction.h
  *         IDE: AppCode
- *      AUTHOR: Galen Rhodes
- *        DATE: 1/10/17 1:04 PM
+ *      AUTHOR:  Galen Rhodes
+ *        DATE: 2/8/17 10:08 PM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
- * Copyright © 2017 Galen Rhodes All rights reserved.
+ * Copyright © 2017  Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,28 +22,16 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGDefines_H_
-#define __Rubicon_PGDefines_H_
+#ifndef __Rubicon_PGDOMProcessingInstruction_H_
+#define __Rubicon_PGDOMProcessingInstruction_H_
 
-#import <Rubicon/GNUstep.h>
+#import <Rubicon/PGDOMNode.h>
 
-typedef long long NSLong;
-typedef CGFloat   NSFloat;  // For the Sheldon Cooper in me.
+@interface PGDOMProcessingInstruction : PGDOMChildNode
 
-#if defined(__APPLE__)
-	#define PGMaxSemaphoreNameLength 30
-#else
-	#define PGMaxSemaphoreNameLength 251
-#endif
+	@property(nonatomic, readonly) NSString *target;
+	@property(nonatomic, copy) NSString     *data;
 
-FOUNDATION_EXPORT NSString *const PGErrorDomain;
+@end
 
-FOUNDATION_EXPORT NSString *const PGTimedWorkerException;
-FOUNDATION_EXPORT NSString *const PGSemaphoreException;
-FOUNDATION_EXPORT NSString *const PGReadWriteLockException;
-FOUNDATION_EXPORT NSString *const PGOSErrorException;
-FOUNDATION_EXPORT NSString *const PGDOMException;
-
-FOUNDATION_EXPORT NSString *const PGDefaultSemaphoreNamePrefix;
-
-#endif //__Rubicon_PGDefines_H_
+#endif //__Rubicon_PGDOMProcessingInstruction_H_

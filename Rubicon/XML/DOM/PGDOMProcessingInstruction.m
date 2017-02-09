@@ -1,13 +1,12 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGActiveNamedNodeMap.h
+ *    FILENAME: PGDOMProcessingInstruction.m
  *         IDE: AppCode
- *      AUTHOR:  Galen Rhodes
- *        DATE: 1/31/17 10:34 PM
- *  VISIBILITY: Private
+ *      AUTHOR: Galen Rhodes
+ *        DATE: 2/8/17 10:08 PM
  * DESCRIPTION:
  *
- * Copyright © 2017  Project Galen. All rights reserved.
+ * Copyright © 2017 Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,21 +21,33 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGActiveNamedNodeMap_H_
-#define __Rubicon_PGActiveNamedNodeMap_H_
+#import "PGDOMProcessingInstruction.h"
 
-#import <Cocoa/Cocoa.h>
-#import <Rubicon/PGNamedNodeMap.h>
+@implementation PGDOMProcessingInstruction {
+	}
 
-@interface PGActiveNamedNodeMap : PGNamedNodeMap
+	-(PGDOMNodeTypes)nodeType {
+		return PGDOMProcessingInstructionNode;
+	}
 
-	@property(nonatomic, readonly) NSMutableDictionary *nodeMap;
+	-(NSString *)nodeName {
+		return self.target;
+	}
 
-	-(instancetype)initWithParentNode:(PGNode *)parentNode;
+	-(NSString *)nodeValue {
+		return self.data;
+	}
 
-	-(void)attributeMapChangeNotification:(NSNotification *)notification;
+	-(void)setNodeValue:(NSString *)nodeValue {
+		self.data = nodeValue;
+	}
+
+	-(NSString *)textContent {
+		return self.data;
+	}
+
+	-(void)setTextContent:(NSString *)textContent {
+		self.data = textContent;
+	}
+
 @end
-
-FOUNDATION_EXPORT NSString *const PGDOMAttributeMapDidChangeNotification;
-
-#endif //__Rubicon_PGActiveNamedNodeMap_H_

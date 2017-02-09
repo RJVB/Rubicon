@@ -1,13 +1,13 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDefines.h
+ *    FILENAME: PGActiveNamedNodeMap.h
  *         IDE: AppCode
- *      AUTHOR: Galen Rhodes
- *        DATE: 1/10/17 1:04 PM
+ *      AUTHOR:  Galen Rhodes
+ *        DATE: 1/31/17 10:34 PM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
- * Copyright © 2017 Galen Rhodes All rights reserved.
+ * Copyright © 2017  Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,28 +22,21 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGDefines_H_
-#define __Rubicon_PGDefines_H_
+#ifndef __Rubicon_PGActiveNamedNodeMap_H_
+#define __Rubicon_PGActiveNamedNodeMap_H_
 
-#import <Rubicon/GNUstep.h>
+#import <Cocoa/Cocoa.h>
+#import "PGDOMNamedNodeMap.h"
 
-typedef long long NSLong;
-typedef CGFloat   NSFloat;  // For the Sheldon Cooper in me.
+@interface PGDOMActiveNamedNodeMap : PGDOMNamedNodeMap
 
-#if defined(__APPLE__)
-	#define PGMaxSemaphoreNameLength 30
-#else
-	#define PGMaxSemaphoreNameLength 251
-#endif
+	@property(nonatomic, readonly) NSMutableDictionary *nodeMap;
 
-FOUNDATION_EXPORT NSString *const PGErrorDomain;
+	-(instancetype)initWithParentNode:(PGDOMNode *)parentNode;
 
-FOUNDATION_EXPORT NSString *const PGTimedWorkerException;
-FOUNDATION_EXPORT NSString *const PGSemaphoreException;
-FOUNDATION_EXPORT NSString *const PGReadWriteLockException;
-FOUNDATION_EXPORT NSString *const PGOSErrorException;
-FOUNDATION_EXPORT NSString *const PGDOMException;
+	-(void)attributeMapChangeNotification:(NSNotification *)notification;
+@end
 
-FOUNDATION_EXPORT NSString *const PGDefaultSemaphoreNamePrefix;
+FOUNDATION_EXPORT NSString *const PGDOMAttributeMapDidChangeNotification;
 
-#endif //__Rubicon_PGDefines_H_
+#endif //__Rubicon_PGActiveNamedNodeMap_H_

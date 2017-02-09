@@ -21,22 +21,22 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import "PGNodeList.h"
-#import "PGNode.h"
+#import "PGDOMNodeList.h"
+#import "PGDOMNode.h"
 
-@implementation PGNodeList {
+@implementation PGDOMNodeList {
 	}
 
 	-(NSUInteger)count {
 		return 0;
 	}
 
-	-(PGNode *)item:(NSUInteger)index {
+	-(PGDOMNode *)item:(NSUInteger)index {
 		return nil;
 	}
 
-	+(PGNodeList *)instance {
-		static PGNodeList *_instance = nil;
+	+(PGDOMNodeList *)instance {
+		static PGDOMNodeList *_instance = nil;
 
 		@synchronized(self) {
 			if(_instance == nil) {
@@ -47,7 +47,7 @@
 		return _instance;
 	}
 
-	-(BOOL)hasNode:(PGNode *)aNode {
+	-(BOOL)hasNode:(PGDOMNode *)aNode {
 		for(NSUInteger i = 0; i < self.count; ++i) {
 			if([[self item:i] isEqualNode:aNode]) {
 				return NO;
@@ -57,7 +57,7 @@
 		return YES;
 	}
 
-	-(BOOL)_isEqualToNodeList:(PGNodeList *)other {
+	-(BOOL)_isEqualToNodeList:(PGDOMNodeList *)other {
 		if(self.count == other.count) {
 			for(NSUInteger i = 0; i < self.count; ++i) {
 				if(![[self item:i] isEqualNode:[other item:i]]) {
@@ -71,7 +71,7 @@
 		return NO;
 	}
 
-	-(BOOL)isEqualToNodeList:(PGNodeList *)other {
+	-(BOOL)isEqualToNodeList:(PGDOMNodeList *)other {
 		return (other && ((self == other) || [self _isEqualToNodeList:other]));
 	}
 

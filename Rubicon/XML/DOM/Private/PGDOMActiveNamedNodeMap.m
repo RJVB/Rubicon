@@ -21,14 +21,14 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import "PGActiveNamedNodeMap.h"
+#import "PGDOMActiveNamedNodeMap.h"
 
-@implementation PGActiveNamedNodeMap {
+@implementation PGDOMActiveNamedNodeMap {
 	}
 
 	@synthesize nodeMap = _nodeMap;
 
-	-(instancetype)initWithParentNode:(PGNode *)parentNode {
+	-(instancetype)initWithParentNode:(PGDOMNode *)parentNode {
 		self = [super init];
 
 		if(self) {
@@ -51,31 +51,31 @@
 		return self.nodeMap.count;
 	}
 
-	-(PGNode *)namedItem:(NSString *)name {
+	-(PGDOMNode *)namedItem:(NSString *)name {
 		return [super namedItem:name];
 	}
 
-	-(PGNode *)namedItem:(NSString *)name namespace:(NSString *)namespaceURI {
+	-(PGDOMNode *)namedItem:(NSString *)name namespace:(NSString *)namespaceURI {
 		return [super namedItem:name namespace:namespaceURI];
 	}
 
-	-(PGNode *)item:(NSUInteger)index {
+	-(PGDOMNode *)item:(NSUInteger)index {
 		return [super item:index];
 	}
 
-	-(PGNode *)removeNamedItem:(NSString *)name {
+	-(PGDOMNode *)removeNamedItem:(NSString *)name {
 		return [super removeNamedItem:name];
 	}
 
-	-(PGNode *)removeNamedItem:(NSString *)name namespace:(NSString *)namespaceURI {
+	-(PGDOMNode *)removeNamedItem:(NSString *)name namespace:(NSString *)namespaceURI {
 		return [super removeNamedItem:name namespace:namespaceURI];
 	}
 
-	-(PGNode *)setNamedItem:(PGNode *)node {
+	-(PGDOMNode *)setNamedItem:(PGDOMNode *)node {
 		return [super setNamedItem:node];
 	}
 
-	-(PGNode *)setNamedItemWithNamespace:(PGNode *)node {
+	-(PGDOMNode *)setNamedItemWithNamespace:(PGDOMNode *)node {
 		return [super setNamedItemWithNamespace:node];
 	}
 

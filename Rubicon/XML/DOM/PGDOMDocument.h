@@ -1,9 +1,9 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGActiveNodeList.h
+ *    FILENAME: PGDocument.h
  *         IDE: AppCode
  *      AUTHOR:  Galen Rhodes
- *        DATE: 1/31/17 9:39 PM
+ *        DATE: 1/31/17 8:13 PM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
@@ -22,26 +22,19 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGActiveNodeList_H_
-#define __Rubicon_PGActiveNodeList_H_
+#ifndef __Rubicon_PGDocument_H_
+#define __Rubicon_PGDocument_H_
 
-#import <Cocoa/Cocoa.h>
-#import <Rubicon/PGNodeList.h>
+#import <Rubicon/PGDOMNode.h>
 
-FOUNDATION_EXPORT NSString *const PGDOMChildListDidChangeNotification;
+@class PGDOMElement;
 
-@interface PGActiveNodeList : PGNodeList
+@interface PGDOMDocument : PGDOMNode
 
-	@property(nonatomic, readonly) NSMutableArray *nodeList;
+	@property(nonatomic, retain) PGDOMElement *documentElement;
 
-	-(instancetype)initWithParentNode:(PGNode *)parentNode;
-
-	-(NSUInteger)count;
-
-	-(PGNode *)item:(NSUInteger)index;
-
-	-(void)childListChangeNotification:(NSNotification *)notification;
+	-(PGDOMNodeTypes)nodeType;
 
 @end
 
-#endif //__Rubicon_PGActiveNodeList_H_
+#endif //__Rubicon_PGDocument_H_
