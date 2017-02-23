@@ -36,7 +36,7 @@
 #define PGFieldsPerPixel (4)
 
 NS_INLINE BOOL PGObjectsEqual(id obj1, id obj2) {
-	return ((obj1 == nil) ? (obj2 == nil) : [obj1 isEqual:obj2]);
+	return ((obj1 == nil) ? (obj2 == nil) : ((obj2 == nil) ? NO : [obj1 isEqual:obj2]));
 }
 
 /**************************************************************************************************//**

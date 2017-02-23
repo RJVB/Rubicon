@@ -1,13 +1,12 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDOMAttribute.h
+ *    FILENAME: PGDOMElement.m
  *         IDE: AppCode
- *      AUTHOR:  Galen Rhodes
- *        DATE: 2/8/17 10:23 PM
- *  VISIBILITY: Private
+ *      AUTHOR: Galen Rhodes
+ *        DATE: 2/15/17 7:11 PM
  * DESCRIPTION:
  *
- * Copyright © 2017  Project Galen. All rights reserved.
+ * Copyright © 2017 Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,13 +21,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGDOMAttribute_H_
-#define __Rubicon_PGDOMAttribute_H_
+#import "PGDOMElement.h"
 
-#import <Rubicon/PGDOMNode.h>
-#import <Rubicon/PGDOMNamespaceAwareNode.h>
-
-@interface PGDOMAttribute : PGDOMNamespaceAwareNode
+@implementation PGDOMElement {
+	}
 @end
-
-#endif //__Rubicon_PGDOMAttribute_H_

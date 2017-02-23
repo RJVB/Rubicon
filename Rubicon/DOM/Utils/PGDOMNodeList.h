@@ -1,12 +1,13 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDOMComment.m
+ *    FILENAME: PGDOMNodeList.h
  *         IDE: AppCode
- *      AUTHOR: Galen Rhodes
- *        DATE: 2/8/17 9:57 PM
+ *      AUTHOR:  Galen Rhodes
+ *        DATE: 2/15/17 7:07 PM
+ *  VISIBILITY: Private
  * DESCRIPTION:
  *
- * Copyright © 2017 Project Galen. All rights reserved.
+ * Copyright © 2017  Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,17 +22,40 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import "PGDOMComment.h"
+#ifndef __Rubicon_PGDOMNodeList_H_
+#define __Rubicon_PGDOMNodeList_H_
 
-@implementation PGDOMComment {
-	}
+#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGDOMNode.h>
 
-	-(NSString *)nodeName {
-		return @"#comment";
-	}
+@class PGDOMElement;
+@class PGDOMAttribute;
 
-	-(PGDOMNodeTypes)nodeType {
-		return PGDOMCommentNode;
-	}
+@interface PGDOMNodeList : NSObject<NSLocking>
 
+	@property(readonly) NSUInteger length;
+
+	-(instancetype)init;
+
+	-(PGDOMNode *)item:(NSUInteger)index;
+
+	-(BOOL)isEqual:(id)other;
+
+	-(BOOL)isEqualToList:(PGDOMNodeList *)list;
+
+	-(NSUInteger)hash;
+
+	-(void)lock;
+
+	-(void)unlock;
+
+	-(BOOL)containsSimilarNode:(PGDOMNode *)node;
+
+	-(BOOL)containsNode:(PGDOMNode *)node;
+
+	-(NSUInteger)indexOfSimilarNode:(PGDOMNode *)node;
+
+	-(NSUInteger)indexOfNode:(PGDOMNode *)node;
 @end
+
+#endif //__Rubicon_PGDOMNodeList_H_

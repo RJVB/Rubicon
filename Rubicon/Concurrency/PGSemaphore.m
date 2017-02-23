@@ -25,7 +25,7 @@
 #import "NSString+PGString.h"
 #import "PGTimedWait.h"
 #import "PGTimeSpec.h"
-#import <semaphore.h>
+#include <semaphore.h>
 
 @interface PGTimedSemWait : PGTimedWait
 

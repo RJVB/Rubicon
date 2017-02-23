@@ -21,7 +21,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import <pthread.h>
+#include <pthread.h>
 #import "PGReadWriteLock.h"
 #import "PGTimedWait.h"
 #import "PGTimeSpec.h"

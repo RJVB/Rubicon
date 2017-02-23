@@ -30,10 +30,16 @@
 typedef long long NSLong;
 typedef CGFloat   NSFloat;  // For the Sheldon Cooper in me.
 
+static const NSUInteger NSUNotFound = NSUIntegerMax;
+
 #if defined(__APPLE__)
 	#define PGMaxSemaphoreNameLength 30
 #else
 	#define PGMaxSemaphoreNameLength 251
+#endif
+
+#if !defined(PGNotImplemented)
+	#define PGNotImplemented [self doesNotRecognizeSelector:_cmd]; __builtin_unreachable()
 #endif
 
 FOUNDATION_EXPORT NSString *const PGErrorDomain;

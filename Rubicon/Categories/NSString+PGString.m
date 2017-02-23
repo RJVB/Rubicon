@@ -23,7 +23,19 @@
 
 #import "NSString+PGString.h"
 
+const NSUInteger PGUNotFound = NSUIntegerMax;
+
 @implementation NSString(PGString)
+
+	-(NSUInteger)indexOfCharacter:(unichar)c {
+		for(NSUInteger i = 0, j = self.length; i < j; i++) {
+			if(c == [self characterAtIndex:i]) {
+				return i;
+			}
+		}
+
+		return PGUNotFound;
+	}
 
 	-(NSString *)limitLength:(NSUInteger)maxLength {
 		return ((self.length > maxLength) ? [self substringWithRange:NSMakeRange(0, maxLength)] : self);

@@ -1,9 +1,9 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGNodeList.h
+ *    FILENAME: PGDOMDocument.h
  *         IDE: AppCode
  *      AUTHOR:  Galen Rhodes
- *        DATE: 1/31/17 8:17 PM
+ *        DATE: 2/15/17 7:09 PM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
@@ -22,25 +22,13 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGNodeList_H_
-#define __Rubicon_PGNodeList_H_
+#ifndef __Rubicon_PGDOMDocument_H_
+#define __Rubicon_PGDOMDocument_H_
 
-#import <Rubicon/PGTools.h>
+#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGDOMNode.h>
 
-@class PGDOMNode;
-
-@interface PGDOMNodeList : NSObject
-
-	@property(nonatomic, readonly) NSUInteger count;
-
-	-(PGDOMNode *)item:(NSUInteger)index;
-
-	-(BOOL)hasNode:(PGDOMNode *)aNode;
-
-	-(BOOL)isEqualToNodeList:(PGDOMNodeList *)other;
-
-	-(BOOL)isEqual:(id)other;
-
+@interface PGDOMDocument : NSObject
 @end
 
-#endif //__Rubicon_PGNodeList_H_
+#endif //__Rubicon_PGDOMDocument_H_

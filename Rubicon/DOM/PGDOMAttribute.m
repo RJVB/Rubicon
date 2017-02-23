@@ -1,13 +1,12 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDocument.h
+ *    FILENAME: PGDOMAttributes.m
  *         IDE: AppCode
- *      AUTHOR:  Galen Rhodes
- *        DATE: 1/31/17 8:13 PM
- *  VISIBILITY: Private
+ *      AUTHOR: Galen Rhodes
+ *        DATE: 2/15/17 7:21 PM
  * DESCRIPTION:
  *
- * Copyright © 2017  Project Galen. All rights reserved.
+ * Copyright © 2017 Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,19 +21,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGDocument_H_
-#define __Rubicon_PGDocument_H_
+#import "PGDOMAttribute.h"
 
-#import <Rubicon/PGDOMNode.h>
-
-@class PGDOMElement;
-
-@interface PGDOMDocument : PGDOMNode
-
-	@property(nonatomic, retain) PGDOMElement *documentElement;
-
-	-(PGDOMNodeTypes)nodeType;
-
+@implementation PGDOMAttribute {
+	}
 @end
-
-#endif //__Rubicon_PGDocument_H_

@@ -1,9 +1,9 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDOMComment.h
+ *    FILENAME: PGDOMNamedNodeMap.h
  *         IDE: AppCode
  *      AUTHOR:  Galen Rhodes
- *        DATE: 2/8/17 9:57 PM
+ *        DATE: 2/15/17 7:05 PM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
@@ -22,12 +22,33 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGDOMComment_H_
-#define __Rubicon_PGDOMComment_H_
+#ifndef __Rubicon_PGDOMNamedNodeMap_H_
+#define __Rubicon_PGDOMNamedNodeMap_H_
 
-#import <Rubicon/PGDOMCharacterData.h>
+#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGDOMNode.h>
 
-@interface PGDOMComment : PGDOMCharacterData
+@class PGDOMElement;
+@class PGDOMAttribute;
+
+@interface PGDOMNamedNodeMap : NSObject
+
+	@property(readonly) NSUInteger length;
+
+	-(PGDOMNode *)item:(NSUInteger)index;
+
+	-(PGDOMNode *)nodeNamed:(NSString *)name;
+
+	-(PGDOMNode *)nodeNamedNS:(NSString *)localName namespaceURI:(NSString *)namespaceURI;
+
+	-(PGDOMNode *)removeNodeNamed:(NSString *)name;
+
+	-(PGDOMNode *)removeNodeNamedNS:(NSString *)localName namespaceURI:(NSString *)namespaceURI;
+
+	-(PGDOMNode *)setNode:(PGDOMNode *)node;
+
+	-(PGDOMNode *)setNodeNS:(PGDOMNode *)node;
+
 @end
 
-#endif //__Rubicon_PGDOMComment_H_
+#endif //__Rubicon_PGDOMNamedNodeMap_H_

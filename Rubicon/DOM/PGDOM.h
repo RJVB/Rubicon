@@ -1,13 +1,13 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGCharacterData.h
+ *    FILENAME: PGDOM.h
  *         IDE: AppCode
- *      AUTHOR:  Galen Rhodes
- *        DATE: 2/8/17 7:23 PM
+ *      AUTHOR: Galen Rhodes
+ *        DATE: 2/15/17 6:55 PM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
- * Copyright © 2017  Project Galen. All rights reserved.
+ * Copyright © 2017 Galen Rhodes All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,28 +22,24 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGCharacterData_H_
-#define __Rubicon_PGCharacterData_H_
+#ifndef __Rubicon_PGDOM_H_
+#define __Rubicon_PGDOM_H_
 
-#import <Rubicon/PGDOMNode.h>
+#import <Cocoa/Cocoa.h>
 
-@interface PGDOMCharacterData : PGDOMChildNode
+typedef enum _en_pgdomnodetypes {
+	PGDOMNodeTypeAttribute,
+	PGDOMNodeTypeCDataSection,
+	PGDOMNodeTypeComment,
+	PGDOMNodeTypeDocument,
+	PGDOMNodeTypeDocumentFragment,
+	PGDOMNodeTypeDocumentType,
+	PGDOMNodeTypeElement,
+	PGDOMNodeTypeEntity,
+	PGDOMNodeTypeEntityReference,
+	PGDOMNodeTypeNotation,
+	PGDOMNodeTypeProcessingInstruction,
+	PGDOMNodeTypeText
+} PGDOMNodeTypes;
 
-	@property(nonatomic, copy) NSString       *data;
-	@property(nonatomic, readonly) NSUInteger length;
-
-	-(instancetype)init;
-
-	-(void)appendData:(NSString *)data;
-
-	-(void)deleteDataAtOffset:(NSUInteger)offset length:(NSUInteger)len;
-
-	-(void)insertData:(NSString *)data offset:(NSUInteger)offset;
-
-	-(void)replaceDataAtOffset:(NSUInteger)offset length:(NSUInteger)len withData:(NSString *)data;
-
-	-(NSString *)substringAtOffset:(NSUInteger)offset length:(NSUInteger)len;
-
-@end
-
-#endif //__Rubicon_PGCharacterData_H_
+#endif //__Rubicon_PGDOM_H_

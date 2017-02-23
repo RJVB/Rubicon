@@ -27,7 +27,11 @@
 
 #import <Rubicon/PGTools.h>
 
+FOUNDATION_EXPORT const NSUInteger PGUNotFound;
+
 @interface NSString(PGString)
+
+	-(NSUInteger)indexOfCharacter:(unichar)c;
 
 	-(NSString *)limitLength:(NSUInteger)maxLength;
 

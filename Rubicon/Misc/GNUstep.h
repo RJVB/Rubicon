@@ -27,17 +27,17 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import <sys/cdefs.h>
-#import <sys/types.h>
-#import <stddef.h>
-#import <stdint.h>
-#import <stdbool.h>
-#import <stdarg.h>
-#import <unistd.h>
-#import <fcntl.h>
-#import <errno.h>
-#import <string.h>
-#import <time.h>
+#include <sys/cdefs.h>
+#include <sys/types.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdarg.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <string.h>
+#include <time.h>
 
 #ifndef PG_ARC
 	#if defined(__has_feature) && __has_feature(objc_arc)

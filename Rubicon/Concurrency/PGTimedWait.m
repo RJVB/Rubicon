@@ -29,7 +29,7 @@
  *******************************************************************************/
 
 #import <Rubicon/Rubicon.h>
-#import <pthread.h>
+#include <pthread.h>
 
 void ignoreSignal(int _signal);
 

@@ -1,12 +1,13 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDOMProcessingInstruction.m
+ *    FILENAME: PGDOMElement.h
  *         IDE: AppCode
- *      AUTHOR: Galen Rhodes
- *        DATE: 2/8/17 10:08 PM
+ *      AUTHOR:  Galen Rhodes
+ *        DATE: 2/15/17 7:11 PM
+ *  VISIBILITY: Private
  * DESCRIPTION:
  *
- * Copyright © 2017 Project Galen. All rights reserved.
+ * Copyright © 2017  Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,33 +22,13 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import "PGDOMProcessingInstruction.h"
+#ifndef __Rubicon_PGDOMElement_H_
+#define __Rubicon_PGDOMElement_H_
 
-@implementation PGDOMProcessingInstruction {
-	}
+#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGDOMNode.h>
 
-	-(PGDOMNodeTypes)nodeType {
-		return PGDOMProcessingInstructionNode;
-	}
-
-	-(NSString *)nodeName {
-		return self.target;
-	}
-
-	-(NSString *)nodeValue {
-		return self.data;
-	}
-
-	-(void)setNodeValue:(NSString *)nodeValue {
-		self.data = nodeValue;
-	}
-
-	-(NSString *)textContent {
-		return self.data;
-	}
-
-	-(void)setTextContent:(NSString *)textContent {
-		self.data = textContent;
-	}
-
+@interface PGDOMElement : NSObject
 @end
+
+#endif //__Rubicon_PGDOMElement_H_

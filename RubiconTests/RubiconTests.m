@@ -89,6 +89,21 @@
 		}
 	}
 
+	-(NSInteger)performWithReturnInTry {
+		NSInteger aNumber = 3;
+
+		@try {
+			return aNumber;
+		}
+		@finally {
+			NSLog(@"Finally block has been executed.");
+		}
+	}
+
+	-(void)testFinallyExecutedWithReturnFromTry {
+		NSLog(@"Value returned: %@", @([self performWithReturnInTry]));
+	}
+
 
 	//	-(void)testPerformanceExample {
 	//		// This is an example of a performance test case.

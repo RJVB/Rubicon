@@ -1,9 +1,9 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGNamespaceAwareNode.h
+ *    FILENAME: PGDOMAttributes.h
  *         IDE: AppCode
  *      AUTHOR:  Galen Rhodes
- *        DATE: 2/2/17 8:13 PM
+ *        DATE: 2/15/17 7:21 PM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
@@ -22,19 +22,13 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGNamespaceAwareNode_H_
-#define __Rubicon_PGNamespaceAwareNode_H_
+#ifndef __Rubicon_PGDOMAttributes_H_
+#define __Rubicon_PGDOMAttributes_H_
 
+#import <Cocoa/Cocoa.h>
 #import <Rubicon/PGDOMNode.h>
 
-@interface PGDOMNamespaceAwareNode : PGDOMChildNode
-
-	-(BOOL)isDefaultNamespace:(NSString *)namespaceURI;
-
-	-(NSString *)lookupNamespaceURI:(NSString *)prefix;
-
-	-(NSString *)lookupPrefix:(NSString *)namespaceURI;
-
+@interface PGDOMAttribute : NSObject
 @end
 
-#endif //__Rubicon_PGNamespaceAwareNode_H_
+#endif //__Rubicon_PGDOMAttributes_H_
