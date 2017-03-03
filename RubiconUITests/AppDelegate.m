@@ -27,7 +27,7 @@
 	@synthesize textField = _textField;
 
 	-(void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-		self.view.rootNode = [[PGBinaryTreeKVNode alloc] initWithValue:@"A" forKey:@"A"];
+		self.view.rootNode = [[PGBinaryTreeNode alloc] initWithKey:@"A" value:@"A"];
 	}
 
 	-(void)applicationWillTerminate:(NSNotification *)aNotification {
@@ -41,18 +41,18 @@
 		NSString *aKey = self.textField.stringValue;
 
 		if(aKey.trim.length) {
-			PGBinaryTreeLeaf *node = self.view.rootNode;
+			PGBinaryTreeNode *node = self.view.rootNode;
 
 			if(node) {
-				self.view.rootNode = [node insertValue:aKey forKey:aKey withComparator:^NSComparisonResult(id obj1, id obj2) {
+				self.view.rootNode = [node insertValue:aKey forKey:aKey comparator:^NSComparisonResult(id obj1, id obj2) {
 					return [(NSString *)obj1 compare:(NSString *)obj2];
-				}].root;
+				}];
 			}
 			else {
-				self.view.rootNode = [[PGBinaryTreeKVNode alloc] initWithValue:aKey forKey:aKey];
+				self.view.rootNode = [[PGBinaryTreeNode alloc] initWithKey:aKey value:aKey];
 			}
 
-			NSLog(@"Insert Text: %@; count = %@", aKey, @(self.view.rootNode.root.count));
+			NSLog(@"Insert Text: %@; count = %@", aKey, @(self.view.rootNode.rootNode.count));
 			self.textField.stringValue = @"";
 		}
 	}
@@ -61,17 +61,16 @@
 		NSString *key = self.textField.stringValue;
 
 		if(key.trim.length) {
-
-			PGBinaryTreeLeaf *node = [self.view.rootNode find:key withComparator:^NSComparisonResult(id obj1, id obj2) {
+			PGBinaryTreeNode *node = [self.view.rootNode findNodeForKey:key comparator:^NSComparisonResult(id obj1, id obj2) {
 				return [(NSString *)obj1 compare:(NSString *)obj2];
 			}];
 
-			if(node && !node.isLeaf) {
+			if(node) {
 				NSLog(@"Removing node %@", node);
 				self.view.rootNode = [node remove];
 			}
 
-			NSLog(@"Remove Text: %@; count = %@", key, @(self.view.rootNode.root.count));
+			NSLog(@"Remove Text: %@; count = %@", key, @(self.view.rootNode.rootNode.count));
 			self.textField.stringValue = @"";
 		}
 	}

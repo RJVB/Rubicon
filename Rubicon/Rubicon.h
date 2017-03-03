@@ -22,7 +22,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-
 #import <Cocoa/Cocoa.h>
 
 //! Project version number for Rubicon.
@@ -31,7 +30,6 @@ FOUNDATION_EXPORT double RubiconVersionNumber;
 //! Project version string for Rubicon.
 FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
 
-#import <Rubicon/PGBinaryTreeKVNode.h>
 #import <Rubicon/PGBinaryTreeDictionary.h>
 #import <Rubicon/PGIPoint.h>
 #import <Rubicon/PGISize.h>
@@ -45,13 +43,7 @@ FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
 #import <Rubicon/PGReadWriteLock.h>
 #import <Rubicon/PGTimeSpec.h>
 #import <Rubicon/PGTimedWait.h>
+#import <Rubicon/PGBinaryTreeNode.h>
 #import <Rubicon/NSObject+PGObject.h>
 #import <Rubicon/NSString+PGString.h>
 #import <Rubicon/NSMutableDictionary+PGBinaryTreeDictionary.h>
-#import <Rubicon/PGDOM.h>
-#import <Rubicon/PGDOMNode.h>
-#import <Rubicon/PGDOMNodeList.h>
-#import <Rubicon/PGDOMNamedNodeMap.h>
-#import <Rubicon/PGDOMElement.h>
-#import <Rubicon/PGDOMDocument.h>
-#import <Rubicon/PGDOMAttribute.h>

@@ -29,13 +29,11 @@
 
 @interface PGBinaryTreeDictionary : NSMutableDictionary
 
-	@property(nonatomic, copy, readonly) NSComparator comparator;
+	@property(copy, readonly) NSComparator comparator;
 
 	-(instancetype)init;
 
 	-(instancetype)initWithComparator:(NSComparator)comparator;
-
-	-(NSEnumerator *)keyEnumerator;
 
 	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt;
 
@@ -46,6 +44,11 @@
 	-(id)objectForKey:(id)aKey;
 
 	-(void)removeObjectForKey:(id)aKey;
+
+	-(NSEnumerator *)keyEnumerator;
+
+	-(NSEnumerator *)objectEnumerator;
+
 @end
 
 #endif //__Rubicon_PGBinaryTree_H_

@@ -58,7 +58,6 @@
 		[self testCompareWithClass:@"Galen"];
 		[self testCompareWithClass:[NSString stringWithFormat:@"My name is %@!", @"Galen"]];
 		[self testCompareWithClass:@[ @"a", @"b", @"c" ]];
-		[self testCompareWithClass:[[PGBinaryTreeLeaf alloc] initWithValue:@"Rhodes" forKey:@"Galen"]];
 	}
 
 	-(void)testCommonBaseClass {

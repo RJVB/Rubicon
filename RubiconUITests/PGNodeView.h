@@ -30,7 +30,7 @@
 
 @interface PGNodeView : NSView
 
-	@property(nonatomic, retain) PGBinaryTreeLeaf *rootNode;
+	@property(nonatomic, retain) PGBinaryTreeNode *rootNode;
 	@property(nonatomic, readonly) NSRect         minimumFrame;
 
 @end

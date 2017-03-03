@@ -23,37 +23,51 @@
 
 #import "PGBinaryTreeDictionary.h"
 #import "PGBinaryTreeNode.h"
-#import "PGBinaryTreeKVNode.h"
-#import "NSObject+PGObject.h"
 
-@interface PGBinaryTreeEnumerator : NSEnumerator
+@interface PGBinaryTreeKeyEnumerator : NSEnumerator
 
-	@property(nonatomic, weak) PGBinaryTreeLeaf *root;
-	@property(nonatomic, weak) PGBinaryTreeLeaf *currentNode;
+	@property(retain) PGBinaryTreeNode       *current;
+	@property(retain) PGBinaryTreeDictionary *dict;
+	@property(retain) NSMutableArray         *stack;
 
-	-(instancetype)initWithRoot:(PGBinaryTreeLeaf *)aRoot;
+	-(instancetype)initWithDictionary:(PGBinaryTreeDictionary *)dict;
+
+	-(PGBinaryTreeNode *)pushStack:(PGBinaryTreeNode *)node;
+
+	-(PGBinaryTreeNode *)popStack;
+
+	-(id)nextObject;
+
+	-(NSArray *)allObjects;
 
 @end
 
-@interface PGBinaryTreeLeaf()
+@interface PGBinaryTreeValueEnumerator : NSEnumerator
 
-	-(instancetype)farLeft;
+	@property(retain) PGBinaryTreeDictionary    *dict;
+	@property(retain) PGBinaryTreeKeyEnumerator *keyEnum;
 
-	-(instancetype)nextNode;
+	-(instancetype)initWithDictionary:(PGBinaryTreeDictionary *)dict;
 
-	-(instancetype)prevNode;
+	-(id)nextObject;
+
+	-(NSArray *)allObjects;
+
+@end
+
+@interface PGBinaryTreeDictionary()
+
+	-(PGBinaryTreeNode *)rootNode;
+
+	-(PGBinaryTreeNode *)nodeForKey:(id)aKey;
 
 @end
 
 @implementation PGBinaryTreeDictionary {
-		PGBinaryTreeLeaf *_root;
+		PGBinaryTreeNode *_rootNode;
 	}
 
 	@synthesize comparator = _comparator;
-
-	-(NSUInteger)count {
-		return _root.count;
-	}
 
 	-(instancetype)init {
 		return (self = [self initWithComparator:nil]);
@@ -63,15 +77,10 @@
 		self = [super init];
 
 		if(self) {
-			_root       = nil;
-			_comparator = [(comparator ? comparator : [PGBinaryTreeDictionary defaultComparator]) copy];
+			_comparator = [comparator copy];
 		}
 
 		return self;
-	}
-
-	-(NSEnumerator *)keyEnumerator {
-		return [super keyEnumerator];
 	}
 
 	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt {
@@ -82,13 +91,9 @@
 		self = [self initWithComparator:comparator];
 
 		if(self) {
-			for(NSUInteger i = 0; i < cnt; ++i) {
-				if(objects[i] && keys[i]) {
+			if(objects && keys) {
+				for(NSUInteger i = 0; i < cnt; i++) {
 					[self setObject:objects[i] forKey:keys[i]];
-				}
-				else {
-					[self removeAllObjects];
-					@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Non-nil object or key passed to dictionary." userInfo:nil];
 				}
 			}
 		}
@@ -96,63 +101,160 @@
 		return self;
 	}
 
+	-(PGBinaryTreeNode *)rootNode {
+		return _rootNode;
+	}
+
 	-(void)setObject:(id)anObject forKey:(id<NSCopying>)aKey {
-		_root = (_root ? [_root insertValue:anObject forKey:aKey withComparator:^NSComparisonResult(id obj1, id obj2) {
-			return NSOrderedSame;
-		}].root : [[PGBinaryTreeKVNode alloc] initWithValue:anObject forKey:aKey]);
+		if(anObject && aKey) {
+			if(self.comparator) {
+				_rootNode = [_rootNode insertValue:anObject forKey:aKey comparator:self.comparator].rootNode;
+			}
+			else {
+				_rootNode = [_rootNode insertValue:anObject forKey:aKey].rootNode;
+			}
+		}
+	}
+
+	-(PGBinaryTreeNode *)nodeForKey:(id)aKey {
+		if(aKey) {
+			if(self.comparator) {
+				return [_rootNode findNodeForKey:aKey comparator:self.comparator];
+			}
+			else {
+				return [_rootNode findNodeForKey:aKey];
+			}
+		}
+
+		return nil;
 	}
 
 	-(id)objectForKey:(id)aKey {
-		return [_root find:aKey withComparator:^NSComparisonResult(id obj1, id obj2) {
-			return NSOrderedSame;
-		}].value;
+		return [self nodeForKey:aKey].value;
 	}
 
 	-(void)removeObjectForKey:(id)aKey {
-		PGBinaryTreeLeaf *node = [_root find:aKey withComparator:^NSComparisonResult(id obj1, id obj2) {
-			return NSOrderedSame;
-		}];
+		PGBinaryTreeNode *node = [self nodeForKey:aKey];
+		if(node) _rootNode = [node remove];
+	}
 
-		if(node && node.isNode) {
-			_root = [node remove];
-		}
+	-(NSUInteger)count {
+		return _rootNode.count;
+	}
+
+	-(NSEnumerator *)keyEnumerator {
+		return [[PGBinaryTreeKeyEnumerator alloc] initWithDictionary:self];
+	}
+
+	-(NSEnumerator *)objectEnumerator {
+		return [[PGBinaryTreeValueEnumerator alloc] initWithDictionary:self];
 	}
 
 @end
 
-@implementation PGBinaryTreeEnumerator {
+@implementation PGBinaryTreeKeyEnumerator {
 	}
 
-	@synthesize root = _root;
-	@synthesize currentNode = _currentNode;
+	@synthesize current = _current;
+	@synthesize dict = _dict;
+	@synthesize stack = _stack;
 
-	-(instancetype)initWithRoot:(PGBinaryTreeLeaf *)aRoot {
+	-(instancetype)initWithDictionary:(PGBinaryTreeDictionary *)dict {
 		self = [super init];
 
 		if(self) {
-			self.root = aRoot.root;
+			if(dict.rootNode) {
+				self.dict  = dict;
+				self.stack = [NSMutableArray array];
+				[self pushStack:self.dict.rootNode];
+			}
+		}
 
-			if(self.root.isLeaf) {
-				self.root        = nil;
-				self.currentNode = nil;
-			}
-			else {
-				self.currentNode = self.root.farLeft;
-			}
+		return self;
+	}
+
+	-(PGBinaryTreeNode *)pushStack:(PGBinaryTreeNode *)node {
+		if(node.leftNode) {
+			[self.stack addObject:node];
+			return [self pushStack:node.leftNode];
+		}
+		else {
+			return node;
+		}
+	}
+
+	-(PGBinaryTreeNode *)popStack {
+		PGBinaryTreeNode *node = nil;
+
+		if(self.stack.count) {
+			node = [self.stack lastObject];
+			[self.stack removeLastObject];
+		}
+
+		return node;
+	}
+
+	-(id)nextObject {
+		id o = nil;
+
+		if(self.current) {
+			o = self.current.key;
+			self.current = (self.current.rightNode ? [self pushStack:self.current.rightNode] : [self popStack]);
+		}
+		else {
+			self.dict  = nil;
+			self.stack = nil;
+		}
+
+		return o;
+	}
+
+	-(NSArray *)allObjects {
+		NSMutableArray *array = [NSMutableArray array];
+		id             o      = self.nextObject;
+
+		while(o) {
+			[array addObject:o];
+			o = self.nextObject;
+		}
+
+		return array;
+	}
+
+@end
+
+@implementation PGBinaryTreeValueEnumerator {
+	}
+
+	@synthesize dict = _dict;
+	@synthesize keyEnum = _keyEnum;
+
+	-(instancetype)initWithDictionary:(PGBinaryTreeDictionary *)dict {
+		self = [super init];
+
+		if(self) {
+			self.dict    = dict;
+			self.keyEnum = [[PGBinaryTreeKeyEnumerator alloc] initWithDictionary:dict];
 		}
 
 		return self;
 	}
 
 	-(id)nextObject {
-		if(self.currentNode && self.currentNode.isNode) {
-			PGBinaryTreeLeaf *node = self.currentNode;
-			self.currentNode = self.currentNode.nextNode;
-			return node.value;
+		id aKey = self.keyEnum.nextObject;
+		return (aKey ? [self.dict objectForKey:aKey] : nil);
+	}
+
+	-(NSArray *)allObjects {
+		NSMutableArray *array = [NSMutableArray array];
+		id             o      = self.nextObject;
+
+		while(o) {
+			[array addObject:o];
+			o = self.nextObject;
 		}
-		else {
-			return nil;
-		}
+
+		return array;
 	}
 
 @end

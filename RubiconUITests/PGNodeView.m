@@ -29,7 +29,7 @@
 	@synthesize rootNode = _rootNode;
 
 	-(NSRect)minimumFrame {
-		NSSize size = (_rootNode ? _rootNode.drawSize : NSZeroSize);
+		NSSize size = NSZeroSize; // (_rootNode ? _rootNode.drawSize : NSZeroSize);
 		return NSMakeRect(0, 0, (size.width + 20.0), (size.height + 20.0));
 	}
 
@@ -40,7 +40,7 @@
 		return NSMakeRect(0, 0, MAX(NSWidth(nframe), NSWidth(pframe)), MAX(NSHeight(nframe), NSHeight(pframe)));
 	}
 
-	-(void)setRootNode:(PGBinaryTreeLeaf *)rootNode {
+	-(void)setRootNode:(PGBinaryTreeNode *)rootNode {
 		_rootNode = rootNode;
 		if(_rootNode) [self setFrame:self.desiredFrame];
 		self.needsDisplay = YES;
@@ -64,7 +64,7 @@
 		[NSBezierPath fillRect:dirtyRect];
 
 		if(self.rootNode) {
-			[self.rootNode draw:self.frame];
+			// [self.rootNode draw:self.frame];
 		}
 		else {
 			[@"Nothing to show" drawDeadCentered:dirtyRect fontName:@"AmericanTypewriter-Light" fontSize:18 fontColor:[NSColor blackColor]];
