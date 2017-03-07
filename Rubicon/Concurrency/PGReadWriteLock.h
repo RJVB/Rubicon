@@ -33,10 +33,6 @@
 
 	-(instancetype)init;
 
-	-(void)dealloc;
-
-	-(void)close;
-
 	-(void)lock;
 
 	-(void)writeLock;

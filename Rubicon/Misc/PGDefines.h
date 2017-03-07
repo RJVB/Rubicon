@@ -42,6 +42,18 @@ static const NSUInteger NSUNotFound = NSUIntegerMax;
 	#define PGNotImplemented [self doesNotRecognizeSelector:_cmd]; __builtin_unreachable()
 #endif
 
+#if NS_BLOCKS_AVAILABLE
+
+typedef BOOL (^PGBinaryTreeTravelBlock)(id nodeKey, id nodeValue);
+
+#endif
+
+@protocol PGBinaryTreeTraveler
+
+	-(BOOL)visitNodeWithKey:(id)aKey andValue:(id)aValue;
+
+@end
+
 FOUNDATION_EXPORT NSString *const PGErrorDomain;
 
 FOUNDATION_EXPORT NSString *const PGTimedWorkerException;

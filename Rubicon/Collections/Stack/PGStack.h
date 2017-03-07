@@ -1,12 +1,13 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDOMElement.m
+ *    FILENAME: PGStack.h
  *         IDE: AppCode
- *      AUTHOR: Galen Rhodes
- *        DATE: 2/15/17 7:11 PM
+ *      AUTHOR:  Galen Rhodes
+ *        DATE: 3/4/17 9:44 PM
+ *  VISIBILITY: Private
  * DESCRIPTION:
  *
- * Copyright © 2017 Project Galen. All rights reserved.
+ * Copyright © 2017  Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,8 +22,38 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import "PGDOMElement.h"
+#ifndef __Rubicon_PGStack_H_
+#define __Rubicon_PGStack_H_
 
-@implementation PGDOMElement {
-	}
+#import <Cocoa/Cocoa.h>
+
+@interface PGStack : NSObject
+
+	@property(readonly) NSUInteger count;
+	@property(readonly) BOOL       isEmpty;
+
+	-(instancetype)init;
+
+	-(instancetype)initWithNSArray:(NSArray *)objs;
+
+	-(instancetype)initWithObjects:(const id[])objects count:(NSUInteger)cnt;
+
+	-(void)push:(id)obj;
+
+	-(id)pop;
+
+	-(id)peek;
+
+	-(NSArray *)popAll;
+
+	-(NSArray *)peekAll;
+
+	-(void)pushAll:(NSArray *)objs;
+
+	-(void)removeAll;
+
+	-(NSEnumerator *)objectEnumerator;
+
 @end
+
+#endif //__Rubicon_PGStack_H_

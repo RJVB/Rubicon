@@ -23,28 +23,42 @@
 
 #include <pthread.h>
 #import "PGReadWriteLock.h"
-#import "PGTimedWait.h"
-#import "PGTimeSpec.h"
+#import "PGTimedReadLock.h"
 
-@interface PGTimedReadLock : PGTimedWait
+typedef enum { PGRWNoLockHeld, PGRWReadLockHeld, PGRWWriteLockHeld } PGRWCurrentLock;
 
-	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock;
+@interface PGRWLockCounts : NSObject
 
-	-(BOOL)action:(id *)results;
+	@property(readwrite) NSUInteger      count;
+	@property(readwrite) PGRWCurrentLock currentLock;
 
-	-(int)performAction:(pthread_rwlock_t *)rwlock;
+	-(instancetype)init;
+
+	+(instancetype)counts;
 
 @end
 
-@interface PGTimedWriteLock : PGTimedReadLock
+@interface PGReadWriteLock()
 
-	-(int)performAction:(pthread_rwlock_t *)rwlock;
+	-(void)osTest:(int)rc;
 
+	-(BOOL)osBusyTest:(int)rc;
+
+	-(PGRWLockCounts *)lockCounts;
+
+	-(void)dealloc;
+
+	-(NSException *)upDownException:(PGRWLockCounts *)lc;
+
+	-(BOOL)privateTimedWriteLock:(PGTimeSpec *)absTime;
+
+	-(BOOL)privateTimedReadLock:(PGTimeSpec *)absTime;
 @end
 
 @implementation PGReadWriteLock {
-		pthread_rwlock_t _rwlock;
 		BOOL             _open;
+		pthread_rwlock_t _rwlock;
+		NSString         *_tlsKey;
 	}
 
 	-(instancetype)init {
@@ -52,130 +66,229 @@
 
 		if(self) {
 			_open = NO;
-			int rc = pthread_rwlock_init(&_rwlock, NULL);
-
-			if(rc) {
-				@throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
-			}
-
-			_open = YES;
+			[self osTest:pthread_rwlock_init(&_rwlock, NULL)];
+			_open   = YES;
+			_tlsKey = [NSString stringWithFormat:@"%@.%@", NSStringFromClass([self class]), [NSUUID UUID].UUIDString];
 		}
 
 		return self;
 	}
 
-	-(void)dealloc {
-		[self close];
+	-(void)osTest:(int)rc {
+		if(rc) @throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
 	}
 
-	-(void)close {
+	-(BOOL)osBusyTest:(int)rc {
+		if(rc) {
+			if(rc == EBUSY) {
+				return NO;
+			}
+			else {
+				[self osTest:rc];
+			}
+		}
+
+		return YES;
+	}
+
+	-(PGRWLockCounts *)lockCounts {
+		NSThread       *currentThread = NSThread.currentThread;
+		PGRWLockCounts *lc            = currentThread.threadDictionary[_tlsKey];
+
+		if(lc == nil) {
+			lc = [PGRWLockCounts counts];
+			currentThread.threadDictionary[_tlsKey] = lc;
+		}
+
+		return lc;
+	}
+
+	-(void)dealloc {
 		if(_open) {
 			pthread_rwlock_destroy(&_rwlock);
 			_open = NO;
+			[NSThread.currentThread.threadDictionary removeObjectForKey:_tlsKey];
 		}
 	}
 
 	-(void)lock {
-		int rc = pthread_rwlock_rdlock(&_rwlock);
-		if(rc) {
-			@throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
+		PGRWLockCounts *lc = self.lockCounts;
+
+		switch(lc.currentLock) {
+			case PGRWNoLockHeld:
+				[self osTest:pthread_rwlock_rdlock(&_rwlock)];
+				lc.count       = 1;
+				lc.currentLock = PGRWReadLockHeld;
+				break;
+			case PGRWReadLockHeld:
+				lc.count++;
+				break;
+			case PGRWWriteLockHeld:
+				@throw [self upDownException:lc];
+				break;
 		}
 	}
 
 	-(void)writeLock {
-		int rc = pthread_rwlock_wrlock(&_rwlock);
-		if(rc) {
-			@throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
+		PGRWLockCounts *lc = self.lockCounts;
+
+		switch(lc.currentLock) {
+			case PGRWNoLockHeld:
+				[self osTest:pthread_rwlock_wrlock(&_rwlock)];
+				lc.currentLock = PGRWWriteLockHeld;
+				lc.count       = 1;
+				break;
+			case PGRWWriteLockHeld:
+				lc.count++;
+				break;
+			case PGRWReadLockHeld:
+				@throw [self upDownException:lc];
+				break;
 		}
 	}
 
 	-(BOOL)tryLock {
-		int rc = pthread_rwlock_tryrdlock(&_rwlock);
+		PGRWLockCounts *lc = self.lockCounts;
 
-		if(rc) {
-			if(rc == EBUSY) {
-				return NO;
-			}
-			else {
-				@throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
-			}
+		switch(lc.currentLock) {
+			case PGRWNoLockHeld:
+				if([self osBusyTest:pthread_rwlock_tryrdlock(&_rwlock)]) {
+					lc.currentLock = PGRWReadLockHeld;
+					lc.count       = 1;
+					return YES;
+				}
+				break;
+			case PGRWReadLockHeld:
+				lc.count++;
+				return YES;
+			case PGRWWriteLockHeld:
+				@throw [self upDownException:lc];
+				break;
 		}
 
-		return YES;
+		return NO;
 	}
 
 	-(BOOL)tryWriteLock {
-		int rc = pthread_rwlock_trywrlock(&_rwlock);
+		PGRWLockCounts *lc = self.lockCounts;
 
-		if(rc) {
-			if(rc == EBUSY) {
-				return NO;
-			}
-			else {
-				@throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
-			}
+		switch(lc.currentLock) {
+			case PGRWNoLockHeld:
+				if([self osBusyTest:pthread_rwlock_trywrlock(&_rwlock)]) {
+					lc.count       = 1;
+					lc.currentLock = PGRWWriteLockHeld;
+					return YES;
+				}
+				break;
+			case PGRWWriteLockHeld:
+				lc.count++;
+				return YES;
+			case PGRWReadLockHeld:
+				@throw [self upDownException:lc];
+				break;
 		}
 
-		return YES;
+		return NO;
 	}
 
 	-(BOOL)timedWriteLock:(PGTimeSpec *)absTime {
-		return ([self tryWriteLock] ? YES : [[[PGTimedWriteLock alloc] initWithTimeout:absTime readWriteLock:&_rwlock] timedAction:NULL]);
+		PGRWLockCounts *lc = self.lockCounts;
+
+		switch(lc.currentLock) {
+			case PGRWNoLockHeld:
+				if([self privateTimedWriteLock:absTime]) {
+					lc.count       = 1;
+					lc.currentLock = PGRWWriteLockHeld;
+					return YES;
+				}
+				break;
+			case PGRWWriteLockHeld:
+				lc.count++;
+				return YES;
+			case PGRWReadLockHeld:
+				@throw [self upDownException:lc];
+				break;
+		}
+
+		return NO;
 	}
 
 	-(BOOL)timedLock:(PGTimeSpec *)absTime {
-		return ([self tryLock] ? YES : [[[PGTimedReadLock alloc] initWithTimeout:absTime readWriteLock:&_rwlock] timedAction:NULL]);
+		PGRWLockCounts *lc = self.lockCounts;
+
+		switch(lc.currentLock) {
+			case PGRWNoLockHeld:
+				if([self privateTimedReadLock:absTime]) {
+					lc.currentLock = PGRWReadLockHeld;
+					lc.count       = 1;
+					return YES;
+				}
+				break;
+			case PGRWReadLockHeld:
+				lc.count++;
+				return YES;
+			case PGRWWriteLockHeld:
+				@throw [self upDownException:lc];
+				break;
+		}
+
+		return NO;
 	}
 
 	-(void)unlock {
-		int rc = pthread_rwlock_unlock(&_rwlock);
-		if(rc) @throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
+		PGRWLockCounts *lc = self.lockCounts;
+
+		if(lc.currentLock != PGRWNoLockHeld) {
+			if(lc.count == 1) {
+				[self osTest:pthread_rwlock_unlock(&_rwlock)];
+				lc.count       = 0;
+				lc.currentLock = PGRWNoLockHeld;
+			}
+			else if(lc.count) {
+				lc.count--;
+			}
+			else {
+				lc.currentLock = PGRWNoLockHeld;
+				@throw [NSException exceptionWithName:PGReadWriteLockException reason:@"No locks are currently held." userInfo:nil];
+			}
+		}
+	}
+
+	-(NSException *)upDownException:(PGRWLockCounts *)lc {
+		NSString *dir    = (lc.currentLock == PGRWReadLockHeld ? @"read" : @"write");
+		NSString *reason = [NSString stringWithFormat:@"%@ %@ locks are currently held.", @(lc.count), dir];
+		return [NSException exceptionWithName:PGReadWriteLockException reason:reason userInfo:nil];
+	}
+
+	-(BOOL)privateTimedWriteLock:(PGTimeSpec *)absTime {
+		return ([self tryWriteLock] ? YES : [[PGTimedWriteLock writeLockWithTimeout:absTime readWriteLock:&_rwlock] timedAction]);
+	}
+
+	-(BOOL)privateTimedReadLock:(PGTimeSpec *)absTime {
+		return ([self tryLock] ? YES : [[PGTimedWriteLock writeLockWithTimeout:absTime readWriteLock:&_rwlock] timedAction]);
 	}
 
 @end
 
-@implementation PGTimedReadLock {
-		pthread_rwlock_t *_rwlock;
+@implementation PGRWLockCounts {
 	}
 
-	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock {
-		self = [super initWithTimeout:absTime];
+	@synthesize count = _count;
+	@synthesize currentLock = _currentLock;
+
+	-(instancetype)init {
+		self = [super init];
 
 		if(self) {
-			_rwlock = rwlock;
+			self.count       = 0;
+			self.currentLock = PGRWNoLockHeld;
 		}
 
 		return self;
 	}
 
-	-(int)performAction:(pthread_rwlock_t *)rwlock {
-		return pthread_rwlock_rdlock(rwlock);
-	}
-
-	-(BOOL)action:(id *)results {
-		*results = nil;
-		int rc = [self performAction:_rwlock];
-
-		if(rc) {
-			if((rc == EINTR) && self.didTimeOut) {
-				return NO;
-			}
-			else {
-				@throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
-			}
-		}
-
-		return YES;
+	+(instancetype)counts {
+		return [[self alloc] init];
 	}
 
 @end
-
-@implementation PGTimedWriteLock {
-	}
-
-	-(int)performAction:(pthread_rwlock_t *)rwlock {
-		return pthread_rwlock_wrlock(rwlock);
-	}
-
-@end
-

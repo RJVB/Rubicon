@@ -1,9 +1,9 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGTimedWait.h
+ *    FILENAME: PGTimedReadLock.h
  *         IDE: AppCode
  *      AUTHOR:  Galen Rhodes
- *        DATE: 1/21/17 7:21 PM
+ *        DATE: 3/6/17 7:21 PM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
@@ -22,26 +22,33 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGTimedWait_H_
-#define __Rubicon_PGTimedWait_H_
+#ifndef __Rubicon_PGTimedReadLock_H_
+#define __Rubicon_PGTimedReadLock_H_
 
-#import <Rubicon/PGTools.h>
+#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGTimedWait.h>
+#import <Rubicon/PGTimeSpec.h>
 
-@class PGTimeSpec;
+@interface PGTimedReadLock : PGTimedWait
 
-@interface PGTimedWait : NSObject
-
-	@property(atomic, readonly, copy) PGTimeSpec *absTime;
-	@property(atomic, readonly) volatile BOOL didTimeOut;
-
-	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime;
-
-	-(BOOL)timedAction:(id *)results;
-
-	-(BOOL)timedAction;
+	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock;
 
 	-(BOOL)action:(id *)results;
 
+	-(int)performAction:(pthread_rwlock_t *)rwlock;
+
+	+(instancetype)readLockWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock;
+
 @end
 
-#endif //__Rubicon_PGTimedWait_H_
+@interface PGTimedWriteLock : PGTimedReadLock
+
+	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock;
+
+	-(int)performAction:(pthread_rwlock_t *)rwlock;
+
+	+(instancetype)writeLockWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock;
+
+@end
+
+#endif //__Rubicon_PGTimedReadLock_H_

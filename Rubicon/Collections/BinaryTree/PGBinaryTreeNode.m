@@ -194,15 +194,17 @@
 		return (self.isRootNode ? self : self.parentNode.rootNode);
 	}
 
-	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key comparator:(NSComparator)compare {
-		if(compare == nil) {
-			return [self insertValue:value forKey:key];
-		}
-		else if(key && value) {
-			switch(compare(self.key, key)) {
+	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key {
+#if NS_BLOCKS_AVAILABLE
+		return [self insertValue:value forKey:key comparator:^NSComparisonResult(id obj1, id obj2) {
+			return [[self class] compareKey:obj1 toKey:obj2];
+		}];
+#else
+		if(key && value) {
+			switch([[self class] compareKey:self.key toKey:key]) {
 				case NSOrderedAscending:
 					if(self.rightNode) {
-						return [self.rightNode insertValue:value forKey:key comparator:compare];
+						return [self.rightNode insertValue:value forKey:key];
 					}
 					else {
 						PGBinaryTreeNode *node = self.rightNode = [(id)[[self class] alloc] initWithKey:key value:value isRed:YES];
@@ -211,7 +213,7 @@
 					}
 				case NSOrderedDescending:
 					if(self.leftNode) {
-						return [self.leftNode insertValue:value forKey:key comparator:compare];
+						return [self.leftNode insertValue:value forKey:key];
 					}
 					else {
 						PGBinaryTreeNode *node = self.leftNode = [(id)[[self class] alloc] initWithKey:key value:value isRed:YES];
@@ -225,38 +227,28 @@
 		}
 
 		return nil;
+#endif
 	}
 
-	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key {
-		return [self insertValue:value forKey:key comparator:^NSComparisonResult(id key1, id key2) {
-			return [[self class] compareKey:key1 toKey:key2];
+	-(instancetype)findNodeForKey:(id)key {
+#if NS_BLOCKS_AVAILABLE
+		return [self findNodeForKey:key comparator:^NSComparisonResult(id obj1, id obj2) {
+			return [[self class] compareKey:obj1 toKey:obj2];
 		}];
-	}
-
-	-(instancetype)findNodeForKey:(id)key comparator:(NSComparator)compare {
+#else
 		if(key) {
-			if(compare == nil) {
-				return [self findNodeForKey:key];
-			}
-			else {
-				switch(compare(self.key, key)) {
-					case NSOrderedAscending:
-						return [self.rightNode findNodeForKey:key comparator:compare];
-					case NSOrderedDescending:
-						return [self.leftNode findNodeForKey:key comparator:compare];
-					default:
-						return self;
-				}
+			switch([[self class] compareKey:self.key toKey:key]) {
+				case NSOrderedAscending:
+					return [self.rightNode findNodeForKey:key];
+				case NSOrderedDescending:
+					return [self.leftNode findNodeForKey:key];
+				default:
+					return self;
 			}
 		}
 
 		return nil;
-	}
-
-	-(instancetype)findNodeForKey:(id)key {
-		return [self findNodeForKey:key comparator:^NSComparisonResult(id key1, id key2) {
-			return [[self class] compareKey:key1 toKey:key2];
-		}];
+#endif
 	}
 
 	-(void)rotate:(BOOL)left {
@@ -385,6 +377,133 @@
 			[parent rotate:sLeft];
 		}
 	}
+
+	-(BOOL)travelTree:(id<PGBinaryTreeTraveler>)traveler backwards:(BOOL)backwards {
+		BOOL willContinue = NO;
+
+		if(traveler) {
+			if(backwards) {
+				if(self.rightNode) {
+					willContinue = [self.rightNode travelTree:traveler backwards:backwards];
+				}
+
+				if(willContinue) {
+					willContinue = [traveler visitNodeWithKey:self.key andValue:self.value];
+				}
+
+				if(willContinue && self.leftNode) {
+					willContinue = [self.leftNode travelTree:traveler backwards:backwards];
+				}
+			}
+			else {
+				if(self.leftNode) {
+					willContinue = [self.leftNode travelTree:traveler backwards:backwards];
+				}
+
+				if(willContinue) {
+					willContinue = [traveler visitNodeWithKey:self.key andValue:self.value];
+				}
+
+				if(willContinue && self.rightNode) {
+					willContinue = [self.rightNode travelTree:traveler backwards:backwards];
+				}
+			}
+		}
+
+		return willContinue;
+	}
+
+#if NS_BLOCKS_AVAILABLE
+
+	-(BOOL)travelTreeWithBlock:(PGBinaryTreeTravelBlock)travelBlock backwards:(BOOL)backwards {
+		BOOL willContinue = NO;
+
+		if(travelBlock) {
+			if(backwards) {
+				if(self.rightNode) {
+					willContinue = [self.rightNode travelTreeWithBlock:travelBlock backwards:backwards];
+				}
+
+				if(willContinue) {
+					willContinue = travelBlock(self.key, self.value);
+				}
+
+				if(willContinue && self.leftNode) {
+					willContinue = [self.leftNode travelTreeWithBlock:travelBlock backwards:backwards];
+				}
+			}
+			else {
+				if(self.leftNode) {
+					willContinue = [self.leftNode travelTreeWithBlock:travelBlock backwards:backwards];
+				}
+
+				if(willContinue) {
+					willContinue = travelBlock(self.key, self.value);
+				}
+
+				if(willContinue && self.rightNode) {
+					willContinue = [self.rightNode travelTreeWithBlock:travelBlock backwards:backwards];
+				}
+			}
+		}
+
+		return willContinue;
+	}
+
+	-(instancetype)findNodeForKey:(id)key comparator:(NSComparator)compare {
+		if(key) {
+			if(compare == nil) {
+				return [self findNodeForKey:key];
+			}
+			else {
+				switch(compare(self.key, key)) {
+					case NSOrderedAscending:
+						return [self.rightNode findNodeForKey:key comparator:compare];
+					case NSOrderedDescending:
+						return [self.leftNode findNodeForKey:key comparator:compare];
+					default:
+						return self;
+				}
+			}
+		}
+
+		return nil;
+	}
+
+	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key comparator:(NSComparator)compare {
+		if(compare == nil) {
+			return [self insertValue:value forKey:key];
+		}
+		else if(key && value) {
+			switch(compare(self.key, key)) {
+				case NSOrderedAscending:
+					if(self.rightNode) {
+						return [self.rightNode insertValue:value forKey:key comparator:compare];
+					}
+					else {
+						PGBinaryTreeNode *node = self.rightNode = [(id)[[self class] alloc] initWithKey:key value:value isRed:YES];
+						[node postInsertRebalance];
+						return node;
+					}
+				case NSOrderedDescending:
+					if(self.leftNode) {
+						return [self.leftNode insertValue:value forKey:key comparator:compare];
+					}
+					else {
+						PGBinaryTreeNode *node = self.leftNode = [(id)[[self class] alloc] initWithKey:key value:value isRed:YES];
+						[node postInsertRebalance];
+						return node;
+					}
+				default:
+					self.value = value;
+					return self;
+			}
+		}
+
+		return nil;
+	}
+
+#endif
 
 	+(NSComparisonResult)compareKey:(id)key1 toKey:(id)key2 {
 		if(key1 && key2) {

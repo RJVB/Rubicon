@@ -95,6 +95,10 @@ void *waitThread(void *obj);
 		return YES;
 	}
 
+	-(BOOL)timedAction {
+		return [self timedAction:NULL];
+	}
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wreturn-stack-address"
 
@@ -104,7 +108,7 @@ void *waitThread(void *obj);
 
 			id          actionResults = nil;
 			int         savedState = 0;
-			BOOL        success;
+			BOOL success = NO;
 			NSException *exception = nil;
 
 			_thread1 = pthread_self();

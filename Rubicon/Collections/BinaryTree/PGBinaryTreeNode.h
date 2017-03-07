@@ -25,7 +25,7 @@
 #ifndef __Rubicon_PGBinaryTreeNode_H_
 #define __Rubicon_PGBinaryTreeNode_H_
 
-#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGTools.h>
 
 @interface PGBinaryTreeNode : NSObject
 
@@ -47,11 +47,19 @@
 
 	+(instancetype)nodeWithKey:(id<NSCopying>)key value:(id)value;
 
-	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key comparator:(NSComparator)compare;
-
 	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key;
 
+#if NS_BLOCKS_AVAILABLE
+
+	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key comparator:(NSComparator)compare;
+
+	-(BOOL)travelTree:(id<PGBinaryTreeTraveler>)traveler backwards:(BOOL)backwards;
+
+	-(BOOL)travelTreeWithBlock:(PGBinaryTreeTravelBlock)travelBlock backwards:(BOOL)backwards;
+
 	-(instancetype)findNodeForKey:(id)key comparator:(NSComparator)compare;
+
+#endif
 
 	-(instancetype)findNodeForKey:(id)key;
 
