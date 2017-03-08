@@ -11,6 +11,8 @@
 		1117D0A959B4E0DAC27E52D2 /* PGDivideRectResults.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D5F57701D8A864D425E3 /* PGDivideRectResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D1743DC5EF45CA9869B1 /* PGTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D08BDB7E4A79C30AC920 /* PGTools.m */; };
 		1117D27A98BC056DBFE34847 /* PGSize.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D0519F04731072A24C3D /* PGSize.m */; };
+		1117D2EDCE1C08D096260F2B /* sem_timedwait.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DB406E5CC4DEC1D566BE /* sem_timedwait.h */; };
+		1117D311EAD4A8741F69E1CB /* sem_timedwait.c in Sources */ = {isa = PBXBuildFile; fileRef = 1117D672168E305743435A11 /* sem_timedwait.c */; };
 		1117D3670F744CB50E7481A6 /* PGBinaryTreeNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D5431A0AC7D441822F48 /* PGBinaryTreeNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D3724C2A43950E8FB710 /* PGTime.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D5A22062D907B9F4DBE6 /* PGTime.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D393399FF2460A8FF8FB /* PGIRect.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DE4B3295D1558CFF389D /* PGIRect.m */; };
@@ -148,6 +150,7 @@
 		1117D5F57701D8A864D425E3 /* PGDivideRectResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDivideRectResults.h; sourceTree = "<group>"; };
 		1117D613575E1934C599AC49 /* GNUstep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GNUstep.h; sourceTree = "<group>"; };
 		1117D64C50C3BD17950836DC /* PGStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGStack.h; sourceTree = "<group>"; };
+		1117D672168E305743435A11 /* sem_timedwait.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sem_timedwait.c; sourceTree = "<group>"; };
 		1117D6B32FC0E11216D8EC0B /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		1117D6DE65CD05E67BDF71C8 /* PGReadWriteLock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGReadWriteLock.m; sourceTree = "<group>"; };
 		1117D6F637757554115282F0 /* PGPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGPoint.h; sourceTree = "<group>"; };
@@ -172,6 +175,7 @@
 		1117DB10E1A25B61C00409B9 /* PGISize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGISize.m; sourceTree = "<group>"; };
 		1117DB1F284C58C383A2A869 /* NSMutableDictionary+PGBinaryTreeDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableDictionary+PGBinaryTreeDictionary.h"; sourceTree = "<group>"; };
 		1117DB2ECB081DB44CB6605D /* PGSemaphore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGSemaphore.h; sourceTree = "<group>"; };
+		1117DB406E5CC4DEC1D566BE /* sem_timedwait.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sem_timedwait.h; sourceTree = "<group>"; };
 		1117DB4FEBB7782769750FB9 /* Rubicon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Rubicon.m; sourceTree = "<group>"; };
 		1117DBCB8D70DB67DE4B6825 /* fetch_and_config.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = fetch_and_config.sh; sourceTree = "<group>"; };
 		1117DC99A8066B8D7D7F5BBE /* PGIRect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGIRect.h; sourceTree = "<group>"; };
@@ -253,6 +257,8 @@
 				1117D08BDB7E4A79C30AC920 /* PGTools.m */,
 				1117D58A6A010B8353C7EAA3 /* PGDefines.h */,
 				1117D54FB85F0E618EB2B3A0 /* PGDefines.m */,
+				1117D672168E305743435A11 /* sem_timedwait.c */,
+				1117DB406E5CC4DEC1D566BE /* sem_timedwait.h */,
 			);
 			path = Misc;
 			sourceTree = "<group>";
@@ -548,6 +554,7 @@
 				1117D64C79917993F557AE4A /* PGBinaryTreeDictionary.h in Headers */,
 				1117D3670F744CB50E7481A6 /* PGBinaryTreeNode.h in Headers */,
 				1117DA0BC598AF33FAA9CCD5 /* PGTimedReadLock.h in Headers */,
+				1117D2EDCE1C08D096260F2B /* sem_timedwait.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -786,6 +793,7 @@
 				1117DF662954FBFB1CE6CB2E /* PGLinkedListNode.m in Sources */,
 				1117DD346AF460FC9199D0A4 /* PGStack.m in Sources */,
 				1117D568385D863CC434E5C3 /* PGTimedReadLock.m in Sources */,
+				1117D311EAD4A8741F69E1CB /* sem_timedwait.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
