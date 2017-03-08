@@ -112,13 +112,11 @@
 #ifdef __APPLE__
 
 #include "sem_timedwait.h"
-#include <semaphore.h>
 #include <time.h>
 #include <sys/time.h>
 #include <pthread.h>
 #include <errno.h>
 #include <signal.h>
-
 
 /*  Some useful definitions - TRUE, FALSE, and DEBUG */
 

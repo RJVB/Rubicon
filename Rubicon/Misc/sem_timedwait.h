@@ -114,6 +114,7 @@
 #define sem_timedwait_h
 
 #include <stdio.h>
+#include <semaphore.h>
 
 #if defined(__cplusplus)
 extern "C" {
