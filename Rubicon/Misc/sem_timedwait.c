@@ -109,10 +109,9 @@
  *  IN THE SOFTWARE.
  */
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "UnusedImportStatement"
 #ifdef __APPLE__
 
+#include "sem_timedwait.h"
 #include <semaphore.h>
 #include <time.h>
 #include <sys/time.h>
@@ -120,7 +119,6 @@
 #include <errno.h>
 #include <signal.h>
 
-#include "sem_timedwait.h"
 
 /*  Some useful definitions - TRUE, FALSE, and DEBUG */
 
@@ -765,5 +763,3 @@ int main (
 }
 
 #endif
-
-#pragma clang diagnostic pop

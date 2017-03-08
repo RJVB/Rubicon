@@ -49,4 +49,4 @@ FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
 #import <Rubicon/PGTimedWait.h>
 #import <Rubicon/PGStack.h>
 #import <Rubicon/PGLinkedListNode.h>
-
+#include <Rubicon/sem_timedwait.h>
