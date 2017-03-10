@@ -22,6 +22,7 @@
  *******************************************************************************/
 
 #import "PGTools.h"
+#import "NSObject+PGObject.h"
 
 NSBitmapImageRep *PGCreateARGBImage(NSFloat width, NSFloat height) {
 	NSInteger iWidth  = (NSInteger)ceil(width);
@@ -59,4 +60,20 @@ NSString *PGFormat(NSString *fmt, ...) {
 
 	va_end(args);
 	return str;
+}
+
+NSComparisonResult PGCompare(id obj1, id obj2) {
+	if(obj1 && obj2) {
+		Class cls = [obj1 baseClassInCommonWith:obj2];
+		if([cls instancesRespondToSelector:@selector(compare:)]) {
+			return [obj1 compare:obj2];
+		}
+		else {
+			NSString *reason = PGFormat(@"Class %@ cannot be compared to class %@.", NSStringFromClass([obj1 class]), NSStringFromClass([obj2 class]));
+			@throw [NSException exceptionWithName:NSInvalidArgumentException reason:reason userInfo:nil];
+		}
+	}
+	else {
+		return (obj2 ? NSOrderedAscending : (obj1 ? NSOrderedDescending : NSOrderedSame));
+	}
 }

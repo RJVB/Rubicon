@@ -29,41 +29,30 @@
 
 @interface PGBinaryTreeNode : NSObject
 
-	@property(copy, readonly) id   key;
-	@property(retain) id           value;
-	@property(readonly) NSUInteger count;
-	@property(readonly) BOOL       isRootNode;
-
-	@property(nonatomic, retain) PGBinaryTreeNode *parentNode;
-	@property(nonatomic, retain) PGBinaryTreeNode *leftNode;
-	@property(nonatomic, retain) PGBinaryTreeNode *rightNode;
-	@property(readonly, retain) PGBinaryTreeNode  *rootNode;
-
-	-(instancetype)initWithKey:(id<NSCopying>)key value:(id)value isRed:(BOOL)isRed;
-
-	+(instancetype)nodeWithKey:(id<NSCopying>)key value:(id)value isRed:(BOOL)isRed;
+	@property(readonly, copy) id         key;
+	@property(retain) id                 value;
+	@property(readonly) PGBinaryTreeNode *rootNode;
+	@property(readonly) PGBinaryTreeNode *parent;
+	@property(readonly) PGBinaryTreeNode *leftChild;
+	@property(readonly) PGBinaryTreeNode *rightChild;
 
 	-(instancetype)initWithKey:(id<NSCopying>)key value:(id)value;
 
-	+(instancetype)nodeWithKey:(id<NSCopying>)key value:(id)value;
-
-	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key;
-
 #if NS_BLOCKS_AVAILABLE
 
-	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key comparator:(NSComparator)compare;
-
-	-(BOOL)travelTree:(id<PGBinaryTreeTraveler>)traveler backwards:(BOOL)backwards;
-
-	-(BOOL)travelTreeWithBlock:(PGBinaryTreeTravelBlock)travelBlock backwards:(BOOL)backwards;
+	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key comparator:(NSComparator)cmp;
 
 	-(instancetype)findNodeForKey:(id)key comparator:(NSComparator)compare;
 
 #endif
 
+	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key;
+
 	-(instancetype)findNodeForKey:(id)key;
 
 	-(instancetype)remove;
+
+	+(instancetype)nodeWithKey:(id<NSCopying>)key value:(id)value;
 
 @end
 

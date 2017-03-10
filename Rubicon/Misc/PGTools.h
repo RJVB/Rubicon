@@ -27,7 +27,7 @@
 
 #import <Rubicon/PGTime.h>
 
-@class PGRect;
+@class NSObject;
 
 /*
  * Definitions for standard 32-bit RGBA color model.
@@ -38,6 +38,16 @@
 NS_INLINE BOOL PGObjectsEqual(id obj1, id obj2) {
 	return ((obj1 == nil) ? (obj2 == nil) : ((obj2 == nil) ? NO : [obj1 isEqual:obj2]));
 }
+
+/**************************************************************************************************//**
+ * Compares to objects for order.  Returns NSOrderedAscending, NSOrderedSame, NSOrderedDescending if
+ * obj1 is less than, equal to, or greater than obj2.
+ * @param obj1 the first object.
+ * @param obj2 the second object.
+ * @return NSOrderedAscending, NSOrderedSame, NSOrderedDescending if obj1 is less than, equal to, or
+ *         greater than obj2.
+ ******************************************************************************************************/
+FOUNDATION_EXPORT NSComparisonResult PGCompare(id obj1, id obj2);
 
 /**************************************************************************************************//**
  * Creates and returns a bitmap image compatible with PNG file formats.  This allows you
