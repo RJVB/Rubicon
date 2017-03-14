@@ -25,124 +25,281 @@
 
 @interface PGBinaryTreeNode()
 
-	-(void)setLeftChild:(PGBinaryTreeNode *)cnode;
+	@property(readwrite) BOOL isRed;
 
-	-(void)setRightChild:(PGBinaryTreeNode *)cnode;
+	-(void)setKey:(id<NSCopying>)key;
+
+	-(instancetype)getChild:(BOOL)left;
+
+	-(instancetype)setChild:(PGBinaryTreeNode *)child onLeft:(BOOL)left;
+
+	-(void)makeOrphan;
+
+	-(void)setLeftChild:(PGBinaryTreeNode *)child;
+
+	-(void)setRightChild:(PGBinaryTreeNode *)child;
 
 	-(void)rotate:(BOOL)left;
 
-	-(void)iRebalance;
+	-(instancetype)farRight;
 
-	-(void)rRebalance;
 @end
 
-NS_INLINE PGBinaryTreeNode *PGSuccessor(PGBinaryTreeNode *node) {
-	PGBinaryTreeNode *succ = (node ? node.rightChild : nil);
-
-	if(succ) {
-		while(succ.leftChild) {
-			succ = succ.leftChild;
-		}
-	}
-	return succ;
-}
-
 @implementation PGBinaryTreeNode {
-		BOOL _isRed;
 	}
 
 	@synthesize key = _key;
 	@synthesize value = _value;
+	@synthesize count = _count;
 	@synthesize parent = _parent;
 	@synthesize leftChild = _leftChild;
 	@synthesize rightChild = _rightChild;
-
-	/*@f:0*/
-	NS_INLINE PGBinaryTreeNode *PGNodeGetChild(PGBinaryTreeNode *n, BOOL l)         { return (l ? n->_leftChild : n->_rightChild); }
-	NS_INLINE void PGNodeSetChild(PGBinaryTreeNode *n, PGBinaryTreeNode *c, BOOL l) { if(l) n.leftChild = c; else n.rightChild = c; }
-	NS_INLINE BOOL PGNodeIsLeft(PGBinaryTreeNode *n)                                { return (n && n->_parent && (n == n->_parent->_leftChild)); }
-	NS_INLINE void PGNodeMakeOrphan(PGBinaryTreeNode *n)                            { if(n) PGNodeSetChild(n, nil, PGNodeIsLeft(n)); }
-	NS_INLINE void PGNodeSetColor(PGBinaryTreeNode *n, BOOL r)                      { if(n) n->_isRed = r; }
-	NS_INLINE BOOL PGNodeIsRed(PGBinaryTreeNode *n)                                 { return (n && n->_isRed); }
-	#define PGNodeIsBlack(n)                                                        (!PGNodeIsRed(n))
-	#define PGNodeMakeRed(n)                                                        PGNodeSetColor((n), YES)
-	#define PGNodeMakeBlack(n)                                                      PGNodeSetColor((n), NO)
-	/*@f:1*/
+	@synthesize isRed = _isRed;
 
 	-(instancetype)initWithKey:(id<NSCopying>)key value:(id)value {
 		self = [super init];
 
 		if(self) {
-			_value = value;
-			_key   = [(id)key copy];
-			_isRed = YES;
+			self.key   = key;
+			self.value = value;
+			self.isRed = YES;
+			_count = 1;
 		}
 
 		return self;
+	}
+
+	-(void)setKey:(id<NSCopying>)key {
+		_key = [(id)key copy];
+	}
+
+	-(void)recount {
+		_count = (1 + self.leftChild.count + self.rightChild.count);
+	}
+
+	-(void)setParent:(PGBinaryTreeNode *)node {
+		if(self == node) {
+			@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"A node cannot be its own parent." userInfo:nil];
+		}
+		else {
+			_parent = node;
+		}
 	}
 
 	-(PGBinaryTreeNode *)rootNode {
 		return (self.parent ? self.parent.rootNode : self);
 	}
 
-	-(void)setLeftChild:(PGBinaryTreeNode *)cnode {
-		if(self == cnode) {
-			@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"A node cannot be a child to itself." userInfo:nil];
+	-(PGBinaryTreeNode *)sibling {
+		return [self getChild:(self == self.parent.rightChild)];
+	}
+
+	-(PGBinaryTreeNode *)uncle {
+		return self.parent.sibling;
+	}
+
+	-(PGBinaryTreeNode *)grandparent {
+		return self.parent.parent;
+	}
+
+	-(instancetype)getChild:(BOOL)left {
+		return (left ? self.leftChild : self.rightChild);
+	}
+
+	-(instancetype)setChild:(PGBinaryTreeNode *)child onLeft:(BOOL)left {
+		return (left ? (self.leftChild = child) : (self.rightChild = child));
+	}
+
+	-(void)makeOrphan {
+		[self.parent setChild:nil onLeft:(self == self.parent.leftChild)];
+	}
+
+	-(void)setLeftChild:(PGBinaryTreeNode *)child {
+		if(self == child) {
+			@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"A node cannot be its own child." userInfo:nil];
 		}
-		else if(_leftChild != cnode) {
-			PGNodeMakeOrphan(cnode);
-			/* @f:0 */ if(_leftChild) _leftChild->_parent = nil; /* @f:1 */
-			_leftChild = cnode;
-			/* @f:0 */ if(_leftChild) _leftChild->_parent = self; /* @f:1 */
+		else if(_leftChild != child) {
+			[child makeOrphan];
+			_leftChild.parent = nil;
+			_leftChild = child;
+			_leftChild.parent = self;
+			[self recount];
 		}
 	}
 
-	-(void)setRightChild:(PGBinaryTreeNode *)cnode {
-		if(self == cnode) {
-			@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"A node cannot be a child to itself." userInfo:nil];
+	-(void)setRightChild:(PGBinaryTreeNode *)child {
+		if(self == child) {
+			@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"A node cannot be its own child." userInfo:nil];
 		}
-		else if(_rightChild != cnode) {
-			PGNodeMakeOrphan(cnode);
-			/* @f:0 */ if(_rightChild) _rightChild->_parent = nil; /* @f:1 */
-			_rightChild = cnode;
-			/* @f:0 */ if(_rightChild) _rightChild->_parent = self; /* @f:1 */
+		else if(_rightChild != child) {
+			[child makeOrphan];
+			_rightChild.parent = nil;
+			_rightChild = child;
+			_rightChild.parent = self;
+			[self recount];
 		}
 	}
 
 	-(void)rotate:(BOOL)left {
-		PGBinaryTreeNode *node = PGNodeGetChild(self, !left);
-		PGNodeSetChild(self->_parent, node, PGNodeIsLeft(self));
-		PGNodeSetChild(self, PGNodeGetChild(node, left), !left);
-		PGNodeSetChild(node, self, left);
-		BOOL r = _isRed;
-		_isRed = PGNodeIsRed(node);
-		PGNodeSetColor(node, r);
+		PGBinaryTreeNode *child = [self getChild:!left];
+
+		if(child) {
+			[self.parent setChild:child onLeft:(self == self.parent.leftChild)];
+			[self setChild:[child getChild:left] onLeft:!left];
+			[child setChild:self onLeft:left];
+			BOOL r = self.isRed;
+			self.isRed  = child.isRed;
+			child.isRed = r;
+		}
+		else {
+			NSString *reason = PGFormat(@"Node cannot be rotated to the %@ because it has no %@ child.",
+										(left ? @"left" : @"right"),
+										(left ? @"right" : @"left"));
+			@throw [NSException exceptionWithName:NSInvalidArgumentException reason:reason userInfo:nil];
+		}
 	}
 
-	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key onLeft:(BOOL)left {
-		PGBinaryTreeNode *node = [PGBinaryTreeNode nodeWithKey:key value:value];
-		PGNodeSetChild(self, node, left);
-		[node iRebalance];
-		return node;
+#if NS_BLOCKS_AVAILABLE
+
+	-(instancetype)findNodeForKey:(id)key comparator:(NSComparator)compare {
+		if(key) {
+			if(compare) {
+				switch(compare(key, self.key)) {
+					case NSOrderedSame:
+						return self;
+					case NSOrderedAscending:
+						return [self.leftChild findNodeForKey:key comparator:compare];
+					case NSOrderedDescending:
+						return [self.rightChild findNodeForKey:key comparator:compare];
+				}
+			}
+			else {
+				return [self findNodeForKey:key];
+			}
+		}
+
+		return nil;
+	}
+
+#endif
+
+	-(instancetype)findNodeForKey:(id)key {
+#if NS_BLOCKS_AVAILABLE
+		return [self findNodeForKey:key comparator:^NSComparisonResult(id obj1, id obj2) {
+			return PGCompare(obj1, obj2);
+		}];
+#else
+		if(key) {
+			switch(PGCompare(key, self.key)) {
+				case NSOrderedSame:
+					return self;
+				case NSOrderedAscending:
+					return [self.leftChild findNodeForKey:key];
+				case NSOrderedDescending:
+					return [self.rightChild findNodeForKey:key];
+			}
+		}
+
+		return nil;
+#endif
+	}
+
+	-(instancetype)iRebalance {
+		PGBinaryTreeNode *pNode = self.parent;
+
+		if(pNode) {
+			if(pNode.isRed) {
+				PGBinaryTreeNode *gNode = pNode.parent;
+				BOOL             pRight = (pNode == gNode.rightChild);
+				PGBinaryTreeNode *uNode = [gNode getChild:pRight];
+
+				if(uNode.isRed) {
+					uNode.isRed = pNode.isRed = !(gNode.isRed = YES);
+					[gNode iRebalance];
+				}
+				else {
+					BOOL meLeft = (self == self.leftChild);
+
+					if(meLeft == pRight) {
+						[pNode rotate:!pRight];
+					}
+
+					[gNode rotate:pRight];
+				}
+			}
+		}
+		else {
+			self.isRed = NO;
+		}
+
+		return self;
+	}
+
+	-(void)rRebalance {
+		PGBinaryTreeNode *pNode = self.parent;
+
+		if(pNode) {
+			BOOL             meRight = (self == pNode.rightChild);
+			PGBinaryTreeNode *sNode  = [pNode getChild:meRight];
+
+			if(sNode.isRed) {
+				[pNode rotate:!meRight];
+				sNode = [pNode getChild:meRight];
+			}
+
+			if(!(sNode.isRed || sNode.leftChild.isRed || sNode.rightChild.isRed)) {
+				sNode.isRed = NO;
+
+				if(pNode.isRed) {
+					pNode.isRed = NO;
+				}
+				else {
+					[pNode rRebalance];
+				}
+			}
+			else {
+				if(![sNode getChild:meRight].isRed) {
+					[sNode rotate:meRight];
+					sNode = sNode.parent;
+				}
+
+				[pNode rotate:!meRight];
+				[sNode getChild:meRight].isRed = NO;
+			}
+		}
 	}
 
 #if NS_BLOCKS_AVAILABLE
 
 	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key comparator:(NSComparator)cmp {
-		if(cmp == nil) {
-			return [self insertValue:value forKey:key];
-		}
-
 		if(key && value) {
-			switch(cmp(key, _key)) {
-				case NSOrderedSame:
-					_value = value;
-					return self;
-				case NSOrderedAscending:
-					return (_leftChild ? [_leftChild insertValue:value forKey:key comparator:cmp] : [self insertValue:value forKey:key onLeft:YES]);
-				case NSOrderedDescending:
-					return (_rightChild ? [_rightChild insertValue:value forKey:key comparator:cmp] : [self insertValue:value forKey:key onLeft:NO]);
+			if(cmp) {
+				switch(cmp(key, self.key)) {
+					case NSOrderedSame:
+						self.value = value;
+						return self;
+					case NSOrderedAscending:
+						if(self.leftChild) {
+							return [self.leftChild insertValue:value forKey:key comparator:cmp];
+						}
+						else {
+							return [(self.leftChild = [(id)[[self class] alloc] initWithKey:key value:value]) iRebalance];
+						}
+					case NSOrderedDescending:
+						if(self.rightChild) {
+							return [self.rightChild insertValue:value forKey:key comparator:cmp];
+						}
+						else {
+							return [(self.rightChild = [(id)[[self class] alloc] initWithKey:key value:value]) iRebalance];
+						}
+				}
 			}
+			else {
+				return [self insertValue:value forKey:key];
+			}
+		}
+		else {
+			@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Key and Value cannot be nil." userInfo:nil];
 		}
 
 		return nil;
@@ -151,108 +308,74 @@ NS_INLINE PGBinaryTreeNode *PGSuccessor(PGBinaryTreeNode *node) {
 #endif
 
 	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key {
+#if NS_BLOCKS_AVAILABLE
+		return [self insertValue:value forKey:key comparator:^NSComparisonResult(id obj1, id obj2) {
+			return PGCompare(obj1, obj2);
+		}];
+#else
 		if(key && value) {
-			switch(PGCompare(key, _key)) {
+			switch(cmp(key, self.key)) {
 				case NSOrderedSame:
-					_value = value;
+					self.value = value;
 					return self;
 				case NSOrderedAscending:
-					return (_leftChild ? [_leftChild insertValue:value forKey:key] : [self insertValue:value forKey:key onLeft:YES]);
+					if(self.leftChild) {
+						return [self.leftChild insertValue:value forKey:key];
+					}
+					else {
+						return [(self.leftChild = [(id)[[self class] alloc] initWithKey:key value:value]) iRebalance];
+					}
 				case NSOrderedDescending:
-					return (_rightChild ? [_rightChild insertValue:value forKey:key] : [self insertValue:value forKey:key onLeft:NO]);
+					if(self.rightChild) {
+						return [self.rightChild insertValue:value forKey:key];
+					}
+					else {
+						return [(self.rightChild = [(id)[[self class] alloc] initWithKey:key value:value]) iRebalance];
+					}
 			}
-		}
-
-		return nil;
-	}
-
-#if NS_BLOCKS_AVAILABLE
-
-	-(instancetype)findNodeForKey:(id)key comparator:(NSComparator)compare {
-		if(compare) {
-			if(key) {
-				switch(compare(key, _key)) {
-					case NSOrderedSame:
-						return self;
-					case NSOrderedAscending:
-						return [_leftChild findNodeForKey:key comparator:compare];
-					case NSOrderedDescending:
-						return [_rightChild findNodeForKey:key comparator:compare];
-				}
-			}
-
-			return nil;
 		}
 		else {
-			return [self findNodeForKey:key];
-		}
-	}
-
-#endif
-
-	-(instancetype)findNodeForKey:(id)key {
-		if(key) {
-			switch(PGCompare(key, _key)) {
-				case NSOrderedSame:
-					return self;
-				case NSOrderedAscending:
-					return [_leftChild findNodeForKey:key];
-				case NSOrderedDescending:
-					return [_rightChild findNodeForKey:key];
-			}
+			@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Key and Value cannot be nil." userInfo:nil];
 		}
 
 		return nil;
+#endif
 	}
 
-	NS_INLINE void PGInsRebalance(PGBinaryTreeNode *p, PGBinaryTreeNode *g, BOOL ml) {
-		/* @f:0 */
-		BOOL pr = (p == g->_rightChild);
-		PGBinaryTreeNode *u = PGNodeGetChild(g, pr);
-		if(PGNodeIsRed(u)) { p->_isRed = u->_isRed = !(g->_isRed = YES); [g iRebalance]; }
-		else { if(ml == pr) { [p rotate:!pr]; } [g rotate:pr]; }
-		/* @f:1 */
-	}
-
-	-(void)iRebalance {
-		/* @f:0 */
-		PGBinaryTreeNode *p = _parent;
-		if(p) { if(p->_isRed) PGInsRebalance(p, p->_parent, (self == p->_leftChild)); } else _isRed = NO;
-		/* @f:1 */
+	-(instancetype)farRight {
+		return (self.rightChild ? self.rightChild.farRight : self);
 	}
 
 	-(instancetype)remove {
-		/*@f:0*/
-		if(_leftChild && _rightChild) {
-			PGBinaryTreeNode *node = PGSuccessor(self); _key = [node->_key copy]; _value = node->_value; return [node remove];
+		PGBinaryTreeNode *lNode = self.leftChild;
+		PGBinaryTreeNode *rNode = self.rightChild;
+
+		if(lNode && rNode) {
+			PGBinaryTreeNode *node = lNode.farRight;
+			self.key   = node.key;
+			self.value = node.value;
+			return [node remove];
 		}
 		else {
-			PGBinaryTreeNode *p = _parent;
-			PGBinaryTreeNode *c = (_leftChild ? _leftChild : _rightChild);
-			if(c) { c->_isRed = NO; if(p) PGNodeSetChild(p, c, (self == p->_leftChild)); }
-			else if(p) { if(!_isRed) { [self rRebalance]; } PGNodeMakeOrphan(self); }
-			_key = nil; _value = nil; return (p ? p.rootNode : (c ? c.rootNode : nil));
-		}
-		/*@f:1*/
-	}
+			PGBinaryTreeNode *cNode = (lNode ? lNode : rNode);
+			PGBinaryTreeNode *pNode = self.parent;
 
-	-(void)rRebalance {
-		/*@f:0*/
-		if(_parent) {
-			BOOL mr = (self == _parent->_rightChild);
-			PGBinaryTreeNode *sibling = PGNodeGetChild(_parent, mr);
-			if(PGNodeIsRed(sibling)) { [_parent rotate:!mr]; sibling = PGNodeGetChild(_parent, mr); }
-			if(PGNodeIsBlack(sibling) && PGNodeIsBlack(sibling->_leftChild) && PGNodeIsBlack(sibling->_rightChild)) {
-				PGNodeMakeRed(sibling);
-				if(PGNodeIsRed(_parent)) PGNodeMakeBlack(_parent); else [_parent rRebalance];
+			if(cNode) {
+				cNode.isRed = NO;
+				[pNode setChild:cNode onLeft:(self == pNode.leftChild)];
 			}
-			else {
-				if(PGNodeIsBlack(PGNodeGetChild(sibling, mr))) [sibling rotate:mr];
-				[_parent rotate:!mr];
-				PGNodeMakeBlack(PGNodeGetChild(_parent->_parent, mr));
+			else if(pNode) {
+				if(!self.isRed) {
+					[self rRebalance];
+				}
+
+				[self makeOrphan];
 			}
+
+			self.key   = nil;
+			self.value = nil;
+			return (pNode ? pNode.rootNode : cNode.rootNode);
 		}
-		/*@f:1*/
 	}
 
 	+(instancetype)nodeWithKey:(id<NSCopying>)key value:(id)value {

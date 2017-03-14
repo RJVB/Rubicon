@@ -35,7 +35,7 @@
 
 	-(BOOL)action:(id *)results;
 
-	-(int)performAction:(pthread_rwlock_t *)rwlock;
+	-(int)performAction;
 
 	+(instancetype)readLockWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock;
 
@@ -45,7 +45,7 @@
 
 	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock;
 
-	-(int)performAction:(pthread_rwlock_t *)rwlock;
+	-(int)performAction;
 
 	+(instancetype)writeLockWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock;
 

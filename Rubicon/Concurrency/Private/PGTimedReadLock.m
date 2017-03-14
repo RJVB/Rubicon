@@ -38,13 +38,13 @@
 		return self;
 	}
 
-	-(int)performAction:(pthread_rwlock_t *)rwlock {
-		return pthread_rwlock_rdlock(rwlock);
+	-(int)performAction {
+		return pthread_rwlock_rdlock(_rwlock);
 	}
 
 	-(BOOL)action:(id *)results {
 		*results = nil;
-		int rc = [self performAction:_rwlock];
+		int rc = [self performAction];
 
 		if(rc) {
 			if((rc == EINTR) && self.didTimeOut) {
@@ -71,8 +71,8 @@
 		return (self = [super initWithTimeout:absTime readWriteLock:rwlock]);
 	}
 
-	-(int)performAction:(pthread_rwlock_t *)rwlock {
-		return pthread_rwlock_wrlock(rwlock);
+	-(int)performAction {
+		return pthread_rwlock_wrlock(_rwlock);
 	}
 
 	+(instancetype)writeLockWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock {

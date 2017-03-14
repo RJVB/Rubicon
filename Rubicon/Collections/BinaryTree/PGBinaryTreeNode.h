@@ -31,10 +31,14 @@
 
 	@property(readonly, copy) id         key;
 	@property(retain) id                 value;
+	@property(readonly) NSUInteger       count;
 	@property(readonly) PGBinaryTreeNode *rootNode;
 	@property(readonly) PGBinaryTreeNode *parent;
 	@property(readonly) PGBinaryTreeNode *leftChild;
 	@property(readonly) PGBinaryTreeNode *rightChild;
+	@property(readonly) PGBinaryTreeNode *sibling;
+	@property(readonly) PGBinaryTreeNode *uncle;
+	@property(readonly) PGBinaryTreeNode *grandparent;
 
 	-(instancetype)initWithKey:(id<NSCopying>)key value:(id)value;
 

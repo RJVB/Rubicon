@@ -25,7 +25,11 @@
 #import "PGReadWriteLock.h"
 #import "PGTimedReadLock.h"
 
-typedef enum { PGRWNoLockHeld, PGRWReadLockHeld, PGRWWriteLockHeld } PGRWCurrentLock;
+typedef enum {
+	PGRWNoLockHeld,
+	PGRWReadLockHeld,
+	PGRWWriteLockHeld
+} PGRWCurrentLock;
 
 @interface PGRWLockCounts : NSObject
 
@@ -75,7 +79,9 @@ typedef enum { PGRWNoLockHeld, PGRWReadLockHeld, PGRWWriteLockHeld } PGRWCurrent
 	}
 
 	-(void)osTest:(int)rc {
-		if(rc) @throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
+		if(rc) {
+			@throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
+		}
 	}
 
 	-(BOOL)osBusyTest:(int)rc {

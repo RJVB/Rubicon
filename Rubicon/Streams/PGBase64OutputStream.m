@@ -62,18 +62,14 @@ char *PGBase64Encode(uint8_t ra[3], char ar[4]) {
 			NSInteger cc = [super write:(buffer + written) maxLength:(4 - written)];
 
 			if(cc <= 0) {
-				if(results) {
-					*results = cc;
-				}
+				*results = cc;
 				return (cc < 0 ? 0 : XXX[written]);
 			}
 
 			written += cc;
 		}
 
-		if(results) {
-			*results = written;
-		}
+		*results = written;
 		return XXX[written];
 	}
 
@@ -90,6 +86,7 @@ char *PGBase64Encode(uint8_t ra[3], char ar[4]) {
 						_inputIndex = 0;
 						PGBase64Encode(_inputBuffer, _outputBuffer);
 						written += [self write:(uint8_t const *)_outputBuffer results:&results];
+
 						if(results <= 0) {
 							return results;
 						}
@@ -115,11 +112,14 @@ char *PGBase64Encode(uint8_t ra[3], char ar[4]) {
 				for(int i = _inputIndex; i < 3; i++) {
 					_inputBuffer[i] = 0;
 				}
+
 				PGBase64Encode(_inputBuffer, _outputBuffer);
 				_outputBuffer[3] = CODES[64];
+
 				if(_inputIndex == 1) {
 					_outputBuffer[2] = CODES[64];
 				}
+
 				_inputIndex = 0;
 				[self write:(uint8_t const *)_outputBuffer results:NULL];
 			}
