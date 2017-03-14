@@ -161,6 +161,18 @@
 		return [[PGStackEnumerator alloc] initWithStack:self];
 	}
 
+	+(instancetype)stack {
+		return [[self alloc] init];
+	}
+
+	+(instancetype)stackWithArray:(NSArray *)array {
+		return [[self alloc] initWithNSArray:array];
+	}
+
+	+(instancetype)stackWithObjects:(const id[])objects count:(NSUInteger)cnt {
+		return [[self alloc] initWithObjects:objects count:cnt];
+	}
+
 @end
 
 @implementation PGStackEnumerator {

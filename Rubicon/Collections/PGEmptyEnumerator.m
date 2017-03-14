@@ -1,13 +1,12 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: Rubicon.h
+ *    FILENAME: PGEmptyEnumerator.m
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 12/21/16 3:19 PM
- *  VISIBILITY: Public
+ *        DATE: 3/14/17 2:47 PM
  * DESCRIPTION:
  *
- * Copyright © 2016 Galen Rhodes All rights reserved.
+ * Copyright © 2017 Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,27 +21,25 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import "PGEmptyEnumerator.h"
 
-//! Project version number for Rubicon.
-FOUNDATION_EXPORT double RubiconVersionNumber;
+@implementation PGEmptyEnumerator {
+	}
 
-//! Project version string for Rubicon.
-FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
+	-(id)nextObject {
+		return nil;
+	}
 
-#include <Rubicon/sem_timedwait.h>
-#import <Rubicon/NSObject+PGObject.h>
-#import <Rubicon/NSString+PGString.h>
-#import <Rubicon/NSMutableDictionary+PGBinaryTreeDictionary.h>
-#import <Rubicon/PGBinaryTreeNode+PGBinaryTreeTraverse.h>
-#import <Rubicon/PGBinaryTreeNode.h>
-#import <Rubicon/PGBinaryTreeDictionary.h>
-#import <Rubicon/PGMacros.h>
-#import <Rubicon/PGSemaphore.h>
-#import <Rubicon/PGReadWriteLock.h>
-#import <Rubicon/PGTimeSpec.h>
-#import <Rubicon/PGTimedWait.h>
-#import <Rubicon/PGStack.h>
-#import <Rubicon/PGLinkedListNode.h>
-#import <Rubicon/PGBase64OutputStream.h>
-#import <Rubicon/PGEmptyEnumerator.h>
+	-(NSArray *)allObjects {
+		return [NSArray array];
+	}
+
+	-(instancetype)init {
+		return (self = [super init]);
+	}
+
+	+(instancetype)emptyEnumerator {
+		return [[self alloc] init];
+	}
+
+@end

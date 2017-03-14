@@ -54,6 +54,11 @@
 
 	-(NSEnumerator *)objectEnumerator;
 
+	+(instancetype)stack;
+
+	+(instancetype)stackWithArray:(NSArray *)array;
+
+	+(instancetype)stackWithObjects:(const id[])objects count:(NSUInteger)cnt;
 @end
 
 #endif //__Rubicon_PGStack_H_

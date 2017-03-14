@@ -1,13 +1,13 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: Rubicon.h
+ *    FILENAME: PGBinaryTreeNodePrivate.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 12/21/16 3:19 PM
- *  VISIBILITY: Public
+ *        DATE: 3/14/17 2:41 PM
+ *  VISIBILITY: Private
  * DESCRIPTION:
  *
- * Copyright © 2016 Galen Rhodes All rights reserved.
+ * Copyright © 2017 Galen Rhodes All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,27 +22,31 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#ifndef __Rubicon_PGBinaryTreeNodePrivate_H_
+#define __Rubicon_PGBinaryTreeNodePrivate_H_
 
-//! Project version number for Rubicon.
-FOUNDATION_EXPORT double RubiconVersionNumber;
-
-//! Project version string for Rubicon.
-FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
-
-#include <Rubicon/sem_timedwait.h>
-#import <Rubicon/NSObject+PGObject.h>
-#import <Rubicon/NSString+PGString.h>
-#import <Rubicon/NSMutableDictionary+PGBinaryTreeDictionary.h>
-#import <Rubicon/PGBinaryTreeNode+PGBinaryTreeTraverse.h>
 #import <Rubicon/PGBinaryTreeNode.h>
-#import <Rubicon/PGBinaryTreeDictionary.h>
-#import <Rubicon/PGMacros.h>
-#import <Rubicon/PGSemaphore.h>
-#import <Rubicon/PGReadWriteLock.h>
-#import <Rubicon/PGTimeSpec.h>
-#import <Rubicon/PGTimedWait.h>
-#import <Rubicon/PGStack.h>
-#import <Rubicon/PGLinkedListNode.h>
-#import <Rubicon/PGBase64OutputStream.h>
-#import <Rubicon/PGEmptyEnumerator.h>
+
+@interface PGBinaryTreeNode()
+
+	@property(readwrite) BOOL isRed;
+
+	-(void)setKey:(id<NSCopying>)key;
+
+	-(instancetype)getChild:(BOOL)left;
+
+	-(instancetype)setChild:(PGBinaryTreeNode *)child onLeft:(BOOL)left;
+
+	-(void)makeOrphan;
+
+	-(void)setLeftChild:(PGBinaryTreeNode *)child;
+
+	-(void)setRightChild:(PGBinaryTreeNode *)child;
+
+	-(void)rotate:(BOOL)left;
+
+	-(instancetype)farRight;
+
+@end
+
+#endif //__Rubicon_PGBinaryTreeNodePrivate_H_

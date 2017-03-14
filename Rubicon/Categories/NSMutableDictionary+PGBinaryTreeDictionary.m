@@ -30,6 +30,36 @@
 		return [[PGBinaryTreeDictionary alloc] init];
 	}
 
+	+(instancetype)binaryTreeDictionaryWithDictionary:(NSDictionary *)dictionary {
+		PGBinaryTreeDictionary *treeDictionary = (PGBinaryTreeDictionary *)[self binaryTreeDictionary];
+
+		for(id key in dictionary) {
+			[treeDictionary setObject:dictionary[key] forKey:key];
+		}
+
+		return treeDictionary;
+	}
+
+	+(instancetype)binaryTreeDictionaryWithObject:(id)anObject forKey:(id<NSCopying>)aKey {
+		PGBinaryTreeDictionary *treeDictionary = (PGBinaryTreeDictionary *)[self binaryTreeDictionary];
+		[treeDictionary setObject:anObject forKey:aKey];
+		return treeDictionary;
+	}
+
+	+(instancetype)binaryTreeDictionaryWithContentsOfFile:(NSString *)aPath {
+		return [self binaryTreeDictionaryWithDictionary:[NSDictionary dictionaryWithContentsOfFile:aPath]];
+	}
+
+	+(instancetype)binaryTreeDictionaryWithContentsOfURL:(NSURL *)aURL {
+		return [self binaryTreeDictionaryWithDictionary:[NSDictionary dictionaryWithContentsOfURL:aURL]];
+	}
+
+	+(instancetype)binaryTreeDictionaryWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt {
+		return [[PGBinaryTreeDictionary alloc] initWithObjects:objects forKeys:keys count:cnt];
+	}
+
+#if NS_BLOCKS_AVAILABLE
+
 	+(instancetype)binaryTreeDictionaryWithComparator:(NSComparator)comparator {
 		return [[PGBinaryTreeDictionary alloc] initWithComparator:comparator];
 	}
@@ -38,14 +68,10 @@
 		PGBinaryTreeDictionary *treeDictionary = [[PGBinaryTreeDictionary alloc] initWithComparator:comparator];
 
 		for(id key in dictionary) {
-			treeDictionary[key] = dictionary[key];
+			[treeDictionary setObject:dictionary[key] forKey:key];
 		}
 
 		return treeDictionary;
-	}
-
-	+(instancetype)binaryTreeDictionaryWithDictionary:(NSDictionary *)dictionary {
-		return [self binaryTreeDictionaryWithDictionary:dictionary andComparator:nil];
 	}
 
 	+(instancetype)binaryTreeDictionaryWithObject:(id)anObject forKey:(id<NSCopying>)aKey andComparator:(NSComparator)comparator {
@@ -54,30 +80,14 @@
 		return treeDictionary;
 	}
 
-	+(instancetype)binaryTreeDictionaryWithObject:(id)anObject forKey:(id<NSCopying>)aKey {
-		return [self binaryTreeDictionaryWithObject:anObject forKey:aKey andComparator:nil];
-	}
-
 	+(instancetype)binaryTreeDictionaryWithContentsOfFile:(NSString *)aPath andComparator:(NSComparator)comparator {
 		NSDictionary *aDictionary = [NSDictionary dictionaryWithContentsOfFile:aPath];
 		return [self binaryTreeDictionaryWithDictionary:aDictionary andComparator:comparator];
 	}
 
-	+(instancetype)binaryTreeDictionaryWithContentsOfFile:(NSString *)aPath {
-		return [self binaryTreeDictionaryWithContentsOfFile:aPath andComparator:nil];
-	}
-
 	+(instancetype)binaryTreeDictionaryWithContentsOfURL:(NSURL *)aURL andComparator:(NSComparator)comparator {
 		NSDictionary *aDictionary = [NSDictionary dictionaryWithContentsOfURL:aURL];
 		return [self binaryTreeDictionaryWithDictionary:aDictionary andComparator:comparator];
-	}
-
-	+(instancetype)binaryTreeDictionaryWithContentsOfURL:(NSURL *)aURL {
-		return [self binaryTreeDictionaryWithContentsOfURL:aURL andComparator:nil];
-	}
-
-	+(instancetype)binaryTreeDictionaryWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt {
-		return [self binaryTreeDictionaryWithObjects:objects forKeys:keys count:cnt comparator:nil];
 	}
 
 	+(instancetype)binaryTreeDictionaryWithObjects:(const id[])objects
@@ -86,5 +96,7 @@
 										comparator:(NSComparator)comparator {
 		return [[PGBinaryTreeDictionary alloc] initWithObjects:objects forKeys:keys count:cnt comparator:comparator];
 	}
+
+#endif
 
 @end

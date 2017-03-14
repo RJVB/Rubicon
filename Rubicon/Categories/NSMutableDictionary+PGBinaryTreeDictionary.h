@@ -27,17 +27,27 @@
 
 #import <Rubicon/PGTools.h>
 
+@class PGBinaryTreeDictionary;
+
 @interface NSMutableDictionary(PGBinaryTreeDictionary)
 
 	+(instancetype)binaryTreeDictionary;
 
-	+(instancetype)binaryTreeDictionaryWithComparator:(NSComparator)comparator;
-
-	+(instancetype)binaryTreeDictionaryWithDictionary:(NSDictionary *)dictionary andComparator:(NSComparator)comparator;
-
 	+(instancetype)binaryTreeDictionaryWithDictionary:(NSDictionary *)dictionary;
 
 	+(instancetype)binaryTreeDictionaryWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt;
+
+	+(instancetype)binaryTreeDictionaryWithObject:(id)anObject forKey:(id<NSCopying>)aKey;
+
+	+(instancetype)binaryTreeDictionaryWithContentsOfFile:(NSString *)aPath;
+
+	+(instancetype)binaryTreeDictionaryWithContentsOfURL:(NSURL *)aURL;
+
+#if NS_BLOCKS_AVAILABLE
+
+	+(instancetype)binaryTreeDictionaryWithComparator:(NSComparator)comparator;
+
+	+(instancetype)binaryTreeDictionaryWithDictionary:(NSDictionary *)dictionary andComparator:(NSComparator)comparator;
 
 	+(instancetype)binaryTreeDictionaryWithObjects:(const id[])objects
 										   forKeys:(const id<NSCopying>[])keys
@@ -46,15 +56,11 @@
 
 	+(instancetype)binaryTreeDictionaryWithObject:(id)anObject forKey:(id<NSCopying>)aKey andComparator:(NSComparator)comparator;
 
-	+(instancetype)binaryTreeDictionaryWithObject:(id)anObject forKey:(id<NSCopying>)aKey;
-
 	+(instancetype)binaryTreeDictionaryWithContentsOfFile:(NSString *)aPath andComparator:(NSComparator)comparator;
-
-	+(instancetype)binaryTreeDictionaryWithContentsOfFile:(NSString *)aPath;
 
 	+(instancetype)binaryTreeDictionaryWithContentsOfURL:(NSURL *)aURL andComparator:(NSComparator)comparator;
 
-	+(instancetype)binaryTreeDictionaryWithContentsOfURL:(NSURL *)aURL;
+#endif
 
 @end
 

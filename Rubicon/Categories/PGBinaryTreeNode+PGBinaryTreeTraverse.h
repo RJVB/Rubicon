@@ -1,9 +1,9 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGBinaryTreeNode.h
+ *    FILENAME: PGBinaryTreeNode(PGBinaryTreeTraverse).h
  *         IDE: AppCode
  *      AUTHOR:  Galen Rhodes
- *        DATE: 2/27/17 7:41 PM
+ *        DATE: 3/14/17 3:19 PM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
@@ -22,39 +22,38 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGBinaryTreeNode_H_
-#define __Rubicon_PGBinaryTreeNode_H_
+#ifndef __Rubicon_PGBinaryTreeNode_PGBinaryTreeTraverse__H_
+#define __Rubicon_PGBinaryTreeNode_PGBinaryTreeTraverse__H_
 
-#import <Rubicon/PGTools.h>
+#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGBinaryTreeNode.h>
 
-@interface PGBinaryTreeNode : NSObject
+@interface PGKVNodeVisitor
 
-	@property(readonly, copy) id         key;
-	@property(retain) id                 value;
-	@property(readonly) NSUInteger       count;
-	@property(readonly) PGBinaryTreeNode *rootNode;
-	@property(readonly) PGBinaryTreeNode *parent;
-	@property(readonly) PGBinaryTreeNode *leftChild;
-	@property(readonly) PGBinaryTreeNode *rightChild;
-
-	-(instancetype)initWithKey:(id<NSCopying>)key value:(id)value;
-
-#if NS_BLOCKS_AVAILABLE
-
-	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key comparator:(NSComparator)cmp;
-
-	-(instancetype)findNodeForKey:(id)key comparator:(NSComparator)compare;
-
-#endif
-
-	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key;
-
-	-(instancetype)findNodeForKey:(id)key;
-
-	-(instancetype)remove;
-
-	+(instancetype)nodeWithKey:(id<NSCopying>)key value:(id)value;
+	-(BOOL)visitNodeWithKey:(id)aKey andValue:(id)aValue;
 
 @end
 
-#endif //__Rubicon_PGBinaryTreeNode_H_
+#if NS_BLOCKS_AVAILABLE
+
+typedef BOOL (^PGKVNodeVisitorBlock)(id aKey, id aValue);
+
+#endif
+
+@interface PGBinaryTreeNode(PGBinaryTreeTraverse)
+
+#if NS_BLOCKS_AVAILABLE
+
+	-(BOOL)travelForwardTreeWithBlock:(PGKVNodeVisitorBlock)visitorBlock;
+
+	-(BOOL)travelBackwardTreeWithBlock:(PGKVNodeVisitorBlock)visitorBlock;
+
+#endif
+
+	-(BOOL)travelForwardTreeWithVisitor:(PGKVNodeVisitor *)visitor;
+
+	-(BOOL)travelBackwardTreeWithVisitor:(PGKVNodeVisitor *)visitor;
+
+@end
+
+#endif // __Rubicon_PGBinaryTreeNode_PGBinaryTreeTraverse__H_

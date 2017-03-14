@@ -22,42 +22,234 @@
  *******************************************************************************/
 
 #import "PGBinaryTreeDictionary.h"
+#import "PGBinaryTreeNodePrivate.h"
+#import "PGStack.h"
+#import "PGEmptyEnumerator.h"
+
+@interface PGBinaryTreeDictionary()
+
+#if NS_BLOCKS_AVAILABLE
+	@property(copy) NSComparator comparator;
+#endif
+	@property(retain) PGBinaryTreeNode *rootNode;
+
+	-(void)loadWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt;
+
+@end
+
+@interface PGBinaryTreeKeyEnumerator : NSEnumerator
+
+	@property(retain) PGBinaryTreeDictionary *dict;
+	@property(retain) PGStack                *stack;
+
+	-(instancetype)initWithTreeDictionary:(PGBinaryTreeDictionary *)dict;
+
+	+(instancetype)enumWithTreeDictionary:(PGBinaryTreeDictionary *)dict;
+
+	-(void)descendLeft:(PGBinaryTreeNode *)node;
+
+	-(id)nextObject;
+
+	-(NSArray *)allObjects;
+
+@end
 
 @implementation PGBinaryTreeDictionary {
 	}
 
+	@synthesize rootNode = _rootNode;
+
 	-(instancetype)init {
-		return nil;
+		return (self = [super init]);
 	}
 
-	-(instancetype)initWithComparator:(NSComparator)comparator {
-		return nil;
+	-(void)loadWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt {
+		if(cnt) {
+			if(objects) {
+				if(keys) {
+					for(NSUInteger i = 0; i < cnt; i++) {
+						[self setObject:objects[i] forKey:keys[i]];
+					}
+				}
+				else {
+					@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Keys array cannot be nil." userInfo:nil];
+				}
+			}
+			else {
+				@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Values array cannot be nil." userInfo:nil];
+			}
+		}
 	}
 
 	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt {
-		return nil;
+		self = [self init];
+
+		if(self) {
+			[self loadWithObjects:objects forKeys:keys count:cnt];
+		}
+
+		return self;
 	}
 
-	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt comparator:(NSComparator)comparator {
-		return nil;
+	-(NSUInteger)count {
+		return self.rootNode.count;
 	}
+
+#if NS_BLOCKS_AVAILABLE
+
+	@synthesize comparator = _comparator;
 
 	-(void)setObject:(id)anObject forKey:(id<NSCopying>)aKey {
+		if(aKey && anObject) {
+			if(self.rootNode) {
+				self.rootNode = (self.comparator ?
+								 [self.rootNode insertValue:anObject forKey:aKey comparator:self.comparator] :
+								 [self.rootNode insertValue:anObject forKey:aKey]).rootNode;
+			}
+			else {
+				self.rootNode       = [PGBinaryTreeNode nodeWithKey:aKey value:anObject];
+				self.rootNode.isRed = NO;
+			}
+		}
+		else {
+			@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Neither Key nor Value can be nil." userInfo:nil];
+		}
 	}
 
 	-(id)objectForKey:(id)aKey {
-		return nil;
+		return (aKey ? (self.comparator ? [self.rootNode findNodeForKey:aKey comparator:self.comparator] : [self.rootNode findNodeForKey:aKey]).value : nil);
 	}
 
 	-(void)removeObjectForKey:(id)aKey {
+		if(aKey) {
+			self.rootNode = [(self.comparator ? [self.rootNode findNodeForKey:aKey comparator:self.comparator] : [self.rootNode findNodeForKey:aKey]) remove];
+		}
 	}
+
+#else
+/*@f:0*/
+	 -(void)setObject:(id)anObject forKey:(id<NSCopying>)aKey {
+		 if(aKey && anObject) {
+			 if(self.rootNode) {
+				 self.rootNode = [self.rootNode insertValue:anObject forKey:aKey].rootNode;
+			 }
+			 else {
+				 self.rootNode       = [PGBinaryTreeNode nodeWithKey:aKey value:anObject];
+				 self.rootNode.isRed = NO;
+			 }
+		 }
+		 else {
+			 @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Neither Key nor Value can be nil." userInfo:nil];
+		 }
+	 }
+
+	 -(id)objectForKey:(id)aKey {
+		 return (aKey ? [self.rootNode findNodeForKey:aKey].value : nil);
+	 }
+
+	 -(void)removeObjectForKey:(id)aKey {
+		 if(aKey) {
+			 self.rootNode = [[self.rootNode findNodeForKey:aKey] remove];
+		 }
+	 }
+ /*@f:1*/
+#endif
 
 	-(NSEnumerator *)keyEnumerator {
-		return nil;
-	}
-
-	-(NSEnumerator *)objectEnumerator {
-		return nil;
+		return (self.rootNode ? [PGBinaryTreeKeyEnumerator enumWithTreeDictionary:self] : [PGEmptyEnumerator emptyEnumerator]);
 	}
 
 @end
+
+@implementation PGBinaryTreeKeyEnumerator {
+	}
+
+	@synthesize dict = _dict;
+	@synthesize stack = _stack;
+
+	-(instancetype)initWithTreeDictionary:(PGBinaryTreeDictionary *)dict {
+		self = [super init];
+
+		if(self) {
+			PGBinaryTreeNode *node = dict.rootNode;
+
+			if(node) {
+				self.dict  = dict;
+				self.stack = [PGStack stack];
+				[self descendLeft:node];
+			}
+		}
+
+		return self;
+	}
+
+	+(instancetype)enumWithTreeDictionary:(PGBinaryTreeDictionary *)dict {
+		return [[self alloc] initWithTreeDictionary:dict];
+	}
+
+	-(void)descendLeft:(PGBinaryTreeNode *)node {
+		while(node) {
+			[self.stack push:node];
+			node = node.leftChild;
+		}
+	}
+
+	-(id)nextObject {
+		id obj = nil;
+
+		if(self.stack) {
+			PGBinaryTreeNode *node = self.stack.pop;
+			[self descendLeft:node.rightChild];
+
+			if(self.stack.isEmpty) {
+				self.dict  = nil;
+				self.stack = nil;
+			}
+
+			obj = node.value;
+		}
+
+		return obj;
+	}
+
+	-(NSArray *)allObjects {
+		NSMutableArray *array = [NSMutableArray array];
+		id             obj    = self.nextObject;
+
+		while(obj) {
+			[array addObject:obj];
+			obj = self.nextObject;
+		}
+
+		return array;
+	}
+
+@end
+
+#if NS_BLOCKS_AVAILABLE
+
+@implementation PGBinaryTreeDictionary(NSComparator)
+
+	-(instancetype)initWithComparator:(NSComparator)comparator {
+		self = [self init];
+
+		if(self) {
+			self.comparator = comparator;
+		}
+
+		return self;
+	}
+
+	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt comparator:(NSComparator)comparator {
+		self = [self initWithComparator:comparator];
+
+		if(self) {
+			[self loadWithObjects:objects forKeys:keys count:cnt];
+		}
+
+		return self;
+	}
+
+@end
+
+#endif

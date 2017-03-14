@@ -22,28 +22,7 @@
  *******************************************************************************/
 
 #import "PGBinaryTreeNode.h"
-
-@interface PGBinaryTreeNode()
-
-	@property(readwrite) BOOL isRed;
-
-	-(void)setKey:(id<NSCopying>)key;
-
-	-(instancetype)getChild:(BOOL)left;
-
-	-(instancetype)setChild:(PGBinaryTreeNode *)child onLeft:(BOOL)left;
-
-	-(void)makeOrphan;
-
-	-(void)setLeftChild:(PGBinaryTreeNode *)child;
-
-	-(void)setRightChild:(PGBinaryTreeNode *)child;
-
-	-(void)rotate:(BOOL)left;
-
-	-(instancetype)farRight;
-
-@end
+#import "PGBinaryTreeNodePrivate.h"
 
 @implementation PGBinaryTreeNode {
 	}
@@ -88,18 +67,6 @@
 
 	-(PGBinaryTreeNode *)rootNode {
 		return (self.parent ? self.parent.rootNode : self);
-	}
-
-	-(PGBinaryTreeNode *)sibling {
-		return [self getChild:(self == self.parent.rightChild)];
-	}
-
-	-(PGBinaryTreeNode *)uncle {
-		return self.parent.sibling;
-	}
-
-	-(PGBinaryTreeNode *)grandparent {
-		return self.parent.parent;
 	}
 
 	-(instancetype)getChild:(BOOL)left {
@@ -283,14 +250,14 @@
 							return [self.leftChild insertValue:value forKey:key comparator:cmp];
 						}
 						else {
-							return [(self.leftChild = [(id)[[self class] alloc] initWithKey:key value:value]) iRebalance];
+							return [(self.leftChild = [[self class] nodeWithKey:key value:value]) iRebalance];
 						}
 					case NSOrderedDescending:
 						if(self.rightChild) {
 							return [self.rightChild insertValue:value forKey:key comparator:cmp];
 						}
 						else {
-							return [(self.rightChild = [(id)[[self class] alloc] initWithKey:key value:value]) iRebalance];
+							return [(self.rightChild = [[self class] nodeWithKey:key value:value]) iRebalance];
 						}
 				}
 			}
@@ -323,14 +290,14 @@
 						return [self.leftChild insertValue:value forKey:key];
 					}
 					else {
-						return [(self.leftChild = [(id)[[self class] alloc] initWithKey:key value:value]) iRebalance];
+						return [(self.leftChild = [[self class] nodeWithKey:key value:value]) iRebalance];
 					}
 				case NSOrderedDescending:
 					if(self.rightChild) {
 						return [self.rightChild insertValue:value forKey:key];
 					}
 					else {
-						return [(self.rightChild = [(id)[[self class] alloc] initWithKey:key value:value]) iRebalance];
+						return [(self.rightChild = [[self class] nodeWithKey:key value:value]) iRebalance];
 					}
 			}
 		}

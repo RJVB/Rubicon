@@ -1,9 +1,9 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGBinaryTreeNode.h
+ *    FILENAME: PGEmptyEnumerator.h
  *         IDE: AppCode
  *      AUTHOR:  Galen Rhodes
- *        DATE: 2/27/17 7:41 PM
+ *        DATE: 3/14/17 2:47 PM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
@@ -22,39 +22,21 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGBinaryTreeNode_H_
-#define __Rubicon_PGBinaryTreeNode_H_
+#ifndef __Rubicon_PGEmptyEnumerator_H_
+#define __Rubicon_PGEmptyEnumerator_H_
 
-#import <Rubicon/PGTools.h>
+#import <Cocoa/Cocoa.h>
 
-@interface PGBinaryTreeNode : NSObject
+@interface PGEmptyEnumerator : NSEnumerator
 
-	@property(readonly, copy) id         key;
-	@property(retain) id                 value;
-	@property(readonly) NSUInteger       count;
-	@property(readonly) PGBinaryTreeNode *rootNode;
-	@property(readonly) PGBinaryTreeNode *parent;
-	@property(readonly) PGBinaryTreeNode *leftChild;
-	@property(readonly) PGBinaryTreeNode *rightChild;
+	-(id)nextObject;
 
-	-(instancetype)initWithKey:(id<NSCopying>)key value:(id)value;
+	-(NSArray *)allObjects;
 
-#if NS_BLOCKS_AVAILABLE
+	-(instancetype)init;
 
-	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key comparator:(NSComparator)cmp;
-
-	-(instancetype)findNodeForKey:(id)key comparator:(NSComparator)compare;
-
-#endif
-
-	-(instancetype)insertValue:(id)value forKey:(id<NSCopying>)key;
-
-	-(instancetype)findNodeForKey:(id)key;
-
-	-(instancetype)remove;
-
-	+(instancetype)nodeWithKey:(id<NSCopying>)key value:(id)value;
+	+(instancetype)emptyEnumerator;
 
 @end
 
-#endif //__Rubicon_PGBinaryTreeNode_H_
+#endif //__Rubicon_PGEmptyEnumerator_H_

@@ -29,15 +29,9 @@
 
 @interface PGBinaryTreeDictionary : NSMutableDictionary
 
-	@property(copy, readonly) NSComparator comparator;
-
 	-(instancetype)init;
 
-	-(instancetype)initWithComparator:(NSComparator)comparator;
-
 	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt;
-
-	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt comparator:(NSComparator)comparator;
 
 	-(void)setObject:(id)anObject forKey:(id<NSCopying>)aKey;
 
@@ -47,8 +41,18 @@
 
 	-(NSEnumerator *)keyEnumerator;
 
-	-(NSEnumerator *)objectEnumerator;
+@end
+
+#if NS_BLOCKS_AVAILABLE
+
+@interface PGBinaryTreeDictionary(NSComparator)
+
+	-(instancetype)initWithComparator:(NSComparator)comparator;
+
+	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt comparator:(NSComparator)comparator;
 
 @end
+
+#endif
 
 #endif //__Rubicon_PGBinaryTree_H_
