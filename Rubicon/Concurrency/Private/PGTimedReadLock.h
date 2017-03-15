@@ -33,10 +33,6 @@
 
 	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock;
 
-	-(BOOL)action:(id *)results;
-
-	-(int)performAction;
-
 	+(instancetype)readLockWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock;
 
 @end
@@ -44,8 +40,6 @@
 @interface PGTimedWriteLock : PGTimedReadLock
 
 	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock;
-
-	-(int)performAction;
 
 	+(instancetype)writeLockWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock;
 

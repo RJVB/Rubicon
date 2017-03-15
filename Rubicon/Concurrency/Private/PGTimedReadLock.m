@@ -24,22 +24,31 @@
 #include <pthread.h>
 #import "PGTimedReadLock.h"
 
+@interface PGTimedReadLock()
+
+	@property(readwrite) pthread_rwlock_t *rwlock;
+
+	-(int)performAction;
+
+@end
+
 @implementation PGTimedReadLock {
-		pthread_rwlock_t *_rwlock;
 	}
+
+	@synthesize rwlock = _rwlock;
 
 	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock {
 		self = [super initWithTimeout:absTime];
 
 		if(self) {
-			_rwlock = rwlock;
+			self.rwlock = rwlock;
 		}
 
 		return self;
 	}
 
 	-(int)performAction {
-		return pthread_rwlock_rdlock(_rwlock);
+		return pthread_rwlock_rdlock(self.rwlock);
 	}
 
 	-(BOOL)action:(id *)results {
@@ -72,7 +81,7 @@
 	}
 
 	-(int)performAction {
-		return pthread_rwlock_wrlock(_rwlock);
+		return pthread_rwlock_wrlock(self.rwlock);
 	}
 
 	+(instancetype)writeLockWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock {

@@ -28,7 +28,7 @@
 #import <Cocoa/Cocoa.h>
 #import <Rubicon/PGBinaryTreeNode.h>
 
-@interface PGKVNodeVisitor
+@interface PGKVNodeVisitor : NSObject
 
 	-(BOOL)visitNodeWithKey:(id)aKey andValue:(id)aValue;
 
