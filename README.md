@@ -2,7 +2,7 @@
 
 Rubicon is an Objective-C library designed to speed cross-platform development by filling in the missing pieces between the official Apple version of it's Foundation classes and the [GNUstep](http://www.gnustep.org) version of the Foundation classes.
 
-### Linux vs Mac OS X
+### Linux vs macOS
 
 Rubicon also attempts to smooth out some of the more glaring differences between the Linux operating system and the macOS operating system such as the former's glaring omission of the [int clock_gettime(clockid_t clk_id, struct timespec *tp);](https://linux.die.net/man/3/clock_gettime) function in versions prior to 10.12 (_macOS Sierra_).
 
