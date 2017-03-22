@@ -24,23 +24,7 @@
 #include <pthread.h>
 #import "PGReadWriteLock.h"
 #import "PGTimedReadLock.h"
-
-typedef enum {
-	PGRWNoLockHeld,
-	PGRWReadLockHeld,
-	PGRWWriteLockHeld
-} PGRWCurrentLock;
-
-@interface PGRWLockCounts : NSObject
-
-	@property(readwrite) NSUInteger      count;
-	@property(readwrite) PGRWCurrentLock currentLock;
-
-	-(instancetype)init;
-
-	+(instancetype)counts;
-
-@end
+#import "PGRWLockCounts.h"
 
 @interface PGReadWriteLock()
 
@@ -272,29 +256,6 @@ typedef enum {
 
 	-(BOOL)privateTimedReadLock:(PGTimeSpec *)absTime {
 		return ([self tryLock] ? YES : [[PGTimedWriteLock writeLockWithTimeout:absTime readWriteLock:&_rwlock] timedAction]);
-	}
-
-@end
-
-@implementation PGRWLockCounts {
-	}
-
-	@synthesize count = _count;
-	@synthesize currentLock = _currentLock;
-
-	-(instancetype)init {
-		self = [super init];
-
-		if(self) {
-			self.count       = 0;
-			self.currentLock = PGRWNoLockHeld;
-		}
-
-		return self;
-	}
-
-	+(instancetype)counts {
-		return [[self alloc] init];
 	}
 
 @end

@@ -21,19 +21,12 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
+#include <semaphore.h>
 #import "PGSemaphore.h"
 #import "NSString+PGString.h"
 #import "PGTimedWait.h"
 #import "PGTimeSpec.h"
-#include <semaphore.h>
-
-@interface PGTimedSemWait : PGTimedWait
-
-	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime semaphore:(sem_t *)semaphore;
-
-	-(BOOL)action:(id *)results;
-
-@end
+#import "PGTimedSemWait.h"
 
 @implementation PGSemaphore {
 		sem_t *_semaphore;
@@ -119,37 +112,3 @@
 
 @end
 
-@implementation PGTimedSemWait {
-		sem_t *_semaphore;
-	}
-
-	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime semaphore:(sem_t *)semaphore {
-		self = [super initWithTimeout:absTime];
-
-		if(self) {
-			_semaphore = semaphore;
-		}
-
-		return self;
-	}
-
-	-(BOOL)action:(id *)results {
-		*results = nil;
-
-		if(sem_wait(_semaphore)) {
-			if(errno == EINTR && self.didTimeOut) {
-				return NO;
-			}
-			else {
-				@throw [NSException exceptionWithName:PGSemaphoreException reason:PGStrError(errno) userInfo:nil];
-			}
-		}
-
-		return YES;
-	}
-
-	-(void)dealloc {
-		_semaphore = SEM_FAILED;
-	}
-
-@end
