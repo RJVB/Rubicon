@@ -1,13 +1,12 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGBinaryTree.h
+ *    FILENAME: PGBTreeNode.m
  *         IDE: AppCode
- *      AUTHOR:  Galen Rhodes
- *        DATE: 12/22/16 1:03 PM
- *  VISIBILITY: Private
+ *      AUTHOR: Galen Rhodes
+ *        DATE: 3/29/17 12:08 PM
  * DESCRIPTION:
  *
- * Copyright © 2016  Project Galen. All rights reserved.
+ * Copyright © 2017 Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,37 +21,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGBinaryTree_H_
-#define __Rubicon_PGBinaryTree_H_
+#import "PGBTreeNode.h"
 
-#import <Rubicon/PGTools.h>
-
-@interface PGBinaryTreeDictionary : NSMutableDictionary
-
-	-(instancetype)init;
-
-	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt;
-
-	-(void)setObject:(id)anObject forKey:(id<NSCopying>)aKey;
-
-	-(id)objectForKey:(id)aKey;
-
-	-(void)removeObjectForKey:(id)aKey;
-
-	-(NSEnumerator *)keyEnumerator;
-
+@implementation PGBTreeNode {
+	}
 @end
-
-#if NS_BLOCKS_AVAILABLE
-
-@interface PGBinaryTreeDictionary(NSComparator)
-
-	-(instancetype)initWithComparator:(NSComparator)comparator;
-
-	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt comparator:(NSComparator)comparator;
-
-@end
-
-#endif
-
-#endif //__Rubicon_PGBinaryTree_H_

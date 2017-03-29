@@ -1,9 +1,9 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGBinaryTreeNode(PGBinaryTreeTraverse).h
+ *    FILENAME: PGKeyValueData.h
  *         IDE: AppCode
  *      AUTHOR:  Galen Rhodes
- *        DATE: 3/14/17 3:19 PM
+ *        DATE: 3/29/17 10:39 AM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
@@ -22,38 +22,20 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGBinaryTreeNode_PGBinaryTreeTraverse__H_
-#define __Rubicon_PGBinaryTreeNode_PGBinaryTreeTraverse__H_
+#ifndef __Rubicon_PGKeyValueData_H_
+#define __Rubicon_PGKeyValueData_H_
 
 #import <Cocoa/Cocoa.h>
-#import <Rubicon/PGBinaryTreeNode.h>
 
-@interface PGKVNodeVisitor : NSObject
+@interface PGKeyValueData : NSObject
 
-	-(BOOL)visitNodeWithKey:(id)aKey andValue:(id)aValue;
+	@property(copy, readonly) id key;
+	@property(retain) id         value;
 
-@end
+	-(instancetype)initWithValue:(id)value forKey:(id)key;
 
-#if NS_BLOCKS_AVAILABLE
-
-typedef BOOL (^PGKVNodeVisitorBlock)(id aKey, id aValue);
-
-#endif
-
-@interface PGBinaryTreeNode(PGBinaryTreeTraverse)
-
-#if NS_BLOCKS_AVAILABLE
-
-	-(BOOL)travelForwardTreeWithBlock:(PGKVNodeVisitorBlock)visitorBlock;
-
-	-(BOOL)travelBackwardTreeWithBlock:(PGKVNodeVisitorBlock)visitorBlock;
-
-#endif
-
-	-(BOOL)travelForwardTreeWithVisitor:(PGKVNodeVisitor *)visitor;
-
-	-(BOOL)travelBackwardTreeWithVisitor:(PGKVNodeVisitor *)visitor;
+	+(instancetype)dataWithValue:(id)value forKey:(id)key;
 
 @end
 
-#endif // __Rubicon_PGBinaryTreeNode_PGBinaryTreeTraverse__H_
+#endif //__Rubicon_PGKeyValueData_H_
