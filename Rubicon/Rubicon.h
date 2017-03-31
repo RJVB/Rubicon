@@ -46,4 +46,5 @@ FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
 #import <Rubicon/PGLinkedListNode.h>
 #import <Rubicon/PGBase64OutputStream.h>
 #import <Rubicon/PGEmptyEnumerator.h>
-#import <Rubicon/PGKeyValueData.h>
+#import "PGKeyValueData.h"
+#import <Rubicon/PGBTreeNode.h>

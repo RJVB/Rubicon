@@ -1,13 +1,12 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGBTreeNode.h
+ *    FILENAME: PGKeyValueNodeTraveler.m
  *         IDE: AppCode
- *      AUTHOR:  Galen Rhodes
- *        DATE: 3/29/17 12:08 PM
- *  VISIBILITY: Private
+ *      AUTHOR: Galen Rhodes
+ *        DATE: 3/30/17 2:48 PM
  * DESCRIPTION:
  *
- * Copyright © 2017  Project Galen. All rights reserved.
+ * Copyright © 2017 Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,33 +21,17 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGBTreeNode_H_
-#define __Rubicon_PGBTreeNode_H_
+#import "PGKeyValueNodeTraveler.h"
 
-#import <Cocoa/Cocoa.h>
+@implementation PGKeyValueNodeTraveler {
+	}
 
-@interface PGBTreeNode : NSObject
+	-(instancetype)init {
+		return (self = [super init]);
+	}
 
-	@property(retain) id                  data;
-	@property(readonly) NSUInteger        count;
-	@property(readonly, weak) PGBTreeNode *parent;
-	@property(readonly) PGBTreeNode       *left;
-	@property(readonly) PGBTreeNode       *right;
-	@property(readonly) PGBTreeNode       *root;
-	@property(readonly) PGBTreeNode       *grandparent;
-	@property(readonly) PGBTreeNode       *sibling;
-	@property(readonly) PGBTreeNode       *uncle;
-
-	-(instancetype)initWithData:(id)data;
-
-	-(instancetype)findNodeWithData:(id)data;
-
-	-(instancetype)remove;
-
-	-(instancetype)insert:(id)data;
-
-	+(instancetype)nodeWithData:(id)data isRed:(BOOL)isRed;
+	-(BOOL)visitNodeWithKey:(id)key forValue:(id)value {
+		return NO;
+	}
 
 @end
-
-#endif //__Rubicon_PGBTreeNode_H_

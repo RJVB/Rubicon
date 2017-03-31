@@ -1,9 +1,9 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGBTreeNode.h
+ *    FILENAME: PGKeyValueNodeTraveler.h
  *         IDE: AppCode
  *      AUTHOR:  Galen Rhodes
- *        DATE: 3/29/17 12:08 PM
+ *        DATE: 3/30/17 2:48 PM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
@@ -22,33 +22,17 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGBTreeNode_H_
-#define __Rubicon_PGBTreeNode_H_
+#ifndef __Rubicon_PGKeyValueNodeTraveler_H_
+#define __Rubicon_PGKeyValueNodeTraveler_H_
 
 #import <Cocoa/Cocoa.h>
 
-@interface PGBTreeNode : NSObject
+@interface PGKeyValueNodeTraveler : NSObject
 
-	@property(retain) id                  data;
-	@property(readonly) NSUInteger        count;
-	@property(readonly, weak) PGBTreeNode *parent;
-	@property(readonly) PGBTreeNode       *left;
-	@property(readonly) PGBTreeNode       *right;
-	@property(readonly) PGBTreeNode       *root;
-	@property(readonly) PGBTreeNode       *grandparent;
-	@property(readonly) PGBTreeNode       *sibling;
-	@property(readonly) PGBTreeNode       *uncle;
+	-(instancetype)init;
 
-	-(instancetype)initWithData:(id)data;
-
-	-(instancetype)findNodeWithData:(id)data;
-
-	-(instancetype)remove;
-
-	-(instancetype)insert:(id)data;
-
-	+(instancetype)nodeWithData:(id)data isRed:(BOOL)isRed;
+	-(BOOL)visitNodeWithKey:(id)key forValue:(id)value;
 
 @end
 
-#endif //__Rubicon_PGBTreeNode_H_
+#endif //__Rubicon_PGKeyValueNodeTraveler_H_

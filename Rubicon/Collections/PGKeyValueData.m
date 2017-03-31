@@ -35,8 +35,8 @@
 
 		if(self) {
 			if(value) {
-				if(key && [(id)key respondsToSelector:@selector(compare:)]) {
-					_key = [key copy];
+				if(key && [(id)key respondsToSelector:@selector(compare:)]) {  // I love reflection and instrospection.
+					_key = [(id)key copy];
 					self.value = value;
 				}
 				else {
@@ -45,7 +45,7 @@
 				}
 			}
 			else {
-				@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Value cannot be nil." userInfo:nil];
+				@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Value cannot be null." userInfo:nil];
 			}
 		}
 

@@ -22,7 +22,246 @@
  *******************************************************************************/
 
 #import "PGBTreeNode.h"
+#import "PGTools.h"
+
+@interface PGBTreeNode()
+
+	@property(readwrite) BOOL isRed;
+	@property(readonly) BOOL  isLeft;
+	@property(readonly) BOOL  isRight;
+
+	-(instancetype)initWithData:(id)data isRed:(BOOL)isRed;
+
+	-(void)setParent:(PGBTreeNode *)node;
+
+	-(void)recount;
+
+	-(instancetype)child:(BOOL)onLeft;
+
+	-(instancetype)makeOrphan;
+
+	-(instancetype)setChild:(PGBTreeNode *)child onLeft:(BOOL)onLeft;
+
+	-(void)rotate:(BOOL)toTheLeft;
+
+	-(instancetype)foobar:(id)data child:(PGBTreeNode *)child onLeft:(BOOL)onLeft;
+
+	-(instancetype)ibal;
+
+	-(instancetype)rbal;
+@end
+
+PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left) : node); }
 
 @implementation PGBTreeNode {
 	}
+
+	@synthesize data = _data;
+	@synthesize isRed = _isRed;
+	@synthesize count = _count;
+	@synthesize parent = _parent;
+	@synthesize left = _left;
+	@synthesize right = _right;
+
+	-(instancetype)initWithData:(id)data { return (self = [self initWithData:data isRed:NO]); }
+
+	-(instancetype)initWithData:(id)data isRed:(BOOL)isRed {
+		self = [super init];
+
+		if(self) {
+			if(data && [data respondsToSelector:@selector(compare:)]) {
+				self.data  = data;
+				self.isRed = isRed;
+			}
+			else {
+				NSString *reason = (data ? @"data class does not respond to compare: selector." : @"data is nil.");
+				@throw [NSException exceptionWithName:NSInvalidArgumentException reason:reason userInfo:nil];
+			}
+		}
+
+		return self;
+	}
+
+	+(instancetype)nodeWithData:(id)data isRed:(BOOL)isRed { return [[self alloc] initWithData:data isRed:isRed]; }
+
+	-(BOOL)allBlack { return !(self.isRed || self.left.isRed || self.right.isRed); }
+
+	-(BOOL)isLeft { return (_parent && (self == _parent->_left)); }
+
+	-(BOOL)isRight { return (_parent && (self == _parent->_right)); }
+
+	-(PGBTreeNode *)root { return (_parent ? _parent.root : self); }
+
+	-(PGBTreeNode *)grandparent { return (_parent ? _parent->_parent : nil); }
+
+	-(PGBTreeNode *)sibling { return (_parent ? ((self == _parent->_left) ? _right : _left) : nil); }
+
+	-(PGBTreeNode *)uncle { return (_parent.sibling); }
+
+	-(instancetype)child:(BOOL)onLeft { return (onLeft ? _left : _right); }
+
+	-(void)setParent:(PGBTreeNode *)node { _parent = node; }
+
+	-(void)recount {
+		_count = (1 + _left.count + _right.count);
+		[_parent recount];
+	}
+
+	-(instancetype)makeOrphan {
+		[self.parent setChild:nil onLeft:self.isLeft];
+		return self;
+	}
+
+	-(instancetype)setChild:(PGBTreeNode *)child onLeft:(BOOL)onLeft {
+		if(self == child) {
+			@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"A node cannot be it's own child." userInfo:nil];
+		}
+		else {
+			child.makeOrphan.parent = self;
+			if(onLeft) {
+				_left.parent = nil;
+				_left = child;
+			}
+			else {
+				_right.parent = nil;
+				_right = child;
+			}
+			[self recount];
+			return child;
+		}
+	}
+
+	-(void)rotate:(BOOL)toTheLeft {
+		PGBTreeNode *child = [self child:!toTheLeft];
+
+		if(child) {
+			[self.parent setChild:child onLeft:self.isLeft];
+			[self setChild:[child child:toTheLeft] onLeft:!toTheLeft];
+			[child setChild:self onLeft:toTheLeft];
+			// Swap colors.
+			BOOL r = self.isRed;
+			self.isRed  = child.isRed;
+			child.isRed = r;
+		}
+		else {
+			@throw [NSException exceptionWithName:NSInvalidArgumentException
+			                               reason:PGFormat(@"Node cannot be rotated to the %@.", (toTheLeft ? @"left" : @"right"))
+			                             userInfo:nil];
+		}
+	}
+
+	-(instancetype)findNodeWithData:(id)data {
+		if(data) {
+			switch(PGCompare(self.data, data)) {
+				case NSOrderedAscending:
+					return [self.right findNodeWithData:data];
+				case NSOrderedDescending:
+					return [self.left findNodeWithData:data];
+				case NSOrderedSame:
+					return self;
+			}
+		}
+
+		return nil;
+	}
+
+	-(instancetype)insert:(id)data {
+		if(data) {
+			switch(PGCompare(self.data, data)) {
+				case NSOrderedAscending:
+					return [self foobar:data child:self.right onLeft:NO];
+				case NSOrderedDescending:
+					return [self foobar:data child:self.left onLeft:YES];
+				case NSOrderedSame:
+					self.data = data;
+					return self;
+			}
+		}
+		else {
+			@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Data cannot be null." userInfo:nil];
+		}
+
+		return nil;
+	}
+
+	-(instancetype)foobar:(id)data child:(PGBTreeNode *)child onLeft:(BOOL)onLeft {
+		return (child ? [child insert:data] : [self setChild:[[self class] nodeWithData:data isRed:YES] onLeft:onLeft].ibal);
+	}
+
+	-(instancetype)ibal {
+		PGBTreeNode *pnode = self.parent;
+
+		if(pnode) {
+			if(pnode.isRed) {
+				PGBTreeNode *gnode = self.grandparent;
+				PGBTreeNode *unode = self.uncle;
+
+				if(unode.isRed) {
+					pnode.isRed = unode.isRed = !(gnode.isRed = YES);
+					[gnode ibal];
+				}
+				else {
+					if(pnode.isRight == self.isLeft) [pnode rotate:pnode.isLeft];
+					[gnode rotate:pnode.isRight];
+				}
+			}
+		}
+		else self.isRed = NO;
+
+		return self;
+	}
+
+	-(instancetype)remove {
+		PGBTreeNode *lc = self.left;
+		PGBTreeNode *rc = self.right;
+
+		if(lc && rc) {
+			PGBTreeNode *ch = farLeft(rc);
+			self.data = ch.data;
+			return ch.remove;
+		}
+		else {
+			PGBTreeNode *rt = nil;
+			PGBTreeNode *ch = (lc ? lc : rc);
+			PGBTreeNode *pn = self.parent;
+
+			if(ch) {
+				ch.isRed = NO;
+				rt = (pn ? [pn setChild:ch onLeft:self.isLeft].root : [ch makeOrphan]);
+			}
+			else if(pn) {
+				if(!self.isRed) [self rbal];
+				rt = pn.root;
+				[self makeOrphan];
+			}
+
+			_parent = nil;
+			_right  = nil;
+			_left   = nil;
+			_data   = nil;
+			return rt;
+		}
+	}
+
+	-(instancetype)rbal {
+		PGBTreeNode *pnode = self.parent; // My parent will not change.
+
+		if(pnode) {
+			BOOL nleft = self.isLeft; // I will always be on the same side of my parent.
+			if(self.sibling.isRed) [pnode rotate:nleft];
+
+			if(self.sibling.allBlack) {
+				self.sibling.isRed = YES;
+				if(pnode.isRed) pnode.isRed = NO; else [pnode rbal];
+			}
+			else {
+				BOOL nright = !nleft;
+				if(![self.sibling child:nright].isRed) [self.sibling rotate:nright];
+				[self.sibling child:nright].isRed = NO;
+				[pnode rotate:nleft];
+			}
+		}
+		return self;
+	}
+
 @end
