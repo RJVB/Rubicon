@@ -54,14 +54,14 @@
 PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left) : node); }
 
 @implementation PGBTreeNode {
+		PGBTreeNode *_parent;
+		PGBTreeNode *_left;
+		PGBTreeNode *_right;
 	}
 
 	@synthesize data = _data;
 	@synthesize isRed = _isRed;
 	@synthesize count = _count;
-	@synthesize parent = _parent;
-	@synthesize left = _left;
-	@synthesize right = _right;
 
 	-(instancetype)initWithData:(id)data { return (self = [self initWithData:data isRed:NO]); }
 
@@ -84,23 +84,30 @@ PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left)
 
 	+(instancetype)nodeWithData:(id)data isRed:(BOOL)isRed { return [[self alloc] initWithData:data isRed:isRed]; }
 
+	-(instancetype)root { return (_parent ? _parent.root : self); }
+
+	-(instancetype)grandparent { return (_parent ? _parent->_parent : nil); }
+
+	-(instancetype)sibling { return (_parent ? ((self == _parent->_left) ? _right : _left) : nil); }
+
+	-(instancetype)uncle { return (_parent.sibling); }
+
+	-(instancetype)child:(BOOL)onLeft { return (onLeft ? _left : _right); }
+
+	-(instancetype)parent { return _parent; }
+
+	-(instancetype)left { return _left; }
+
+	-(instancetype)right { return _right; }
+
 	-(BOOL)allBlack { return !(self.isRed || self.left.isRed || self.right.isRed); }
 
 	-(BOOL)isLeft { return (_parent && (self == _parent->_left)); }
 
 	-(BOOL)isRight { return (_parent && (self == _parent->_right)); }
 
-	-(PGBTreeNode *)root { return (_parent ? _parent.root : self); }
-
-	-(PGBTreeNode *)grandparent { return (_parent ? _parent->_parent : nil); }
-
-	-(PGBTreeNode *)sibling { return (_parent ? ((self == _parent->_left) ? _right : _left) : nil); }
-
-	-(PGBTreeNode *)uncle { return (_parent.sibling); }
-
-	-(instancetype)child:(BOOL)onLeft { return (onLeft ? _left : _right); }
-
 	-(void)setParent:(PGBTreeNode *)node { _parent = node; }
+
 
 	-(void)recount {
 		_count = (1 + _left.count + _right.count);
@@ -150,13 +157,13 @@ PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left)
 		}
 	}
 
-	-(instancetype)findNodeWithData:(id)data {
+	-(instancetype)find:(id)data {
 		if(data) {
 			switch(PGCompare(self.data, data)) {
 				case NSOrderedAscending:
-					return [self.right findNodeWithData:data];
+					return [self.right find:data];
 				case NSOrderedDescending:
-					return [self.left findNodeWithData:data];
+					return [self.left find:data];
 				case NSOrderedSame:
 					return self;
 			}

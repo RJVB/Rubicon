@@ -1,9 +1,9 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGBTreeNode.h
+ *    FILENAME: PGBTreeDictionary.h
  *         IDE: AppCode
  *      AUTHOR:  Galen Rhodes
- *        DATE: 3/29/17 12:08 PM
+ *        DATE: 3/31/17 2:10 PM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
@@ -22,40 +22,38 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGBTreeNode_H_
-#define __Rubicon_PGBTreeNode_H_
+#ifndef __Rubicon_PGBTreeDictionary_H_
+#define __Rubicon_PGBTreeDictionary_H_
 
 #import <Cocoa/Cocoa.h>
 
-@interface PGBTreeNode : NSObject
+@interface PGBTreeDictionary : NSDictionary
 
-	@property(retain) id           data;
-	@property(readonly) NSUInteger count;
+	-(instancetype)init;
 
-	-(instancetype)initWithData:(id)data;
+	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt;
 
-	+(instancetype)nodeWithData:(id)data isRed:(BOOL)isRed;
+	-(id)objectForKey:(id)aKey;
 
-	-(instancetype)find:(id)data;
+	-(NSEnumerator *)keyEnumerator;
+@end
 
-	-(instancetype)insert:(id)data;
+@interface PGBTreeMutableDictionary : NSMutableDictionary
 
-	-(instancetype)remove;
+	-(instancetype)init;
 
-	-(instancetype)parent;
+	-(instancetype)initWithCapacity:(NSUInteger)numItems;
 
-	-(instancetype)left;
+	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt;
 
-	-(instancetype)right;
+	-(id)objectForKey:(id)aKey;
 
-	-(instancetype)root;
+	-(NSEnumerator *)keyEnumerator;
 
-	-(instancetype)grandparent;
+	-(void)removeObjectForKey:(id)aKey;
 
-	-(instancetype)sibling;
-
-	-(instancetype)uncle;
+	-(void)setObject:(id)anObject forKey:(id<NSCopying>)aKey;
 
 @end
 
-#endif //__Rubicon_PGBTreeNode_H_
+#endif //__Rubicon_PGBTreeDictionary_H_
