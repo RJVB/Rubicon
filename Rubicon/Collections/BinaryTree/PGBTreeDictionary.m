@@ -76,6 +76,28 @@
 
 	-(instancetype)init { return (self = [super init]); }
 
+	-(instancetype)initWithDictionary:(NSDictionary *)dict {
+		self = [super init];
+
+		if(self) {
+			for(id key in dict.allKeys) {
+				[self setObject:dict[key] forKey:key];
+			}
+		}
+
+		return self;
+	}
+
+	-(instancetype)initWithObject:(const id)object forKey:(const id<NSCopying>)key {
+		self = [super init];
+
+		if(self) {
+			[self setObject:object forKey:key];
+		}
+
+		return self;
+	}
+
 	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt {
 		self = [super init];
 
@@ -98,6 +120,18 @@
 		}
 
 		return self;
+	}
+
+	-(instancetype)initWithCoder:(NSCoder *)coder {
+		return (self = [self initWithDictionary:[[NSDictionary alloc] initWithCoder:coder]]);
+	}
+
+	-(instancetype)initWithContentsOfFile:(NSString *)path {
+		return (self = [self initWithDictionary:[NSDictionary dictionaryWithContentsOfFile:path]]);
+	}
+
+	-(instancetype)initWithContentsOfURL:(NSURL *)url {
+		return (self = [self initWithDictionary:[NSDictionary dictionaryWithContentsOfURL:url]]);
 	}
 
 	-(NSEnumerator *)keyEnumerator {
@@ -146,6 +180,46 @@
 
 		if(self) {
 			_treeDictionary = [[PGBTreeDictionary alloc] initWithObjects:objects forKeys:keys count:cnt];
+		}
+
+		return self;
+	}
+
+	-(instancetype)initWithObject:(const id)object forKey:(const id<NSCopying>)key {
+		self = [super init];
+
+		if(self) {
+			_treeDictionary = [[PGBTreeDictionary alloc] initWithObject:object forKey:key];
+		}
+
+		return self;
+	}
+
+	-(instancetype)initWithCoder:(NSCoder *)coder {
+		self = [super init];
+
+		if(self) {
+			_treeDictionary = [[PGBTreeDictionary alloc] initWithCoder:coder];
+		}
+
+		return self;
+	}
+
+	-(instancetype)initWithContentsOfFile:(NSString *)path {
+		self = [super init];
+
+		if(self) {
+			_treeDictionary = [[PGBTreeDictionary alloc] initWithContentsOfFile:path];
+		}
+
+		return self;
+	}
+
+	-(instancetype)initWithContentsOfURL:(NSURL *)url {
+		self = [super init];
+
+		if(self) {
+			_treeDictionary = [[PGBTreeDictionary alloc] initWithContentsOfURL:url];
 		}
 
 		return self;

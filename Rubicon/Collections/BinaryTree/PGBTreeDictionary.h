@@ -33,9 +33,18 @@
 
 	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt;
 
+	-(instancetype)initWithObject:(const id)object forKey:(const id<NSCopying>)key;
+
+	-(instancetype)initWithCoder:(NSCoder *)coder;
+
+	-(instancetype)initWithContentsOfFile:(NSString *)path;
+
+	-(instancetype)initWithContentsOfURL:(NSURL *)url;
+
 	-(id)objectForKey:(id)aKey;
 
 	-(NSEnumerator *)keyEnumerator;
+
 @end
 
 @interface PGBTreeMutableDictionary : NSMutableDictionary
@@ -45,6 +54,14 @@
 	-(instancetype)initWithCapacity:(NSUInteger)numItems;
 
 	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt;
+
+	-(instancetype)initWithObject:(const id)object forKey:(const id<NSCopying>)key;
+
+	-(instancetype)initWithCoder:(NSCoder *)coder;
+
+	-(instancetype)initWithContentsOfFile:(NSString *)path;
+
+	-(instancetype)initWithContentsOfURL:(NSURL *)url;
 
 	-(id)objectForKey:(id)aKey;
 

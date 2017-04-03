@@ -33,6 +33,8 @@ FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
 #include <Rubicon/sem_timedwait.h>
 #import <Rubicon/NSObject+PGObject.h>
 #import <Rubicon/NSString+PGString.h>
+#import <Rubicon/NSDictionary+PGBTreeDictionary.h>
+#import <Rubicon/NSMutableDictionary+PGBTreeMutableDictionary.h>
 #import <Rubicon/PGMacros.h>
 #import <Rubicon/PGSemaphore.h>
 #import <Rubicon/PGReadWriteLock.h>
