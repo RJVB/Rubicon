@@ -1,9 +1,9 @@
 /***************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGTimedWait.h
+ *    FILENAME: PGReadWriteLock.h
  *         IDE: AppCode
  *      AUTHOR:  Galen Rhodes
- *        DATE: 1/21/17 7:21 PM
+ *        DATE: 1/12/17 6:12 PM
  *  VISIBILITY: Private
  * DESCRIPTION:
  *
@@ -22,26 +22,31 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#ifndef __Rubicon_PGTimedWait_H_
-#define __Rubicon_PGTimedWait_H_
+#ifndef __Rubicon_PGReadWriteLock_H_
+#define __Rubicon_PGReadWriteLock_H_
 
-#import <Rubicon/PGTools.h>
+#import "PGTools.h"
 
 @class PGTimeSpec;
 
-@interface PGTimedWait : NSObject
+@interface PGReadWriteLock : NSObject<NSLocking>
 
-	@property(atomic, readonly, copy) PGTimeSpec *absTime;
-	@property(atomic, readonly) volatile BOOL didTimeOut;
+	-(instancetype)init;
 
-	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime;
+	-(void)lock;
 
-	-(BOOL)timedAction:(id *)results;
+	-(void)writeLock;
 
-	-(BOOL)timedAction;
+	-(BOOL)tryLock;
 
-	-(BOOL)action:(id *)results;
+	-(BOOL)tryWriteLock;
+
+	-(BOOL)timedWriteLock:(PGTimeSpec *)absTime;
+
+	-(BOOL)timedLock:(PGTimeSpec *)absTime;
+
+	-(void)unlock;
 
 @end
 
-#endif //__Rubicon_PGTimedWait_H_
+#endif //__Rubicon_PGReadWriteLock_H_

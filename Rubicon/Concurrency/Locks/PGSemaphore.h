@@ -25,7 +25,7 @@
 #ifndef __Rubicon_PGSemaphore_H_
 #define __Rubicon_PGSemaphore_H_
 
-#import <Rubicon/PGTools.h>
+#import "PGTools.h"
 
 @class PGTimeSpec;
 

@@ -26,7 +26,7 @@
 #define __Rubicon_PGTimedReadLock_H_
 
 #import <Cocoa/Cocoa.h>
-#import <Rubicon/PGTimedWait.h>
+#import "PGTimedWait.h"
 #import <Rubicon/PGTimeSpec.h>
 
 @interface PGTimedReadLock : PGTimedWait

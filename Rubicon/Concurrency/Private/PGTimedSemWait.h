@@ -27,7 +27,7 @@
 
 #include <semaphore.h>
 #import <Cocoa/Cocoa.h>
-#import <Rubicon/PGTimedWait.h>
+#import "PGTimedWait.h"
 
 @class PGTimeSpec;
 
