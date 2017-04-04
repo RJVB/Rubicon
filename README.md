@@ -12,7 +12,7 @@ Rubicon also provides some of my own additions, (defines, functions, classes, pr
 
 ## PGSemaphore
 
-**PGSemaphore** is an Objective-C class that provides a wrapper around the semaphore functions provided in the POSIX pthreads library.  Additionally it provides a handy implementation of the [sem_timedwait](http://man7.org/linux/man-pages/man3/sem_wait.3.html) function that is found in most newer Linux versions. *see [sem_timedwait.c](Rubicon/Misc/sem_timedwait.c)*
+**PGSemaphore** is an Objective-C class that provides a wrapper around the semaphore functions provided in the POSIX pthreads library.  Additionally it provides a handy implementation of the [sem_timedwait](http://man7.org/linux/man-pages/man3/sem_wait.3.html) function that is found in most newer Linux versions. *see [sem_timedwait.c](Rubicon/Concurrency/Locks/sem_timedwait.c)*
 
 ## sem_timedwait
 

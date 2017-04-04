@@ -30,7 +30,7 @@ FOUNDATION_EXPORT double RubiconVersionNumber;
 //! Project version string for Rubicon.
 FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
 
-#include <Rubicon/sem_timedwait.h>
+#import <Rubicon/sem_timedwait.h>
 #import <Rubicon/NSObject+PGObject.h>
 #import <Rubicon/NSString+PGString.h>
 #import <Rubicon/NSDictionary+PGBTreeDictionary.h>
