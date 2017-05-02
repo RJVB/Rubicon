@@ -41,6 +41,7 @@
 		1117DA0BC598AF33FAA9CCD5 /* PGTimedReadLock.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D8576A8D6B3291FC3A1E /* PGTimedReadLock.h */; };
 		1117DA878A1A41B7896533D8 /* PGMacros.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D35A818616F0E99E59BA /* PGMacros.m */; };
 		1117DABB62C7EADDECBCC356 /* PGReadWriteLock.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D403ABABEF7B2D24D3B7 /* PGReadWriteLock.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1117DB286C8ECD53FA07CA61 /* NSRegularExpression+PGRegularExpression.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D1CEBF5C6EAF6C17FB77 /* NSRegularExpression+PGRegularExpression.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117DBB362320F47607B2FBF /* PGTimedWait.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DC0934B0E763DA6F459C /* PGTimedWait.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117DBE57B71202921B00FB1 /* PGKeyValueNodeTraveler.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D4B0DB64BE99AF27482D /* PGKeyValueNodeTraveler.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117DBFA1E8FB6E3B2A148DB /* PGStack.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D64C50C3BD17950836DC /* PGStack.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -56,6 +57,7 @@
 		1117DD877864305D7FEE9CD9 /* NSObject+PGObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DF8222D67F4383089DCF /* NSObject+PGObject.m */; };
 		1117DE54512876B454A00C72 /* PGTools.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D96AC9AAF96394E7BA36 /* PGTools.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117DE981E0E690547AC5B2C /* PGKeyValueNodeTraveler.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DF762BE9D757F1A6A175 /* PGKeyValueNodeTraveler.m */; };
+		1117DEBDC16D9C4476A99387 /* NSRegularExpression+PGRegularExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D0AF6BE265A96DA07535 /* NSRegularExpression+PGRegularExpression.m */; };
 		1117DED02A6B4C080C1D4A32 /* PGBTreeNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D67A2AE040A7E6CB7048 /* PGBTreeNode.m */; };
 		1117DEE5922222736B6B055A /* PGKeyValueData.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DBDF90510140CAA225EA /* PGKeyValueData.m */; };
 		1117DF197EE4AABA9851A4CD /* PGBTreeNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D950F73E1966A4DA091B /* PGBTreeNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -124,9 +126,11 @@
 		1117D0018483764220700B13 /* CommonBaseClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonBaseClass.m; sourceTree = "<group>"; };
 		1117D08BDB7E4A79C30AC920 /* PGTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTools.m; sourceTree = "<group>"; };
 		1117D0903BA71BEB8EA0F955 /* NSString+PGString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+PGString.m"; sourceTree = "<group>"; };
+		1117D0AF6BE265A96DA07535 /* NSRegularExpression+PGRegularExpression.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSRegularExpression+PGRegularExpression.m"; sourceTree = "<group>"; };
 		1117D0BFF8918A57A18F1DC3 /* PGKeyValueData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGKeyValueData.h; sourceTree = "<group>"; };
 		1117D197529716B32098E317 /* NSObject+PGObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+PGObject.h"; sourceTree = "<group>"; };
 		1117D1C50288D6AC04C60456 /* CommonBaseClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonBaseClass.h; sourceTree = "<group>"; };
+		1117D1CEBF5C6EAF6C17FB77 /* NSRegularExpression+PGRegularExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSRegularExpression+PGRegularExpression.h"; sourceTree = "<group>"; };
 		1117D33042231F8E68498B6F /* NSDictionary+PGBTreeDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+PGBTreeDictionary.m"; sourceTree = "<group>"; };
 		1117D35A818616F0E99E59BA /* PGMacros.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGMacros.m; sourceTree = "<group>"; };
 		1117D391F03918AED5A6575A /* PGRWLockCounts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGRWLockCounts.m; sourceTree = "<group>"; };
@@ -346,6 +350,8 @@
 				1117D7D778ADC7FC60542F68 /* NSDictionary+PGBTreeDictionary.h */,
 				1117D71D6DBBA58A29B232A1 /* NSMutableDictionary+PGBTreeMutableDictionary.m */,
 				1117D3FD0552EE47075FC086 /* NSMutableDictionary+PGBTreeMutableDictionary.h */,
+				1117D0AF6BE265A96DA07535 /* NSRegularExpression+PGRegularExpression.m */,
+				1117D1CEBF5C6EAF6C17FB77 /* NSRegularExpression+PGRegularExpression.h */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -527,30 +533,31 @@
 			buildActionMask = 2147483647;
 			files = (
 				83CC449D1E0B037700DDE50D /* Rubicon.h in Headers */,
+				1117D43A0D1A8FC2E08604C8 /* GNUstep.h in Headers */,
 				1117DFB65E9C10CB25417E42 /* PGDefines.h in Headers */,
 				1117DE54512876B454A00C72 /* PGTools.h in Headers */,
-				1117D43A0D1A8FC2E08604C8 /* GNUstep.h in Headers */,
 				1117D3724C2A43950E8FB710 /* PGTime.h in Headers */,
 				1117DC81610608A9F6FAF318 /* PGTimeSpec.h in Headers */,
 				1117D86E190AE0BF1ED8C58F /* PGMacros.h in Headers */,
-				1117D63E9D2E4D166A347214 /* NSString+PGString.h in Headers */,
-				1117D8797C09C256E91EB180 /* PGLinkedListNode.h in Headers */,
-				1117DBFA1E8FB6E3B2A148DB /* PGStack.h in Headers */,
-				1117D72A8C001A697B2C3DEE /* NSMutableDictionary+PGBTreeMutableDictionary.h in Headers */,
-				1117D5FDDA11181787EA4911 /* PGEmptyEnumerator.h in Headers */,
-				1117DF197EE4AABA9851A4CD /* PGBTreeNode.h in Headers */,
 				1117D9ED3505D5CC303D17E2 /* NSDictionary+PGBTreeDictionary.h in Headers */,
+				1117D72A8C001A697B2C3DEE /* NSMutableDictionary+PGBTreeMutableDictionary.h in Headers */,
+				1117D08C283C1BA68BF7FE31 /* NSObject+PGObject.h in Headers */,
+				1117DB286C8ECD53FA07CA61 /* NSRegularExpression+PGRegularExpression.h in Headers */,
+				1117D63E9D2E4D166A347214 /* NSString+PGString.h in Headers */,
+				1117D5FDDA11181787EA4911 /* PGEmptyEnumerator.h in Headers */,
+				1117D67C4F88B0DDCCB4DBB1 /* PGKeyValueData.h in Headers */,
 				1117DBE57B71202921B00FB1 /* PGKeyValueNodeTraveler.h in Headers */,
 				1117DC736295ACF75CD93401 /* PGBTreeDictionary.h in Headers */,
+				1117DF197EE4AABA9851A4CD /* PGBTreeNode.h in Headers */,
+				1117D8797C09C256E91EB180 /* PGLinkedListNode.h in Headers */,
+				1117DBFA1E8FB6E3B2A148DB /* PGStack.h in Headers */,
 				1117D82C071E4B56245A3D39 /* PGBase64OutputStream.h in Headers */,
+				1117DABB62C7EADDECBCC356 /* PGReadWriteLock.h in Headers */,
+				1117D72FD20B775B8F0898A7 /* PGSemaphore.h in Headers */,
 				1117DA0BC598AF33FAA9CCD5 /* PGTimedReadLock.h in Headers */,
 				1117D9F77F007547086C011D /* PGTimedSemWait.h in Headers */,
 				1117DD4081DB0393F9318DF2 /* PGRWLockCounts.h in Headers */,
-				1117D08C283C1BA68BF7FE31 /* NSObject+PGObject.h in Headers */,
-				1117D67C4F88B0DDCCB4DBB1 /* PGKeyValueData.h in Headers */,
 				1117DBB362320F47607B2FBF /* PGTimedWait.h in Headers */,
-				1117D72FD20B775B8F0898A7 /* PGSemaphore.h in Headers */,
-				1117DABB62C7EADDECBCC356 /* PGReadWriteLock.h in Headers */,
 				1117D0BACEE7BBFB719DBC09 /* sem_timedwait.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -790,6 +797,7 @@
 				1117DD3C3F5E578EBFD243D6 /* PGTimedWait.m in Sources */,
 				1117D749C5FEC2DD2562CBC9 /* PGSemaphore.m in Sources */,
 				1117D8C0D8FEA9BA9181C6E8 /* sem_timedwait.c in Sources */,
+				1117DEBDC16D9C4476A99387 /* NSRegularExpression+PGRegularExpression.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

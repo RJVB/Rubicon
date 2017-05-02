@@ -32,6 +32,7 @@ FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
 #import <Rubicon/NSString+PGString.h>
 #import <Rubicon/NSDictionary+PGBTreeDictionary.h>
 #import <Rubicon/NSMutableDictionary+PGBTreeMutableDictionary.h>
+#import <Rubicon/NSRegularExpression+PGRegularExpression.h>
 #import <Rubicon/PGMacros.h>
 #import <Rubicon/PGSemaphore.h>
 #import <Rubicon/PGReadWriteLock.h>
