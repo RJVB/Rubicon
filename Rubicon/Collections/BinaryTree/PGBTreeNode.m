@@ -24,33 +24,6 @@
 #import "PGBTreeNode.h"
 #import "PGTools.h"
 
-@interface PGBTreeNode()
-
-	@property(readwrite) BOOL isRed;
-	@property(readonly) BOOL  isLeft;
-	@property(readonly) BOOL  isRight;
-
-	-(instancetype)initWithData:(id)data isRed:(BOOL)isRed;
-
-	-(void)setParent:(PGBTreeNode *)node;
-
-	-(void)recount;
-
-	-(instancetype)child:(BOOL)onLeft;
-
-	-(instancetype)makeOrphan;
-
-	-(instancetype)setChild:(PGBTreeNode *)child onLeft:(BOOL)onLeft;
-
-	-(void)rotate:(BOOL)toTheLeft;
-
-	-(instancetype)foobar:(id)data child:(PGBTreeNode *)child onLeft:(BOOL)onLeft;
-
-	-(instancetype)ibal;
-
-	-(instancetype)rbal;
-@end
-
 PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left) : node); }
 
 @implementation PGBTreeNode {
@@ -82,23 +55,25 @@ PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left)
 		return self;
 	}
 
+	-(void)setIsRed:(BOOL)b { _isRed = b; }
+
 	+(instancetype)nodeWithData:(id)data isRed:(BOOL)isRed { return [[self alloc] initWithData:data isRed:isRed]; }
 
 	-(instancetype)root { return (_parent ? _parent.root : self); }
 
-	-(instancetype)grandparent { return (_parent ? _parent->_parent : nil); }
+	-(nullable instancetype)grandparent { return (_parent ? _parent->_parent : nil); }
 
-	-(instancetype)sibling { return (_parent ? ((self == _parent->_left) ? _right : _left) : nil); }
+	-(nullable instancetype)sibling { return (_parent ? ((self == _parent->_left) ? _right : _left) : nil); }
 
-	-(instancetype)uncle { return (_parent.sibling); }
+	-(nullable instancetype)uncle { return (_parent.sibling); }
 
-	-(instancetype)child:(BOOL)onLeft { return (onLeft ? _left : _right); }
+	-(nullable instancetype)child:(BOOL)onLeft { return (onLeft ? _left : _right); }
 
-	-(instancetype)parent { return _parent; }
+	-(nullable instancetype)parent { return _parent; }
 
-	-(instancetype)left { return _left; }
+	-(nullable instancetype)left { return _left; }
 
-	-(instancetype)right { return _right; }
+	-(nullable instancetype)right { return _right; }
 
 	-(BOOL)allBlack { return !(self.isRed || self.left.isRed || self.right.isRed); }
 
@@ -106,8 +81,7 @@ PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left)
 
 	-(BOOL)isRight { return (_parent && (self == _parent->_right)); }
 
-	-(void)setParent:(PGBTreeNode *)node { _parent = node; }
-
+	-(void)setParent:(nullable PGBTreeNode *)node { _parent = node; }
 
 	-(void)recount {
 		_count = (1 + _left.count + _right.count);
@@ -119,7 +93,7 @@ PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left)
 		return self;
 	}
 
-	-(instancetype)setChild:(PGBTreeNode *)child onLeft:(BOOL)onLeft {
+	-(nullable instancetype)setChild:(nullable PGBTreeNode *)child onLeft:(BOOL)onLeft {
 		if(self == child) {
 			@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"A node cannot be it's own child." userInfo:nil];
 		}
@@ -151,13 +125,11 @@ PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left)
 			child.isRed = r;
 		}
 		else {
-			@throw [NSException exceptionWithName:NSInvalidArgumentException
-			                               reason:PGFormat(@"Node cannot be rotated to the %@.", (toTheLeft ? @"left" : @"right"))
-			                             userInfo:nil];
+			@throw [NSException exceptionWithName:NSInvalidArgumentException reason:PGFormat(@"Node cannot be rotated to the %@.", (toTheLeft ? @"left" : @"right")) userInfo:nil];
 		}
 	}
 
-	-(instancetype)find:(id)data {
+	-(nullable instancetype)find:(id)data {
 		if(data) {
 			switch(PGCompare(self.data, data)) {
 				case NSOrderedAscending:
@@ -191,7 +163,7 @@ PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left)
 		return nil;
 	}
 
-	-(instancetype)foobar:(id)data child:(PGBTreeNode *)child onLeft:(BOOL)onLeft {
+	-(instancetype)foobar:(id)data child:(nullable PGBTreeNode *)child onLeft:(BOOL)onLeft {
 		return (child ? [child insert:data] : [self setChild:[[self class] nodeWithData:data isRed:YES] onLeft:onLeft].ibal);
 	}
 
@@ -218,7 +190,7 @@ PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left)
 		return self;
 	}
 
-	-(instancetype)remove {
+	-(nullable instancetype)remove {
 		PGBTreeNode *lc = self.left;
 		PGBTreeNode *rc = self.right;
 

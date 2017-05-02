@@ -24,10 +24,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-//! Project version number for Rubicon.
 FOUNDATION_EXPORT double RubiconVersionNumber;
-
-//! Project version string for Rubicon.
 FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
 
 #import <Rubicon/sem_timedwait.h>

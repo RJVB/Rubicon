@@ -38,18 +38,38 @@ static const NSUInteger NSUNotFound = NSUIntegerMax;
 	#define PGMaxSemaphoreNameLength 251
 #endif
 
-#if !defined(PGNotImplemented)
-	#define PGNotImplemented [self doesNotRecognizeSelector:_cmd]; __builtin_unreachable()
-#endif
-
 FOUNDATION_EXPORT NSString *const PGErrorDomain;
 
-FOUNDATION_EXPORT NSString *const PGTimedWorkerException;
-FOUNDATION_EXPORT NSString *const PGSemaphoreException;
-FOUNDATION_EXPORT NSString *const PGReadWriteLockException;
-FOUNDATION_EXPORT NSString *const PGOSErrorException;
-FOUNDATION_EXPORT NSString *const PGDOMException;
+FOUNDATION_EXPORT NSExceptionName const PGTimedWorkerException;
+FOUNDATION_EXPORT NSExceptionName const PGSemaphoreException;
+FOUNDATION_EXPORT NSExceptionName const PGReadWriteLockException;
+FOUNDATION_EXPORT NSExceptionName const PGOSErrorException;
+FOUNDATION_EXPORT NSExceptionName const PGDOMException;
 
 FOUNDATION_EXPORT NSString *const PGDefaultSemaphoreNamePrefix;
+
+#if !defined(PGAbstractClassError)
+	#define PGAbstractClassError do {\
+		NSString *reason = PGFormat(@"Instances of abstract class %@ cannot be created.", NSStringFromClass([self class]));\
+	    @throw [NSException exceptionWithName:NSIllegalSelectorException reason:reason userInfo:nil];\
+	    __builtin_unreachable();\
+	} while(0)
+#endif
+
+#if !defined(PGBadConstructorError)
+	#define PGBadConstructorError do {\
+		NSString *reason = PGFormat(@"The selector \"%@\" cannot be used to create instances of the class %@.", NSStringFromSelector(_cmd), NSStringFromClass([self class]));\
+		@throw [NSException exceptionWithName:NSIllegalSelectorException reason:reason userInfo:nil];\
+		__builtin_unreachable();\
+	} while(0)
+#endif
+
+#if !defined(PGNotImplemented)
+	#define PGNotImplemented do {\
+		NSString *reason = PGFormat(@"The selector \"%@\" is abstract.", NSStringFromSelector(_cmd));\
+        @throw [NSException exceptionWithName:NSIllegalSelectorException reason:reason userInfo:nil];\
+        __builtin_unreachable();\
+    } while(0)
+#endif
 
 #endif //__Rubicon_PGDefines_H_

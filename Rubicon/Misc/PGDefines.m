@@ -23,13 +23,13 @@
 
 #import "PGDefines.h"
 
-NSString *const PGErrorDomain      = @"com.projectgalen.Rubicon";
+NSString *const PGErrorDomain = @"com.projectgalen.Rubicon";
 
-NSString *const PGTimedWorkerException   = @"PGTimedWorkerException";
-NSString *const PGSemaphoreException     = @"PGSemaphoreException";
-NSString *const PGReadWriteLockException = @"PGReadWriteLockException";
-NSString *const PGOSErrorException = @"PGOSErrorException";
-NSString *const PGDOMException     = @"PGDOMException";
+NSExceptionName const PGTimedWorkerException   = @"PGTimedWorkerException";
+NSExceptionName const PGSemaphoreException     = @"PGSemaphoreException";
+NSExceptionName const PGReadWriteLockException = @"PGReadWriteLockException";
+NSExceptionName const PGOSErrorException       = @"PGOSErrorException";
+NSExceptionName const PGDOMException           = @"PGDOMException";
 
 NSString *const PGDefaultSemaphoreNamePrefix = @"/sem";
 

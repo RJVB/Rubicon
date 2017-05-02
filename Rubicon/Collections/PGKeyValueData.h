@@ -27,15 +27,18 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface PGKeyValueData : NSObject
+NS_ASSUME_NONNULL_BEGIN
 
-	@property(copy, readonly) id key;
-	@property(retain) id         value;
+@interface PGKeyValueData<__covariant KeyType, __covariant ObjectType> : NSObject
 
-	-(instancetype)initWithValue:(id)value forKey:(id)key;
+	@property(copy, readonly) KeyType key;
+	@property(retain) ObjectType      value;
 
-	+(instancetype)dataWithValue:(id)value forKey:(id)key;
+	-(instancetype)initWithValue:(ObjectType)value forKey:(KeyType<NSCopying>)key;
+
+	+(instancetype)dataWithValue:(ObjectType)value forKey:(KeyType<NSCopying>)key;
 
 @end
 
+NS_ASSUME_NONNULL_END
 #endif //__Rubicon_PGKeyValueData_H_

@@ -27,35 +27,40 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface PGBTreeNode : NSObject
+NS_ASSUME_NONNULL_BEGIN
 
-	@property(retain) id           data;
+@interface PGBTreeNode<__covariant ObjectType> : NSObject
+
+	@property(retain) ObjectType   data;
 	@property(readonly) NSUInteger count;
+	@property(readonly) BOOL       isRed;
 
-	-(instancetype)initWithData:(id)data;
+	-(instancetype)initWithData:(ObjectType)data;
 
-	+(instancetype)nodeWithData:(id)data isRed:(BOOL)isRed;
+	+(instancetype)nodeWithData:(ObjectType)data isRed:(BOOL)isRed;
 
-	-(instancetype)find:(id)data;
+	-(nullable instancetype)find:(ObjectType)data;
 
-	-(instancetype)insert:(id)data;
+	-(instancetype)insert:(ObjectType)data;
 
-	-(instancetype)remove;
+	-(nullable instancetype)remove;
 
-	-(instancetype)parent;
+	-(nullable instancetype)parent;
 
-	-(instancetype)left;
+	-(nullable instancetype)left;
 
-	-(instancetype)right;
+	-(nullable instancetype)right;
 
-	-(instancetype)root;
+	-(nullable instancetype)root;
 
-	-(instancetype)grandparent;
+	-(nullable instancetype)grandparent;
 
-	-(instancetype)sibling;
+	-(nullable instancetype)sibling;
 
-	-(instancetype)uncle;
+	-(nullable instancetype)uncle;
 
 @end
+
+NS_ASSUME_NONNULL_END
 
 #endif //__Rubicon_PGBTreeNode_H_
