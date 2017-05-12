@@ -24,15 +24,13 @@
 
 #import <Cocoa/Cocoa.h>
 
-FOUNDATION_EXPORT double RubiconVersionNumber;
-FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
-
 #import <Rubicon/sem_timedwait.h>
 #import <Rubicon/NSObject+PGObject.h>
 #import <Rubicon/NSString+PGString.h>
 #import <Rubicon/NSDictionary+PGBTreeDictionary.h>
 #import <Rubicon/NSMutableDictionary+PGBTreeMutableDictionary.h>
 #import <Rubicon/NSRegularExpression+PGRegularExpression.h>
+#import <Rubicon/NSArray+PGArray.h>
 #import <Rubicon/PGMacros.h>
 #import <Rubicon/PGSemaphore.h>
 #import <Rubicon/PGReadWriteLock.h>
@@ -45,3 +43,7 @@ FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
 #import <Rubicon/PGKeyValueData.h>
 #import <Rubicon/PGBTreeNode.h>
 #import <Rubicon/PGBTreeDictionary.h>
+#import <Rubicon/PGKeyValueNodeTraveler.h>
+
+FOUNDATION_EXPORT double              RubiconVersionNumber;
+FOUNDATION_EXPORT const unsigned char RubiconVersionString[];

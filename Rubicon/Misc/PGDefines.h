@@ -44,7 +44,6 @@ FOUNDATION_EXPORT NSExceptionName const PGTimedWorkerException;
 FOUNDATION_EXPORT NSExceptionName const PGSemaphoreException;
 FOUNDATION_EXPORT NSExceptionName const PGReadWriteLockException;
 FOUNDATION_EXPORT NSExceptionName const PGOSErrorException;
-FOUNDATION_EXPORT NSExceptionName const PGDOMException;
 
 FOUNDATION_EXPORT NSString *const PGDefaultSemaphoreNamePrefix;
 

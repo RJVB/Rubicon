@@ -29,7 +29,6 @@ NSExceptionName const PGTimedWorkerException   = @"PGTimedWorkerException";
 NSExceptionName const PGSemaphoreException     = @"PGSemaphoreException";
 NSExceptionName const PGReadWriteLockException = @"PGReadWriteLockException";
 NSExceptionName const PGOSErrorException       = @"PGOSErrorException";
-NSExceptionName const PGDOMException           = @"PGDOMException";
 
 NSString *const PGDefaultSemaphoreNamePrefix = @"/sem";
 

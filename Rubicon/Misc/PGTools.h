@@ -25,9 +25,8 @@
 #ifndef __Rubicon_PGTools_H_
 #define __Rubicon_PGTools_H_
 
+#import <Foundation/Foundation.h>
 #import <Rubicon/PGTime.h>
-
-@class NSObject;
 
 /*
  * Definitions for standard 32-bit RGBA color model.
@@ -35,8 +34,30 @@
 #define PGBitsPerField   (8)
 #define PGFieldsPerPixel (4)
 
+/**************************************************************************************************//**
+ * Test the equality of two objects. Safely handles the case of either or both objects being NULL.
+ * Two objects are considered equal if both are NULL or [obj1 isEquals:obj2] returns TRUE.
+ *
+ * @param obj1 the first object.
+ * @param obj2 the second object.
+ * @return YES if both objects are either NULL or equal according to the isEqual: selector.
+ */
 NS_INLINE BOOL PGObjectsEqual(id obj1, id obj2) {
 	return ((obj1 == nil) ? (obj2 == nil) : ((obj2 == nil) ? NO : [obj1 isEqual:obj2]));
+}
+
+/**************************************************************************************************//**
+ * Safely set a value by reference without having to constantly write code to check the pointers validaty.
+ * If the value of reference is not nil then the pointer will be de-referenced and the value val will be
+ * stored.  Otherwise the value val is simply returned.
+ *
+ * @param ref the reference.
+ * @param val the value.
+ * @return the value.
+ */
+NS_INLINE id PGSetReference(id *ref, id val) {
+	if(ref) *ref = val;
+	return val;
 }
 
 /**************************************************************************************************//**
@@ -77,6 +98,12 @@ FOUNDATION_EXPORT BOOL PGSaveImageAsPNG(NSBitmapImageRep *image, NSString *filen
  ******************************************************************************************************/
 FOUNDATION_EXPORT NSString *PGStrError(int osErrNo);
 
+/**************************************************************************************************//**
+ * Convenience function for [NSString stringWithFormat:fmt, ...].
+ * @param fmt
+ * @param ...
+ * @return a new string.
+ */
 FOUNDATION_EXPORT NSString *PGFormat(NSString *fmt, ...) NS_FORMAT_FUNCTION(1, 2);
 
 #endif //__Rubicon_PGTools_H_
