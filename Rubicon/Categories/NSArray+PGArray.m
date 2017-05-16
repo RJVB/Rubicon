@@ -27,13 +27,18 @@
 
 	-(BOOL)containsIdenticalObjectsAsArray:(NSArray<id> *)array {
 		if(array == self) return YES;
+
+		NSUInteger i = array.count;
 		NSUInteger j = self.count;
-		if(array.count == j) {
-			for(NSUInteger i = 0; i < j; i++) {
-				if(self[i] != array[i]) return NO;
+
+		if(i == j) {
+			for(NSUInteger x = 0; x < j; x++) {
+				if(self[x] != array[x]) return NO;
 			}
+
 			return YES;
 		}
+
 		return NO;
 	}
 
