@@ -22,6 +22,7 @@
  *********************************************************************************************************************************/
 
 #import "NSRegularExpression+PGRegularExpression.h"
+#import "PGTools.h"
 
 @implementation NSRegularExpression(PGRegularExpression)
 
@@ -39,6 +40,30 @@
 
 	-(BOOL)matches:(NSString *)string {
 		return [self matches:string range:NSMakeRange(0, string.length)];
+	}
+
+	+(NSRegularExpression *)cachedRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options error:(NSError **)error {
+		static NSMutableDictionary *regexCache = nil;
+		NSRegularExpression        *regex      = nil;
+
+		if(pattern.length) {
+			@synchronized([NSRegularExpression class]) {
+				NSString *key = PGFormat(@"%@|%@", pattern, @(options));
+
+				if(regexCache == nil) regexCache = [NSMutableDictionary new]; else regex = regexCache[key];
+
+				if(regex == nil) {
+					regex = [NSRegularExpression regularExpressionWithPattern:pattern options:options error:error];
+					if(regex) regexCache[key] = regex;
+				}
+			}
+		}
+
+		return regex;
+	}
+
+	+(NSRegularExpression *)cachedRegex:(NSString *)pattern error:(NSError **)error {
+		return [self cachedRegex:pattern options:0 error:error];
 	}
 
 @end
