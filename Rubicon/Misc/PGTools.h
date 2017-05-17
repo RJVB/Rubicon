@@ -107,4 +107,3 @@ FOUNDATION_EXPORT NSString *PGStrError(int osErrNo);
 FOUNDATION_EXPORT NSString *PGFormat(NSString *fmt, ...) NS_FORMAT_FUNCTION(1, 2);
 
 #endif //__Rubicon_PGTools_H_
-
