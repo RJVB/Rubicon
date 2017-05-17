@@ -100,8 +100,8 @@ FOUNDATION_EXPORT NSString *PGStrError(int osErrNo);
 
 /**************************************************************************************************//**
  * Convenience function for [NSString stringWithFormat:fmt, ...].
- * @param fmt
- * @param ...
+ * @param fmt the format string.
+ * @param ... the parameters.
  * @return a new string.
  */
 FOUNDATION_EXPORT NSString *PGFormat(NSString *fmt, ...) NS_FORMAT_FUNCTION(1, 2);
