@@ -42,4 +42,21 @@
 		return NO;
 	}
 
+	-(NSString *)componentsJoinedByString:(NSString *)string fromIndex:(NSUInteger)idx {
+		if(idx > self.count) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Index out of bounds." userInfo:nil];
+		if(idx == self.count) return @"";
+		return [[self subarrayWithRange:NSMakeRange(idx, self.count - idx)] componentsJoinedByString:string];
+	}
+
+	-(NSString *)componentsJoinedByString:(NSString *)string toIndex:(NSUInteger)idx {
+		if(idx > self.count) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Index out of bounds." userInfo:nil];
+		if(idx == self.count) return [self componentsJoinedByString:string];
+		if(idx == 0) return @"";
+		return [[self subarrayWithRange:NSMakeRange(0, idx)] componentsJoinedByString:string];
+	}
+
+	-(NSString *)componentsJoinedByString:(NSString *)string inRange:(NSRange)range {
+		return [[self subarrayWithRange:range] componentsJoinedByString:string];
+	}
+
 @end

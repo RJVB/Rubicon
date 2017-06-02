@@ -31,6 +31,13 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NSArray<T>(PGArray)
 
 	-(BOOL)containsIdenticalObjectsAsArray:(NSArray<T> *)array;
+
+	-(NSString *)componentsJoinedByString:(NSString *)string fromIndex:(NSUInteger)idx;
+
+	-(NSString *)componentsJoinedByString:(NSString *)string toIndex:(NSUInteger)idx;
+
+	-(NSString *)componentsJoinedByString:(NSString *)string inRange:(NSRange)range;
+
 @end
 
 NS_ASSUME_NONNULL_END
