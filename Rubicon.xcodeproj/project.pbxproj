@@ -166,6 +166,7 @@
 		1117D815FD8832412F83E9E5 /* NSArray+PGArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+PGArray.m"; sourceTree = "<group>"; };
 		1117D82A3FCEF61B52811265 /* NSString+PGString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+PGString.h"; sourceTree = "<group>"; };
 		1117D8576A8D6B3291FC3A1E /* PGTimedReadLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTimedReadLock.h; sourceTree = "<group>"; };
+		1117D85B443E90ECB14646B9 /* macInstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = macInstall.sh; sourceTree = "<group>"; };
 		1117D863C6B27B3A2A6436EB /* PGTimeSpec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTimeSpec.h; sourceTree = "<group>"; };
 		1117D86CDCB304501F61812F /* PGLinkedListNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGLinkedListNode.m; sourceTree = "<group>"; };
 		1117D8D7FA877AB382169852 /* PGSplitView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGSplitView.m; sourceTree = "<group>"; };
@@ -421,6 +422,7 @@
 				1117DBCB8D70DB67DE4B6825 /* fetch_and_config.sh */,
 				1117DE79E4A8E257C25DE703 /* LICENSE */,
 				1117DCCC597057A2315B1AC8 /* README.md */,
+				1117D85B443E90ECB14646B9 /* macInstall.sh */,
 			);
 			name = SupportingFiles;
 			sourceTree = "<group>";
