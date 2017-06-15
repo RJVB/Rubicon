@@ -29,19 +29,19 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGBTreeNode<__covariant ObjectType> : NSObject
+@interface PGBTreeNode<__covariant T> : NSObject
 
-	@property(retain) ObjectType   data;
+	@property(retain) T            data;
 	@property(readonly) NSUInteger count;
 	@property(readonly) BOOL       isRed;
 
-	-(instancetype)initWithData:(ObjectType)data;
+	-(instancetype)initWithData:(T)data;
 
-	+(instancetype)nodeWithData:(ObjectType)data isRed:(BOOL)isRed;
+	+(instancetype)nodeWithData:(T)data isRed:(BOOL)isRed;
 
-	-(nullable instancetype)find:(ObjectType)data;
+	-(nullable instancetype)find:(T)data;
 
-	-(instancetype)insert:(ObjectType)data;
+	-(instancetype)insert:(T)data;
 
 	-(nullable instancetype)remove;
 

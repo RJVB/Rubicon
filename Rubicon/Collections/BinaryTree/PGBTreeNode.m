@@ -36,8 +36,6 @@ PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left)
 	@synthesize isRed = _isRed;
 	@synthesize count = _count;
 
-	-(instancetype)initWithData:(id)data { return (self = [self initWithData:data isRed:NO]); }
-
 	-(instancetype)initWithData:(id)data isRed:(BOOL)isRed {
 		self = [super init];
 
@@ -55,9 +53,14 @@ PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left)
 		return self;
 	}
 
-	-(void)setIsRed:(BOOL)b { _isRed = b; }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverriding-method-mismatch"
+
+	-(instancetype)initWithData:(id)data { return (self = [self initWithData:data isRed:NO]); }
 
 	+(instancetype)nodeWithData:(id)data isRed:(BOOL)isRed { return [[self alloc] initWithData:data isRed:isRed]; }
+
+#pragma clang diagnostic pop
 
 	-(instancetype)root { return (_parent ? _parent.root : self); }
 
@@ -80,6 +83,8 @@ PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left)
 	-(BOOL)isLeft { return (_parent && (self == _parent->_left)); }
 
 	-(BOOL)isRight { return (_parent && (self == _parent->_right)); }
+
+	-(void)setIsRed:(BOOL)b { _isRed = b; }
 
 	-(void)setParent:(nullable PGBTreeNode *)node { _parent = node; }
 
@@ -129,6 +134,9 @@ PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left)
 		}
 	}
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverriding-method-mismatch"
+
 	-(nullable instancetype)find:(id)data {
 		if(data) {
 			switch(PGCompare(self.data, data)) {
@@ -162,6 +170,8 @@ PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left)
 
 		return nil;
 	}
+
+#pragma clang diagnostic pop
 
 	-(instancetype)foobar:(id)data child:(nullable PGBTreeNode *)child onLeft:(BOOL)onLeft {
 		return (child ? [child insert:data] : [self setChild:[[self class] nodeWithData:data isRed:YES] onLeft:onLeft].ibal);
