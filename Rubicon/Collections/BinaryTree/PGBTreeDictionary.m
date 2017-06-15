@@ -46,6 +46,8 @@
 	-(void)setObject:(const id)object forKey:(const id<NSCopying>)key;
 
 	-(void)removeObjectForKey:(id)aKey;
+
+	-(void)removeAllObjects;
 @end
 
 @interface PGBTreeMutableDictionary()
@@ -148,6 +150,11 @@
 
 	-(void)removeObjectForKey:(id)aKey { if(aKey) self.root = [[self.root find:aKey] remove]; }
 
+	-(void)removeAllObjects {
+		[self.root clearTree];
+		self.root = nil;
+	}
+
 @end
 
 @implementation PGBTreeMutableDictionary {
@@ -234,6 +241,10 @@
 	-(void)removeObjectForKey:(id)aKey { [self.treeDictionary removeObjectForKey:aKey]; }
 
 	-(void)setObject:(id)anObject forKey:(id<NSCopying>)aKey { [self.treeDictionary setObject:anObject forKey:aKey]; }
+
+	-(void)removeAllObjects {
+		[self.treeDictionary removeAllObjects];
+	}
 
 @end
 

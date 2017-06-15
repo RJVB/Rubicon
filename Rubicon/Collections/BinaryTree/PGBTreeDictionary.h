@@ -71,6 +71,7 @@
 
 	-(void)setObject:(id)anObject forKey:(id<NSCopying>)aKey;
 
+	-(void)removeAllObjects;
 @end
 
 #endif //__Rubicon_PGBTreeDictionary_H_
