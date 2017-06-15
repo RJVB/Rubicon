@@ -188,6 +188,7 @@
 		1117DC59A7B77EC63A993424 /* PGBase64OutputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBase64OutputStream.h; sourceTree = "<group>"; };
 		1117DCCC597057A2315B1AC8 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		1117DD0B79903344E5C7ABB4 /* PGSplitView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGSplitView.h; sourceTree = "<group>"; };
+		1117DD67FD830402689CD8BE /* PGBTreeNodePriv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBTreeNodePriv.h; sourceTree = "<group>"; };
 		1117DDAC0320752E3280CF8E /* PGEmptyEnumerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGEmptyEnumerator.h; sourceTree = "<group>"; };
 		1117DE2957617583494C69B1 /* PGLinkedListNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGLinkedListNode.h; sourceTree = "<group>"; };
 		1117DE3904471B3FE31696AB /* PGBase64OutputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBase64OutputStream.m; sourceTree = "<group>"; };
@@ -320,6 +321,14 @@
 			name = SupportingFiles;
 			sourceTree = "<group>";
 		};
+		1117D4151242D99B9862035A /* Private */ = {
+			isa = PBXGroup;
+			children = (
+				1117DD67FD830402689CD8BE /* PGBTreeNodePriv.h */,
+			);
+			path = Private;
+			sourceTree = "<group>";
+		};
 		1117D4C2EFDF55DE4A38FCBE /* Locks */ = {
 			isa = PBXGroup;
 			children = (
@@ -370,6 +379,7 @@
 				1117D950F73E1966A4DA091B /* PGBTreeNode.h */,
 				1117D63CB50AA7BB486C62B2 /* PGBTreeDictionary.m */,
 				1117D633C627A60F2B56A183 /* PGBTreeDictionary.h */,
+				1117D4151242D99B9862035A /* Private */,
 			);
 			path = BinaryTree;
 			sourceTree = "<group>";

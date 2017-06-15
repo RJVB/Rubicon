@@ -37,15 +37,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 	-(instancetype)initWithData:(T)data;
 
-	+(instancetype)nodeWithData:(T)data isRed:(BOOL)isRed;
-
 	-(nullable instancetype)find:(T)data;
 
 	-(instancetype)insert:(T)data;
 
 	-(nullable instancetype)remove;
-
-	-(void)clearTree;
 
 	-(nullable instancetype)parent;
 
@@ -60,6 +56,10 @@ NS_ASSUME_NONNULL_BEGIN
 	-(nullable instancetype)sibling;
 
 	-(nullable instancetype)uncle;
+
+	-(void)clearTree;
+
+	+(instancetype)nodeWithData:(T)data;
 
 @end
 

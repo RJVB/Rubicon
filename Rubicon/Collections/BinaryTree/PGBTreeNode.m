@@ -21,7 +21,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import "PGBTreeNode.h"
+#import "PGBTreeNodePriv.h"
 #import "PGTools.h"
 
 PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left) : node); }
@@ -59,6 +59,8 @@ PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left)
 	-(instancetype)initWithData:(id)data { return (self = [self initWithData:data isRed:NO]); }
 
 	+(instancetype)nodeWithData:(id)data isRed:(BOOL)isRed { return [[self alloc] initWithData:data isRed:isRed]; }
+
+	+(instancetype)nodeWithData:(id)data { return [[self alloc] initWithData:data isRed:NO]; }
 
 #pragma clang diagnostic pop
 
