@@ -253,4 +253,13 @@ PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left)
 		return self;
 	}
 
+	-(void)clearTree {
+		[_left clearTree];
+		[_right clearTree];
+		_left   = nil;
+		_right  = nil;
+		_parent = nil;
+		_data   = nil;
+	}
+
 @end

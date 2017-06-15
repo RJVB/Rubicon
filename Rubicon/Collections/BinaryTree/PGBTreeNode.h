@@ -45,6 +45,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 	-(nullable instancetype)remove;
 
+	-(void)clearTree;
+
 	-(nullable instancetype)parent;
 
 	-(nullable instancetype)left;
