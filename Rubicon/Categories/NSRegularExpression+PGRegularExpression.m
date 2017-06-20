@@ -26,44 +26,44 @@
 
 @implementation NSRegularExpression(PGRegularExpression)
 
-	-(BOOL)matches:(NSString *)string range:(NSRange)range {
-		if(string.length && range.length) {
-			NSArray<NSTextCheckingResult *> *matches = [self matchesInString:string options:0 range:range];
-			if(matches.count == 1) {
-				NSRange mrange = matches[0].range;
-				return ((range.length == mrange.length) && (range.location == mrange.location));
-			}
-		}
+    -(BOOL)matches:(NSString *)string range:(NSRange)range {
+        if(string.length && range.length) {
+            NSArray<NSTextCheckingResult *> *matches = [self matchesInString:string options:0 range:range];
+            if(matches.count == 1) {
+                NSRange mrange = matches[0].range;
+                return ((range.length == mrange.length) && (range.location == mrange.location));
+            }
+        }
 
-		return NO;
-	}
+        return NO;
+    }
 
-	-(BOOL)matches:(NSString *)string {
-		return [self matches:string range:NSMakeRange(0, string.length)];
-	}
+    -(BOOL)matches:(NSString *)string {
+        return [self matches:string range:NSMakeRange(0, string.length)];
+    }
 
-	+(NSRegularExpression *)cachedRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options error:(NSError **)error {
-		static NSMutableDictionary *regexCache = nil;
-		NSRegularExpression        *regex      = nil;
+    +(NSRegularExpression *)cachedRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options error:(NSError **)error {
+        static NSMutableDictionary *regexCache = nil;
+        NSRegularExpression        *regex      = nil;
 
-		if(pattern.length) {
-			@synchronized([NSRegularExpression class]) {
-				NSString *key = PGFormat(@"%@|%@", pattern, @(options));
+        if(pattern.length) {
+            @synchronized([NSRegularExpression class]) {
+                NSString *key = PGFormat(@"%@|%@", pattern, @(options));
 
-				if(regexCache == nil) regexCache = [NSMutableDictionary new]; else regex = regexCache[key];
+                if(regexCache == nil) regexCache = [NSMutableDictionary new]; else regex = regexCache[key];
 
-				if(regex == nil) {
-					regex = [NSRegularExpression regularExpressionWithPattern:pattern options:options error:error];
-					if(regex) regexCache[key] = regex;
-				}
-			}
-		}
+                if(regex == nil) {
+                    regex = [NSRegularExpression regularExpressionWithPattern:pattern options:options error:error];
+                    if(regex) regexCache[key] = regex;
+                }
+            }
+        }
 
-		return regex;
-	}
+        return regex;
+    }
 
-	+(NSRegularExpression *)cachedRegex:(NSString *)pattern error:(NSError **)error {
-		return [self cachedRegex:pattern options:0 error:error];
-	}
+    +(NSRegularExpression *)cachedRegex:(NSString *)pattern error:(NSError **)error {
+        return [self cachedRegex:pattern options:0 error:error];
+    }
 
 @end

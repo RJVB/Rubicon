@@ -31,12 +31,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGKeyValueData<__covariant KeyType, __covariant ObjectType> : NSObject
 
-	@property(copy, readonly) KeyType key;
-	@property(retain) ObjectType      value;
+    @property(copy, readonly) KeyType key;
+    @property(retain) ObjectType      value;
 
-	-(instancetype)initWithValue:(ObjectType)value forKey:(KeyType<NSCopying>)key;
+    -(instancetype)initWithValue:(ObjectType)value forKey:(KeyType<NSCopying>)key;
 
-	+(instancetype)dataWithValue:(ObjectType)value forKey:(KeyType<NSCopying>)key;
+    +(instancetype)dataWithValue:(ObjectType)value forKey:(KeyType<NSCopying>)key;
 
 @end
 

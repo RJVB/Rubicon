@@ -24,24 +24,24 @@
 #import "PGRWLockCounts.h"
 
 @implementation PGRWLockCounts {
-	}
+    }
 
-	@synthesize count = _count;
-	@synthesize currentLock = _currentLock;
+    @synthesize count = _count;
+    @synthesize currentLock = _currentLock;
 
-	-(instancetype)init {
-		self = [super init];
+    -(instancetype)init {
+        self = [super init];
 
-		if(self) {
-			self.count       = 0;
-			self.currentLock = PGRWNoLockHeld;
-		}
+        if(self) {
+            self.count       = 0;
+            self.currentLock = PGRWNoLockHeld;
+        }
 
-		return self;
-	}
+        return self;
+    }
 
-	+(instancetype)counts {
-		return [[self alloc] init];
-	}
+    +(instancetype)counts {
+        return [[self alloc] init];
+    }
 
 @end

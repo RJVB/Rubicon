@@ -38,48 +38,48 @@
  ******************************************************************************************************/
 @interface PGTimeSpec : NSObject<NSCopying>
 
-	@property(nonatomic, readonly) NSLong years;
-	@property(nonatomic, readonly) NSLong days;
-	@property(nonatomic, readonly) NSLong hours;
-	@property(nonatomic, readonly) NSLong minutes;
-	@property(nonatomic, readonly) NSLong seconds;
-	@property(nonatomic, readonly) NSLong milliseconds;
-	@property(nonatomic, readonly) NSLong microseconds;
-	@property(nonatomic, readonly) NSLong nanoseconds;
+    @property(nonatomic, readonly) NSLong years;
+    @property(nonatomic, readonly) NSLong days;
+    @property(nonatomic, readonly) NSLong hours;
+    @property(nonatomic, readonly) NSLong minutes;
+    @property(nonatomic, readonly) NSLong seconds;
+    @property(nonatomic, readonly) NSLong milliseconds;
+    @property(nonatomic, readonly) NSLong microseconds;
+    @property(nonatomic, readonly) NSLong nanoseconds;
 
-	-(instancetype)init;
+    -(instancetype)init;
 
-	-(instancetype)initWithSeconds:(NSInteger)seconds andNanos:(NSInteger)nanos;
+    -(instancetype)initWithSeconds:(NSInteger)seconds andNanos:(NSInteger)nanos;
 
-	-(instancetype)initWithTimeVal:(PTimeVal)timeVal;
+    -(instancetype)initWithTimeVal:(PTimeVal)timeVal;
 
-	-(instancetype)initWithTimeSpec:(const PTimeSpec)timeSpec;
+    -(instancetype)initWithTimeSpec:(const PTimeSpec)timeSpec;
 
-	-(BOOL)isEqual:(id)other;
+    -(BOOL)isEqual:(id)other;
 
-	-(BOOL)isEqualToSpec:(PGTimeSpec *)spec;
+    -(BOOL)isEqualToSpec:(PGTimeSpec *)spec;
 
-	-(NSUInteger)hash;
+    -(NSUInteger)hash;
 
-	-(id)copyWithZone:(NSZone *)zone;
+    -(id)copyWithZone:(NSZone *)zone;
 
-	-(TimeSpec)toUnixTimeSpec;
+    -(TimeSpec)toUnixTimeSpec;
 
-	-(PGTimeSpec *)sleep;
+    -(PGTimeSpec *)sleep;
 
-	-(PGTimeSpec *)remainingTimeFromAbsoluteTime;
+    -(PGTimeSpec *)remainingTimeFromAbsoluteTime;
 
-	+(instancetype)timeSpecWithCurrentTime;
+    +(instancetype)timeSpecWithCurrentTime;
 
-	+(instancetype)timeSpecWithSeconds:(NSInteger)seconds andNanos:(NSInteger)nanos;
+    +(instancetype)timeSpecWithSeconds:(NSInteger)seconds andNanos:(NSInteger)nanos;
 
-	+(instancetype)timeSpecWithTimeVal:(PTimeVal)timeVal;
+    +(instancetype)timeSpecWithTimeVal:(PTimeVal)timeVal;
 
-	+(instancetype)timeSpecWithTimeSpec:(const PTimeSpec)timeSpec;
+    +(instancetype)timeSpecWithTimeSpec:(const PTimeSpec)timeSpec;
 
-	+(instancetype)timeSpecWithFutureSeconds:(NSInteger)seconds andNanos:(NSInteger)nanos;
+    +(instancetype)timeSpecWithFutureSeconds:(NSInteger)seconds andNanos:(NSInteger)nanos;
 
-	+(void)validateSeconds:(NSInteger)seconds andNanos:(NSInteger)nanos;
+    +(void)validateSeconds:(NSInteger)seconds andNanos:(NSInteger)nanos;
 @end
 
 #endif //__Rubicon_PGTimeSpec_H_

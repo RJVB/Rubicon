@@ -34,27 +34,27 @@
 
 @interface PGBase64OutputStream : NSOutputStream
 
-	-(NSInteger)write:(const uint8_t *)buffer maxLength:(NSUInteger)len;
+    -(NSInteger)write:(const uint8_t *)buffer maxLength:(NSUInteger)len;
 
-	-(void)close;
+    -(void)close;
 
-	-(void)flush;
+    -(void)flush;
 
-	-(instancetype)initToMemory;
+    -(instancetype)initToMemory;
 
-	-(instancetype)initToBuffer:(uint8_t *)buffer capacity:(NSUInteger)capacity;
+    -(instancetype)initToBuffer:(uint8_t *)buffer capacity:(NSUInteger)capacity;
 
-	-(instancetype)initWithURL:(NSURL *)url append:(BOOL)shouldAppend;
+    -(instancetype)initWithURL:(NSURL *)url append:(BOOL)shouldAppend;
 
-	-(instancetype)initToFileAtPath:(NSString *)path append:(BOOL)shouldAppend;
+    -(instancetype)initToFileAtPath:(NSString *)path append:(BOOL)shouldAppend;
 
-	+(instancetype)outputStreamToMemory;
+    +(instancetype)outputStreamToMemory;
 
-	+(instancetype)outputStreamToBuffer:(uint8_t *)buffer capacity:(NSUInteger)capacity;
+    +(instancetype)outputStreamToBuffer:(uint8_t *)buffer capacity:(NSUInteger)capacity;
 
-	+(instancetype)outputStreamToFileAtPath:(NSString *)path append:(BOOL)shouldAppend;
+    +(instancetype)outputStreamToFileAtPath:(NSString *)path append:(BOOL)shouldAppend;
 
-	+(instancetype)outputStreamWithURL:(NSURL *)url append:(BOOL)shouldAppend;
+    +(instancetype)outputStreamWithURL:(NSURL *)url append:(BOOL)shouldAppend;
 
 @end
 

@@ -24,22 +24,22 @@
 #import "PGEmptyEnumerator.h"
 
 @implementation PGEmptyEnumerator {
-	}
+    }
 
-	-(id)nextObject {
-		return nil;
-	}
+    -(id)nextObject {
+        return nil;
+    }
 
-	-(NSArray *)allObjects {
-		return [NSArray array];
-	}
+    -(NSArray *)allObjects {
+        return [NSArray array];
+    }
 
-	-(instancetype)init {
-		return (self = [super init]);
-	}
+    -(instancetype)init {
+        return (self = [super init]);
+    }
 
-	+(instancetype)emptyEnumerator {
-		return [[self alloc] init];
-	}
+    +(instancetype)emptyEnumerator {
+        return [[self alloc] init];
+    }
 
 @end

@@ -29,86 +29,86 @@
 #import "PGTimedSemWait.h"
 
 @implementation PGSemaphore {
-		sem_t *_semaphore;
-	}
+        sem_t *_semaphore;
+    }
 
-	@synthesize value = _value;
-	@synthesize name = _name;
+    @synthesize value = _value;
+    @synthesize name = _name;
 
-	-(instancetype)initWithSemaphoreName:(NSString *)name value:(NSUInteger)value {
-		self = [super init];
+    -(instancetype)initWithSemaphoreName:(NSString *)name value:(NSUInteger)value {
+        self = [super init];
 
-		if(self) {
-			_value     = ((value < 1) ? 1 : ((value > SEM_VALUE_MAX) ? SEM_VALUE_MAX : value));
-			_name      = (name.length ? [self cleanName:name] : [self makeName]);
-			_semaphore = sem_open(self.name.UTF8String, O_CREAT, (S_IRUSR | S_IWUSR), _value);
+        if(self) {
+            _value     = ((value < 1) ? 1 : ((value > SEM_VALUE_MAX) ? SEM_VALUE_MAX : value));
+            _name      = (name.length ? [self cleanName:name] : [self makeName]);
+            _semaphore = sem_open(self.name.UTF8String, O_CREAT, (S_IRUSR | S_IWUSR), _value);
 
-			if(_semaphore == SEM_FAILED) {
-				@throw [NSException exceptionWithName:PGSemaphoreException reason:PGStrError(errno) userInfo:nil];
-			}
-		}
+            if(_semaphore == SEM_FAILED) {
+                @throw [NSException exceptionWithName:PGSemaphoreException reason:PGStrError(errno) userInfo:nil];
+            }
+        }
 
-		return self;
-	}
+        return self;
+    }
 
-	+(instancetype)semaphoreWithName:(NSString *)name value:(NSUInteger)value {
-		return [[self alloc] initWithSemaphoreName:name value:value];
-	}
+    +(instancetype)semaphoreWithName:(NSString *)name value:(NSUInteger)value {
+        return [[self alloc] initWithSemaphoreName:name value:value];
+    }
 
-	-(NSString *)makeName {
-		return [PGFormat(@"%@%@", PGDefaultSemaphoreNamePrefix, @(PGSystemRealTime(0))) limitLength:PGMaxSemaphoreNameLength];
-	}
+    -(NSString *)makeName {
+        return [PGFormat(@"%@%@", PGDefaultSemaphoreNamePrefix, @(PGSystemRealTime(0))) limitLength:PGMaxSemaphoreNameLength];
+    }
 
-	-(NSString *)cleanName:(NSString *)name {
-		return [name hasPrefix:@"/"] ? [name copy] : PGFormat(@"/%@", name);
-	}
+    -(NSString *)cleanName:(NSString *)name {
+        return [name hasPrefix:@"/"] ? [name copy] : PGFormat(@"/%@", name);
+    }
 
-	-(BOOL)isOpen {
-		return (_semaphore != SEM_FAILED);
-	}
+    -(BOOL)isOpen {
+        return (_semaphore != SEM_FAILED);
+    }
 
-	-(void)dealloc {
-		[self close];
-	}
+    -(void)dealloc {
+        [self close];
+    }
 
-	-(void)close {
-		@synchronized(self) {
-			if(self.isOpen) {
-				sem_close(_semaphore);
-				_semaphore = SEM_FAILED;
-				sem_unlink(self.name.UTF8String);
-			}
-		}
-	}
+    -(void)close {
+        @synchronized(self) {
+            if(self.isOpen) {
+                sem_close(_semaphore);
+                _semaphore = SEM_FAILED;
+                sem_unlink(self.name.UTF8String);
+            }
+        }
+    }
 
-	-(void)post {
-		if(sem_post(_semaphore)) {
-			@throw [NSException exceptionWithName:PGSemaphoreException reason:PGStrError(errno) userInfo:nil];
-		}
-	}
+    -(void)post {
+        if(sem_post(_semaphore)) {
+            @throw [NSException exceptionWithName:PGSemaphoreException reason:PGStrError(errno) userInfo:nil];
+        }
+    }
 
-	-(void)wait {
-		if(sem_wait(_semaphore)) {
-			@throw [NSException exceptionWithName:PGSemaphoreException reason:PGStrError(errno) userInfo:nil];
-		}
-	}
+    -(void)wait {
+        if(sem_wait(_semaphore)) {
+            @throw [NSException exceptionWithName:PGSemaphoreException reason:PGStrError(errno) userInfo:nil];
+        }
+    }
 
-	-(BOOL)tryWait {
-		if(sem_trywait(_semaphore)) {
-			if(errno == EAGAIN) {
-				return NO;
-			}
-			else {
-				@throw [NSException exceptionWithName:PGSemaphoreException reason:PGStrError(errno) userInfo:nil];
-			}
-		}
+    -(BOOL)tryWait {
+        if(sem_trywait(_semaphore)) {
+            if(errno == EAGAIN) {
+                return NO;
+            }
+            else {
+                @throw [NSException exceptionWithName:PGSemaphoreException reason:PGStrError(errno) userInfo:nil];
+            }
+        }
 
-		return YES;
-	}
+        return YES;
+    }
 
-	-(BOOL)timedWait:(PGTimeSpec *)abstime {
-		return ([self tryWait] ? YES : [[[PGTimedSemWait alloc] initWithTimeout:abstime semaphore:_semaphore] timedAction:NULL]);
-	}
+    -(BOOL)timedWait:(PGTimeSpec *)abstime {
+        return ([self tryWait] ? YES : [[[PGTimedSemWait alloc] initWithTimeout:abstime semaphore:_semaphore] timedAction:NULL]);
+    }
 
 @end
 

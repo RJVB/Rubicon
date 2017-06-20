@@ -29,60 +29,60 @@
 
 @interface PGLinkedListNode : NSObject
 
-	@property(retain) PGLinkedListNode *nextNode;
-	@property(retain) PGLinkedListNode *prevNode;
-	@property(retain) id               value;
-	@property(atomic) BOOL             isFirst;
+    @property(retain) PGLinkedListNode *nextNode;
+    @property(retain) PGLinkedListNode *prevNode;
+    @property(retain) id               value;
+    @property(atomic) BOOL             isFirst;
 
-	/**************************************************************************************************//**
+    /**************************************************************************************************//**
 	 * Creates a new node with the given value.
 	 *
 	 * @param value the value that this node will contain.
 	 * @return the new first node.
 	 ******************************************************************************************************/
-	-(instancetype)initWithValue:(id)value;
+    -(instancetype)initWithValue:(id)value;
 
-	/**************************************************************************************************//**
+    /**************************************************************************************************//**
      * @return The first node in the chain.
      ******************************************************************************************************/
-	-(instancetype)firstNode;
+    -(instancetype)firstNode;
 
-	/**************************************************************************************************//**
+    /**************************************************************************************************//**
 	 * @return The last node in the chain.
 	 ******************************************************************************************************/
-	-(instancetype)lastNode;
+    -(instancetype)lastNode;
 
-	/**************************************************************************************************//**
+    /**************************************************************************************************//**
 	 * Creates and inserts a new node with the given value into the chain AFTER this node.
 	 *
 	 * @param value the value that the new node will contain.
 	 * @return the new node that was created.
 	 ******************************************************************************************************/
-	-(instancetype)insertAfter:(id)value;
+    -(instancetype)insertAfter:(id)value;
 
-	/**************************************************************************************************//**
+    /**************************************************************************************************//**
 	 * Creates and inserts a new node with the given value into the chain BEFORE this new node.
 	 *
 	 * @param value the value that the new node will contain.
 	 * @return the new node that was created.
 	 ******************************************************************************************************/
-	-(instancetype)insertBefore:(id)value;
+    -(instancetype)insertBefore:(id)value;
 
-	/**************************************************************************************************//**
+    /**************************************************************************************************//**
 	 * Removes this node from the chain.  If this node represented the FIRST node then the next chain will
 	 * become the next node.
 	 *
 	 * @return The next node in the chain or nil if this was the only node left.
 	 ******************************************************************************************************/
-	-(instancetype)remove;
+    -(instancetype)remove;
 
-	/**************************************************************************************************//**
+    /**************************************************************************************************//**
 	 * Creates a new node with the given value.
 	 *
 	 * @param value the value that this node will contain.
 	 * @return the new first node.
 	 ******************************************************************************************************/
-	+(instancetype)nodeWithValue:(id)value;
+    +(instancetype)nodeWithValue:(id)value;
 
 @end
 

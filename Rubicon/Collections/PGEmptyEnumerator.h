@@ -29,13 +29,13 @@
 
 @interface PGEmptyEnumerator : NSEnumerator
 
-	-(id)nextObject;
+    -(id)nextObject;
 
-	-(NSArray *)allObjects;
+    -(NSArray *)allObjects;
 
-	-(instancetype)init;
+    -(instancetype)init;
 
-	+(instancetype)emptyEnumerator;
+    +(instancetype)emptyEnumerator;
 
 @end
 

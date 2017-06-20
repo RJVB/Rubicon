@@ -6,7 +6,7 @@
  *        DATE: 6/15/17 12:11 PM
  * DESCRIPTION:
  *
- * Copyright © 2017Galen Rhodes All rights reserved.
+ * Copyright © 2017 Galen Rhodes All rights reserved.
  *
  * "It can hardly be a coincidence that no language on Earth has ever produced the expression 'As pretty as an airport.' Airports
  * are ugly. Some are very ugly. Some attain a degree of ugliness that can only be the result of special effort."
@@ -30,35 +30,35 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGBTreeNode<__covariant T>()
 
-	-(instancetype)initWithData:(T)data isRed:(BOOL)isRed;
+    -(instancetype)initWithData:(T)data isRed:(BOOL)isRed;
 
-	-(nullable instancetype)child:(BOOL)onLeft;
+    -(nullable instancetype)child:(BOOL)onLeft;
 
-	-(BOOL)allBlack;
+    -(BOOL)allBlack;
 
-	-(BOOL)isLeft;
+    -(BOOL)isLeft;
 
-	-(BOOL)isRight;
+    -(BOOL)isRight;
 
-	-(void)setIsRed:(BOOL)b;
+    -(void)setIsRed:(BOOL)b;
 
-	-(void)setParent:(nullable PGBTreeNode *)node;
+    -(void)setParent:(nullable PGBTreeNode *)node;
 
-	-(void)recount;
+    -(void)recount;
 
-	-(instancetype)makeOrphan;
+    -(instancetype)makeOrphan;
 
-	-(nullable instancetype)setChild:(nullable PGBTreeNode *)child onLeft:(BOOL)onLeft;
+    -(nullable instancetype)setChild:(nullable PGBTreeNode *)child onLeft:(BOOL)onLeft;
 
-	-(void)rotate:(BOOL)toTheLeft;
+    -(void)rotate:(BOOL)toTheLeft;
 
-	-(instancetype)foobar:(T)data child:(nullable PGBTreeNode *)child onLeft:(BOOL)onLeft;
+    -(instancetype)foobar:(T)data child:(nullable PGBTreeNode *)child onLeft:(BOOL)onLeft;
 
-	-(instancetype)ibal;
+    -(instancetype)ibal;
 
-	-(instancetype)rbal;
+    -(instancetype)rbal;
 
-	+(instancetype)nodeWithData:(T)data isRed:(BOOL)isRed;
+    +(instancetype)nodeWithData:(T)data isRed:(BOOL)isRed;
 
 @end
 

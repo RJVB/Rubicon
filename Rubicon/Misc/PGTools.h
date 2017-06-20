@@ -43,7 +43,7 @@
  * @return YES if both objects are either NULL or equal according to the isEqual: selector.
  */
 NS_INLINE BOOL PGObjectsEqual(id obj1, id obj2) {
-	return ((obj1 == nil) ? (obj2 == nil) : ((obj2 == nil) ? NO : [obj1 isEqual:obj2]));
+    return ((obj1 == nil) ? (obj2 == nil) : ((obj2 == nil) ? NO : [obj1 isEqual:obj2]));
 }
 
 /**************************************************************************************************//**
@@ -56,8 +56,8 @@ NS_INLINE BOOL PGObjectsEqual(id obj1, id obj2) {
  * @return the value.
  */
 NS_INLINE id PGSetReference(id *ref, id val) {
-	if(ref) *ref = val;
-	return val;
+    if(ref) *ref = val;
+    return val;
 }
 
 /**************************************************************************************************//**

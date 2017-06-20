@@ -31,24 +31,24 @@
 
 @interface PGSemaphore : NSObject
 
-	@property(nonatomic, readonly) NSUInteger     value;
-	@property(nonatomic, readonly, copy) NSString *name;
+    @property(nonatomic, readonly) NSUInteger     value;
+    @property(nonatomic, readonly, copy) NSString *name;
 
-	-(instancetype)initWithSemaphoreName:(NSString *)name value:(NSUInteger)value;
+    -(instancetype)initWithSemaphoreName:(NSString *)name value:(NSUInteger)value;
 
-	+(instancetype)semaphoreWithName:(NSString *)name value:(NSUInteger)value;
+    +(instancetype)semaphoreWithName:(NSString *)name value:(NSUInteger)value;
 
-	-(BOOL)isOpen;
+    -(BOOL)isOpen;
 
-	-(void)close;
+    -(void)close;
 
-	-(void)post;
+    -(void)post;
 
-	-(void)wait;
+    -(void)wait;
 
-	-(BOOL)tryWait;
+    -(BOOL)tryWait;
 
-	/**************************************************************************************************//**
+    /**************************************************************************************************//**
 	 * Mimics the POSIX sem_timedwait(2p) function.
 	 *
 	 * This method shall lock the semaphore referenced by this object as in the wait method. However, if
@@ -73,7 +73,7 @@
 	 * @return YES if it was able to successfully lock the semaphore before the timeout occurred.
 	 * @see http://man7.org/linux/man-pages/man3/sem_timedwait.3p.html
 	 ******************************************************************************************************/
-	-(BOOL)timedWait:(PGTimeSpec *)abstime;
+    -(BOOL)timedWait:(PGTimeSpec *)abstime;
 
 @end
 

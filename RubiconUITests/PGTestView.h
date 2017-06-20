@@ -29,7 +29,7 @@
 
 @interface PGTestView : NSView
 
-	@property(nonatomic, assign) CGFloat fontSize;
+    @property(nonatomic, assign) CGFloat fontSize;
 
 @end
 

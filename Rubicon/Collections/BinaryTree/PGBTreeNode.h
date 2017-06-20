@@ -31,35 +31,35 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGBTreeNode<__covariant T> : NSObject
 
-	@property(retain) T            data;
-	@property(readonly) NSUInteger count;
-	@property(readonly) BOOL       isRed;
+    @property(retain) T            data;
+    @property(readonly) NSUInteger count;
+    @property(readonly) BOOL       isRed;
 
-	-(instancetype)initWithData:(T)data;
+    -(instancetype)initWithData:(T)data;
 
-	-(nullable instancetype)find:(T)data;
+    -(nullable instancetype)find:(T)data;
 
-	-(instancetype)insert:(T)data;
+    -(instancetype)insert:(T)data;
 
-	-(nullable instancetype)remove;
+    -(nullable instancetype)remove;
 
-	-(nullable instancetype)parent;
+    -(nullable instancetype)parent;
 
-	-(nullable instancetype)left;
+    -(nullable instancetype)left;
 
-	-(nullable instancetype)right;
+    -(nullable instancetype)right;
 
-	-(nullable instancetype)root;
+    -(nullable instancetype)root;
 
-	-(nullable instancetype)grandparent;
+    -(nullable instancetype)grandparent;
 
-	-(nullable instancetype)sibling;
+    -(nullable instancetype)sibling;
 
-	-(nullable instancetype)uncle;
+    -(nullable instancetype)uncle;
 
-	-(void)clearTree;
+    -(void)clearTree;
 
-	+(instancetype)nodeWithData:(T)data;
+    +(instancetype)nodeWithData:(T)data;
 
 @end
 

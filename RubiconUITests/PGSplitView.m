@@ -24,5 +24,5 @@
 #import "PGSplitView.h"
 
 @implementation PGSplitView {
-	}
+    }
 @end

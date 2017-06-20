@@ -29,36 +29,36 @@
 
 @interface PGStack : NSObject
 
-	@property(readonly) NSUInteger count;
-	@property(readonly) BOOL       isEmpty;
+    @property(readonly) NSUInteger count;
+    @property(readonly) BOOL       isEmpty;
 
-	-(instancetype)init;
+    -(instancetype)init;
 
-	-(instancetype)initWithNSArray:(NSArray *)objs;
+    -(instancetype)initWithNSArray:(NSArray *)objs;
 
-	-(instancetype)initWithObjects:(const id[])objects count:(NSUInteger)cnt;
+    -(instancetype)initWithObjects:(const id[])objects count:(NSUInteger)cnt;
 
-	-(void)push:(id)obj;
+    -(void)push:(id)obj;
 
-	-(id)pop;
+    -(id)pop;
 
-	-(id)peek;
+    -(id)peek;
 
-	-(NSArray *)popAll;
+    -(NSArray *)popAll;
 
-	-(NSArray *)peekAll;
+    -(NSArray *)peekAll;
 
-	-(void)pushAll:(NSArray *)objs;
+    -(void)pushAll:(NSArray *)objs;
 
-	-(void)removeAll;
+    -(void)removeAll;
 
-	-(NSEnumerator *)objectEnumerator;
+    -(NSEnumerator *)objectEnumerator;
 
-	+(instancetype)stack;
+    +(instancetype)stack;
 
-	+(instancetype)stackWithArray:(NSArray *)array;
+    +(instancetype)stackWithArray:(NSArray *)array;
 
-	+(instancetype)stackWithObjects:(const id[])objects count:(NSUInteger)cnt;
+    +(instancetype)stackWithObjects:(const id[])objects count:(NSUInteger)cnt;
 @end
 
 #endif //__Rubicon_PGStack_H_

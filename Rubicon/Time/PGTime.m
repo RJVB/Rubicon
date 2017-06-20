@@ -35,10 +35,10 @@ double                    machTimeFactor   = 0;
  * @param tp The time specification record.
  ******************************************************************************************************/
 NS_INLINE int clock_gettime_monotonic(PTimeSpec tp) {
-	NSLong machNanos = PGSystemCPUTime(0);
-	tp->tv_sec  = (__darwin_time_t)(machNanos / PG_NANOS_PER_SECOND);
-	tp->tv_nsec = (long)(machNanos % PG_NANOS_PER_SECOND);
-	return 0;
+NSLong machNanos = PGSystemCPUTime(0);
+tp->tv_sec  = (__darwin_time_t)(machNanos / PG_NANOS_PER_SECOND);
+tp->tv_nsec = (long)(machNanos % PG_NANOS_PER_SECOND);
+return 0;
 }
 
 /**************************************************************************************************//**
@@ -47,36 +47,36 @@ NS_INLINE int clock_gettime_monotonic(PTimeSpec tp) {
  * @param tp The time specificatoin record.
  ******************************************************************************************************/
 NS_INLINE int clock_gettime_realtime(PTimeSpec tp) {
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	tp->tv_sec  = tv.tv_sec;
-	tp->tv_nsec = tv.tv_usec * 1000;
-	return 0;
+struct timeval tv;
+gettimeofday(&tv, NULL);
+tp->tv_sec  = tv.tv_sec;
+tp->tv_nsec = tv.tv_usec * 1000;
+return 0;
 }
 
 /**************************************************************************************************//**
  * Duplicates to some degree the same function as the Linux version.
  ******************************************************************************************************/
 int clock_gettime(int clk_id, PTimeSpec tp) {
-	if(tp) {
-		switch(clk_id) {
-			case CLOCK_MONOTONIC:
-			case CLOCK_MONOTONIC_COARSE:
-			case CLOCK_MONOTONIC_RAW:
-				return clock_gettime_monotonic(tp);
-			case CLOCK_REALTIME:
-			case CLOCK_REALTIME_COARSE:
-				return clock_gettime_realtime(tp);
-			default:
-				errno = EINVAL;
-				break;
-		}
-	}
-	else {
-		errno = EFAULT;
-	}
+if(tp) {
+switch(clk_id) {
+case CLOCK_MONOTONIC:
+case CLOCK_MONOTONIC_COARSE:
+case CLOCK_MONOTONIC_RAW:
+return clock_gettime_monotonic(tp);
+case CLOCK_REALTIME:
+case CLOCK_REALTIME_COARSE:
+return clock_gettime_realtime(tp);
+default:
+errno = EINVAL;
+break;
+}
+}
+else {
+errno = EFAULT;
+}
 
-	return -1;
+return -1;
 }
 
 #endif

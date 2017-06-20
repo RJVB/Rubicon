@@ -24,14 +24,14 @@
 #import "PGKeyValueNodeTraveler.h"
 
 @implementation PGKeyValueNodeTraveler {
-	}
+    }
 
-	-(instancetype)init {
-		return (self = [super init]);
-	}
+    -(instancetype)init {
+        return (self = [super init]);
+    }
 
-	-(BOOL)visitNodeWithKey:(id)key forValue:(id)value {
-		return NO;
-	}
+    -(BOOL)visitNodeWithKey:(id)key forValue:(id)value {
+        return NO;
+    }
 
 @end

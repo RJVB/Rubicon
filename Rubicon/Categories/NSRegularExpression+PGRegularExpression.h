@@ -30,13 +30,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSRegularExpression(PGRegularExpression)
 
-	-(BOOL)matches:(NSString *)string range:(NSRange)range;
+    -(BOOL)matches:(NSString *)string range:(NSRange)range;
 
-	-(BOOL)matches:(NSString *)string;
+    -(BOOL)matches:(NSString *)string;
 
-	+(NSRegularExpression *)cachedRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options error:(NSError **)error;
+    +(NSRegularExpression *)cachedRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options error:(NSError **)error;
 
-	+(NSRegularExpression *)cachedRegex:(NSString *)pattern error:(NSError **)error;
+    +(NSRegularExpression *)cachedRegex:(NSString *)pattern error:(NSError **)error;
 
 @end
 

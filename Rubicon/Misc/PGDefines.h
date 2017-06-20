@@ -33,9 +33,9 @@ typedef CGFloat   NSFloat;  // For the Sheldon Cooper in me.
 static const NSUInteger NSUNotFound = NSUIntegerMax;
 
 #if defined(__APPLE__)
-	#define PGMaxSemaphoreNameLength 30
+    #define PGMaxSemaphoreNameLength 30
 #else
-	#define PGMaxSemaphoreNameLength 251
+    #define PGMaxSemaphoreNameLength 251
 #endif
 
 FOUNDATION_EXPORT NSString *const PGErrorDomain;
@@ -48,24 +48,24 @@ FOUNDATION_EXPORT NSExceptionName const PGOSErrorException;
 FOUNDATION_EXPORT NSString *const PGDefaultSemaphoreNamePrefix;
 
 #if !defined(PGAbstractClassError)
-	#define PGAbstractClassError do {\
-		NSString *reason = PGFormat(@"Instances of abstract class %@ cannot be created.", NSStringFromClass([self class]));\
-	    @throw [NSException exceptionWithName:NSIllegalSelectorException reason:reason userInfo:nil];\
-	    __builtin_unreachable();\
-	} while(0)
+    #define PGAbstractClassError do {\
+        NSString *reason = PGFormat(@"Instances of abstract class %@ cannot be created.", NSStringFromClass([self class]));\
+        @throw [NSException exceptionWithName:NSIllegalSelectorException reason:reason userInfo:nil];\
+        __builtin_unreachable();\
+    } while(0)
 #endif
 
 #if !defined(PGBadConstructorError)
-	#define PGBadConstructorError do {\
-		NSString *reason = PGFormat(@"The selector \"%@\" cannot be used to create instances of the class %@.", NSStringFromSelector(_cmd), NSStringFromClass([self class]));\
-		@throw [NSException exceptionWithName:NSIllegalSelectorException reason:reason userInfo:nil];\
-		__builtin_unreachable();\
-	} while(0)
+    #define PGBadConstructorError do {\
+        NSString *reason = PGFormat(@"The selector \"%@\" cannot be used to create instances of the class %@.", NSStringFromSelector(_cmd), NSStringFromClass([self class]));\
+        @throw [NSException exceptionWithName:NSIllegalSelectorException reason:reason userInfo:nil];\
+        __builtin_unreachable();\
+    } while(0)
 #endif
 
 #if !defined(PGNotImplemented)
-	#define PGNotImplemented do {\
-		NSString *reason = PGFormat(@"The selector \"%@\" is abstract.", NSStringFromSelector(_cmd));\
+    #define PGNotImplemented do {\
+        NSString *reason = PGFormat(@"The selector \"%@\" is abstract.", NSStringFromSelector(_cmd));\
         @throw [NSException exceptionWithName:NSIllegalSelectorException reason:reason userInfo:nil];\
         __builtin_unreachable();\
     } while(0)

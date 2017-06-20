@@ -46,43 +46,43 @@ typedef NSString *(^PGMacroHandler)(NSString *label, NSString *whole, NSRange ra
 
 @interface PGMacros : NSObject
 
-	@property(nonatomic, copy) PGMacroHandler macroHandler;
-	@property(nonatomic, copy) NSString       *macroRegex;
+    @property(nonatomic, copy) PGMacroHandler macroHandler;
+    @property(nonatomic, copy) NSString       *macroRegex;
 
-	/**************************************************************************************************//**
+    /**************************************************************************************************//**
 	 * Initiialize the object with the given macro handler.
 	 *
 	 * @param macroHandler the macro handler.
 	 * @return a initialized object.
 	 */
-	-(instancetype)initWithHandler:(PGMacroHandler)macroHandler;
+    -(instancetype)initWithHandler:(PGMacroHandler)macroHandler;
 
-	/**************************************************************************************************//**
+    /**************************************************************************************************//**
 	 * Initialize the object with the given regular expression and macro handler.
 	 *
 	 * @param macroRegex the regular expression to search for macro instances with.
 	 * @param macroHandler the macro handler.
 	 * @return an initialized object.
 	 */
-	-(instancetype)initWithRegex:(NSString *)macroRegex andHandler:(PGMacroHandler)macroHandler;
+    -(instancetype)initWithRegex:(NSString *)macroRegex andHandler:(PGMacroHandler)macroHandler;
 
-	-(NSString *)stringByProcessingMacrosIn:(NSString *)aString options:(NSRegularExpressionOptions)options error:(NSError **)error;
+    -(NSString *)stringByProcessingMacrosIn:(NSString *)aString options:(NSRegularExpressionOptions)options error:(NSError **)error;
 
-	-(NSString *)stringByProcessingMacrosIn:(NSString *)aString error:(NSError **)error;
+    -(NSString *)stringByProcessingMacrosIn:(NSString *)aString error:(NSError **)error;
 
-	+(NSString *)stringByProcessingMacrosIn:(NSString *)aString
-	                              withRegex:(NSString *)macroRegex
-	                             andHandler:(PGMacroHandler)macroHandler
-	                                options:(NSRegularExpressionOptions)options
-	                                  error:(NSError **)error;
+    +(NSString *)stringByProcessingMacrosIn:(NSString *)aString
+                                  withRegex:(NSString *)macroRegex
+                                 andHandler:(PGMacroHandler)macroHandler
+                                    options:(NSRegularExpressionOptions)options
+                                      error:(NSError **)error;
 
-	+(NSString *)stringByProcessingMacrosIn:(NSString *)aString withHandler:(PGMacroHandler)macroHandler options:(NSRegularExpressionOptions)options error:(NSError **)error;
+    +(NSString *)stringByProcessingMacrosIn:(NSString *)aString withHandler:(PGMacroHandler)macroHandler options:(NSRegularExpressionOptions)options error:(NSError **)error;
 
-	+(NSString *)stringByProcessingMacrosIn:(NSString *)aString withHandler:(PGMacroHandler)macroHandler error:(NSError **)error;
+    +(NSString *)stringByProcessingMacrosIn:(NSString *)aString withHandler:(PGMacroHandler)macroHandler error:(NSError **)error;
 
-	+(instancetype)macrosWithRegex:(NSString *)macroRegex andHandler:(PGMacroHandler)macroHandler;
+    +(instancetype)macrosWithRegex:(NSString *)macroRegex andHandler:(PGMacroHandler)macroHandler;
 
-	+(instancetype)macrosWithHandler:(PGMacroHandler)macroHandler;
+    +(instancetype)macrosWithHandler:(PGMacroHandler)macroHandler;
 
 @end
 

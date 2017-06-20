@@ -26,28 +26,28 @@
 
 @implementation NSMutableDictionary(PGBTreeMutableDictionary)
 
-	+(PGBTreeMutableDictionary *)btreeDictionary {
-		return [[PGBTreeMutableDictionary alloc] init];
-	}
+    +(PGBTreeMutableDictionary *)btreeDictionary {
+        return [[PGBTreeMutableDictionary alloc] init];
+    }
 
-	+(PGBTreeMutableDictionary *)btreeDictionaryWithDictionary:(NSDictionary *)dict {
-		return [[PGBTreeMutableDictionary alloc] initWithDictionary:dict];
-	}
+    +(PGBTreeMutableDictionary *)btreeDictionaryWithDictionary:(NSDictionary *)dict {
+        return [[PGBTreeMutableDictionary alloc] initWithDictionary:dict];
+    }
 
-	+(PGBTreeMutableDictionary *)btreeDictionaryWithObject:(id)anObject forKey:(id<NSCopying>)aKey {
-		return [[PGBTreeMutableDictionary alloc] initWithObject:anObject forKey:aKey];
-	}
+    +(PGBTreeMutableDictionary *)btreeDictionaryWithObject:(id)anObject forKey:(id<NSCopying>)aKey {
+        return [[PGBTreeMutableDictionary alloc] initWithObject:anObject forKey:aKey];
+    }
 
-	+(PGBTreeMutableDictionary *)btreeDictionaryWithCoder:(NSCoder *)coder {
-		return [[PGBTreeMutableDictionary alloc] initWithCoder:coder];
-	}
+    +(PGBTreeMutableDictionary *)btreeDictionaryWithCoder:(NSCoder *)coder {
+        return [[PGBTreeMutableDictionary alloc] initWithCoder:coder];
+    }
 
-	+(PGBTreeMutableDictionary *)btreeDictionaryWithContentsOfFile:(NSString *)path {
-		return [[PGBTreeMutableDictionary alloc] initWithContentsOfFile:path];
-	}
+    +(PGBTreeMutableDictionary *)btreeDictionaryWithContentsOfFile:(NSString *)path {
+        return [[PGBTreeMutableDictionary alloc] initWithContentsOfFile:path];
+    }
 
-	+(PGBTreeMutableDictionary *)btreeDictionaryWithContentsOfURL:(NSURL *)url {
-		return [[PGBTreeMutableDictionary alloc] initWithContentsOfURL:url];
-	}
+    +(PGBTreeMutableDictionary *)btreeDictionaryWithContentsOfURL:(NSURL *)url {
+        return [[PGBTreeMutableDictionary alloc] initWithContentsOfURL:url];
+    }
 
 @end

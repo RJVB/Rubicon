@@ -29,7 +29,7 @@
 
 @interface CommonBaseClass : NSObject
 
-	-(NSString *)description;
+    -(NSString *)description;
 @end
 
 @interface Subclass1A : CommonBaseClass

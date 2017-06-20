@@ -26,7 +26,7 @@
 
 @implementation NSObject(PGObject)
 
-	/**************************************************************************************************//**
+    /**************************************************************************************************//**
 	 * This method returns the first superclass that this object has in common with the given object.
 	 * For example, if you have two objects that are descendents of NSString but neither is a descendent
 	 * of the other then calling this method on one of the objects and passing the other will return the
@@ -36,66 +36,66 @@
 	 * @param obj the other object.
 	 * @return the first superclass that both this object and the given class have in common.
 	 ******************************************************************************************************/
-	-(Class)baseClassInCommonWith:(id)obj {
-		return (obj ? PGCommonBaseClass([self class], [obj class]) : nil);
-	}
+    -(Class)baseClassInCommonWith:(id)obj {
+        return (obj ? PGCommonBaseClass([self class], [obj class]) : nil);
+    }
 
-	/**************************************************************************************************//**
+    /**************************************************************************************************//**
 	 * Created because the definition of isKindOf:(Class) and isMemberOf:(Class) is hard for me to
 	 * remember for some reason.
 	 *
 	 * @param clazz the class to compare to.
 	 * @return YES if this object is an instance of clazz or one of it's subclasses.
 	 ******************************************************************************************************/
-	-(BOOL)isInstanceOf:(Class)clazz {
-		return [self isKindOfClass:clazz];
-	}
+    -(BOOL)isInstanceOf:(Class)clazz {
+        return [self isKindOfClass:clazz];
+    }
 
-	-(BOOL)isInstanceOfObject:(id)obj {
-		return [self isInstanceOf:[obj class]];
-	}
+    -(BOOL)isInstanceOfObject:(id)obj {
+        return [self isInstanceOf:[obj class]];
+    }
 
-	/**************************************************************************************************//**
+    /**************************************************************************************************//**
 	 * Created because the definition of isKindOf:(Class) and isMemberOf:(Class) is hard for me to
 	 * remember for some reason.
 	 *
 	 * @param clazz the class to compare to.
 	 * @return YES if this object is an instance of clazz.
 	 ******************************************************************************************************/
-	-(BOOL)isExactInstanceOf:(Class)clazz {
-		return [self isMemberOfClass:clazz];
-	}
+    -(BOOL)isExactInstanceOf:(Class)clazz {
+        return [self isMemberOfClass:clazz];
+    }
 
-	-(BOOL)isExactInstanceOfObject:(id)obj {
-		return [self isExactInstanceOf:[obj class]];
-	}
+    -(BOOL)isExactInstanceOfObject:(id)obj {
+        return [self isExactInstanceOf:[obj class]];
+    }
 
-	/**************************************************************************************************//**
+    /**************************************************************************************************//**
 	 * Returns a default generic comparator that will make a best attempt at comparing this object with
 	 * another object.
 	 ******************************************************************************************************/
-	+(NSComparator)defaultComparator {
-		return ^NSComparisonResult(id obj1, id obj2) {
-			if(obj1 && obj2) {
-				if(obj1 == obj2 || [obj1 isEqual:obj2]) {
-					return NSOrderedSame;
-				}
-				else if([[obj1 baseClassInCommonWith:obj2] instancesRespondToSelector:@selector(compare:)]) {
-					return [obj1 compare:obj2];
-				}
-			}
+    +(NSComparator)defaultComparator {
+        return ^NSComparisonResult(id obj1, id obj2) {
+            if(obj1 && obj2) {
+                if(obj1 == obj2 || [obj1 isEqual:obj2]) {
+                    return NSOrderedSame;
+                }
+                else if([[obj1 baseClassInCommonWith:obj2] instancesRespondToSelector:@selector(compare:)]) {
+                    return [obj1 compare:obj2];
+                }
+            }
 
-			return ((obj1 < obj2) ? NSOrderedAscending : ((obj1 > obj2) ? NSOrderedDescending : NSOrderedSame));
-		};
-	}
+            return ((obj1 < obj2) ? NSOrderedAscending : ((obj1 > obj2) ? NSOrderedDescending : NSOrderedSame));
+        };
+    }
 
 @end
 
 Class _commonBaseClass1(Class c1, Class c2, Class c3) {
-	return (c1 ? (c2 ? ((c1 == c2) ? c1 : _commonBaseClass1(c1, class_getSuperclass(c2), c3)) : _commonBaseClass1(class_getSuperclass(c1), c3, c3)) : nil);
+    return (c1 ? (c2 ? ((c1 == c2) ? c1 : _commonBaseClass1(c1, class_getSuperclass(c2), c3)) : _commonBaseClass1(class_getSuperclass(c1), c3, c3)) : nil);
 }
 
 Class PGCommonBaseClass(Class c1, Class c2) {
-	return _commonBaseClass1(c1, c2, c2);
+    return _commonBaseClass1(c1, c2, c2);
 }
 

@@ -40,11 +40,11 @@
 #include <time.h>
 
 #ifndef PG_ARC
-	#if defined(__has_feature) && __has_feature(objc_arc)
-		#define PG_ARC 1
-	#else
-		#define PG_ARC 0
-	#endif
+    #if defined(__has_feature) && __has_feature(objc_arc)
+        #define PG_ARC 1
+    #else
+        #define PG_ARC 0
+    #endif
 #endif
 
 /* @formatter:off */

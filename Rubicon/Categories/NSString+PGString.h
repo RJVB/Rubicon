@@ -31,17 +31,17 @@ FOUNDATION_EXPORT const NSUInteger PGUNotFound;
 
 @interface NSString(PGString)
 
-	-(NSUInteger)indexOfCharacter:(unichar)c;
+    -(NSUInteger)indexOfCharacter:(unichar)c;
 
-	-(NSString *)limitLength:(NSUInteger)maxLength;
+    -(NSString *)limitLength:(NSUInteger)maxLength;
 
-	-(NSString *)trim;
+    -(NSString *)trim;
 
-	-(void)drawDeadCentered:(NSRect)textRect fontName:(NSString *)fontName fontSize:(NSFloat)fontSize fontColor:(NSColor *)fontColor;
+    -(void)drawDeadCentered:(NSRect)textRect fontName:(NSString *)fontName fontSize:(NSFloat)fontSize fontColor:(NSColor *)fontColor;
 
-	-(void)drawDeadCentered:(NSRect)textRect font:(NSFont *)font fontColor:(NSColor *)fontColor;
+    -(void)drawDeadCentered:(NSRect)textRect font:(NSFont *)font fontColor:(NSColor *)fontColor;
 
-	-(void)drawDeadCentered:(NSRect)textRect fontAttributes:(NSDictionary *)fontAttribs;
+    -(void)drawDeadCentered:(NSRect)textRect fontAttributes:(NSDictionary *)fontAttribs;
 
 @end
 

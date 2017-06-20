@@ -26,67 +26,67 @@
 
 @interface PGTimedReadLock()
 
-	@property(readwrite) pthread_rwlock_t *rwlock;
+    @property(readwrite) pthread_rwlock_t *rwlock;
 
-	-(int)performAction;
+    -(int)performAction;
 
 @end
 
 @implementation PGTimedReadLock {
-	}
+    }
 
-	@synthesize rwlock = _rwlock;
+    @synthesize rwlock = _rwlock;
 
-	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock {
-		self = [super initWithTimeout:absTime];
+    -(instancetype)initWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock {
+        self = [super initWithTimeout:absTime];
 
-		if(self) {
-			self.rwlock = rwlock;
-		}
+        if(self) {
+            self.rwlock = rwlock;
+        }
 
-		return self;
-	}
+        return self;
+    }
 
-	-(int)performAction {
-		return pthread_rwlock_rdlock(self.rwlock);
-	}
+    -(int)performAction {
+        return pthread_rwlock_rdlock(self.rwlock);
+    }
 
-	-(BOOL)action:(id *)results {
-		*results = nil;
-		int rc = [self performAction];
+    -(BOOL)action:(id *)results {
+        *results = nil;
+        int rc = [self performAction];
 
-		if(rc) {
-			if((rc == EINTR) && self.didTimeOut) {
-				return NO;
-			}
-			else {
-				@throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
-			}
-		}
+        if(rc) {
+            if((rc == EINTR) && self.didTimeOut) {
+                return NO;
+            }
+            else {
+                @throw [NSException exceptionWithName:PGReadWriteLockException reason:PGStrError(rc) userInfo:nil];
+            }
+        }
 
-		return YES;
-	}
+        return YES;
+    }
 
-	+(instancetype)readLockWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock {
-		return [[PGTimedReadLock alloc] initWithTimeout:absTime readWriteLock:rwlock];
-	}
+    +(instancetype)readLockWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock {
+        return [[PGTimedReadLock alloc] initWithTimeout:absTime readWriteLock:rwlock];
+    }
 
 @end
 
 @implementation PGTimedWriteLock {
-	}
+    }
 
-	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock {
-		return (self = [super initWithTimeout:absTime readWriteLock:rwlock]);
-	}
+    -(instancetype)initWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock {
+        return (self = [super initWithTimeout:absTime readWriteLock:rwlock]);
+    }
 
-	-(int)performAction {
-		return pthread_rwlock_wrlock(self.rwlock);
-	}
+    -(int)performAction {
+        return pthread_rwlock_wrlock(self.rwlock);
+    }
 
-	+(instancetype)writeLockWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock {
-		return [[PGTimedWriteLock alloc] initWithTimeout:absTime readWriteLock:rwlock];
-	}
+    +(instancetype)writeLockWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock {
+        return [[PGTimedWriteLock alloc] initWithTimeout:absTime readWriteLock:rwlock];
+    }
 
 @end
 

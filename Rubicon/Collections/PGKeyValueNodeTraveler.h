@@ -29,9 +29,9 @@
 
 @interface PGKeyValueNodeTraveler : NSObject
 
-	-(instancetype)init;
+    -(instancetype)init;
 
-	-(BOOL)visitNodeWithKey:(id)key forValue:(id)value;
+    -(BOOL)visitNodeWithKey:(id)key forValue:(id)value;
 
 @end
 

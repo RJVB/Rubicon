@@ -27,92 +27,92 @@ const NSUInteger PGUNotFound = NSUIntegerMax;
 
 @implementation NSString(PGString)
 
-	-(NSUInteger)indexOfCharacter:(unichar)c {
-		for(NSUInteger i = 0, j = self.length; i < j; i++) {
-			if(c == [self characterAtIndex:i]) {
-				return i;
-			}
-		}
+    -(NSUInteger)indexOfCharacter:(unichar)c {
+        for(NSUInteger i = 0, j = self.length; i < j; i++) {
+            if(c == [self characterAtIndex:i]) {
+                return i;
+            }
+        }
 
-		return PGUNotFound;
-	}
+        return PGUNotFound;
+    }
 
-	-(NSString *)limitLength:(NSUInteger)maxLength {
-		return ((self.length > maxLength) ? [self substringWithRange:NSMakeRange(0, maxLength)] : self);
-	}
+    -(NSString *)limitLength:(NSUInteger)maxLength {
+        return ((self.length > maxLength) ? [self substringWithRange:NSMakeRange(0, maxLength)] : self);
+    }
 
-	-(NSString *)trim {
-		return [[[self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]
-		               stringByTrimmingCharactersInSet:[NSCharacterSet controlCharacterSet]]
-		               copy];
-	}
+    -(NSString *)trim {
+        return [[[self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]
+                       stringByTrimmingCharactersInSet:[NSCharacterSet controlCharacterSet]]
+                       copy];
+    }
 
-	-(NSDictionary *)makeAlignmentCentered:(NSDictionary *)fontAttribs {
-		if(fontAttribs) {
-			NSMutableParagraphStyle *style = fontAttribs[NSParagraphStyleAttributeName];
+    -(NSDictionary *)makeAlignmentCentered:(NSDictionary *)fontAttribs {
+        if(fontAttribs) {
+            NSMutableParagraphStyle *style = fontAttribs[NSParagraphStyleAttributeName];
 
-			if(style == nil) {
-				NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary:fontAttribs];
-				dict[NSParagraphStyleAttributeName] = (style = [[NSMutableParagraphStyle alloc] init]);
-				fontAttribs = [NSDictionary dictionaryWithDictionary:dict];
-			}
+            if(style == nil) {
+                NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary:fontAttribs];
+                dict[NSParagraphStyleAttributeName] = (style = [[NSMutableParagraphStyle alloc] init]);
+                fontAttribs = [NSDictionary dictionaryWithDictionary:dict];
+            }
 
 #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 101200)
-			style.alignment = NSCenterTextAlignment;
+            style.alignment = NSCenterTextAlignment;
 #else
-			style.alignment = NSTextAlignmentCenter;
+            style.alignment = NSTextAlignmentCenter;
 #endif
-		}
-		else {
-			NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
+        }
+        else {
+            NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
 #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 101200)
-			style.alignment = NSCenterTextAlignment;
+            style.alignment = NSCenterTextAlignment;
 #else
-			style.alignment = NSTextAlignmentCenter;
+            style.alignment = NSTextAlignmentCenter;
 #endif
-			fontAttribs = @{
-					NSFontAttributeName           :[NSFont systemFontOfSize:13], // Font
-					NSForegroundColorAttributeName:[NSColor blackColor],         // Color
-					NSParagraphStyleAttributeName :style                         // Style
-			};
-		}
+            fontAttribs = @{
+                NSFontAttributeName           :[NSFont systemFontOfSize:13], // Font
+                NSForegroundColorAttributeName:[NSColor blackColor],         // Color
+                NSParagraphStyleAttributeName :style                         // Style
+            };
+        }
 
-		return fontAttribs;
-	}
+        return fontAttribs;
+    }
 
-	-(void)drawDeadCentered:(NSRect)textRect fontName:(NSString *)fontName fontSize:(NSFloat)fontSize fontColor:(NSColor *)fontColor {
-		NSFont *aFont = (fontName.length ? [NSFont fontWithName:fontName size:fontSize] : [NSFont systemFontOfSize:fontSize]);
-		[self drawDeadCentered:textRect font:aFont fontColor:fontColor];
-	}
+    -(void)drawDeadCentered:(NSRect)textRect fontName:(NSString *)fontName fontSize:(NSFloat)fontSize fontColor:(NSColor *)fontColor {
+        NSFont *aFont = (fontName.length ? [NSFont fontWithName:fontName size:fontSize] : [NSFont systemFontOfSize:fontSize]);
+        [self drawDeadCentered:textRect font:aFont fontColor:fontColor];
+    }
 
-	-(void)drawDeadCentered:(NSRect)textRect font:(NSFont *)font fontColor:(NSColor *)fontColor {
-		NSDictionary *textFontAttributes = @{
-				NSFontAttributeName           :(font ? font : [NSFont systemFontOfSize:13]),  // Draw Font
-				NSForegroundColorAttributeName:(fontColor ? fontColor : [NSColor blackColor]) // Draw Color
-		};
+    -(void)drawDeadCentered:(NSRect)textRect font:(NSFont *)font fontColor:(NSColor *)fontColor {
+        NSDictionary *textFontAttributes = @{
+            NSFontAttributeName           :(font ? font : [NSFont systemFontOfSize:13]),  // Draw Font
+            NSForegroundColorAttributeName:(fontColor ? fontColor : [NSColor blackColor]) // Draw Color
+        };
 
-		[self drawDeadCentered:textRect fontAttributes:textFontAttributes];
-	}
+        [self drawDeadCentered:textRect fontAttributes:textFontAttributes];
+    }
 
-	-(void)drawDeadCentered:(NSRect)textRect fontAttributes:(NSDictionary *)fontAttribs {
-		[self _drawDeadCentered:textRect fontAttribs:[self makeAlignmentCentered:fontAttribs]];
-	}
+    -(void)drawDeadCentered:(NSRect)textRect fontAttributes:(NSDictionary *)fontAttribs {
+        [self _drawDeadCentered:textRect fontAttribs:[self makeAlignmentCentered:fontAttribs]];
+    }
 
-	-(void)_drawDeadCentered:(NSRect)textRect fontAttribs:(NSDictionary *)fontAttribs {
-		NSFont  *textFont  = fontAttribs[NSFontAttributeName];
-		NSFloat textHeight = ceil(NSHeight([self boundingRectWithSize:textRect.size options:NSStringDrawingUsesLineFragmentOrigin attributes:fontAttribs]));
-		NSRect textRect2 = NSMakeRect(NSMinX(textRect), ceil(NSMinY(textRect) + (NSHeight(textRect) - textHeight) / 2), NSWidth(textRect), textHeight);
-		double offset    = ceil(0 - textFont.descender - (textFont.ascender - textFont.capHeight) / 2.0);
+    -(void)_drawDeadCentered:(NSRect)textRect fontAttribs:(NSDictionary *)fontAttribs {
+        NSFont  *textFont  = fontAttribs[NSFontAttributeName];
+        NSFloat textHeight = ceil(NSHeight([self boundingRectWithSize:textRect.size options:NSStringDrawingUsesLineFragmentOrigin attributes:fontAttribs]));
+        NSRect  textRect2  = NSMakeRect(NSMinX(textRect), ceil(NSMinY(textRect) + (NSHeight(textRect) - textHeight) / 2), NSWidth(textRect), textHeight);
+        double  offset     = ceil(0 - textFont.descender - (textFont.ascender - textFont.capHeight) / 2.0);
 
-		[NSGraphicsContext saveGraphicsState];
+        [NSGraphicsContext saveGraphicsState];
 
-		if([NSGraphicsContext currentContext].isFlipped) {
-			offset *= -1;
-		}
+        if([NSGraphicsContext currentContext].isFlipped) {
+            offset *= -1;
+        }
 
-		NSRectClip(textRect);
-		[self drawInRect:NSOffsetRect(textRect2, 0, offset) withAttributes:fontAttribs];
-		[NSGraphicsContext restoreGraphicsState];
-	}
+        NSRectClip(textRect);
+        [self drawInRect:NSOffsetRect(textRect2, 0, offset) withAttributes:fontAttribs];
+        [NSGraphicsContext restoreGraphicsState];
+    }
 
 @end

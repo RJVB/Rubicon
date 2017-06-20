@@ -25,53 +25,53 @@
 #import <Rubicon/Rubicon.h>
 
 @implementation PGTestView {
-	}
+    }
 
-	@synthesize fontSize = _fontSize;
+    @synthesize fontSize = _fontSize;
 
-	-(instancetype)initWithFrame:(NSRect)frameRect {
-		self = [super initWithFrame:frameRect];
+    -(instancetype)initWithFrame:(NSRect)frameRect {
+        self = [super initWithFrame:frameRect];
 
-		if(self) {
-			self.fontSize = 40;
-		}
+        if(self) {
+            self.fontSize = 40;
+        }
 
-		return self;
-	}
+        return self;
+    }
 
-	-(instancetype)initWithCoder:(NSCoder *)coder {
-		self = [super initWithCoder:coder];
+    -(instancetype)initWithCoder:(NSCoder *)coder {
+        self = [super initWithCoder:coder];
 
-		if(self) {
-			self.fontSize = 40;
-		}
+        if(self) {
+            self.fontSize = 40;
+        }
 
-		return self;
-	}
+        return self;
+    }
 
-	-(void)displayRect:(NSRect)rect {
-		[super displayRect:rect];
-	}
+    -(void)displayRect:(NSRect)rect {
+        [super displayRect:rect];
+    }
 
-	-(void)drawRect:(NSRect)dirtyRect {
-		[super drawRect:dirtyRect];
+    -(void)drawRect:(NSRect)dirtyRect {
+        [super drawRect:dirtyRect];
 
-		[NSGraphicsContext saveGraphicsState];
-		NSBezierPath *bp       = [NSBezierPath bezierPath];
-		CGFloat      midHeight = ceil((dirtyRect.size.height / 2.0) - 0.5);
+        [NSGraphicsContext saveGraphicsState];
+        NSBezierPath *bp       = [NSBezierPath bezierPath];
+        CGFloat      midHeight = ceil((dirtyRect.size.height / 2.0) - 0.5);
 
-		[bp moveToPoint:NSMakePoint(0, midHeight)];
-		[bp lineToPoint:NSMakePoint(dirtyRect.size.width, midHeight)];
-		[bp closePath];
-		[bp setLineWidth:1.0];
-		[NSColor.redColor setStroke];
-		[NSColor.redColor setFill];
-		[bp fill];
-		[bp stroke];
-		[NSGraphicsContext restoreGraphicsState];
+        [bp moveToPoint:NSMakePoint(0, midHeight)];
+        [bp lineToPoint:NSMakePoint(dirtyRect.size.width, midHeight)];
+        [bp closePath];
+        [bp setLineWidth:1.0];
+        [NSColor.redColor setStroke];
+        [NSColor.redColor setFill];
+        [bp fill];
+        [bp stroke];
+        [NSGraphicsContext restoreGraphicsState];
 
-		NSString *aString = @"Galen Rhodes gyjqp";
-		[aString drawDeadCentered:dirtyRect fontName:@".HelveticaNeueDeskInterface-MediumP4" fontSize:self.fontSize fontColor:NSColor.blackColor];
-	}
+        NSString *aString = @"Galen Rhodes gyjqp";
+        [aString drawDeadCentered:dirtyRect fontName:@".HelveticaNeueDeskInterface-MediumP4" fontSize:self.fontSize fontColor:NSColor.blackColor];
+    }
 
 @end

@@ -25,36 +25,36 @@
 #import "PGTimeSpec.h"
 
 @implementation PGTimedSemWait {
-		sem_t *_semaphore;
-	}
+        sem_t *_semaphore;
+    }
 
-	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime semaphore:(sem_t *)semaphore {
-		self = [super initWithTimeout:absTime];
+    -(instancetype)initWithTimeout:(PGTimeSpec *)absTime semaphore:(sem_t *)semaphore {
+        self = [super initWithTimeout:absTime];
 
-		if(self) {
-			_semaphore = semaphore;
-		}
+        if(self) {
+            _semaphore = semaphore;
+        }
 
-		return self;
-	}
+        return self;
+    }
 
-	-(BOOL)action:(id *)results {
-		*results = nil;
+    -(BOOL)action:(id *)results {
+        *results = nil;
 
-		if(sem_wait(_semaphore)) {
-			if(errno == EINTR && self.didTimeOut) {
-				return NO;
-			}
-			else {
-				@throw [NSException exceptionWithName:PGSemaphoreException reason:PGStrError(errno) userInfo:nil];
-			}
-		}
+        if(sem_wait(_semaphore)) {
+            if(errno == EINTR && self.didTimeOut) {
+                return NO;
+            }
+            else {
+                @throw [NSException exceptionWithName:PGSemaphoreException reason:PGStrError(errno) userInfo:nil];
+            }
+        }
 
-		return YES;
-	}
+        return YES;
+    }
 
-	-(void)dealloc {
-		_semaphore = SEM_FAILED;
-	}
+    -(void)dealloc {
+        _semaphore = SEM_FAILED;
+    }
 
 @end

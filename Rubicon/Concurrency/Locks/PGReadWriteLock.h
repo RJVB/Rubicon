@@ -31,21 +31,21 @@
 
 @interface PGReadWriteLock : NSObject<NSLocking>
 
-	-(instancetype)init;
+    -(instancetype)init;
 
-	-(void)lock;
+    -(void)lock;
 
-	-(void)writeLock;
+    -(void)writeLock;
 
-	-(BOOL)tryLock;
+    -(BOOL)tryLock;
 
-	-(BOOL)tryWriteLock;
+    -(BOOL)tryWriteLock;
 
-	-(BOOL)timedWriteLock:(PGTimeSpec *)absTime;
+    -(BOOL)timedWriteLock:(PGTimeSpec *)absTime;
 
-	-(BOOL)timedLock:(PGTimeSpec *)absTime;
+    -(BOOL)timedLock:(PGTimeSpec *)absTime;
 
-	-(void)unlock;
+    -(void)unlock;
 
 @end
 

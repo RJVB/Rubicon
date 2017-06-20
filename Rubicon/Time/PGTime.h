@@ -76,7 +76,7 @@ typedef TimeVal         *PTimeVal;
  * @return the number of nanoseconds representing the time value as a long long int.
  ******************************************************************************************************/
 NS_INLINE NSLong PGTimeValToNanos(PTimeVal tv) {
-	return (tv ? ((I64(tv->tv_sec) * PG_NANOS_PER_SECOND) + (I64(tv->tv_usec) * PG_NANOS_PER_MICRO)) : 0);
+    return (tv ? ((I64(tv->tv_sec) * PG_NANOS_PER_SECOND) + (I64(tv->tv_usec) * PG_NANOS_PER_MICRO)) : 0);
 }
 
 /**************************************************************************************************//**
@@ -87,16 +87,16 @@ NS_INLINE NSLong PGTimeValToNanos(PTimeVal tv) {
  * @return the pointer to the same time value structure.
  ******************************************************************************************************/
 NS_INLINE PTimeVal PGNanosToTimeVal(PTimeVal tv, NSLong nanos) {
-	if(!tv) {
-		tv = (PTimeVal)malloc(sizeof(TimeVal));
-	}
+    if(!tv) {
+        tv = (PTimeVal)malloc(sizeof(TimeVal));
+    }
 
-	if(tv) {
-		tv->tv_sec  = (long)(nanos / PG_NANOS_PER_SECOND);
-		tv->tv_usec = (int)((nanos % PG_NANOS_PER_SECOND) / PG_NANOS_PER_MICRO);
-	}
+    if(tv) {
+        tv->tv_sec  = (long)(nanos / PG_NANOS_PER_SECOND);
+        tv->tv_usec = (int)((nanos % PG_NANOS_PER_SECOND) / PG_NANOS_PER_MICRO);
+    }
 
-	return tv;
+    return tv;
 }
 
 /**************************************************************************************************//**
@@ -106,7 +106,7 @@ NS_INLINE PTimeVal PGNanosToTimeVal(PTimeVal tv, NSLong nanos) {
  * @return the number of nanoseconds representing the time specification as a long long int.
  ******************************************************************************************************/
 NS_INLINE NSLong PGTimeSpecToNanos(const PTimeSpec tp) {
-	return (NSLong)(tp ? ((I64(tp->tv_sec) * PG_NANOS_PER_SECOND) + I64(tp->tv_nsec)) : 0);
+    return (NSLong)(tp ? ((I64(tp->tv_sec) * PG_NANOS_PER_SECOND) + I64(tp->tv_nsec)) : 0);
 }
 
 /**************************************************************************************************//**
@@ -117,12 +117,12 @@ NS_INLINE NSLong PGTimeSpecToNanos(const PTimeSpec tp) {
  * @return the pointer to the same time specification structure.
  ******************************************************************************************************/
 NS_INLINE PTimeSpec PGNanosToTimeSpec(PTimeSpec tp, NSLong nanos) {
-	if(tp) {
-		tp->tv_sec  = (long)(nanos / PG_NANOS_PER_SECOND);
-		tp->tv_nsec = (long)(nanos % PG_NANOS_PER_SECOND);
-	}
+    if(tp) {
+        tp->tv_sec  = (long)(nanos / PG_NANOS_PER_SECOND);
+        tp->tv_nsec = (long)(nanos % PG_NANOS_PER_SECOND);
+    }
 
-	return tp;
+    return tp;
 }
 
 /**************************************************************************************************//**
@@ -133,7 +133,7 @@ NS_INLINE PTimeSpec PGNanosToTimeSpec(PTimeSpec tp, NSLong nanos) {
  * @return the time specifier.
  ******************************************************************************************************/
 NS_INLINE PTimeSpec PGAddNanosToTimeSpec(PTimeSpec tp, NSLong nanos) {
-	return PGNanosToTimeSpec(tp, (PGTimeSpecToNanos(tp) + nanos));
+    return PGNanosToTimeSpec(tp, (PGTimeSpecToNanos(tp) + nanos));
 }
 
 /**************************************************************************************************//**
@@ -145,8 +145,8 @@ NS_INLINE PTimeSpec PGAddNanosToTimeSpec(PTimeSpec tp, NSLong nanos) {
  *      tp2. NSOrderedDescending if tp1 occurs after tp2.
  ******************************************************************************************************/
 NS_INLINE NSComparisonResult PGCompareTimeSpecs(PTimeSpec tp1, PTimeSpec tp2) {
-	NSLong n1 = PGTimeSpecToNanos(tp1), n2 = PGTimeSpecToNanos(tp2);
-	return (n1 < n2 ? NSOrderedAscending : (n1 > n2 ? NSOrderedDescending : NSOrderedSame));
+    NSLong n1 = PGTimeSpecToNanos(tp1), n2 = PGTimeSpecToNanos(tp2);
+    return (n1 < n2 ? NSOrderedAscending : (n1 > n2 ? NSOrderedDescending : NSOrderedSame));
 }
 
 /**************************************************************************************************//**
@@ -158,11 +158,12 @@ NS_INLINE NSComparisonResult PGCompareTimeSpecs(PTimeSpec tp1, PTimeSpec tp2) {
  *      tv2. NSOrderedDescending if tv1 occurs after tv2.
  ******************************************************************************************************/
 NS_INLINE NSComparisonResult PGCompareTimeVals(PTimeVal tv1, PTimeVal tv2) {
-	NSLong n1 = PGTimeValToNanos(tv1), n2 = PGTimeValToNanos(tv2);
-	return (n1 < n2 ? NSOrderedAscending : (n1 > n2 ? NSOrderedDescending : NSOrderedSame));
+    NSLong n1 = PGTimeValToNanos(tv1), n2 = PGTimeValToNanos(tv2);
+    return (n1 < n2 ? NSOrderedAscending : (n1 > n2 ? NSOrderedDescending : NSOrderedSame));
 }
 
 #ifdef __APPLE__
+
 #import <mach/mach_time.h>
 #import <sys/time.h>
 
@@ -177,12 +178,12 @@ FOUNDATION_EXPORT double                    machTimeFactor;
  * @return The value of the system clock plus any additional time.
  ******************************************************************************************************/
 NS_INLINE NSLong PGSystemCPUTime(NSLong delta) {
-	if(machTimebaseInfo.denom == 0) {
-		mach_timebase_info(&machTimebaseInfo);
-		machTimeFactor = (D64(machTimebaseInfo.numer) / D64(machTimebaseInfo.denom));
-	}
+    if(machTimebaseInfo.denom == 0) {
+        mach_timebase_info(&machTimebaseInfo);
+        machTimeFactor = (D64(machTimebaseInfo.numer) / D64(machTimebaseInfo.denom));
+    }
 
-	return (I64(D64(mach_absolute_time()) * machTimeFactor) + delta);
+    return (I64(D64(mach_absolute_time()) * machTimeFactor) + delta);
 }
 
 /**************************************************************************************************//**
@@ -193,9 +194,9 @@ NS_INLINE NSLong PGSystemCPUTime(NSLong delta) {
  * @return The value of the system clock plus any additional time.
  ******************************************************************************************************/
 NS_INLINE NSLong PGSystemRealTime(NSLong delta) {
-	TimeVal tv;
-	gettimeofday(&tv, NULL);
-	return (PGTimeValToNanos(&tv) + delta);
+    TimeVal tv;
+    gettimeofday(&tv, NULL);
+    return (PGTimeValToNanos(&tv) + delta);
 }
 
 #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 101200)
@@ -222,13 +223,13 @@ int clock_gettime(int clk_id, PTimeSpec tp);
  * @return The value of the system clock plus any additional time.
  ******************************************************************************************************/
 NS_INLINE NSLong PGSystemRealTime(NSLong delta) {
-	TimeSpec tm = { 0, 0 };
+TimeSpec tm = { 0, 0 };
 
-	if(clock_gettime(CLOCK_REALTIME, &tm)) {
-		@throw [NSException exceptionWithName:NSGenericException reason:errnoAsNSString(errno) userInfo:nil];
-	}
+if(clock_gettime(CLOCK_REALTIME, &tm)) {
+@throw [NSException exceptionWithName:NSGenericException reason:errnoAsNSString(errno) userInfo:nil];
+}
 
-	return (PGTimeSpecToNanos(&tm) + delta);
+return (PGTimeSpecToNanos(&tm) + delta);
 }
 
 /**************************************************************************************************//**
@@ -239,13 +240,13 @@ NS_INLINE NSLong PGSystemRealTime(NSLong delta) {
  * @return The value of the system clock plus any additional time.
  ******************************************************************************************************/
 NS_INLINE NSLong PGSystemCPUTime(NSLong delta) {
-	TimeSpec tm = { 0, 0 };
+TimeSpec tm = { 0, 0 };
 
-	if(clock_gettime(CLOCK_MONOTONIC_RAW, &tm)) {
-		@throw [NSException exceptionWithName:NSGenericException reason:errnoAsNSString(errno) userInfo:nil];
-	}
+if(clock_gettime(CLOCK_MONOTONIC_RAW, &tm)) {
+@throw [NSException exceptionWithName:NSGenericException reason:errnoAsNSString(errno) userInfo:nil];
+}
 
-	return (PGTimeSpecToNanos(&tm) + delta);
+return (PGTimeSpecToNanos(&tm) + delta);
 }
 
 #endif

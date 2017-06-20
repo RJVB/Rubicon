@@ -33,9 +33,9 @@
 
 @interface PGTimedSemWait : PGTimedWait
 
-	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime semaphore:(sem_t *)semaphore;
+    -(instancetype)initWithTimeout:(PGTimeSpec *)absTime semaphore:(sem_t *)semaphore;
 
-	-(BOOL)action:(id *)results;
+    -(BOOL)action:(id *)results;
 
 @end
 

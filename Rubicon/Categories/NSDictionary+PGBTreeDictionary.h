@@ -31,17 +31,17 @@
 
 @interface NSDictionary(PGBTreeDictionary)
 
-	+(PGBTreeDictionary *)btreeDictionary;
+    +(PGBTreeDictionary *)btreeDictionary;
 
-	+(PGBTreeDictionary *)btreeDictionaryWithDictionary:(NSDictionary *)dict;
+    +(PGBTreeDictionary *)btreeDictionaryWithDictionary:(NSDictionary *)dict;
 
-	+(PGBTreeDictionary *)btreeDictionaryWithObject:(id)anObject forKey:(id<NSCopying>)aKey;
+    +(PGBTreeDictionary *)btreeDictionaryWithObject:(id)anObject forKey:(id<NSCopying>)aKey;
 
-	+(PGBTreeDictionary *)btreeDictionaryWithCoder:(NSCoder *)coder;
+    +(PGBTreeDictionary *)btreeDictionaryWithCoder:(NSCoder *)coder;
 
-	+(PGBTreeDictionary *)btreeDictionaryWithContentsOfFile:(NSString *)path;
+    +(PGBTreeDictionary *)btreeDictionaryWithContentsOfFile:(NSString *)path;
 
-	+(PGBTreeDictionary *)btreeDictionaryWithContentsOfURL:(NSURL *)url;
+    +(PGBTreeDictionary *)btreeDictionaryWithContentsOfURL:(NSURL *)url;
 
 @end
 

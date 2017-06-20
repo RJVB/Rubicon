@@ -25,53 +25,53 @@
 #import "NSObject+PGObject.h"
 
 NSBitmapImageRep *PGCreateARGBImage(NSFloat width, NSFloat height) {
-	NSInteger iWidth  = (NSInteger)ceil(width);
-	NSInteger iHeight = (NSInteger)ceil(height);
+    NSInteger iWidth  = (NSInteger)ceil(width);
+    NSInteger iHeight = (NSInteger)ceil(height);
 
-	return [[NSBitmapImageRep alloc]
-							  initWithBitmapDataPlanes:NULL
-											pixelsWide:iWidth
-											pixelsHigh:iHeight
-										 bitsPerSample:PGBitsPerField
-									   samplesPerPixel:PGFieldsPerPixel
-											  hasAlpha:YES
-											  isPlanar:NO
-										colorSpaceName:NSDeviceRGBColorSpace
-										  bitmapFormat:NSAlphaFirstBitmapFormat
-										   bytesPerRow:(iWidth * PGFieldsPerPixel)
-										  bitsPerPixel:(PGBitsPerField * PGFieldsPerPixel)];
+    return [[NSBitmapImageRep alloc]
+                              initWithBitmapDataPlanes:NULL
+                                            pixelsWide:iWidth
+                                            pixelsHigh:iHeight
+                                         bitsPerSample:PGBitsPerField
+                                       samplesPerPixel:PGFieldsPerPixel
+                                              hasAlpha:YES
+                                              isPlanar:NO
+                                        colorSpaceName:NSDeviceRGBColorSpace
+                                          bitmapFormat:NSAlphaFirstBitmapFormat
+                                           bytesPerRow:(iWidth * PGFieldsPerPixel)
+                                          bitsPerPixel:(PGBitsPerField * PGFieldsPerPixel)];
 }
 
 BOOL PGSaveImageAsPNG(NSBitmapImageRep *image, NSString *filename, NSError **error) {
-	NSData *pngData = [image representationUsingType:NSPNGFileType properties:@{}];
-	return [pngData writeToFile:filename options:0 error:error];
+    NSData *pngData = [image representationUsingType:NSPNGFileType properties:@{}];
+    return [pngData writeToFile:filename options:0 error:error];
 }
 
 NSString *PGStrError(int osErrNo) {
-	return [NSString stringWithUTF8String:strerror(osErrNo)];
+    return [NSString stringWithUTF8String:strerror(osErrNo)];
 }
 
 NSString *PGFormat(NSString *fmt, ...) {
-	va_list  args;
-	NSString *str = nil;
-	va_start(args, fmt);
-	str = [[NSString alloc] initWithFormat:fmt arguments:args];
-	va_end(args);
-	return str;
+    va_list  args;
+    NSString *str = nil;
+    va_start(args, fmt);
+    str = [[NSString alloc] initWithFormat:fmt arguments:args];
+    va_end(args);
+    return str;
 }
 
 NSComparisonResult PGCompare(id obj1, id obj2) {
-	if(obj1 && obj2) {
-		Class cls = [obj1 baseClassInCommonWith:obj2];
-		if([cls instancesRespondToSelector:@selector(compare:)]) {
-			return [obj1 compare:obj2];
-		}
-		else {
-			NSString *reason = PGFormat(@"Class %@ cannot be compared to class %@.", NSStringFromClass([obj1 class]), NSStringFromClass([obj2 class]));
-			@throw [NSException exceptionWithName:NSInvalidArgumentException reason:reason userInfo:nil];
-		}
-	}
-	else {
-		return (obj2 ? NSOrderedAscending : (obj1 ? NSOrderedDescending : NSOrderedSame));
-	}
+    if(obj1 && obj2) {
+        Class cls = [obj1 baseClassInCommonWith:obj2];
+        if([cls instancesRespondToSelector:@selector(compare:)]) {
+            return [obj1 compare:obj2];
+        }
+        else {
+            NSString *reason = PGFormat(@"Class %@ cannot be compared to class %@.", NSStringFromClass([obj1 class]), NSStringFromClass([obj2 class]));
+            @throw [NSException exceptionWithName:NSInvalidArgumentException reason:reason userInfo:nil];
+        }
+    }
+    else {
+        return (obj2 ? NSOrderedAscending : (obj1 ? NSOrderedDescending : NSOrderedSame));
+    }
 }

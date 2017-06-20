@@ -31,16 +31,16 @@
 
 @interface PGTimedWait : NSObject
 
-	@property(atomic, readonly, copy) PGTimeSpec *absTime;
-	@property(atomic, readonly) volatile BOOL didTimeOut;
+    @property(atomic, readonly, copy) PGTimeSpec *absTime;
+    @property(atomic, readonly) volatile BOOL    didTimeOut;
 
-	-(instancetype)initWithTimeout:(PGTimeSpec *)absTime;
+    -(instancetype)initWithTimeout:(PGTimeSpec *)absTime;
 
-	-(BOOL)timedAction:(id *)results;
+    -(BOOL)timedAction:(id *)results;
 
-	-(BOOL)timedAction;
+    -(BOOL)timedAction;
 
-	-(BOOL)action:(id *)results;
+    -(BOOL)action:(id *)results;
 
 @end
 

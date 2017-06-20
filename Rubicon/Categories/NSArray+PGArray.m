@@ -25,38 +25,38 @@
 
 @implementation NSArray(PGArray)
 
-	-(BOOL)containsIdenticalObjectsAsArray:(NSArray<id> *)array {
-		if(array == self) return YES;
+    -(BOOL)containsIdenticalObjectsAsArray:(NSArray<id> *)array {
+        if(array == self) return YES;
 
-		NSUInteger i = array.count;
-		NSUInteger j = self.count;
+        NSUInteger i = array.count;
+        NSUInteger j = self.count;
 
-		if(i == j) {
-			for(NSUInteger x = 0; x < j; x++) {
-				if(self[x] != array[x]) return NO;
-			}
+        if(i == j) {
+            for(NSUInteger x = 0; x < j; x++) {
+                if(self[x] != array[x]) return NO;
+            }
 
-			return YES;
-		}
+            return YES;
+        }
 
-		return NO;
-	}
+        return NO;
+    }
 
-	-(NSString *)componentsJoinedByString:(NSString *)string fromIndex:(NSUInteger)idx {
-		if(idx > self.count) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Index out of bounds." userInfo:nil];
-		if(idx == self.count) return @"";
-		return [[self subarrayWithRange:NSMakeRange(idx, self.count - idx)] componentsJoinedByString:string];
-	}
+    -(NSString *)componentsJoinedByString:(NSString *)string fromIndex:(NSUInteger)idx {
+        if(idx > self.count) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Index out of bounds." userInfo:nil];
+        if(idx == self.count) return @"";
+        return [[self subarrayWithRange:NSMakeRange(idx, self.count - idx)] componentsJoinedByString:string];
+    }
 
-	-(NSString *)componentsJoinedByString:(NSString *)string toIndex:(NSUInteger)idx {
-		if(idx > self.count) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Index out of bounds." userInfo:nil];
-		if(idx == self.count) return [self componentsJoinedByString:string];
-		if(idx == 0) return @"";
-		return [[self subarrayWithRange:NSMakeRange(0, idx)] componentsJoinedByString:string];
-	}
+    -(NSString *)componentsJoinedByString:(NSString *)string toIndex:(NSUInteger)idx {
+        if(idx > self.count) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Index out of bounds." userInfo:nil];
+        if(idx == self.count) return [self componentsJoinedByString:string];
+        if(idx == 0) return @"";
+        return [[self subarrayWithRange:NSMakeRange(0, idx)] componentsJoinedByString:string];
+    }
 
-	-(NSString *)componentsJoinedByString:(NSString *)string inRange:(NSRange)range {
-		return [[self subarrayWithRange:range] componentsJoinedByString:string];
-	}
+    -(NSString *)componentsJoinedByString:(NSString *)string inRange:(NSRange)range {
+        return [[self subarrayWithRange:range] componentsJoinedByString:string];
+    }
 
 @end

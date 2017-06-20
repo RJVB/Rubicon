@@ -29,49 +29,49 @@
 
 @interface PGBTreeDictionary : NSDictionary
 
-	-(instancetype)init;
+    -(instancetype)init;
 
-	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt;
+    -(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt;
 
-	-(instancetype)initWithObject:(const id)object forKey:(const id<NSCopying>)key;
+    -(instancetype)initWithObject:(const id)object forKey:(const id<NSCopying>)key;
 
-	-(instancetype)initWithCoder:(NSCoder *)coder;
+    -(instancetype)initWithCoder:(NSCoder *)coder;
 
-	-(instancetype)initWithContentsOfFile:(NSString *)path;
+    -(instancetype)initWithContentsOfFile:(NSString *)path;
 
-	-(instancetype)initWithContentsOfURL:(NSURL *)url;
+    -(instancetype)initWithContentsOfURL:(NSURL *)url;
 
-	-(id)objectForKey:(id)aKey;
+    -(id)objectForKey:(id)aKey;
 
-	-(NSEnumerator *)keyEnumerator;
+    -(NSEnumerator *)keyEnumerator;
 
 @end
 
 @interface PGBTreeMutableDictionary : NSMutableDictionary
 
-	-(instancetype)init;
+    -(instancetype)init;
 
-	-(instancetype)initWithCapacity:(NSUInteger)numItems;
+    -(instancetype)initWithCapacity:(NSUInteger)numItems;
 
-	-(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt;
+    -(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt;
 
-	-(instancetype)initWithObject:(const id)object forKey:(const id<NSCopying>)key;
+    -(instancetype)initWithObject:(const id)object forKey:(const id<NSCopying>)key;
 
-	-(instancetype)initWithCoder:(NSCoder *)coder;
+    -(instancetype)initWithCoder:(NSCoder *)coder;
 
-	-(instancetype)initWithContentsOfFile:(NSString *)path;
+    -(instancetype)initWithContentsOfFile:(NSString *)path;
 
-	-(instancetype)initWithContentsOfURL:(NSURL *)url;
+    -(instancetype)initWithContentsOfURL:(NSURL *)url;
 
-	-(id)objectForKey:(id)aKey;
+    -(id)objectForKey:(id)aKey;
 
-	-(NSEnumerator *)keyEnumerator;
+    -(NSEnumerator *)keyEnumerator;
 
-	-(void)removeObjectForKey:(id)aKey;
+    -(void)removeObjectForKey:(id)aKey;
 
-	-(void)setObject:(id)anObject forKey:(id<NSCopying>)aKey;
+    -(void)setObject:(id)anObject forKey:(id<NSCopying>)aKey;
 
-	-(void)removeAllObjects;
+    -(void)removeAllObjects;
 @end
 
 #endif //__Rubicon_PGBTreeDictionary_H_

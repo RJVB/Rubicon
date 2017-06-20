@@ -25,39 +25,39 @@
 #import "NSObject+PGObject.h"
 
 @implementation PGKeyValueData {
-	}
+    }
 
-	@synthesize key = _key;
-	@synthesize value = _value;
+    @synthesize key = _key;
+    @synthesize value = _value;
 
-	-(instancetype)initWithValue:(id)value forKey:(id<NSCopying>)key {
-		self = [super init];
+    -(instancetype)initWithValue:(id)value forKey:(id<NSCopying>)key {
+        self = [super init];
 
-		if(self) {
-			if(value) {
-				if(key && [(id)key respondsToSelector:@selector(compare:)]) {  // I love reflection and instrospection.
-					_key = [(id)key copy];
-					self.value = value;
-				}
-				else {
-					NSString *reason = (key ? @"Key cannot be null." : @"Key must respond to the compare: selector.");
-					@throw [NSException exceptionWithName:NSInvalidArgumentException reason:reason userInfo:nil];
-				}
-			}
-			else {
-				@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Value cannot be null." userInfo:nil];
-			}
-		}
+        if(self) {
+            if(value) {
+                if(key && [(id)key respondsToSelector:@selector(compare:)]) {  // I love reflection and instrospection.
+                    _key = [(id)key copy];
+                    self.value = value;
+                }
+                else {
+                    NSString *reason = (key ? @"Key cannot be null." : @"Key must respond to the compare: selector.");
+                    @throw [NSException exceptionWithName:NSInvalidArgumentException reason:reason userInfo:nil];
+                }
+            }
+            else {
+                @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Value cannot be null." userInfo:nil];
+            }
+        }
 
-		return self;
-	}
+        return self;
+    }
 
-	+(instancetype)dataWithValue:(id)value forKey:(id)key {
-		return [[self alloc] initWithValue:value forKey:key];
-	}
+    +(instancetype)dataWithValue:(id)value forKey:(id)key {
+        return [[self alloc] initWithValue:value forKey:key];
+    }
 
-	-(NSComparisonResult)compare:(PGKeyValueData *)kvData {
-		return (kvData ? PGCompare(self.key, kvData.key) : NSOrderedDescending);
-	}
+    -(NSComparisonResult)compare:(PGKeyValueData *)kvData {
+        return (kvData ? PGCompare(self.key, kvData.key) : NSOrderedDescending);
+    }
 
 @end

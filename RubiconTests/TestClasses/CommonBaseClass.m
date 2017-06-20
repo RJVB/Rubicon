@@ -24,42 +24,42 @@
 #import "CommonBaseClass.h"
 
 @implementation CommonBaseClass {
-	}
+    }
 
-	-(NSString *)description {
-		NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
+    -(NSString *)description {
+        NSMutableString *description = [NSMutableString stringWithFormat:@"<%@: ", NSStringFromClass([self class])];
 
-		[description appendString:@">"];
-		return description;
-	}
+        [description appendString:@">"];
+        return description;
+    }
 @end
 
 @implementation Subclass1A {
-	}
+    }
 @end
 
 @implementation Subclass1B {
-	}
+    }
 @end
 
 @implementation Subclass1C {
-	}
+    }
 @end
 
 @implementation Subclass1D {
-	}
+    }
 @end
 
 @implementation Subclass2A {
-	}
+    }
 @end
 
 @implementation Subclass2B {
-	}
+    }
 @end
 
 @implementation Subclass2C {
-	}
+    }
 
 @end
 

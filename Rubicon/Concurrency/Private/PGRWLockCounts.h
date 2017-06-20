@@ -28,19 +28,17 @@
 #import <Cocoa/Cocoa.h>
 
 typedef enum {
-	PGRWNoLockHeld,
-	PGRWReadLockHeld,
-	PGRWWriteLockHeld
+    PGRWNoLockHeld, PGRWReadLockHeld, PGRWWriteLockHeld
 } PGRWCurrentLock;
 
 @interface PGRWLockCounts : NSObject
 
-	@property(readwrite) NSUInteger      count;
-	@property(readwrite) PGRWCurrentLock currentLock;
+    @property(readwrite) NSUInteger      count;
+    @property(readwrite) PGRWCurrentLock currentLock;
 
-	-(instancetype)init;
+    -(instancetype)init;
 
-	+(instancetype)counts;
+    +(instancetype)counts;
 
 @end
 

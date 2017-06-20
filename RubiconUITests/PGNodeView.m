@@ -24,51 +24,51 @@
 #import "PGNodeView.h"
 
 @implementation PGNodeView {
-	}
+    }
 
-	@synthesize rootNode = _rootNode;
+    @synthesize rootNode = _rootNode;
 
-	-(NSRect)minimumFrame {
-		NSSize size = NSZeroSize; // (_rootNode ? _rootNode.drawSize : NSZeroSize);
-		return NSMakeRect(0, 0, (size.width + 20.0), (size.height + 20.0));
-	}
+    -(NSRect)minimumFrame {
+        NSSize size = NSZeroSize; // (_rootNode ? _rootNode.drawSize : NSZeroSize);
+        return NSMakeRect(0, 0, (size.width + 20.0), (size.height + 20.0));
+    }
 
-	-(NSRect)desiredFrame {
-		NSRect nframe = self.minimumFrame;
-		NSRect aframe = self.superview.frame;
-		NSRect pframe = NSOffsetRect(aframe, 0 - NSMinX(aframe), 0 - NSMinY(aframe));
-		return NSMakeRect(0, 0, MAX(NSWidth(nframe), NSWidth(pframe)), MAX(NSHeight(nframe), NSHeight(pframe)));
-	}
+    -(NSRect)desiredFrame {
+        NSRect nframe = self.minimumFrame;
+        NSRect aframe = self.superview.frame;
+        NSRect pframe = NSOffsetRect(aframe, 0 - NSMinX(aframe), 0 - NSMinY(aframe));
+        return NSMakeRect(0, 0, MAX(NSWidth(nframe), NSWidth(pframe)), MAX(NSHeight(nframe), NSHeight(pframe)));
+    }
 
-	-(void)setRootNode:(PGBinaryTreeNode *)rootNode {
-		_rootNode = rootNode;
-		if(_rootNode) [self setFrame:self.desiredFrame];
-		self.needsDisplay = YES;
-	}
+    -(void)setRootNode:(PGBinaryTreeNode *)rootNode {
+        _rootNode = rootNode;
+        if(_rootNode) [self setFrame:self.desiredFrame];
+        self.needsDisplay = YES;
+    }
 
-	-(void)setFrame:(NSRect)frame {
-		if(self.rootNode) {
-			NSRect dframe = self.desiredFrame;
-			if(!NSContainsRect(frame, dframe)) frame = dframe;
-		}
+    -(void)setFrame:(NSRect)frame {
+        if(self.rootNode) {
+            NSRect dframe = self.desiredFrame;
+            if(!NSContainsRect(frame, dframe)) frame = dframe;
+        }
 
-		[super setFrame:frame];
-	}
+        [super setFrame:frame];
+    }
 
-	-(BOOL)isFlipped {
-		return YES;
-	}
+    -(BOOL)isFlipped {
+        return YES;
+    }
 
-	-(void)drawRect:(NSRect)dirtyRect {
-		[[NSColor whiteColor] setFill];
-		[NSBezierPath fillRect:dirtyRect];
+    -(void)drawRect:(NSRect)dirtyRect {
+        [[NSColor whiteColor] setFill];
+        [NSBezierPath fillRect:dirtyRect];
 
-		if(self.rootNode) {
-			// [self.rootNode draw:self.frame];
-		}
-		else {
-			[@"Nothing to show" drawDeadCentered:dirtyRect fontName:@"AmericanTypewriter-Light" fontSize:18 fontColor:[NSColor blackColor]];
-		}
-	}
+        if(self.rootNode) {
+            // [self.rootNode draw:self.frame];
+        }
+        else {
+            [@"Nothing to show" drawDeadCentered:dirtyRect fontName:@"AmericanTypewriter-Light" fontSize:18 fontColor:[NSColor blackColor]];
+        }
+    }
 
 @end
