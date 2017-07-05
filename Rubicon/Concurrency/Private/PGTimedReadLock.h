@@ -25,9 +25,7 @@
 #ifndef __Rubicon_PGTimedReadLock_H_
 #define __Rubicon_PGTimedReadLock_H_
 
-#import <Cocoa/Cocoa.h>
-#import "PGTimedWait.h"
-#import <Rubicon/PGTimeSpec.h>
+#import <Rubicon/PGTimedWait.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

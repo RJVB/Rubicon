@@ -111,12 +111,12 @@
 
 #ifdef __APPLE__
 
-#include <Rubicon/sem_timedwait.h>
 #include <time.h>
 #include <sys/time.h>
 #include <pthread.h>
 #include <errno.h>
 #include <signal.h>
+#include "sem_timedwait.h"
 
 /*  Some useful definitions - TRUE, FALSE, and DEBUG */
 

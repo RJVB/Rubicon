@@ -25,9 +25,7 @@
 #ifndef __Rubicon_PGTimedWait_H_
 #define __Rubicon_PGTimedWait_H_
 
-#import <Rubicon/PGTools.h>
-
-@class PGTimeSpec;
+#import <Rubicon/PGTimeSpec.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -22,7 +22,6 @@
  *******************************************************************************/
 
 #import "PGTimedSemWait.h"
-#import "PGTimeSpec.h"
 
 @implementation PGTimedSemWait {
         sem_t *_semaphore;

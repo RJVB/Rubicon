@@ -25,7 +25,7 @@
 #ifndef __Rubicon_NSObject_PGObject__H_
 #define __Rubicon_NSObject_PGObject__H_
 
-#import "PGTools.h"
+#import <Rubicon/PGTools.h>
 
 Class PGCommonBaseClass(Class c1, Class c2);
 

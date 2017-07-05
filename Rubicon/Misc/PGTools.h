@@ -25,7 +25,6 @@
 #ifndef __Rubicon_PGTools_H_
 #define __Rubicon_PGTools_H_
 
-#import <Foundation/Foundation.h>
 #import <Rubicon/PGTime.h>
 
 /*

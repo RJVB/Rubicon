@@ -21,8 +21,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
+#import "PGBTreeNode.h"
 #import "PGBTreeNodePriv.h"
-#import "PGTools.h"
 
 PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left) : node); }
 

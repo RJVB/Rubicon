@@ -30,7 +30,7 @@
 #ifndef __Rubicon_PGBase64OutputStream_H_
 #define __Rubicon_PGBase64OutputStream_H_
 
-#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGTools.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

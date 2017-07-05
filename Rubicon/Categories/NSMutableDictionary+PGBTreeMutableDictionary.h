@@ -25,7 +25,7 @@
 #ifndef __Rubicon_NSMutableDictionary_PGBTreeMutableDictionary__H_
 #define __Rubicon_NSMutableDictionary_PGBTreeMutableDictionary__H_
 
-#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGTools.h>
 
 @class PGBTreeMutableDictionary;
 

@@ -74,7 +74,9 @@ typedef NSString *_Nonnull (^PGMacroHandler)(NSString *_Nonnull label, NSString 
 
     +(NSString *)stringByProcessingMacrosIn:(NSString *)aString
                                   withRegex:(NSString *)macroRegex
-                                 andHandler:(PGMacroHandler)macroHandler options:(NSRegularExpressionOptions)options error:(NSError *_Nullable *)error;
+                                 andHandler:(PGMacroHandler)macroHandler
+                                    options:(NSRegularExpressionOptions)options
+                                      error:(NSError *_Nullable *)error;
 
     +(NSString *)stringByProcessingMacrosIn:(NSString *)aString
                                 withHandler:(PGMacroHandler)macroHandler

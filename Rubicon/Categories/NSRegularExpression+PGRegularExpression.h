@@ -24,7 +24,7 @@
 #ifndef __Rubicon_NSRegularExpression_PGRegularExpression__H_
 #define __Rubicon_NSRegularExpression_PGRegularExpression__H_
 
-#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGTools.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

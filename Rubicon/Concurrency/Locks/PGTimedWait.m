@@ -28,8 +28,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import <Rubicon/Rubicon.h>
 #include <pthread.h>
+#import "PGTimedWait.h"
 
 void ignoreSignal(int _signal);
 

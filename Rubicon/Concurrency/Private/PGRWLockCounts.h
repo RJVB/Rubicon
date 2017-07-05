@@ -25,7 +25,7 @@
 #ifndef __Rubicon_PGRWLockCounts_H_
 #define __Rubicon_PGRWLockCounts_H_
 
-#import <Cocoa/Cocoa.h>
+#import <Rubicon/PGTools.h>
 
 typedef enum {
     PGRWNoLockHeld, PGRWReadLockHeld, PGRWWriteLockHeld

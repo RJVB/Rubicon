@@ -25,11 +25,9 @@
 #ifndef __Rubicon_PGTimedSemWait_H_
 #define __Rubicon_PGTimedSemWait_H_
 
+#import <Rubicon/PGTimedWait.h>
 #include <semaphore.h>
-#import <Cocoa/Cocoa.h>
-#import "PGTimedWait.h"
 
-@class PGTimeSpec;
 NS_ASSUME_NONNULL_BEGIN
 
 @interface PGTimedSemWait : PGTimedWait

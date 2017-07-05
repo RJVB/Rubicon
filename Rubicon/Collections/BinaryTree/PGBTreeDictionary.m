@@ -21,6 +21,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
+#import "PGBTreeDictionary.h"
 #import "PGBTreeDictionaryKeyEnumerator.h"
 
 #pragma clang diagnostic push

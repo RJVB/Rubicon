@@ -22,8 +22,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import <Cocoa/Cocoa.h>
-
 #import <Rubicon/sem_timedwait.h>
 #import <Rubicon/NSObject+PGObject.h>
 #import <Rubicon/NSString+PGString.h>
