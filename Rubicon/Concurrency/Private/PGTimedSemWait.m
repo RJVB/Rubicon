@@ -39,7 +39,7 @@
     }
 
     -(BOOL)action:(id *)results {
-        *results = nil;
+        if(results) *results = nil;
 
         if(sem_wait(_semaphore)) {
             if(errno == EINTR && self.didTimeOut) {

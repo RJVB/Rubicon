@@ -27,11 +27,13 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface PGEmptyEnumerator : NSEnumerator
+NS_ASSUME_NONNULL_BEGIN
 
-    -(id)nextObject;
+@interface PGEmptyEnumerator<__covariant T> : NSEnumerator<T>
 
-    -(NSArray *)allObjects;
+    -(nullable T)nextObject;
+
+    -(NSArray<T> *)allObjects;
 
     -(instancetype)init;
 
@@ -39,4 +41,5 @@
 
 @end
 
+NS_ASSUME_NONNULL_END
 #endif //__Rubicon_PGEmptyEnumerator_H_

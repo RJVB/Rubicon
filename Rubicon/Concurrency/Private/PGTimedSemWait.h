@@ -30,13 +30,15 @@
 #import "PGTimedWait.h"
 
 @class PGTimeSpec;
+NS_ASSUME_NONNULL_BEGIN
 
 @interface PGTimedSemWait : PGTimedWait
 
     -(instancetype)initWithTimeout:(PGTimeSpec *)absTime semaphore:(sem_t *)semaphore;
 
-    -(BOOL)action:(id *)results;
+    -(BOOL)action:(id _Nullable *_Nullable)results;
 
 @end
 
+NS_ASSUME_NONNULL_END
 #endif //__Rubicon_PGTimedSemWait_H_

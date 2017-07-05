@@ -61,8 +61,12 @@ NSString *PGFormat(NSString *fmt, ...) {
 }
 
 NSComparisonResult PGCompare(id obj1, id obj2) {
-    if(obj1 && obj2) {
+    if(obj1 == obj2) {
+        return NSOrderedSame;
+    }
+    else if(obj1 && obj2) {
         Class cls = [obj1 baseClassInCommonWith:obj2];
+
         if([cls instancesRespondToSelector:@selector(compare:)]) {
             return [obj1 compare:obj2];
         }
@@ -72,6 +76,6 @@ NSComparisonResult PGCompare(id obj1, id obj2) {
         }
     }
     else {
-        return (obj2 ? NSOrderedAscending : (obj1 ? NSOrderedDescending : NSOrderedSame));
+        return (obj2 ? NSOrderedAscending : NSOrderedDescending);
     }
 }

@@ -27,6 +27,8 @@
 
 #import <Rubicon/PGTools.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**************************************************************************************************//**
  * This is simply an object wrapper around the standard C timespec structure.  This class makes no
  * assumptions about the meaning of the time that it has stored other than the seconds field must be
@@ -61,7 +63,7 @@
 
     -(NSUInteger)hash;
 
-    -(id)copyWithZone:(NSZone *)zone;
+    -(id)copyWithZone:(nullable NSZone *)zone;
 
     -(TimeSpec)toUnixTimeSpec;
 
@@ -80,6 +82,8 @@
     +(instancetype)timeSpecWithFutureSeconds:(NSInteger)seconds andNanos:(NSInteger)nanos;
 
     +(void)validateSeconds:(NSInteger)seconds andNanos:(NSInteger)nanos;
+
 @end
 
+NS_ASSUME_NONNULL_END
 #endif //__Rubicon_PGTimeSpec_H_

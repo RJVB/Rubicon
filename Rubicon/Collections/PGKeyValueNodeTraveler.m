@@ -30,8 +30,13 @@
         return (self = [super init]);
     }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverriding-method-mismatch"
+
     -(BOOL)visitNodeWithKey:(id)key forValue:(id)value {
         return NO;
     }
+
+#pragma clang diagnostic pop
 
 @end

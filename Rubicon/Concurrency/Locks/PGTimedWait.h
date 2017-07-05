@@ -25,9 +25,11 @@
 #ifndef __Rubicon_PGTimedWait_H_
 #define __Rubicon_PGTimedWait_H_
 
-#import "PGTools.h"
+#import <Rubicon/PGTools.h>
 
 @class PGTimeSpec;
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface PGTimedWait : NSObject
 
@@ -36,12 +38,13 @@
 
     -(instancetype)initWithTimeout:(PGTimeSpec *)absTime;
 
-    -(BOOL)timedAction:(id *)results;
+    -(BOOL)timedAction:(id _Nullable *_Nullable)results;
 
     -(BOOL)timedAction;
 
-    -(BOOL)action:(id *)results;
+    -(BOOL)action:(id _Nullable *_Nullable)results;
 
 @end
 
+NS_ASSUME_NONNULL_END
 #endif //__Rubicon_PGTimedWait_H_

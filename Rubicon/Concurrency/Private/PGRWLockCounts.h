@@ -30,6 +30,7 @@
 typedef enum {
     PGRWNoLockHeld, PGRWReadLockHeld, PGRWWriteLockHeld
 } PGRWCurrentLock;
+NS_ASSUME_NONNULL_BEGIN
 
 @interface PGRWLockCounts : NSObject
 
@@ -42,4 +43,5 @@ typedef enum {
 
 @end
 
+NS_ASSUME_NONNULL_END
 #endif //__Rubicon_PGRWLockCounts_H_

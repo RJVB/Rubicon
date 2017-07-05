@@ -25,18 +25,19 @@
 #ifndef __Rubicon_PGSemaphore_H_
 #define __Rubicon_PGSemaphore_H_
 
-#import "PGTools.h"
+#import <Rubicon/PGTools.h>
 
 @class PGTimeSpec;
+NS_ASSUME_NONNULL_BEGIN
 
 @interface PGSemaphore : NSObject
 
-    @property(nonatomic, readonly) NSUInteger     value;
-    @property(nonatomic, readonly, copy) NSString *name;
+    @property(nonatomic, readonly) NSUInteger               value;
+    @property(nonatomic, readonly, copy, nullable) NSString *name;
 
-    -(instancetype)initWithSemaphoreName:(NSString *)name value:(NSUInteger)value;
+    -(instancetype)initWithSemaphoreName:(nullable NSString *)name value:(NSUInteger)value;
 
-    +(instancetype)semaphoreWithName:(NSString *)name value:(NSUInteger)value;
+    +(instancetype)semaphoreWithName:(nullable NSString *)name value:(NSUInteger)value;
 
     -(BOOL)isOpen;
 
@@ -77,4 +78,5 @@
 
 @end
 
+NS_ASSUME_NONNULL_END
 #endif //__Rubicon_PGSemaphore_H_

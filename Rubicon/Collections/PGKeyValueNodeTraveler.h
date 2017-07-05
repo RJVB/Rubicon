@@ -27,12 +27,15 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface PGKeyValueNodeTraveler : NSObject
+NS_ASSUME_NONNULL_BEGIN
+
+@interface PGKeyValueNodeTraveler<__covariant K, __covariant V> : NSObject
 
     -(instancetype)init;
 
-    -(BOOL)visitNodeWithKey:(id)key forValue:(id)value;
+    -(BOOL)visitNodeWithKey:(K)key forValue:(V)value;
 
 @end
 
+NS_ASSUME_NONNULL_END
 #endif //__Rubicon_PGKeyValueNodeTraveler_H_

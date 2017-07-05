@@ -29,6 +29,8 @@
 #import "PGTimedWait.h"
 #import <Rubicon/PGTimeSpec.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface PGTimedReadLock : PGTimedWait
 
     -(instancetype)initWithTimeout:(PGTimeSpec *)absTime readWriteLock:(pthread_rwlock_t *)rwlock;
@@ -45,4 +47,5 @@
 
 @end
 
+NS_ASSUME_NONNULL_END
 #endif //__Rubicon_PGTimedReadLock_H_

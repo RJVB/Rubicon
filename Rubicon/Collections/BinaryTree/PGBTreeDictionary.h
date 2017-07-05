@@ -27,13 +27,19 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface PGBTreeDictionary : NSDictionary
+NS_ASSUME_NONNULL_BEGIN
+
+@interface PGBTreeDictionary<__covariant K, __covariant V> : NSDictionary<K, V>
 
     -(instancetype)init;
 
-    -(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt;
+    -(instancetype)initWithDictionary:(NSDictionary<K, V> *)otherDictionary;
 
-    -(instancetype)initWithObject:(const id)object forKey:(const id<NSCopying>)key;
+    -(instancetype)initWithDictionary:(NSDictionary<K, V> *)otherDictionary copyItems:(BOOL)flag;
+
+    -(instancetype)initWithObjects:(const V _Nonnull[_Nullable])objects forKeys:(const K<NSCopying> _Nonnull[_Nullable])keys count:(NSUInteger)cnt;
+
+    -(instancetype)initWithObject:(const V)object forKey:(const K<NSCopying>)key;
 
     -(instancetype)initWithCoder:(NSCoder *)coder;
 
@@ -41,21 +47,29 @@
 
     -(instancetype)initWithContentsOfURL:(NSURL *)url;
 
-    -(id)objectForKey:(id)aKey;
+    -(nullable V)objectForKey:(K)aKey;
 
-    -(NSEnumerator *)keyEnumerator;
+    -(NSEnumerator<K> *)keyEnumerator;
+
+    -(id)mutableCopyWithZone:(nullable NSZone *)zone;
+
+    -(id)copyWithZone:(nullable NSZone *)zone;
 
 @end
 
-@interface PGBTreeMutableDictionary : NSMutableDictionary
+@interface PGBTreeMutableDictionary<__covariant K, __covariant V> : NSMutableDictionary<K, V>
 
     -(instancetype)init;
 
     -(instancetype)initWithCapacity:(NSUInteger)numItems;
 
-    -(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt;
+    -(instancetype)initWithDictionary:(NSDictionary<K, V> *)otherDictionary;
 
-    -(instancetype)initWithObject:(const id)object forKey:(const id<NSCopying>)key;
+    -(instancetype)initWithDictionary:(NSDictionary<K, V> *)otherDictionary copyItems:(BOOL)flag;
+
+    -(instancetype)initWithObjects:(const V _Nonnull[_Nullable])objects forKeys:(const K<NSCopying> _Nonnull[_Nullable])keys count:(NSUInteger)cnt;
+
+    -(instancetype)initWithObject:(const V)object forKey:(const K<NSCopying>)key;
 
     -(instancetype)initWithCoder:(NSCoder *)coder;
 
@@ -63,15 +77,23 @@
 
     -(instancetype)initWithContentsOfURL:(NSURL *)url;
 
-    -(id)objectForKey:(id)aKey;
+    -(nullable V)objectForKey:(K)aKey;
 
-    -(NSEnumerator *)keyEnumerator;
+    -(NSEnumerator<K> *)keyEnumerator;
 
-    -(void)removeObjectForKey:(id)aKey;
+    -(void)removeObjectForKey:(K)aKey;
 
-    -(void)setObject:(id)anObject forKey:(id<NSCopying>)aKey;
+    -(void)setObject:(V)anObject forKey:(K<NSCopying>)aKey;
 
     -(void)removeAllObjects;
+
+    -(void)dealloc;
+
+    -(id)mutableCopyWithZone:(nullable NSZone *)zone;
+
+    -(id)copyWithZone:(nullable NSZone *)zone;
+
 @end
 
+NS_ASSUME_NONNULL_END
 #endif //__Rubicon_PGBTreeDictionary_H_

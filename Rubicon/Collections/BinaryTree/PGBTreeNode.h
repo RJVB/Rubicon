@@ -27,6 +27,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class PGBTreeNode;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface PGBTreeNode<__covariant T> : NSObject
@@ -38,6 +40,10 @@ NS_ASSUME_NONNULL_BEGIN
     -(instancetype)initWithData:(T)data;
 
     -(nullable instancetype)find:(T)data;
+
+    -(nullable instancetype)findWithCompareBlock:(NSComparisonResult(^)(T nodeData))compareBlock;
+
+    -(instancetype)insertWithCompareBlock:(NSComparisonResult(^)(T nodeData))compareBlock dataBlock:(T(^)(void))dataBlock;
 
     -(instancetype)insert:(T)data;
 

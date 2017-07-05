@@ -23,6 +23,9 @@
 
 #import "PGEmptyEnumerator.h"
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverriding-method-mismatch"
+
 @implementation PGEmptyEnumerator {
     }
 
@@ -43,3 +46,5 @@
     }
 
 @end
+
+#pragma clang diagnostic pop

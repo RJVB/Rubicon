@@ -21,80 +21,115 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#import "PGBTreeDictionary.h"
-#import "PGBTreeNode.h"
-#import "PGKeyValueData.h"
-#import "PGTools.h"
-#import "PGEmptyEnumerator.h"
-#import "PGStack.h"
+#import "PGBTreeDictionaryKeyEnumerator.h"
 
-@interface PGBTreeKVNode : PGBTreeNode
-
-    @property(readonly) id key;
-    @property(readonly) id value;
-
-    -(instancetype)initWithValue:(const id)value forKey:(const id<NSCopying>)key;
-
-    -(instancetype)insertValue:(const id)value forKey:(const id<NSCopying>)key;
-
-@end
-
-@interface PGBTreeDictionary()
-
-    @property(retain) PGBTreeKVNode *root;
-
-    -(void)setObject:(const id)object forKey:(const id<NSCopying>)key;
-
-    -(void)removeObjectForKey:(id)aKey;
-
-    -(void)removeAllObjects;
-@end
-
-@interface PGBTreeMutableDictionary()
-
-    @property(retain, readonly) PGBTreeDictionary *treeDictionary;
-
-@end
-
-@interface PGBTreeDictionaryKeyEnumerator : NSEnumerator
-
-    @property(retain) PGBTreeDictionary *dictionary;
-    @property(retain) PGBTreeKVNode     *current;
-    @property(retain) PGStack           *stack;
-
-    -(instancetype)initWithBTreeDictionary:(PGBTreeDictionary *)dict;
-
-    -(PGBTreeKVNode *)driveLeft:(PGBTreeKVNode *)node;
-
-    -(id)nextObject;
-
-    -(NSArray *)allObjects;
-@end
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverriding-method-mismatch"
 
 @implementation PGBTreeDictionary {
+        PGBTreeMutableDictionary *_treeDict;
+    }
+
+    -(instancetype)init {
+        self = [super init];
+        if(self) _treeDict = [[PGBTreeMutableDictionary alloc] init];
+        return self;
+    }
+
+    -(instancetype)initWithDictionary:(NSDictionary *)otherDictionary {
+        self = [super init];
+        if(self) _treeDict = [[PGBTreeMutableDictionary alloc] initWithDictionary:otherDictionary copyItems:NO];
+        return self;
+    }
+
+    -(instancetype)initWithDictionary:(NSDictionary *)otherDictionary copyItems:(BOOL)flag {
+        self = [super init];
+        if(self) _treeDict = [[PGBTreeMutableDictionary alloc] initWithDictionary:otherDictionary copyItems:YES];
+        return self;
+    }
+
+    -(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt {
+        self = [super init];
+        if(self) _treeDict = [[PGBTreeMutableDictionary alloc] initWithObjects:objects forKeys:keys count:cnt];
+        return self;
+    }
+
+    -(instancetype)initWithObject:(const id)object forKey:(const id)key {
+        self = [super init];
+        if(self) _treeDict = [[PGBTreeMutableDictionary alloc] initWithObject:object forKey:key];
+        return self;
+    }
+
+    -(instancetype)initWithCoder:(NSCoder *)coder {
+        self = [super init];
+        if(self) _treeDict = [[PGBTreeMutableDictionary alloc] initWithCoder:coder];
+        return self;
+    }
+
+    -(instancetype)initWithContentsOfFile:(NSString *)path {
+        self = [super init];
+        if(self) _treeDict = [[PGBTreeMutableDictionary alloc] initWithContentsOfFile:path];
+        return self;
+    }
+
+    -(instancetype)initWithContentsOfURL:(NSURL *)url {
+        self = [super init];
+        if(self) _treeDict = [[PGBTreeMutableDictionary alloc] initWithContentsOfURL:url];
+        return self;
+    }
+
+    -(PGBTreeNode<PGKeyValueData *> *)root {
+        return _treeDict.root;
+    }
+
+    -(NSUInteger)count {
+        return [_treeDict count];
+    }
+
+    -(id)objectForKey:(id)aKey {
+        return [_treeDict objectForKey:aKey];
+    }
+
+    -(NSEnumerator *)keyEnumerator {
+        return [_treeDict keyEnumerator];
+    }
+
+    -(id)mutableCopyWithZone:(nullable NSZone *)zone {
+        return [[PGBTreeMutableDictionary allocWithZone:zone] initWithDictionary:_treeDict];
+    }
+
+    -(id)copyWithZone:(nullable NSZone *)zone {
+        return [(PGBTreeDictionary *)[[self class] allocWithZone:zone] initWithDictionary:_treeDict];
+    }
+
+@end
+
+@implementation PGBTreeMutableDictionary {
     }
 
     @synthesize root = _root;
 
-    -(instancetype)init { return (self = [super init]); }
-
-    -(instancetype)initWithDictionary:(NSDictionary *)dict {
-        self = [super init];
-
-        if(self) {
-            for(id key in dict.allKeys) {
-                [self setObject:dict[key] forKey:key];
-            }
-        }
-
-        return self;
+    -(instancetype)init {
+        return (self = [super init]);
     }
 
-    -(instancetype)initWithObject:(const id)object forKey:(const id<NSCopying>)key {
+    -(instancetype)initWithCapacity:(NSUInteger)numItems {
+        return (self = [super init]);
+    }
+
+    -(instancetype)initWithDictionary:(NSDictionary *)otherDictionary {
+        return (self = [self initWithDictionary:otherDictionary copyItems:NO]);
+    }
+
+    -(instancetype)initWithDictionary:(NSDictionary *)otherDictionary copyItems:(BOOL)flag {
         self = [super init];
 
         if(self) {
-            [self setObject:object forKey:key];
+            for(id aKey in otherDictionary.allKeys) {
+                id obj = otherDictionary[aKey];
+                if(flag && [obj conformsToProtocol:@protocol(NSCopying)]) obj = [obj copy];
+                [self setObject:obj forKey:aKey];
+            }
         }
 
         return self;
@@ -102,25 +137,13 @@
 
     -(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt {
         self = [super init];
+        if(self) for(NSUInteger i = 0; i < cnt; i++) [self setObject:objects[i] forKey:keys[i]];
+        return self;
+    }
 
-        if(self) {
-            if(cnt) {
-                if(objects) {
-                    if(keys) {
-                        for(NSUInteger i = 0; i < cnt; i++) {
-                            [self setObject:objects[i] forKey:keys[i]];
-                        }
-                    }
-                    else {
-                        @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"keys cannot be null." userInfo:nil];
-                    }
-                }
-                else {
-                    @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"objects cannot be null." userInfo:nil];
-                }
-            }
-        }
-
+    -(instancetype)initWithObject:(const id)object forKey:(const id)key {
+        self = [super init];
+        if(self) [self setObject:object forKey:key];
         return self;
     }
 
@@ -136,202 +159,70 @@
         return (self = [self initWithDictionary:[NSDictionary dictionaryWithContentsOfURL:url]]);
     }
 
+    -(void)setRoot:(PGBTreeNode<PGKeyValueData *> *)node {
+        while(node.parent) node = node.parent;
+        _root = node;
+    }
+
+    -(PGBTreeNode<PGKeyValueData *> *)findNode:(id)aKey {
+        return ((_root && aKey) ? [_root findWithCompareBlock:^NSComparisonResult(PGKeyValueData *nodeData) { return [nodeData compareKeyTo:aKey]; }] : nil);
+    }
+
+    -(NSUInteger)count {
+        return _root.count;
+    }
+
+    -(id)objectForKey:(id)aKey {
+        return [self findNode:aKey].data.value;
+    }
+
     -(NSEnumerator *)keyEnumerator {
-        return (self.root ? [[PGBTreeDictionaryKeyEnumerator alloc] initWithBTreeDictionary:self] : [PGEmptyEnumerator emptyEnumerator]);
+        return (_root ? [[PGBTreeDictionaryKeyEnumerator alloc] initWithMutableBTreeDictionary:self] : [[PGEmptyEnumerator alloc] init]);
     }
 
-    -(void)setObject:(const id)object forKey:(const id<NSCopying>)key {
-        self.root = (self.root ? [[self.root insertValue:object forKey:key] root] : [[PGBTreeKVNode alloc] initWithValue:object forKey:key]);
+    -(void)removeObjectForKey:(id)aKey {
+        if(aKey == nil) {
+            @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Key is null." userInfo:nil];
+        }
+        else if(_root) {
+            PGBTreeNode<PGKeyValueData *> *fnode = [self findNode:aKey];
+            if(fnode) self.root = fnode.remove;
+        }
     }
 
-    -(id)objectForKey:(id)aKey { return [self.root find:aKey].value; }
+    -(void)setObject:(id)anObject forKey:(id)aKey {
+        if(anObject == nil) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Key is null." userInfo:nil];
+        else if(aKey == nil) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Object is null." userInfo:nil];
+        else if(_root) {
+            NSComparisonResult (^compareBlock)(PGKeyValueData *)=^NSComparisonResult(PGKeyValueData *nodeData) { return [nodeData compareKeyTo:aKey]; };
+            PGKeyValueData *(^dataBlock)()=^PGKeyValueData *() { return [PGKeyValueData dataWithValue:anObject forKey:aKey]; };
 
-    -(NSUInteger)count { return self.root.count; }
-
-    -(void)removeObjectForKey:(id)aKey { if(aKey) self.root = [[self.root find:aKey] remove]; }
+            self.root = [_root insertWithCompareBlock:compareBlock dataBlock:dataBlock];
+        }
+        else {
+            self.root = [PGBTreeNode nodeWithData:[PGKeyValueData dataWithValue:anObject forKey:aKey]];
+        }
+    }
 
     -(void)removeAllObjects {
-        [self.root clearTree];
-        self.root = nil;
+        if(_root) {
+            [_root clearTree];
+            _root = nil;
+        }
+    }
+
+    -(void)dealloc {
+        [self removeAllObjects];
+    }
+
+    -(id)mutableCopyWithZone:(nullable NSZone *)zone {
+        return [(PGBTreeMutableDictionary *)[[self class] allocWithZone:zone] initWithDictionary:self];
+    }
+
+    -(id)copyWithZone:(nullable NSZone *)zone {
+        return [self mutableCopyWithZone:zone];
     }
 
 @end
 
-@implementation PGBTreeMutableDictionary {
-    }
-
-    @synthesize treeDictionary = _treeDictionary;
-
-    -(instancetype)init {
-        self = [super init];
-
-        if(self) {
-            _treeDictionary = [[PGBTreeDictionary alloc] init];
-        }
-
-        return self;
-    }
-
-    -(instancetype)initWithCapacity:(NSUInteger)numItems {
-        self = [super init];
-
-        if(self) {
-            _treeDictionary = [[PGBTreeDictionary alloc] init];
-        }
-
-        return self;
-    }
-
-    -(instancetype)initWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt {
-        self = [super init];
-
-        if(self) {
-            _treeDictionary = [[PGBTreeDictionary alloc] initWithObjects:objects forKeys:keys count:cnt];
-        }
-
-        return self;
-    }
-
-    -(instancetype)initWithObject:(const id)object forKey:(const id<NSCopying>)key {
-        self = [super init];
-
-        if(self) {
-            _treeDictionary = [[PGBTreeDictionary alloc] initWithObject:object forKey:key];
-        }
-
-        return self;
-    }
-
-    -(instancetype)initWithCoder:(NSCoder *)coder {
-        self = [super init];
-
-        if(self) {
-            _treeDictionary = [[PGBTreeDictionary alloc] initWithCoder:coder];
-        }
-
-        return self;
-    }
-
-    -(instancetype)initWithContentsOfFile:(NSString *)path {
-        self = [super init];
-
-        if(self) {
-            _treeDictionary = [[PGBTreeDictionary alloc] initWithContentsOfFile:path];
-        }
-
-        return self;
-    }
-
-    -(instancetype)initWithContentsOfURL:(NSURL *)url {
-        self = [super init];
-
-        if(self) {
-            _treeDictionary = [[PGBTreeDictionary alloc] initWithContentsOfURL:url];
-        }
-
-        return self;
-    }
-
-    -(NSUInteger)count { return self.treeDictionary.count; }
-
-    -(id)objectForKey:(id)aKey { return self.treeDictionary[aKey]; }
-
-    -(NSEnumerator *)keyEnumerator { return self.treeDictionary.keyEnumerator; }
-
-    -(void)removeObjectForKey:(id)aKey { [self.treeDictionary removeObjectForKey:aKey]; }
-
-    -(void)setObject:(id)anObject forKey:(id<NSCopying>)aKey { [self.treeDictionary setObject:anObject forKey:aKey]; }
-
-    -(void)removeAllObjects {
-        [self.treeDictionary removeAllObjects];
-    }
-
-@end
-
-@implementation PGBTreeKVNode {
-    }
-
-    -(id)key {
-        return [(PGKeyValueData *)self.data key];
-    }
-
-    -(id)value {
-        return [(PGKeyValueData *)self.data value];
-    }
-
-    -(instancetype)initWithValue:(const id)value forKey:(const id<NSCopying>)key {
-        return (self = [super initWithData:[PGKeyValueData dataWithValue:value forKey:key]]);
-    }
-
-    -(instancetype)insertValue:(const id)value forKey:(const id<NSCopying>)key {
-        return [self insert:[PGKeyValueData dataWithValue:value forKey:key]];
-    }
-
-    -(instancetype)find:(id)key {
-        if(key) {
-            switch(PGCompare(self.key, key)) {
-                case NSOrderedAscending:
-                    return [self.right find:key];
-                case NSOrderedDescending:
-                    return [self.left find:key];
-                case NSOrderedSame:
-                    return self;
-            }
-        }
-        return nil;
-    }
-
-@end
-
-@implementation PGBTreeDictionaryKeyEnumerator {
-    }
-
-    @synthesize dictionary = _dictionary;
-    @synthesize current = _current;
-    @synthesize stack = _stack;
-
-    -(instancetype)initWithBTreeDictionary:(PGBTreeDictionary *)dict {
-        self = [super init];
-
-        if(self) {
-            self.dictionary = dict;
-            self.stack      = [[PGStack alloc] init];
-            self.current    = [self driveLeft:self.dictionary.root];
-        }
-
-        return self;
-    }
-
-    -(PGBTreeKVNode *)driveLeft:(PGBTreeKVNode *)node {
-        if(node && node.left) {
-            [self.stack push:node];
-            return [self driveLeft:node.left];
-        }
-
-        return node;
-    }
-
-    -(id)nextObject {
-        id obj = nil;
-
-        if(self.current) {
-            obj = self.current.key;
-            self.current = (self.current.right ? [self driveLeft:self.current.right] : [self.stack pop]);
-        }
-
-        return obj;
-    }
-
-    -(NSArray *)allObjects {
-        NSMutableArray *array = [NSMutableArray array];
-        id             obj    = self.nextObject;
-
-        while(obj) {
-            [array addObject:obj];
-            obj = self.nextObject;
-        }
-
-        return array;
-    }
-
-@end
+#pragma clang diagnostic pop

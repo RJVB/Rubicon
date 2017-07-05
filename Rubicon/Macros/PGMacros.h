@@ -27,6 +27,8 @@
 
 #import <Rubicon/PGTools.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**************************************************************************************************//**
  * Default macro regex definition. This regex sees a macro as anything in the form of "${sometext}"
  * (not including the quotes) where "sometext" is the macro label.
@@ -42,7 +44,7 @@
  * @param range this is the range within the whole string that this macro occupies.
  * @return the replacement string that will be substituted for this macro in the end result.
  ******************************************************************************************************/
-typedef NSString *(^PGMacroHandler)(NSString *label, NSString *whole, NSRange range);
+typedef NSString *_Nonnull (^PGMacroHandler)(NSString *_Nonnull label, NSString *_Nonnull whole, NSRange range);
 
 @interface PGMacros : NSObject
 
@@ -66,19 +68,20 @@ typedef NSString *(^PGMacroHandler)(NSString *label, NSString *whole, NSRange ra
 	 */
     -(instancetype)initWithRegex:(NSString *)macroRegex andHandler:(PGMacroHandler)macroHandler;
 
-    -(NSString *)stringByProcessingMacrosIn:(NSString *)aString options:(NSRegularExpressionOptions)options error:(NSError **)error;
+    -(NSString *)stringByProcessingMacrosIn:(NSString *)aString options:(NSRegularExpressionOptions)options error:(NSError *_Nullable *)error;
 
-    -(NSString *)stringByProcessingMacrosIn:(NSString *)aString error:(NSError **)error;
+    -(NSString *)stringByProcessingMacrosIn:(NSString *)aString error:(NSError *_Nullable *)error;
 
     +(NSString *)stringByProcessingMacrosIn:(NSString *)aString
                                   withRegex:(NSString *)macroRegex
-                                 andHandler:(PGMacroHandler)macroHandler
+                                 andHandler:(PGMacroHandler)macroHandler options:(NSRegularExpressionOptions)options error:(NSError *_Nullable *)error;
+
+    +(NSString *)stringByProcessingMacrosIn:(NSString *)aString
+                                withHandler:(PGMacroHandler)macroHandler
                                     options:(NSRegularExpressionOptions)options
-                                      error:(NSError **)error;
+                                      error:(NSError *_Nullable *)error;
 
-    +(NSString *)stringByProcessingMacrosIn:(NSString *)aString withHandler:(PGMacroHandler)macroHandler options:(NSRegularExpressionOptions)options error:(NSError **)error;
-
-    +(NSString *)stringByProcessingMacrosIn:(NSString *)aString withHandler:(PGMacroHandler)macroHandler error:(NSError **)error;
+    +(NSString *)stringByProcessingMacrosIn:(NSString *)aString withHandler:(PGMacroHandler)macroHandler error:(NSError *_Nullable *)error;
 
     +(instancetype)macrosWithRegex:(NSString *)macroRegex andHandler:(PGMacroHandler)macroHandler;
 
@@ -86,4 +89,5 @@ typedef NSString *(^PGMacroHandler)(NSString *label, NSString *whole, NSRange ra
 
 @end
 
+NS_ASSUME_NONNULL_END
 #endif //__Rubicon_PGMacros_H_

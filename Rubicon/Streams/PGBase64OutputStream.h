@@ -32,6 +32,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface PGBase64OutputStream : NSOutputStream
 
     -(NSInteger)write:(const uint8_t *)buffer maxLength:(NSUInteger)len;
@@ -57,5 +59,7 @@
     +(instancetype)outputStreamWithURL:(NSURL *)url append:(BOOL)shouldAppend;
 
 @end
+
+NS_ASSUME_NONNULL_END
 
 #endif //__Rubicon_PGBase64OutputStream_H_

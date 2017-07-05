@@ -24,6 +24,9 @@
 #import "PGKeyValueData.h"
 #import "NSObject+PGObject.h"
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverriding-method-mismatch"
+
 @implementation PGKeyValueData {
     }
 
@@ -57,7 +60,13 @@
     }
 
     -(NSComparisonResult)compare:(PGKeyValueData *)kvData {
-        return (kvData ? PGCompare(self.key, kvData.key) : NSOrderedDescending);
+        return [self compareKeyTo:kvData.key];
+    }
+
+    -(NSComparisonResult)compareKeyTo:(id)otherKey {
+        return PGCompare(self.key, otherKey);
     }
 
 @end
+
+#pragma clang diagnostic pop

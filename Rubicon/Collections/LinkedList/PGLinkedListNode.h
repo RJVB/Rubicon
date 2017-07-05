@@ -27,12 +27,14 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface PGLinkedListNode : NSObject
+NS_ASSUME_NONNULL_BEGIN
 
-    @property(retain) PGLinkedListNode *nextNode;
-    @property(retain) PGLinkedListNode *prevNode;
-    @property(retain) id               value;
-    @property(atomic) BOOL             isFirst;
+@interface PGLinkedListNode<__covariant T> : NSObject
+
+    @property(nullable, retain) PGLinkedListNode *nextNode;
+    @property(nullable, retain) PGLinkedListNode *prevNode;
+    @property(nullable, retain) T                value;
+    @property(atomic) BOOL                       isFirst;
 
     /**************************************************************************************************//**
 	 * Creates a new node with the given value.
@@ -40,17 +42,17 @@
 	 * @param value the value that this node will contain.
 	 * @return the new first node.
 	 ******************************************************************************************************/
-    -(instancetype)initWithValue:(id)value;
+    -(instancetype)initWithValue:(T)value;
 
     /**************************************************************************************************//**
      * @return The first node in the chain.
      ******************************************************************************************************/
-    -(instancetype)firstNode;
+    -(nullable instancetype)firstNode;
 
     /**************************************************************************************************//**
 	 * @return The last node in the chain.
 	 ******************************************************************************************************/
-    -(instancetype)lastNode;
+    -(nullable instancetype)lastNode;
 
     /**************************************************************************************************//**
 	 * Creates and inserts a new node with the given value into the chain AFTER this node.
@@ -58,7 +60,7 @@
 	 * @param value the value that the new node will contain.
 	 * @return the new node that was created.
 	 ******************************************************************************************************/
-    -(instancetype)insertAfter:(id)value;
+    -(instancetype)insertAfter:(T)value;
 
     /**************************************************************************************************//**
 	 * Creates and inserts a new node with the given value into the chain BEFORE this new node.
@@ -66,7 +68,7 @@
 	 * @param value the value that the new node will contain.
 	 * @return the new node that was created.
 	 ******************************************************************************************************/
-    -(instancetype)insertBefore:(id)value;
+    -(instancetype)insertBefore:(T)value;
 
     /**************************************************************************************************//**
 	 * Removes this node from the chain.  If this node represented the FIRST node then the next chain will
@@ -74,7 +76,7 @@
 	 *
 	 * @return The next node in the chain or nil if this was the only node left.
 	 ******************************************************************************************************/
-    -(instancetype)remove;
+    -(nullable instancetype)remove;
 
     /**************************************************************************************************//**
 	 * Creates a new node with the given value.
@@ -82,8 +84,9 @@
 	 * @param value the value that this node will contain.
 	 * @return the new first node.
 	 ******************************************************************************************************/
-    +(instancetype)nodeWithValue:(id)value;
+    +(instancetype)nodeWithValue:(T)value;
 
 @end
 
+NS_ASSUME_NONNULL_END
 #endif //__Rubicon_PGLinkedListNode_H_

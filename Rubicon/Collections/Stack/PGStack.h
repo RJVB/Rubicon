@@ -27,38 +27,44 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface PGStack : NSObject
+NS_ASSUME_NONNULL_BEGIN
+
+@interface PGStack<__covariant T> : NSObject
 
     @property(readonly) NSUInteger count;
     @property(readonly) BOOL       isEmpty;
 
     -(instancetype)init;
 
-    -(instancetype)initWithNSArray:(NSArray *)objs;
+    -(instancetype)initWithNSArray:(NSArray<T> *)objs;
 
-    -(instancetype)initWithObjects:(const id[])objects count:(NSUInteger)cnt;
+    -(instancetype)initWithObjects:(const T _Nonnull[_Nullable])objects count:(NSUInteger)cnt;
 
-    -(void)push:(id)obj;
+    -(void)push:(T)obj;
 
-    -(id)pop;
+    -(nullable T)pop;
 
-    -(id)peek;
+    -(nullable T)peek;
 
-    -(NSArray *)popAll;
+    -(NSArray<T> *)popAll;
 
-    -(NSArray *)peekAll;
+    -(NSArray<T> *)peekAll;
 
-    -(void)pushAll:(NSArray *)objs;
+    -(void)pushAll:(NSArray<T> *)objs;
+
+    -(void)pushAllObjects:(const T _Nonnull[_Nullable])objects count:(NSUInteger)cnt;
 
     -(void)removeAll;
 
-    -(NSEnumerator *)objectEnumerator;
+    -(NSEnumerator<T> *)objectEnumerator;
 
     +(instancetype)stack;
 
-    +(instancetype)stackWithArray:(NSArray *)array;
+    +(instancetype)stackWithArray:(NSArray<T> *)array;
 
-    +(instancetype)stackWithObjects:(const id[])objects count:(NSUInteger)cnt;
+    +(instancetype)stackWithObjects:(const T _Nonnull[_Nullable])objects count:(NSUInteger)cnt;
+
 @end
 
+NS_ASSUME_NONNULL_END
 #endif //__Rubicon_PGStack_H_

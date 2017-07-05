@@ -139,16 +139,25 @@ PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Woverriding-method-mismatch"
 
-    -(nullable instancetype)find:(id)data {
+    -(instancetype)find:(id)data {
         if(data) {
-            switch(PGCompare(self.data, data)) {
-                case NSOrderedAscending:
-                    return [self.right find:data];
-                case NSOrderedDescending:
-                    return [self.left find:data];
-                case NSOrderedSame:
-                    return self;
-            }
+            NSComparisonResult (^compareBlock)(id)=^NSComparisonResult(id nodeData) {
+                return PGCompare(nodeData, data);
+            };
+            return [self findWithCompareBlock:compareBlock];
+        }
+
+        return nil;
+    }
+
+    -(instancetype)findWithCompareBlock:(NSComparisonResult(^)(id nodeData))compareBlock {
+        switch(compareBlock(self.data)) {
+            case NSOrderedAscending:
+                return [self.right findWithCompareBlock:compareBlock];
+            case NSOrderedDescending:
+                return [self.left findWithCompareBlock:compareBlock];
+            case NSOrderedSame:
+                return self;
         }
 
         return nil;
@@ -156,20 +165,33 @@ PGBTreeNode *farLeft(PGBTreeNode *node) { return (node.left ? farLeft(node.left)
 
     -(instancetype)insert:(id)data {
         if(data) {
-            switch(PGCompare(self.data, data)) {
-                case NSOrderedAscending:
-                    return [self foobar:data child:self.right onLeft:NO];
-                case NSOrderedDescending:
-                    return [self foobar:data child:self.left onLeft:YES];
-                case NSOrderedSame:
-                    self.data = data;
-                    return self;
-            }
+            NSComparisonResult (^compareBlock)(id)=^NSComparisonResult(id nodeData) {
+                return PGCompare(nodeData, data);
+            };
+            id (^dataBlock)()=^id {
+                return data;
+            };
+            return [self insertWithCompareBlock:compareBlock dataBlock:dataBlock];
         }
         else {
             @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Data cannot be null." userInfo:nil];
         }
 
+        return nil;
+    }
+
+    -(instancetype)insertWithCompareBlock:(NSComparisonResult(^)(id nodeData))compareBlock dataBlock:(id(^)(void))dataBlock {
+        switch(compareBlock(self.data)) {
+            case NSOrderedAscending:
+                if(self.right) return [self.right insertWithCompareBlock:compareBlock dataBlock:dataBlock];
+                else return [self setChild:[self.class nodeWithData:dataBlock() isRed:YES] onLeft:NO].ibal;
+            case NSOrderedDescending:
+                if(self.left) return [self.left insertWithCompareBlock:compareBlock dataBlock:dataBlock];
+                else return [self setChild:[self.class nodeWithData:dataBlock() isRed:YES] onLeft:YES].ibal;
+            case NSOrderedSame:
+                self.data = dataBlock();
+                return self;
+        }
         return nil;
     }
 

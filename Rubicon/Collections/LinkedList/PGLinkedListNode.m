@@ -23,6 +23,9 @@
 
 #import "PGLinkedListNode.h"
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverriding-method-mismatch"
+
 @interface PGLinkedListNode()
 
     -(instancetype)initWithValue:(id)value isFirst:(BOOL)isFirst;
@@ -66,8 +69,9 @@
 
             if(self == node) {
                 /*
-         * We went around the world and didn't find the first node so let's make ourselves the first node just so we have some consistency.
-         */
+                 * We went around the world and didn't find the first node so let's make ourselves the first node just so we have
+                 * some consistency.
+                 */
                 node.isFirst = YES;
                 break;
             }
@@ -95,8 +99,8 @@
         PGLinkedListNode *newNode = [self.prevNode insertAfter:value];
 
         /*
-     * Inserting before the first node causes the new node to be the new first node.  This models the behaviour of an array.
-     */
+         * Inserting before the first node causes the new node to be the new first node.  This models the behaviour of an array.
+         */
         if(self.isFirst) {
             self.isFirst    = NO;
             newNode.isFirst = YES;
@@ -129,3 +133,5 @@
     }
 
 @end
+
+#pragma clang diagnostic pop

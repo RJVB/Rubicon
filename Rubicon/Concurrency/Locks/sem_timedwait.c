@@ -111,7 +111,7 @@
 
 #ifdef __APPLE__
 
-#include "sem_timedwait.h"
+#include <Rubicon/sem_timedwait.h>
 #include <time.h>
 #include <sys/time.h>
 #include <pthread.h>

@@ -42,7 +42,7 @@
  * @param obj2 the second object.
  * @return YES if both objects are either NULL or equal according to the isEqual: selector.
  */
-NS_INLINE BOOL PGObjectsEqual(id obj1, id obj2) {
+NS_INLINE BOOL PGObjectsEqual(id _Nullable obj1, id _Nullable obj2) {
     return ((obj1 == nil) ? (obj2 == nil) : ((obj2 == nil) ? NO : [obj1 isEqual:obj2]));
 }
 
@@ -55,7 +55,7 @@ NS_INLINE BOOL PGObjectsEqual(id obj1, id obj2) {
  * @param val the value.
  * @return the value.
  */
-NS_INLINE id PGSetReference(id *ref, id val) {
+NS_INLINE id _Nullable PGSetReference(id _Nullable *_Nullable ref, id _Nullable val) {
     if(ref) *ref = val;
     return val;
 }
@@ -68,7 +68,7 @@ NS_INLINE id PGSetReference(id *ref, id val) {
  * @return NSOrderedAscending, NSOrderedSame, NSOrderedDescending if obj1 is less than, equal to, or
  *         greater than obj2.
  ******************************************************************************************************/
-FOUNDATION_EXPORT NSComparisonResult PGCompare(id obj1, id obj2);
+FOUNDATION_EXPORT NSComparisonResult PGCompare(id _Nullable obj1, id _Nullable obj2);
 
 /**************************************************************************************************//**
  * Creates and returns a bitmap image compatible with PNG file formats.  This allows you
@@ -78,7 +78,7 @@ FOUNDATION_EXPORT NSComparisonResult PGCompare(id obj1, id obj2);
  * @param height the height of the image.
  * @return a bitmap image for off-screen drawing.
  ******************************************************************************************************/
-FOUNDATION_EXPORT NSBitmapImageRep *PGCreateARGBImage(NSFloat width, NSFloat height);
+FOUNDATION_EXPORT NSBitmapImageRep *_Nonnull PGCreateARGBImage(NSFloat width, NSFloat height);
 
 /**************************************************************************************************//**
  * Takes an off-screen image and saves it as a PNG file.
@@ -88,7 +88,7 @@ FOUNDATION_EXPORT NSBitmapImageRep *PGCreateARGBImage(NSFloat width, NSFloat hei
  * @param error a pointer to an error object field that will receive an error object if an error
  *              occurs.
  ******************************************************************************************************/
-FOUNDATION_EXPORT BOOL PGSaveImageAsPNG(NSBitmapImageRep *image, NSString *filename, NSError **error);
+FOUNDATION_EXPORT BOOL PGSaveImageAsPNG(NSBitmapImageRep *_Nonnull image, NSString *_Nonnull filename, NSError *_Nullable *_Nullable error);
 
 /**************************************************************************************************//**
  * Returns an NSString as by calling the C function strerror(int).
@@ -96,7 +96,7 @@ FOUNDATION_EXPORT BOOL PGSaveImageAsPNG(NSBitmapImageRep *image, NSString *filen
  * @param osErrNo the C library error number usually obtained from the global variable errno.
  * @return The C library generated error message as an NSString object.
  ******************************************************************************************************/
-FOUNDATION_EXPORT NSString *PGStrError(int osErrNo);
+FOUNDATION_EXPORT NSString *_Nonnull PGStrError(int osErrNo);
 
 /**************************************************************************************************//**
  * Convenience function for [NSString stringWithFormat:fmt, ...].
@@ -104,6 +104,6 @@ FOUNDATION_EXPORT NSString *PGStrError(int osErrNo);
  * @param ... the parameters.
  * @return a new string.
  */
-FOUNDATION_EXPORT NSString *PGFormat(NSString *fmt, ...) NS_FORMAT_FUNCTION(1, 2);
+FOUNDATION_EXPORT NSString *_Nonnull PGFormat(NSString *_Nonnull fmt, ...) NS_FORMAT_FUNCTION(1, 2);
 
 #endif //__Rubicon_PGTools_H_

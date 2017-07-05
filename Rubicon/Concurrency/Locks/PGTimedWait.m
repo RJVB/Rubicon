@@ -91,7 +91,7 @@ void *waitThread(void *obj);
     }
 
     -(BOOL)action:(id *)results {
-        *results = nil;
+        if(results) *results = nil;
         return YES;
     }
 

@@ -25,9 +25,10 @@
 #ifndef __Rubicon_PGReadWriteLock_H_
 #define __Rubicon_PGReadWriteLock_H_
 
-#import "PGTools.h"
+#import <Rubicon/PGTools.h>
 
 @class PGTimeSpec;
+NS_ASSUME_NONNULL_BEGIN
 
 @interface PGReadWriteLock : NSObject<NSLocking>
 
@@ -49,4 +50,5 @@
 
 @end
 
+NS_ASSUME_NONNULL_END
 #endif //__Rubicon_PGReadWriteLock_H_

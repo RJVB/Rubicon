@@ -24,6 +24,9 @@
 #import "PGStack.h"
 #import "PGLinkedListNode.h"
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverriding-method-mismatch"
+
 @interface PGStackEnumerator : NSEnumerator
 
     -(instancetype)initWithStack:(PGStack *)stack;
@@ -147,6 +150,12 @@
         }
     }
 
+    -(void)pushAllObjects:(const id[])objects count:(NSUInteger)cnt {
+        for(NSUInteger i = 0; i < cnt; i++) {
+            [self push:objects[i]];
+        }
+    }
+
     -(BOOL)isEmpty {
         return (_firstNode == nil);
     }
@@ -220,3 +229,5 @@
     }
 
 @end
+
+#pragma clang diagnostic pop
