@@ -21,16 +21,12 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *******************************************************************************/
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "UnusedImportStatement"
-
 #ifndef __APPLE__
 
-#import "Rubicon.h"
+extern const unsigned char RubiconVersionString[];
+extern const double RubiconVersionNumber;
 
-double              RubiconVersionNumber   = 1.0;
-const unsigned char RubiconVersionString[] = "1.0";
+const unsigned char RubiconVersionString[] __attribute__ ((used)) = "@(#)PROGRAM:Rubicon  PROJECT:Rubicon-1" "\n";
+const double RubiconVersionNumber __attribute__ ((used)) = (double)1.;
 
 #endif
-
-#pragma clang diagnostic pop
