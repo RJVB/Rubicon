@@ -18,6 +18,7 @@
 		1117D1E5C76FD09AE1F3E979 /* PGEmptyEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DA4CA3B004D00E984EA5 /* PGEmptyEnumerator.m */; };
 		1117D3724C2A43950E8FB710 /* PGTime.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D5A22062D907B9F4DBE6 /* PGTime.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D43A0D1A8FC2E08604C8 /* GNUstep.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D613575E1934C599AC49 /* GNUstep.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1117D448C9396CD024971C97 /* NSData+PGData.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D2F717122C3EB529C8F9 /* NSData+PGData.m */; };
 		1117D4644A03DBBCBC84FF60 /* CommonBaseClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D0018483764220700B13 /* CommonBaseClass.m */; };
 		1117D5134D391E189F84ABF3 /* PGTestView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D4FFD90ED7502EA2A871 /* PGTestView.m */; };
 		1117D5452A4357171D4A7F61 /* PGSplitView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D8D7FA877AB382169852 /* PGSplitView.m */; };
@@ -63,6 +64,7 @@
 		1117DEBDC16D9C4476A99387 /* NSRegularExpression+PGRegularExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D0AF6BE265A96DA07535 /* NSRegularExpression+PGRegularExpression.m */; };
 		1117DED02A6B4C080C1D4A32 /* PGBTreeNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D67A2AE040A7E6CB7048 /* PGBTreeNode.m */; };
 		1117DEE5922222736B6B055A /* PGKeyValueData.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DBDF90510140CAA225EA /* PGKeyValueData.m */; };
+		1117DF0F963B8A7436A2692F /* NSData+PGData.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D5B762B0A787500E4A06 /* NSData+PGData.h */; };
 		1117DF197EE4AABA9851A4CD /* PGBTreeNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D950F73E1966A4DA091B /* PGBTreeNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117DF662954FBFB1CE6CB2E /* PGLinkedListNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D86CDCB304501F61812F /* PGLinkedListNode.m */; };
 		1117DFAA56BA4EB892BC022C /* PGBTreeDictionaryKeyEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D85ED6F9D2E7AEEB9209 /* PGBTreeDictionaryKeyEnumerator.m */; };
@@ -136,6 +138,7 @@
 		1117D1C50288D6AC04C60456 /* CommonBaseClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonBaseClass.h; sourceTree = "<group>"; };
 		1117D1CEBF5C6EAF6C17FB77 /* NSRegularExpression+PGRegularExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSRegularExpression+PGRegularExpression.h"; sourceTree = "<group>"; };
 		1117D1F64319BD70B014FEA8 /* PGBTreeDictionaryKeyEnumerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBTreeDictionaryKeyEnumerator.h; sourceTree = "<group>"; };
+		1117D2F717122C3EB529C8F9 /* NSData+PGData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+PGData.m"; sourceTree = "<group>"; };
 		1117D33042231F8E68498B6F /* NSDictionary+PGBTreeDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+PGBTreeDictionary.m"; sourceTree = "<group>"; };
 		1117D35A818616F0E99E59BA /* PGMacros.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGMacros.m; sourceTree = "<group>"; };
 		1117D391F03918AED5A6575A /* PGRWLockCounts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGRWLockCounts.m; sourceTree = "<group>"; };
@@ -154,6 +157,7 @@
 		1117D57792306E4C2744E086 /* PGTime.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTime.m; sourceTree = "<group>"; };
 		1117D58A6A010B8353C7EAA3 /* PGDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDefines.h; sourceTree = "<group>"; };
 		1117D5A22062D907B9F4DBE6 /* PGTime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTime.h; sourceTree = "<group>"; };
+		1117D5B762B0A787500E4A06 /* NSData+PGData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+PGData.h"; sourceTree = "<group>"; };
 		1117D607B5EF87616FC650DE /* sem_timedwait.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sem_timedwait.h; sourceTree = "<group>"; };
 		1117D613575E1934C599AC49 /* GNUstep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GNUstep.h; sourceTree = "<group>"; };
 		1117D633C627A60F2B56A183 /* PGBTreeDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBTreeDictionary.h; sourceTree = "<group>"; };
@@ -374,6 +378,8 @@
 				1117D1CEBF5C6EAF6C17FB77 /* NSRegularExpression+PGRegularExpression.h */,
 				1117D815FD8832412F83E9E5 /* NSArray+PGArray.m */,
 				1117D42C28C03BA65BFF47BD /* NSArray+PGArray.h */,
+				1117D2F717122C3EB529C8F9 /* NSData+PGData.m */,
+				1117D5B762B0A787500E4A06 /* NSData+PGData.h */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -585,6 +591,7 @@
 				1117DBB362320F47607B2FBF /* PGTimedWait.h in Headers */,
 				1117D0BACEE7BBFB719DBC09 /* sem_timedwait.h in Headers */,
 				1117D785ED482E1FBC167D0C /* PGBTreeDictionaryKeyEnumerator.h in Headers */,
+				1117DF0F963B8A7436A2692F /* NSData+PGData.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -826,6 +833,7 @@
 				1117DEBDC16D9C4476A99387 /* NSRegularExpression+PGRegularExpression.m in Sources */,
 				1117D0EFEC5609199A60B88F /* NSArray+PGArray.m in Sources */,
 				1117DFAA56BA4EB892BC022C /* PGBTreeDictionaryKeyEnumerator.m in Sources */,
+				1117D448C9396CD024971C97 /* NSData+PGData.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
