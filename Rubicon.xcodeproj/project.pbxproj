@@ -64,7 +64,7 @@
 		1117DEBDC16D9C4476A99387 /* NSRegularExpression+PGRegularExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D0AF6BE265A96DA07535 /* NSRegularExpression+PGRegularExpression.m */; };
 		1117DED02A6B4C080C1D4A32 /* PGBTreeNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D67A2AE040A7E6CB7048 /* PGBTreeNode.m */; };
 		1117DEE5922222736B6B055A /* PGKeyValueData.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DBDF90510140CAA225EA /* PGKeyValueData.m */; };
-		1117DF0F963B8A7436A2692F /* NSData+PGData.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D5B762B0A787500E4A06 /* NSData+PGData.h */; };
+		1117DF0F963B8A7436A2692F /* NSData+PGData.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D5B762B0A787500E4A06 /* NSData+PGData.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117DF197EE4AABA9851A4CD /* PGBTreeNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D950F73E1966A4DA091B /* PGBTreeNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117DF662954FBFB1CE6CB2E /* PGLinkedListNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D86CDCB304501F61812F /* PGLinkedListNode.m */; };
 		1117DFAA56BA4EB892BC022C /* PGBTreeDictionaryKeyEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D85ED6F9D2E7AEEB9209 /* PGBTreeDictionaryKeyEnumerator.m */; };
@@ -570,6 +570,8 @@
 				1117DC81610608A9F6FAF318 /* PGTimeSpec.h in Headers */,
 				1117D86E190AE0BF1ED8C58F /* PGMacros.h in Headers */,
 				1117D9ED3505D5CC303D17E2 /* NSDictionary+PGBTreeDictionary.h in Headers */,
+				1117DCA7F02AB630583BCDFF /* NSArray+PGArray.h in Headers */,
+				1117DF0F963B8A7436A2692F /* NSData+PGData.h in Headers */,
 				1117D72A8C001A697B2C3DEE /* NSMutableDictionary+PGBTreeMutableDictionary.h in Headers */,
 				1117D08C283C1BA68BF7FE31 /* NSObject+PGObject.h in Headers */,
 				1117DB286C8ECD53FA07CA61 /* NSRegularExpression+PGRegularExpression.h in Headers */,
@@ -586,12 +588,10 @@
 				1117D72FD20B775B8F0898A7 /* PGSemaphore.h in Headers */,
 				1117DA0BC598AF33FAA9CCD5 /* PGTimedReadLock.h in Headers */,
 				1117D9F77F007547086C011D /* PGTimedSemWait.h in Headers */,
-				1117DCA7F02AB630583BCDFF /* NSArray+PGArray.h in Headers */,
 				1117DD4081DB0393F9318DF2 /* PGRWLockCounts.h in Headers */,
 				1117DBB362320F47607B2FBF /* PGTimedWait.h in Headers */,
 				1117D0BACEE7BBFB719DBC09 /* sem_timedwait.h in Headers */,
 				1117D785ED482E1FBC167D0C /* PGBTreeDictionaryKeyEnumerator.h in Headers */,
-				1117DF0F963B8A7436A2692F /* NSData+PGData.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
