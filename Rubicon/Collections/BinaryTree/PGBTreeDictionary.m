@@ -196,9 +196,7 @@
         else if(aKey == nil) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Object is null." userInfo:nil];
         else if(_root) {
             NSComparisonResult (^compareBlock)(PGKeyValueData *)=^NSComparisonResult(PGKeyValueData *nodeData) { return [nodeData compareKeyTo:aKey]; };
-            PGKeyValueData *(^dataBlock)()=^PGKeyValueData *() { return [PGKeyValueData dataWithValue:anObject forKey:aKey]; };
-
-            self.root = [_root insertWithCompareBlock:compareBlock dataBlock:dataBlock];
+            self.root = [_root insertData:[PGKeyValueData dataWithValue:anObject forKey:aKey] withCompareBlock:compareBlock];
         }
         else {
             self.root = [PGBTreeNode nodeWithData:[PGKeyValueData dataWithValue:anObject forKey:aKey]];

@@ -29,6 +29,7 @@
 #import <Rubicon/NSMutableDictionary+PGBTreeMutableDictionary.h>
 #import <Rubicon/NSRegularExpression+PGRegularExpression.h>
 #import <Rubicon/NSArray+PGArray.h>
+#import <Rubicon/NSData+PGData.h>
 #import <Rubicon/PGMacros.h>
 #import <Rubicon/PGSemaphore.h>
 #import <Rubicon/PGReadWriteLock.h>

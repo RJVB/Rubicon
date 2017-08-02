@@ -30,33 +30,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGBTreeNode<__covariant T>()
 
+    @property(nonatomic) BOOL           isRed;
+    @property(nonatomic, readonly) BOOL isAllBlack;
+
     -(instancetype)initWithData:(T)data isRed:(BOOL)isRed;
-
-    -(nullable instancetype)child:(BOOL)onLeft;
-
-    -(BOOL)allBlack;
-
-    -(BOOL)isLeft;
-
-    -(BOOL)isRight;
-
-    -(void)setIsRed:(BOOL)b;
-
-    -(void)setParent:(nullable PGBTreeNode *)node;
 
     -(void)recount;
 
-    -(instancetype)makeOrphan;
-
-    -(nullable instancetype)setChild:(nullable PGBTreeNode *)child onLeft:(BOOL)onLeft;
+    -(void)replaceMeWith:(nullable PGBTreeNode *)node;
 
     -(void)rotate:(BOOL)toTheLeft;
 
-    -(instancetype)foobar:(T)data child:(nullable PGBTreeNode *)child onLeft:(BOOL)onLeft;
+    -(void)swapColorsWith:(PGBTreeNode *)child;
 
     -(instancetype)ibal;
 
-    -(instancetype)rbal;
+    -(void)rbal;
 
     +(instancetype)nodeWithData:(T)data isRed:(BOOL)isRed;
 

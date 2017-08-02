@@ -33,21 +33,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGBTreeNode<__covariant T> : NSObject
 
-    @property(retain) T            data;
-    @property(readonly) NSUInteger count;
-    @property(readonly) BOOL       isRed;
+    @property(nonatomic, readonly) T          data;
+    @property(nonatomic, readonly) NSUInteger count;
 
     -(instancetype)initWithData:(T)data;
 
-    -(nullable instancetype)find:(T)data;
+    +(instancetype)nodeWithData:(T)data;
 
-    -(nullable instancetype)findWithCompareBlock:(NSComparisonResult(^)(T nodeData))compareBlock;
-
-    -(instancetype)insertWithCompareBlock:(NSComparisonResult(^)(T nodeData))compareBlock dataBlock:(T(^)(void))dataBlock;
-
-    -(instancetype)insert:(T)data;
-
-    -(nullable instancetype)remove;
+    -(nullable instancetype)root;
 
     -(nullable instancetype)parent;
 
@@ -55,17 +48,17 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(nullable instancetype)right;
 
-    -(nullable instancetype)root;
+    -(nullable instancetype)find:(T)data;
 
-    -(nullable instancetype)grandparent;
+    -(instancetype)insert:(T)data;
 
-    -(nullable instancetype)sibling;
+    -(nullable instancetype)findWithCompareBlock:(NSComparisonResult(^)(T nodeData))compareBlock;
 
-    -(nullable instancetype)uncle;
+    -(instancetype)insertData:(T)data withCompareBlock:(NSComparisonResult(^)(T nodeData))compareBlock;
+
+    -(nullable instancetype)remove;
 
     -(void)clearTree;
-
-    +(instancetype)nodeWithData:(T)data;
 
 @end
 
