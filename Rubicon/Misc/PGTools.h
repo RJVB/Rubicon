@@ -60,13 +60,21 @@ NS_INLINE id _Nullable PGSetReference(id _Nullable *_Nullable ref, id _Nullable 
 }
 
 /**************************************************************************************************//**
- * Compares to objects for order.  Returns NSOrderedAscending, NSOrderedSame, NSOrderedDescending if
- * obj1 is less than, equal to, or greater than obj2.
+ * This function attempts to generically compare two objects to determine their sort ordering. Two
+ * objects are fully comparable if 1) they share a common superclass and 2) instances of that
+ * superclass implement the "compare:" selector.
+ *
+ * NOTE: just because two objects have the same ordering weight (this function returns NSOrderedSame)
+ * does not automatically mean they have equal values. Equality should still be determined by the
+ * "isEqual:" method.
+ *
  * @param obj1 the first object.
  * @param obj2 the second object.
- * @return NSOrderedAscending, NSOrderedSame, NSOrderedDescending if obj1 is less than, equal to, or
- *         greater than obj2.
- ******************************************************************************************************/
+ * @return NSOrderedSame if both objects have the same sorting weight, NSOrderedAscending if the first
+ *          object's sorting weight is less than the second, and NSOrderedDescending if the first
+ *          object's sorting weight is greater than the second.
+ * @throws NSException named "NSInvalidArgumentException" if the two objects are not comparable.
+ */
 FOUNDATION_EXPORT NSComparisonResult PGCompare(id _Nullable obj1, id _Nullable obj2);
 
 /**************************************************************************************************//**

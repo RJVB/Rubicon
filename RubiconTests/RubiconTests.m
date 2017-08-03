@@ -65,9 +65,9 @@
         NSString   *s1 = @"String #1";
         NSString   *s2 = [NSString stringWithFormat:@"My name is %@!", @"Galen"];
 
-        Class cClass1 = [c1 baseClassInCommonWith:c2];
-        Class cClass2 = [s1 baseClassInCommonWith:s2];
-        Class cClass3 = [s1 baseClassInCommonWith:c1];
+        Class cClass1 = [c1 superclassInCommonWith:c2];
+        Class cClass2 = [s1 superclassInCommonWith:s2];
+        Class cClass3 = [s1 superclassInCommonWith:c1];
 
         NSString *c1Name = NSStringFromClass([c1 class]);
         NSString *c2Name = NSStringFromClass([c2 class]);

@@ -27,7 +27,19 @@
 
 #import <Rubicon/PGTools.h>
 
-Class PGCommonBaseClass(Class c1, Class c2);
+/**
+ * The purpose of this function is to attempt to find a class that is the first common superclass of the two
+ * provided classes.  If not common superclass can be found then Nil is returned.  Usually, all classes in
+ * normal Objective-C programs share at least one superclass, the root class NSObject.  However, this
+ * function makes the assumption that one or both of the provided classes may not ultimately inherit from
+ * NSObject.  As such this function uses the Objective-C runtime function class_getSuperclass(Class) rather
+ * than assuming that the NSObject class method superclass is available to use.
+ *
+ * @param c1 the first class.
+ * @param c2 the second class.
+ * @return the first common superclass or Nil if there isn't one.
+ */
+Class PGCommonSuperclass(Class c1, Class c2);
 
 @interface NSObject(PGObject)
 
@@ -41,7 +53,7 @@ Class PGCommonBaseClass(Class c1, Class c2);
 	 * @param obj the other object.
 	 * @return the first superclass that both this object and the given class have in common.
 	 ******************************************************************************************************/
-    -(Class)baseClassInCommonWith:(id)obj;
+    -(Class)superclassInCommonWith:(id)obj;
 
     /**************************************************************************************************//**
 	 * Created because the definition of isKindOf:(Class) and isMemberOf:(Class) is hard for me to

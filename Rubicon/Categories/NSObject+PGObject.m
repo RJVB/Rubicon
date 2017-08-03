@@ -36,8 +36,8 @@
 	 * @param obj the other object.
 	 * @return the first superclass that both this object and the given class have in common.
 	 ******************************************************************************************************/
-    -(Class)baseClassInCommonWith:(id)obj {
-        return (obj ? PGCommonBaseClass([self class], [obj class]) : nil);
+    -(Class)superclassInCommonWith:(id)obj {
+        return (obj ? PGCommonSuperclass([self class], [obj class]) : nil);
     }
 
     /**************************************************************************************************//**
@@ -80,7 +80,7 @@
                 if(obj1 == obj2 || [obj1 isEqual:obj2]) {
                     return NSOrderedSame;
                 }
-                else if([[obj1 baseClassInCommonWith:obj2] instancesRespondToSelector:@selector(compare:)]) {
+                else if([[obj1 superclassInCommonWith:obj2] instancesRespondToSelector:@selector(compare:)]) {
                     return [obj1 compare:obj2];
                 }
             }
@@ -91,11 +91,27 @@
 
 @end
 
-Class _commonBaseClass1(Class c1, Class c2, Class c3) {
-    return (c1 ? (c2 ? ((c1 == c2) ? c1 : _commonBaseClass1(c1, class_getSuperclass(c2), c3)) : _commonBaseClass1(class_getSuperclass(c1), c3, c3)) : nil);
-}
+/**
+ * The purpose of this function is to attempt to find a class that is the first common superclass of the two
+ * provided classes.  If not common superclass can be found then Nil is returned.  Usually, all classes in
+ * normal Objective-C programs share at least one superclass, the root class NSObject.  However, this
+ * function makes the assumption that one or both of the provided classes may not ultimately inherit from
+ * NSObject.  As such this function uses the Objective-C runtime function class_getSuperclass(Class) rather
+ * than assuming that the NSObject class method superclass is available to use.
+ *
+ * @param c1 the first class.
+ * @param c2 the second class.
+ * @return the first common superclass or Nil if there isn't one.
+ */
+Class PGCommonSuperclass(Class c1, Class c2) {
+    if(c1 && c2) {
+        for(Class ca = c1; (ca != nil); ca = class_getSuperclass(ca)) {
+            for(Class cb = c2; (cb != nil); cb = class_getSuperclass(cb)) {
+                if(ca == cb) return cb;
+            }
+        }
+    }
 
-Class PGCommonBaseClass(Class c1, Class c2) {
-    return _commonBaseClass1(c1, c2, c2);
+    return nil;
 }
 
