@@ -1,12 +1,12 @@
 /******************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGBTreeNodePriv.h
+ *    FILENAME: NSBitmapImageRep(PGBitmapImageRep).h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 6/15/17 12:11 PM
+ *        DATE: 8/4/17 10:13 AM
  * DESCRIPTION:
  *
- * Copyright © 2017 Galen Rhodes All rights reserved.
+ * Copyright © 2017 Project Galen. All rights reserved.
  *
  * "It can hardly be a coincidence that no language on Earth has ever produced the expression 'As pretty as an airport.' Airports
  * are ugly. Some are very ugly. Some attain a degree of ugliness that can only be the result of special effort."
@@ -21,35 +21,19 @@
  * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *********************************************************************************************************************************/
 
-#ifndef __Rubicon_PGBTreeNodePriv_H_
-#define __Rubicon_PGBTreeNodePriv_H_
+#ifndef __Rubicon_NSBitmapImageRep_PGBitmapImageRep__H_
+#define __Rubicon_NSBitmapImageRep_PGBitmapImageRep__H_
 
-#import <Rubicon/PGBTreeNode.h>
+#import <Rubicon/PGTools.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGBTreeNode<__covariant T>()
+@interface NSBitmapImageRep(PGBitmapImageRep)
 
-    @property(nonatomic) BOOL           isRed;
-
-    -(instancetype)initWithData:(T)data isRed:(BOOL)isRed;
-
-    -(void)recount;
-
-    -(void)replaceMeWith:(nullable PGBTreeNode *)node;
-
-    -(void)rotate:(BOOL)toTheLeft;
-
-    -(void)swapColorsWith:(PGBTreeNode *)child;
-
-    -(instancetype)ibal;
-
-    -(void)rbal;
-
-    +(instancetype)nodeWithData:(T)data isRed:(BOOL)isRed;
+    +(NSBitmapImageRep *)createARGBImage:(NSFloat)width height:(NSFloat)height;
 
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif //__Rubicon_PGBTreeNodePriv_H_
+#endif // __Rubicon_NSBitmapImageRep_PGBitmapImageRep__H_

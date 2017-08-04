@@ -28,6 +28,7 @@
 #import <Rubicon/NSDictionary+PGBTreeDictionary.h>
 #import <Rubicon/NSMutableDictionary+PGBTreeMutableDictionary.h>
 #import <Rubicon/NSRegularExpression+PGRegularExpression.h>
+#import <Rubicon/NSBitmapImageRep+PGBitmapImageRep.h>
 #import <Rubicon/NSArray+PGArray.h>
 #import <Rubicon/NSData+PGData.h>
 #import <Rubicon/PGMacros.h>

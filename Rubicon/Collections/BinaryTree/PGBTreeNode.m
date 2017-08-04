@@ -24,8 +24,6 @@
 #import "PGBTreeNode.h"
 #import "PGBTreeNodePriv.h"
 
-#define PGBTreeChild(p, l) ((l)?((p).left):((p).right))
-
 @implementation PGBTreeNode {
         PGBTreeNode *_parent;
         PGBTreeNode *_left;
@@ -65,8 +63,8 @@
 #pragma clang diagnostic pop
 
     -(void)recount {
-        _count = (1 + self.left.count + self.right.count);
-        [self.parent recount];
+        _count = (1 + _left.count + _right.count);
+        [_parent recount];
     }
 
     -(instancetype)root { return (_parent ? _parent.root : self); }
@@ -151,21 +149,14 @@
 
     -(void)replaceMeWith:(PGBTreeNode *)node {
         PGBTreeNode *parent = self.parent;
-        if(parent) {
-            if(self == parent.left) parent.left = node; else parent.right = node;
-        }
+        if(parent) { if(self == parent.left) parent.left = node; else parent.right = node; }
     }
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Woverriding-method-mismatch"
 
     -(instancetype)find:(id)data {
-        if(data) {
-            NSComparisonResult (^compareBlock)(id)=^NSComparisonResult(id nodeData) { return PGCompare(nodeData, data); };
-            return [self findWithCompareBlock:compareBlock];
-        }
-
-        return nil;
+        return (data ? [self findWithCompareBlock:^NSComparisonResult(id nodeData) { return PGCompare(nodeData, data); }] : nil);
     }
 
     -(instancetype)findWithCompareBlock:(NSComparisonResult(^)(id nodeData))compareBlock {
@@ -180,29 +171,18 @@
     }
 
     -(instancetype)insert:(id)data {
-        if(data) {
-            NSComparisonResult (^compareBlock)(id)=^NSComparisonResult(id nodeData) { return PGCompare(nodeData, data); };
-            return [self insertData:data withCompareBlock:compareBlock];
-        }
+        if(data) return [self insertData:data withCompareBlock:^NSComparisonResult(id nodeData) { return PGCompare(nodeData, data); }];
         else @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Data cannot be null." userInfo:nil];
     }
+
+    -(instancetype)newNode:(id)data { return [self.class nodeWithData:data isRed:YES]; }
 
     -(instancetype)insertData:(id)data withCompareBlock:(NSComparisonResult(^)(id nodeData))compareBlock {
         switch(compareBlock(self.data)) {
             case NSOrderedAscending:
-                if(self.right) {
-                    return [self.right insertData:data withCompareBlock:compareBlock];
-                }
-                else {
-                    return (self.right = [self.class nodeWithData:data isRed:YES]).ibal;
-                }
+                return (self.right ? [self.right insertData:data withCompareBlock:compareBlock] : (self.right = [self newNode:data]).ibal);
             case NSOrderedDescending:
-                if(self.left) {
-                    return [self.left insertData:data withCompareBlock:compareBlock];
-                }
-                else {
-                    return (self.left = [self.class nodeWithData:data isRed:YES]).ibal;
-                }
+                return (self.left ? [self.left insertData:data withCompareBlock:compareBlock] : (self.left    = [self newNode:data]).ibal);
             default:
                 _data = data;
                 return self;
@@ -217,22 +197,21 @@
         if(pnode) {
             if(pnode.isRed) {
                 PGBTreeNode *gnode = pnode.parent;
+                BOOL        sLeft  = (self == pnode.left);
                 BOOL        pRight = (pnode == gnode.right);
-                PGBTreeNode *unode = PGBTreeChild(gnode, pRight);
+                PGBTreeNode *unode = (pRight ? gnode.left : gnode.right);
 
                 if(unode.isRed) {
                     pnode.isRed = unode.isRed = !(gnode.isRed = YES);
                     [gnode ibal];
                 }
                 else {
-                    if(pRight == (self == pnode.left)) [pnode rotate:!pRight];
+                    if(pRight == sLeft) [pnode rotate:!pRight];
                     [gnode rotate:pRight];
                 }
             }
         }
-        else {
-            self.isRed = NO;
-        }
+        else self.isRed = NO;
 
         return self;
     }
@@ -249,43 +228,48 @@
         else {
             if(lc) rc = lc;
             lc = self.parent;
-
-            if(!self.isRed) {
-                if(rc.isRed) rc.isRed = NO; else [self rbal];
-            }
+            if(!self.isRed) { if(rc.isRed) rc.isRed = NO; else [self rbal]; }
             [self replaceMeWith:rc];
             [self clearFields];
             return (lc ? lc : rc).root;
         }
     }
 
-    -(BOOL)isAllBlack { return !(self.isRed || self.left.isRed || self.right.isRed); }
+    NS_INLINE void rbal4(PGBTreeNode *p, PGBTreeNode *s, BOOL r) {
+        (r ? s.left : s.right).isRed = NO;
+        [p rotate:!r];
+    }
+
+    NS_INLINE void rbal3(PGBTreeNode *p, PGBTreeNode *s, BOOL r) {
+        if((r ? s.right : s.left).isRed) {
+            [s rotate:r];
+            rbal4(p, s.parent, r);
+        }
+        else rbal4(p, s, r);
+    }
+
+    NS_INLINE void rbal2(PGBTreeNode *p, PGBTreeNode *s, BOOL r) {
+        if(s.isRed || s.left.isRed || s.right.isRed) rbal3(p, s, r);
+        else {
+            s.isRed = YES;
+            if(p.isRed) p.isRed = NO; else [p rbal];
+        }
+    }
+
+    NS_INLINE void rbal1(PGBTreeNode *p, PGBTreeNode *s, BOOL r) {
+        if(s.isRed) {
+            [p rotate:!r];
+            rbal2(p, (r ? p.left : p.right), r);
+        }
+        else rbal2(p, s, r);
+    }
 
     -(void)rbal {
-        PGBTreeNode *pNode = self.parent;
+        PGBTreeNode *p = self.parent;
 
-        if(pNode) {
-            BOOL        l      = (self == pNode.left);
-            PGBTreeNode *sNode = PGBTreeChild(pNode, !l);
-
-            if(sNode.isRed) {
-                [pNode rotate:l];
-                sNode = PGBTreeChild(pNode, !l);
-            }
-
-            if(sNode.isAllBlack) {
-                sNode.isRed = YES;
-                if(pNode.isRed) pNode.isRed = NO; else [pNode rbal];
-            }
-            else {
-                if(PGBTreeChild(sNode, l).isRed) {
-                    [sNode rotate:!l];
-                    sNode = sNode.parent;
-                }
-
-                PGBTreeChild(sNode, !l).isRed = NO;
-                [pNode rotate:l];
-            }
+        if(p) {
+            BOOL r = (self == p.right);
+            rbal1(p, (r ? p.left : p.right), r);
         }
     }
 

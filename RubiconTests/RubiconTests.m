@@ -26,7 +26,7 @@
         [super tearDown];
     }
 
-    -(void)testPGFormat {
+    -(void)te2stPGFormat {
         NSLog(@"New String = \"%@\"", PGFormat(@"Galen %@", @"Rhodes"));
     }
 
@@ -51,7 +51,7 @@
         }
     }
 
-    -(void)testCompare {
+    -(void)te2stCompare {
         [self testCompareWithClass:[[NSObject alloc] init]];
         [self testCompareWithClass:@(123)];
         [self testCompareWithClass:@"Galen"];
@@ -59,7 +59,7 @@
         [self testCompareWithClass:@[ @"a", @"b", @"c" ]];
     }
 
-    -(void)testCommonBaseClass {
+    -(void)te2stCommonBaseClass {
         Subclass1D *c1 = [[Subclass1D alloc] init];
         Subclass2C *c2 = [[Subclass2C alloc] init];
         NSString   *s1 = @"String #1";
@@ -98,10 +98,20 @@
         }
     }
 
-    -(void)testFinallyExecutedWithReturnFromTry {
+    -(void)te2stFinallyExecutedWithReturnFromTry {
         NSLog(@"Value returned: %@", @([self performWithReturnInTry]));
     }
 
+    -(void)ifthentest:(BOOL)a b:(BOOL)b {
+        if(a) if(b) NSLog(@"if(b)"); else NSLog(@"else b"); else NSLog(@"else a");
+    }
+
+    -(void)testIfThenElse {
+        [self ifthentest:NO b:NO];
+        [self ifthentest:NO b:YES];
+        [self ifthentest:YES b:YES];
+        [self ifthentest:YES b:NO];
+    }
 
     //	-(void)testPerformanceExample {
     //		// This is an example of a performance test case.

@@ -23,7 +23,6 @@
 
 #import "PGTools.h"
 #import "NSObject+PGObject.h"
-#import "PGTimeSpec.h"
 
 NSBitmapImageRep *PGCreateARGBImage(NSFloat width, NSFloat height) {
     NSInteger iWidth  = (NSInteger)ceil(width);
@@ -61,6 +60,26 @@ NSString *PGFormat(NSString *fmt, ...) {
     return str;
 }
 
+NSComparisonResult PGDateCompare(NSDate *d1, NSDate *d2) {
+    return ((d1 == d2) ? NSOrderedSame : ((d1 && d2) ? [d1 compare:d2] : (d2 ? NSOrderedAscending : NSOrderedDescending)));
+}
+
+NSComparisonResult PGNumCompare(NSNumber *n1, NSNumber *n2) {
+    return ((n1 == n2) ? NSOrderedSame : ((n1 && n2) ? [n1 compare:n2] : (n2 ? NSOrderedAscending : NSOrderedDescending)));
+}
+
+NSComparisonResult PGStrCompare(NSString *str1, NSString *str2) {
+    return ((str1 == str2) ? NSOrderedSame : ((str1 && str2) ? [str1 compare:str2] : (str2 ? NSOrderedAscending : NSOrderedDescending)));
+}
+
+NSComparisonResult _PGCompare(id obj1, id obj2) {
+    if([[obj1 superclassInCommonWith:obj2] instancesRespondToSelector:@selector(compare:)]) return [obj1 compare:obj2];
+
+    @throw [NSException exceptionWithName:NSInvalidArgumentException
+                                   reason:PGFormat(@"Class %@ cannot be compared to class %@.", NSStringFromClass([obj1 class]), NSStringFromClass([obj2 class]))
+                                 userInfo:nil];
+}
+
 /**************************************************************************************************//**
  * This function attempts to generically compare two objects to determine their sort ordering. Two
  * objects are fully comparable if 1) they share a common superclass and 2) instances of that
@@ -78,28 +97,5 @@ NSString *PGFormat(NSString *fmt, ...) {
  * @throws NSException named "NSInvalidArgumentException" if the two objects are not comparable.
  */
 NSComparisonResult PGCompare(id obj1, id obj2) {
-    if(obj1 == obj2) {
-        return NSOrderedSame;
-    }
-    else if(obj1 && obj2) {
-        if([obj1 isEqual:obj2]) {
-            return NSOrderedSame;
-        }
-        else {
-            Class cls = [obj1 superclassInCommonWith:obj2];
-
-            if([cls instancesRespondToSelector:@selector(compare:)]) {
-                return [obj1 compare:obj2];
-            }
-            else {
-                NSString *className1 = NSStringFromClass([obj1 class]);
-                NSString *className2 = NSStringFromClass([obj2 class]);
-                NSString *reason     = PGFormat(@"Class %@ cannot be compared to class %@.", className1, className2);
-                @throw [NSException exceptionWithName:NSInvalidArgumentException reason:reason userInfo:nil];
-            }
-        }
-    }
-    else {
-        return (obj2 ? NSOrderedAscending : NSOrderedDescending);
-    }
+    return ((obj1 == obj2) ? NSOrderedSame : ((obj1 && obj2) ? _PGCompare(obj1, obj2) : (obj2 ? NSOrderedAscending : NSOrderedDescending)));
 }

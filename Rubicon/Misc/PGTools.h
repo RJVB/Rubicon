@@ -59,6 +59,12 @@ NS_INLINE id _Nullable PGSetReference(id _Nullable *_Nullable ref, id _Nullable 
     return val;
 }
 
+FOUNDATION_EXPORT NSComparisonResult PGDateCompare(NSDate *_Nullable d1, NSDate *_Nullable d2);
+
+FOUNDATION_EXPORT NSComparisonResult PGNumCompare(NSNumber *_Nullable n1, NSNumber *_Nullable n2);
+
+FOUNDATION_EXPORT NSComparisonResult PGStrCompare(NSString *_Nullable str1, NSString *_Nullable str2);
+
 /**************************************************************************************************//**
  * This function attempts to generically compare two objects to determine their sort ordering. Two
  * objects are fully comparable if 1) they share a common superclass and 2) instances of that
