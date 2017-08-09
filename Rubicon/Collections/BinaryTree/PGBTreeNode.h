@@ -35,6 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     @property(nonatomic, readonly) T          data;
     @property(nonatomic, readonly) NSUInteger count;
+    @property(nonatomic, readonly) BOOL       onLeft;
+    @property(nonatomic, readonly) BOOL       onRight;
 
     -(instancetype)initWithData:(T)data;
 
@@ -47,6 +49,10 @@ NS_ASSUME_NONNULL_BEGIN
     -(nullable instancetype)left;
 
     -(nullable instancetype)right;
+
+    -(instancetype)sibling;
+
+    -(instancetype)uncle;
 
     -(nullable instancetype)find:(T)data;
 

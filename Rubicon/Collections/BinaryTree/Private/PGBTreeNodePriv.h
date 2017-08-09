@@ -34,18 +34,6 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(instancetype)initWithData:(T)data isRed:(BOOL)isRed;
 
-    -(void)recount;
-
-    -(void)replaceMeWith:(nullable PGBTreeNode *)node;
-
-    -(void)rotate:(BOOL)toTheLeft;
-
-    -(void)swapColorsWith:(PGBTreeNode *)child;
-
-    -(instancetype)ibal;
-
-    -(void)rbal;
-
     +(instancetype)nodeWithData:(T)data isRed:(BOOL)isRed;
 
 @end

@@ -54,11 +54,17 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Woverriding-method-mismatch"
 
-    -(instancetype)initWithData:(id)data { return (self = [self initWithData:data isRed:NO]); }
+    -(instancetype)initWithData:(id)data {
+        return (self = [self initWithData:data isRed:NO]);
+    }
 
-    +(instancetype)nodeWithData:(id)data isRed:(BOOL)isRed { return [[self alloc] initWithData:data isRed:isRed]; }
+    +(instancetype)nodeWithData:(id)data isRed:(BOOL)isRed {
+        return [[self alloc] initWithData:data isRed:isRed];
+    }
 
-    +(instancetype)nodeWithData:(id)data { return [[self alloc] initWithData:data isRed:NO]; }
+    +(instancetype)nodeWithData:(id)data {
+        return [[self alloc] initWithData:data isRed:NO];
+    }
 
 #pragma clang diagnostic pop
 
@@ -67,13 +73,21 @@
         [_parent recount];
     }
 
-    -(instancetype)root { return (_parent ? _parent.root : self); }
+    -(instancetype)root {
+        return (_parent ? _parent.root : self);
+    }
 
-    -(instancetype)parent { return _parent; }
+    -(instancetype)parent {
+        return _parent;
+    }
 
-    -(void)setParent:(PGBTreeNode *)parent { _parent = parent; }
+    -(void)setParent:(PGBTreeNode *)parent {
+        _parent = parent;
+    }
 
-    -(instancetype)left { return _left; }
+    -(instancetype)left {
+        return _left;
+    }
 
     -(void)setLeft:(PGBTreeNode *)child {
         if(self == child) {
@@ -91,7 +105,9 @@
         }
     }
 
-    -(instancetype)right { return _right; }
+    -(instancetype)right {
+        return _right;
+    }
 
     -(void)setRight:(PGBTreeNode *)child {
         if(self == child) {
@@ -107,6 +123,26 @@
             _right = child;
             [self recount];
         }
+    }
+
+    -(BOOL)onLeft {
+        return (self == self.parent.left);
+    }
+
+    -(BOOL)onRight {
+        return (self == self.parent.right);
+    }
+
+    -(instancetype)sibling {
+        return (self.onLeft ? self.parent.right : self.parent.left);
+    }
+
+    -(instancetype)uncle {
+        return self.parent.sibling;
+    }
+
+    -(instancetype)grandparent {
+        return self.parent.parent;
     }
 
     -(void)rotateLeft {
@@ -148,15 +184,24 @@
     }
 
     -(void)replaceMeWith:(PGBTreeNode *)node {
-        PGBTreeNode *parent = self.parent;
-        if(parent) { if(self == parent.left) parent.left = node; else parent.right = node; }
+        if(self.onLeft) self.parent.left = node; else self.parent.right = node;
     }
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Woverriding-method-mismatch"
 
     -(instancetype)find:(id)data {
-        return (data ? [self findWithCompareBlock:^NSComparisonResult(id nodeData) { return PGCompare(nodeData, data); }] : nil);
+        if(data) {
+            switch(PGCompare(self.data, data)) {
+                case NSOrderedAscending:
+                    return [self.right find:data];
+                case NSOrderedDescending:
+                    return [self.left find:data];
+                default:
+                    return self;
+            }
+        }
+        return nil;
     }
 
     -(instancetype)findWithCompareBlock:(NSComparisonResult(^)(id nodeData))compareBlock {
@@ -170,45 +215,54 @@
         }
     }
 
+    -(instancetype)newNode:(id)data {
+        return [self.class nodeWithData:data isRed:YES];
+    }
+
     -(instancetype)insert:(id)data {
-        if(data) return [self insertData:data withCompareBlock:^NSComparisonResult(id nodeData) { return PGCompare(nodeData, data); }];
+        if(data) {
+            switch(PGCompare(self.data, data)) {
+                case NSOrderedAscending:
+                    return (self.right ? [self.right insert:data] : (self.right = [self newNode:data]).ibal);
+                case NSOrderedDescending:
+                    return (self.left ? [self.left insert:data] : (self.left    = [self newNode:data]).ibal);
+                default:
+                    _data = data;
+                    return self;
+            }
+        }
         else @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Data cannot be null." userInfo:nil];
     }
 
-    -(instancetype)newNode:(id)data { return [self.class nodeWithData:data isRed:YES]; }
-
     -(instancetype)insertData:(id)data withCompareBlock:(NSComparisonResult(^)(id nodeData))compareBlock {
-        switch(compareBlock(self.data)) {
-            case NSOrderedAscending:
-                return (self.right ? [self.right insertData:data withCompareBlock:compareBlock] : (self.right = [self newNode:data]).ibal);
-            case NSOrderedDescending:
-                return (self.left ? [self.left insertData:data withCompareBlock:compareBlock] : (self.left    = [self newNode:data]).ibal);
-            default:
-                _data = data;
-                return self;
+        if(data) {
+            switch(compareBlock(self.data)) {
+                case NSOrderedAscending:
+                    return (self.right ? [self.right insertData:data withCompareBlock:compareBlock] : (self.right = [self newNode:data]).ibal);
+                case NSOrderedDescending:
+                    return (self.left ? [self.left insertData:data withCompareBlock:compareBlock] : (self.left    = [self newNode:data]).ibal);
+                default:
+                    _data = data;
+                    return self;
+            }
         }
+        else @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Data cannot be null." userInfo:nil];
     }
 
 #pragma clang diagnostic pop
 
     -(instancetype)ibal {
-        PGBTreeNode *pnode = self.parent;
-
-        if(pnode) {
-            if(pnode.isRed) {
-                PGBTreeNode *gnode = pnode.parent;
-                BOOL        sLeft  = (self == pnode.left);
-                BOOL        pRight = (pnode == gnode.right);
-                PGBTreeNode *unode = (pRight ? gnode.left : gnode.right);
-
-                if(unode.isRed) {
-                    pnode.isRed = unode.isRed = !(gnode.isRed = YES);
-                    [gnode ibal];
+        if(self.parent) {
+            if(self.parent.isRed) {
+                if(self.uncle.isRed) {
+                    self.parent.isRed = self.uncle.isRed = !(self.grandparent.isRed = YES);
+                    [self.grandparent ibal];
                 }
-                else {
-                    if(pRight == sLeft) [pnode rotate:!pRight];
-                    [gnode rotate:pRight];
+                else if(self.parent.onRight == self.onLeft) {
+                    [self.parent rotate:self.onRight];
+                    [self.parent rotate:self.onRight];
                 }
+                else [self.grandparent rotate:self.onRight];
             }
         }
         else self.isRed = NO;
@@ -235,41 +289,30 @@
         }
     }
 
-    NS_INLINE void rbal4(PGBTreeNode *p, PGBTreeNode *s, BOOL r) {
-        (r ? s.left : s.right).isRed = NO;
-        [p rotate:!r];
-    }
-
-    NS_INLINE void rbal3(PGBTreeNode *p, PGBTreeNode *s, BOOL r) {
-        if((r ? s.right : s.left).isRed) {
-            [s rotate:r];
-            rbal4(p, s.parent, r);
-        }
-        else rbal4(p, s, r);
-    }
-
-    NS_INLINE void rbal2(PGBTreeNode *p, PGBTreeNode *s, BOOL r) {
-        if(s.isRed || s.left.isRed || s.right.isRed) rbal3(p, s, r);
-        else {
-            s.isRed = YES;
-            if(p.isRed) p.isRed = NO; else [p rbal];
-        }
-    }
-
-    NS_INLINE void rbal1(PGBTreeNode *p, PGBTreeNode *s, BOOL r) {
-        if(s.isRed) {
-            [p rotate:!r];
-            rbal2(p, (r ? p.left : p.right), r);
-        }
-        else rbal2(p, s, r);
-    }
-
     -(void)rbal {
-        PGBTreeNode *p = self.parent;
+        PGBTreeNode *p = self.parent; // My parent will never change.
 
         if(p) {
-            BOOL r = (self == p.right);
-            rbal1(p, (r ? p.left : p.right), r);
+            BOOL        l  = self.onLeft; // Which side of my parent I'm on will never change.
+            PGBTreeNode *s = (l ? p.right : p.left); // My sibling will change but we'll correct.
+
+            if(s.isRed) {
+                [p rotate:l];
+                s = (l ? p.right : p.left);
+            }
+
+            if(s.isRed || s.left.isRed || s.right.isRed) {
+                if(!(l ? s.right.isRed : s.left.isRed)) {
+                    [s rotate:!l];
+                    s = s.parent;
+                }
+                (l ? s.right : s.left).isRed = NO;
+                [p rotate:l];
+            }
+            else {
+                s.isRed = YES;
+                if(p.isRed) p.isRed = NO; else [p rbal];
+            }
         }
     }
 
