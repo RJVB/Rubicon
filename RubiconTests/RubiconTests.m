@@ -30,11 +30,11 @@
         NSLog(@"New String = \"%@\"", PGFormat(@"Galen %@", @"Rhodes"));
     }
 
-    -(void)testCompareWithClass:(id)obj {
+    -(void)te2stCompareWithClass:(id)obj {
         NSLog(@"Class %@ responds to \"compare:\": %@", NSStringFromClass([obj class]), @([obj respondsToSelector:@selector(compare:)]));
     }
 
-    -(void)testMacros {
+    -(void)te2stMacros {
         PGMacros *macros = [PGMacros macrosWithHandler:^NSString *(NSString *label, NSString *whole, NSRange range) {
             NSLog(@"Found Macro: %@", label);
             return [NSString stringWithFormat:@"*** %@%@ ***", label, NSStringFromRange(range)];
@@ -52,11 +52,11 @@
     }
 
     -(void)te2stCompare {
-        [self testCompareWithClass:[[NSObject alloc] init]];
-        [self testCompareWithClass:@(123)];
-        [self testCompareWithClass:@"Galen"];
-        [self testCompareWithClass:[NSString stringWithFormat:@"My name is %@!", @"Galen"]];
-        [self testCompareWithClass:@[ @"a", @"b", @"c" ]];
+        [self te2stCompareWithClass:[[NSObject alloc] init]];
+        [self te2stCompareWithClass:@(123)];
+        [self te2stCompareWithClass:@"Galen"];
+        [self te2stCompareWithClass:[NSString stringWithFormat:@"My name is %@!", @"Galen"]];
+        [self te2stCompareWithClass:@[ @"a", @"b", @"c" ]];
     }
 
     -(void)te2stCommonBaseClass {
@@ -106,11 +106,24 @@
         if(a) if(b) NSLog(@"if(b)"); else NSLog(@"else b"); else NSLog(@"else a");
     }
 
-    -(void)testIfThenElse {
+    -(void)te2stIfThenElse {
         [self ifthentest:NO b:NO];
         [self ifthentest:NO b:YES];
         [self ifthentest:YES b:YES];
         [self ifthentest:YES b:NO];
+    }
+
+    -(void)testTrim {
+        NSString *a1 = @"BOB";
+        NSString *b1 = @" BOB \r\n";
+
+        NSString *a2 = [a1 stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSString *b2 = [b1 stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
+        NSLog(@"a1 = %p", (__bridge void *)a1);
+        NSLog(@"a2 = %p", (__bridge void *)a2);
+        NSLog(@"b1 = %p", (__bridge void *)b1);
+        NSLog(@"b2 = %p", (__bridge void *)b2);
     }
 
     //	-(void)testPerformanceExample {

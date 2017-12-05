@@ -42,9 +42,9 @@ const NSUInteger PGUNotFound = NSUIntegerMax;
     }
 
     -(NSString *)trim {
-        return [[[self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]
-                       stringByTrimmingCharactersInSet:[NSCharacterSet controlCharacterSet]]
-                       copy];
+        NSString *re0 = [self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSString *res = [re0 stringByTrimmingCharactersInSet:[NSCharacterSet controlCharacterSet]];
+        return ((self == res) ? [self copy] : res);
     }
 
     -(NSDictionary *)makeAlignmentCentered:(NSDictionary *)fontAttribs {
