@@ -25,18 +25,38 @@
 
 @implementation NSArray(PGArray)
 
-    -(BOOL)containsIdenticalObjectsAsArray:(NSArray<id> *)array {
-        if(array == self) return YES;
+    -(BOOL)containsIdenticalObjectsOutOfOrderAsArray:(NSArray<id> *)array {
+        if(array) {
+            if(array == self) return YES;
 
-        NSUInteger i = array.count;
-        NSUInteger j = self.count;
+            NSUInteger c = self.count;
 
-        if(i == j) {
-            for(NSUInteger x = 0; x < j; x++) {
-                if(self[x] != array[x]) return NO;
+            if(array.count == c) {
+                for(NSUInteger i = 0; i < c; i++) {
+                    if([array indexOfObjectIdenticalTo:self[i]] == NSNotFound) return NO;
+                }
+
+                return YES;
             }
+        }
 
-            return YES;
+        return NO;
+    }
+
+    -(BOOL)containsIdenticalObjectsAsArray:(NSArray<id> *)array {
+        if(array) {
+            if(array == self) return YES;
+
+            NSUInteger i = array.count;
+            NSUInteger j = self.count;
+
+            if(i == j) {
+                for(NSUInteger x = 0; x < j; x++) {
+                    if(self[x] != array[x]) return NO;
+                }
+
+                return YES;
+            }
         }
 
         return NO;
