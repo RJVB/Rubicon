@@ -73,30 +73,13 @@ void *waitThread(void *obj);
         return (success ? success : pthread_kill(_thread1, SIGUSR2));
     }
 
-    -(BOOL)timedAction:(id *)results savedState:(int)savedState exception:(NSException **)exception {
-        BOOL success = (pthread_create(&_thread2, NULL, waitThread, (__bridge_retained void *)self) == 0);
-        pthread_setcancelstate(savedState, NULL);
-
-        if(success) {
-            @try {
-                success = [self action:results];
-            }
-            @catch(NSException *caughtException) {
-                success = NO;
-                *exception = caughtException;
-            }
-        }
-
-        return success;
-    }
-
     -(BOOL)action:(id *)results {
         if(results) *results = nil;
         return YES;
     }
 
     -(BOOL)timedAction {
-        return [self timedAction:NULL];
+        return [self timedAction:nil];
     }
 
 #pragma clang diagnostic push
@@ -113,7 +96,7 @@ void *waitThread(void *obj);
 
             _thread1 = pthread_self();
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &savedState);
-            pthread_cleanup_push(threadCleanup, (__bridge_retained void *)self);
+            pthread_cleanup_push(threadCleanup, (__bridge void *)self);
 
                 success = [self timedAction:&actionResults savedState:savedState exception:&exception];
 
@@ -125,6 +108,23 @@ void *waitThread(void *obj);
     }
 
 #pragma clang diagnostic pop
+
+    -(BOOL)timedAction:(id *)results savedState:(int)savedState exception:(NSException **)exception {
+        BOOL success = (pthread_create(&_thread2, NULL, waitThread, (__bridge void *)self) == 0);
+        pthread_setcancelstate(savedState, NULL);
+
+        if(success) {
+            @try {
+                success = [self action:results];
+            }
+            @catch(NSException *caughtException) {
+                success = NO;
+                *exception = caughtException;
+            }
+        }
+
+        return success;
+    }
 
     -(NSInteger)wait {
         NSInteger  errorNo   = 0;
@@ -174,10 +174,12 @@ void ignoreSignal(int _signal) {
 #pragma clang diagnostic pop
 
 void threadCleanup(void *obj) {
-    [((__bridge_transfer PGTimedWait *)obj) cleanup];
+    [((__bridge PGTimedWait *)obj) cleanup];
 }
 
 void *waitThread(void *obj) {
-    return (void *)(long)[((__bridge_transfer PGTimedWait *)obj) wait];
+    PGTimedWait *timedWait = ((__bridge PGTimedWait *)obj);
+    long        errorNo    = ((long)[timedWait wait]);
+    return ((void *)errorNo);
 }
 

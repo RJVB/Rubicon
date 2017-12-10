@@ -223,13 +223,13 @@ int clock_gettime(int clk_id, PTimeSpec tp);
  * @return The value of the system clock plus any additional time.
  ******************************************************************************************************/
 NS_INLINE NSLong PGSystemRealTime(NSLong delta) {
-TimeSpec tm = { 0, 0 };
+    TimeSpec tm = { 0, 0 };
 
-if(clock_gettime(CLOCK_REALTIME, &tm)) {
-@throw [NSException exceptionWithName:NSGenericException reason:errnoAsNSString(errno) userInfo:nil];
-}
+    if(clock_gettime(CLOCK_REALTIME, &tm)) {
+        @throw [NSException exceptionWithName:NSGenericException reason:errnoAsNSString(errno) userInfo:nil];
+    }
 
-return (PGTimeSpecToNanos(&tm) + delta);
+    return (PGTimeSpecToNanos(&tm) + delta);
 }
 
 /**************************************************************************************************//**
@@ -240,13 +240,13 @@ return (PGTimeSpecToNanos(&tm) + delta);
  * @return The value of the system clock plus any additional time.
  ******************************************************************************************************/
 NS_INLINE NSLong PGSystemCPUTime(NSLong delta) {
-TimeSpec tm = { 0, 0 };
+    TimeSpec tm = { 0, 0 };
 
-if(clock_gettime(CLOCK_MONOTONIC_RAW, &tm)) {
-@throw [NSException exceptionWithName:NSGenericException reason:errnoAsNSString(errno) userInfo:nil];
-}
+    if(clock_gettime(CLOCK_MONOTONIC_RAW, &tm)) {
+        @throw [NSException exceptionWithName:NSGenericException reason:errnoAsNSString(errno) userInfo:nil];
+    }
 
-return (PGTimeSpecToNanos(&tm) + delta);
+    return (PGTimeSpecToNanos(&tm) + delta);
 }
 
 #endif

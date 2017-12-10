@@ -86,10 +86,7 @@ char *PGBase64Encode(uint8_t ra[3], char ar[4]) {
                         _inputIndex = 0;
                         PGBase64Encode(_inputBuffer, _outputBuffer);
                         written += [self write:(uint8_t const *)_outputBuffer results:&results];
-
-                        if(results <= 0) {
-                            return results;
-                        }
+                        if(results <= 0) return results;
                     }
                 }
 
@@ -109,17 +106,10 @@ char *PGBase64Encode(uint8_t ra[3], char ar[4]) {
     -(void)flush {
         @synchronized(self) {
             if(_inputIndex) {
-                for(int i = _inputIndex; i < 3; i++) {
-                    _inputBuffer[i] = 0;
-                }
-
+                for(int i = _inputIndex; i < 3; i++) _inputBuffer[i] = 0;
                 PGBase64Encode(_inputBuffer, _outputBuffer);
-                _outputBuffer[3] = CODES[64];
-
-                if(_inputIndex == 1) {
-                    _outputBuffer[2] = CODES[64];
-                }
-
+                _outputBuffer[3]                      = CODES[64];
+                if(_inputIndex == 1) _outputBuffer[2] = CODES[64];
                 _inputIndex = 0;
                 [self write:(uint8_t const *)_outputBuffer results:NULL];
             }
@@ -132,41 +122,25 @@ char *PGBase64Encode(uint8_t ra[3], char ar[4]) {
 
     -(instancetype)initToMemory {
         self = [super initToMemory];
-
-        if(self) {
-            _inputIndex = 0;
-        }
-
+        if(self) _inputIndex = 0;
         return self;
     }
 
     -(instancetype)initToBuffer:(uint8_t *)buffer capacity:(NSUInteger)capacity {
         self = [super initToBuffer:buffer capacity:capacity];
-
-        if(self) {
-            _inputIndex = 0;
-        }
-
+        if(self) _inputIndex = 0;
         return self;
     }
 
     -(instancetype)initWithURL:(NSURL *)url append:(BOOL)shouldAppend {
         self = [super initWithURL:url append:shouldAppend];
-
-        if(self) {
-            _inputIndex = 0;
-        }
-
+        if(self) _inputIndex = 0;
         return self;
     }
 
     -(instancetype)initToFileAtPath:(NSString *)path append:(BOOL)shouldAppend {
         self = [super initToFileAtPath:path append:shouldAppend];
-
-        if(self) {
-            _inputIndex = 0;
-        }
-
+        if(self) _inputIndex = 0;
         return self;
     }
 
