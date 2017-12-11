@@ -45,4 +45,13 @@ FOUNDATION_EXPORT const NSUInteger PGUNotFound;
 
 @end
 
+NS_INLINE NSString *PGNoNil(NSString *str) {
+    return (str ? str.trim : @"");
+}
+
+NS_INLINE NSString *PGNilOnEmpty(NSString *str) {
+    NSString *st2 = PGNoNil(str);
+    return (st2.length ? st2 : nil);
+}
+
 #endif // __Rubicon_NSString_PGString__H_
