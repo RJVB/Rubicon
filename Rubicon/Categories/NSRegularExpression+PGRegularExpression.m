@@ -28,6 +28,7 @@
     -(BOOL)matches:(NSString *)string range:(NSRange)range {
         if(string.length && range.length) {
             NSArray<NSTextCheckingResult *> *matches = [self matchesInString:string options:0 range:range];
+
             if(matches.count == 1) {
                 NSRange mrange = matches[0].range;
                 return ((range.length == mrange.length) && (range.location == mrange.location));

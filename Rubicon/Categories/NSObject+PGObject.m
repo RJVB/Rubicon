@@ -91,7 +91,7 @@
 
 @end
 
-/**
+/**************************************************************************************************//**
  * The purpose of this function is to attempt to find a class that is the first common superclass of the two
  * provided classes.  If not common superclass can be found then Nil is returned.  Usually, all classes in
  * normal Objective-C programs share at least one superclass, the root class NSObject.  However, this

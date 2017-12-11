@@ -174,7 +174,8 @@ void ignoreSignal(int _signal) {
 #pragma clang diagnostic pop
 
 void threadCleanup(void *obj) {
-    [((__bridge PGTimedWait *)obj) cleanup];
+    PGTimedWait *timedWait = ((__bridge PGTimedWait *)obj);
+    [timedWait cleanup];
 }
 
 void *waitThread(void *obj) {

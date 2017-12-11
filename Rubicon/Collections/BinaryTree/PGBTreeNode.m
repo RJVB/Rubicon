@@ -302,7 +302,7 @@
             }
 
             if(s.isRed || s.left.isRed || s.right.isRed) {
-                if(!(l ? s.right.isRed : s.left.isRed)) {
+                if(l ? s.left.isRed : s.right.isRed) {
                     [s rotate:!l];
                     s = s.parent;
                 }
