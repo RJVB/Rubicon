@@ -35,13 +35,13 @@ if(Rubicon_libGNUstepBase)
 			execute_process(COMMAND "${Rubicon_GNUstepConfig}" "--objc-flags" OUTPUT_VARIABLE objc_def_flags      OUTPUT_STRIP_TRAILING_WHITESPACE)
 			execute_process(COMMAND "${Rubicon_GNUstepConfig}" "--gui-libs"   OUTPUT_VARIABLE objc_def_link_flags OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-			set(objc_flags      "${objc_def_flags} -fobjc-runtime=gnustep-1.8.1 -fblocks -fobjc-arc -DOS_OBJECT_HAVE_OBJC_SUPPORT=0")
+			set(objc_flags      "${objc_def_flags} -fobjc-runtime=gnustep-1.8.1 -fblocks -fobjc-arc -fobjc-arc-exceptions -DOS_OBJECT_HAVE_OBJC_SUPPORT=0")
 			set(objc_link_flags "${objc_def_link_flags}")
 		else()
 			set(objc_defs       "-DOS_OBJECT_HAVE_OBJC_SUPPORT=0 -DGNUSTEP -DGNUSTEP_BASE_LIBRARY=1 -DGNU_GUI_LIBRARY=1 -DGNU_RUNTIME=1 -DGNUSTEP_BASE_LIBRARY=1 -D_NATIVE_OBJC_EXCEPTIONS -D_NONFRAGILE_ABI")
 
 			set(comm_feats      "-pthread -fexceptions -fobjc-nonfragile-abi -fgnu-runtime")
-			set(objc_feats      "-fno-strict-aliasing -fobjc-exceptions -fobjc-runtime=gnustep-1.8.1 -fblocks -fobjc-arc -fPIC -fconstant-string-class=NSConstantString")
+			set(objc_feats      "-fno-strict-aliasing -fobjc-exceptions -fobjc-runtime=gnustep-1.8.1 -fblocks -fobjc-arc -fobjc-arc-exceptions -fPIC -fconstant-string-class=NSConstantString")
 			set(objc_warn       "-Wall -DGSWARN -DGSDIAGNOSE -Wno-import")
 			set(objc_incld      "-I. -I/home/odroid/GNUstep/Library/Headers -I/usr/include")
 
