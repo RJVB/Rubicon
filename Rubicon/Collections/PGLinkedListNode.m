@@ -26,6 +26,18 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Woverriding-method-mismatch"
 
+@interface PGLinkedListNodeEnumerator<__covariant T> : NSEnumerator<T>
+
+    -(instancetype)initWithStartingNode:(PGLinkedListNode *)staringNode;
+
+@end
+
+@interface PGLinkedListNodeReverseEnumerator<__covariant T> : NSEnumerator<T>
+
+    -(instancetype)initWithStartingNode:(PGLinkedListNode *)staringNode;
+
+@end
+
 @interface PGLinkedListNode<__covariant T>()
 
     @property(atomic, readwrite) BOOL                        isFirstNode;
@@ -171,6 +183,84 @@
 
     -(NSUInteger)hash {
         return ((((NSUInteger)self.isFirstNode) * 31u) + [self.data hash]);
+    }
+
+    -(NSEnumerator *)objectEnumerator {
+        return [[PGLinkedListNodeEnumerator alloc] initWithStartingNode:self];
+    }
+
+    -(NSEnumerator *)reverseObjectEnumerator {
+        return [[PGLinkedListNodeReverseEnumerator alloc] initWithStartingNode:self];
+    }
+
+@end
+
+@implementation PGLinkedListNodeEnumerator {
+        PGLinkedListNode *_startingNode;
+        PGLinkedListNode *_nextNode;
+    }
+
+    -(instancetype)initWithStartingNode:(PGLinkedListNode *)staringNode {
+        self = [super init];
+
+        if(self) {
+            _startingNode = staringNode;
+            _nextNode     = nil;
+        }
+
+        return self;
+    }
+
+    -(id)nextObject {
+        id item = nil;
+
+        if(_nextNode) {
+            if(_nextNode != _startingNode) {
+                item      = _nextNode.data;
+                _nextNode = _nextNode.nextNode;
+            }
+        }
+        else {
+            item      = _startingNode.data;
+            _nextNode = _startingNode.nextNode;
+        }
+
+        return item;
+    }
+
+@end
+
+@implementation PGLinkedListNodeReverseEnumerator {
+        PGLinkedListNode *_startingNode;
+        PGLinkedListNode *_previousNode;
+    }
+
+    -(instancetype)initWithStartingNode:(PGLinkedListNode *)staringNode {
+        self = [super init];
+
+        if(self) {
+            _startingNode = staringNode;
+            _previousNode = nil;
+        }
+
+        return self;
+    }
+
+    -(id)nextObject {
+        id item = nil;
+
+        if(_previousNode) {
+            if(_previousNode != _startingNode) {
+                item          = _previousNode.data;
+                _previousNode = _previousNode.previousNode;
+            }
+        }
+        else {
+            item          = _startingNode.data;
+            _previousNode = _startingNode.previousNode;
+        }
+
+        return item;
     }
 
 @end

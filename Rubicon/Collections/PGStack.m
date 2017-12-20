@@ -32,10 +32,6 @@
 
     -(void)_push:(T)item;
 
-    -(void)_pushAllFromStack:(PGStack *)stack;
-
-    -(void)__pushAllFromStack:(PGStack *)stack;
-
 @end
 
 #pragma clang diagnostic push
@@ -148,27 +144,16 @@
     }
 
     -(void)pushAllFromStack:(PGStack *)stack {
-        [self lock];
-        @try { [self _pushAllFromStack:stack]; } @finally { [self unlock]; }
-    }
+        if(stack) {
+            [stack lock];
 
-    -(void)_pushAllFromStack:(PGStack *)stack {
-        [stack lock];
-        @try { [self __pushAllFromStack:stack]; } @finally { [stack unlock]; }
-    }
-
-    -(void)__pushAllFromStack:(PGStack *)stack {
-        PGLinkedListNode *st = stack.stackTop;
-
-        if(st) {
-            PGLinkedListNode *nd = st.previousNode;
-
-            [self _push:nd.data];
-
-            while(nd != st) {
-                nd = nd.previousNode;
-                [self _push:nd.data];
+            @try {
+                if(stack.stackTop) {
+                    [self lock];
+                    @try { for(id item in [stack.stackTop.previousNode reverseObjectEnumerator]) [self _push:item]; } @finally { [self unlock]; }
+                }
             }
+            @finally { [stack unlock]; }
         }
     }
 

@@ -1,9 +1,9 @@
 /******************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGLinkedListNode.h
+ *    FILENAME: PGEmptyEnumerator.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 12/19/17 2:20 PM
+ *        DATE: 12/20/17 12:34 PM
  * DESCRIPTION:
  *
  * Copyright © 2017 Project Galen. All rights reserved.
@@ -21,46 +21,20 @@
  * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *********************************************************************************************************************************/
 
-#ifndef __Rubicon_PGLinkedListNode_H_
-#define __Rubicon_PGLinkedListNode_H_
+#ifndef __Rubicon_PGEmptyEnumerator_H_
+#define __Rubicon_PGEmptyEnumerator_H_
 
 #import <Rubicon/PGTools.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGLinkedListNode<__covariant T> : NSObject
+@interface PGEmptyEnumerator<__covariant T> : NSEnumerator<T>
 
-    @property(atomic, readonly) BOOL                        isFirstNode;
-    @property(atomic, readonly, strong) T                   data;
-    @property(atomic, readonly, strong) PGLinkedListNode<T> *previousNode;
-    @property(atomic, readonly, strong) PGLinkedListNode<T> *nextNode;
+    -(instancetype)init;
 
-    @property(nonatomic, readonly) BOOL                        isLastNode;
-    @property(nonatomic, readonly, strong) PGLinkedListNode<T> *firstNode;
-    @property(nonatomic, readonly, strong) PGLinkedListNode<T> *lastNode;
-
-    -(instancetype)initWithData:(T)data;
-
-    -(instancetype)append:(T)data;
-
-    -(instancetype)prepend:(T)data;
-
-    -(instancetype)remove;
-
-    -(T)replace:(T)data;
-
-    -(BOOL)isEqual:(id)other;
-
-    -(BOOL)isEqualToNode:(PGLinkedListNode<T> *)node;
-
-    -(NSUInteger)hash;
-
-    -(NSEnumerator<T> *)objectEnumerator;
-
-    -(NSEnumerator<T> *)reverseObjectEnumerator;
-
+    +(instancetype)emptyEnumerator;
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif //__Rubicon_PGLinkedListNode_H_
+#endif //__Rubicon_PGEmptyEnumerator_H_

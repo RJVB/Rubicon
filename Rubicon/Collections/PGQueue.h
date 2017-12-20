@@ -1,9 +1,9 @@
 /******************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGLinkedListNode.h
+ *    FILENAME: PGQueue.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 12/19/17 2:20 PM
+ *        DATE: 12/20/17 11:11 AM
  * DESCRIPTION:
  *
  * Copyright © 2017 Project Galen. All rights reserved.
@@ -21,46 +21,47 @@
  * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *********************************************************************************************************************************/
 
-#ifndef __Rubicon_PGLinkedListNode_H_
-#define __Rubicon_PGLinkedListNode_H_
+#ifndef __Rubicon_PGQueue_H_
+#define __Rubicon_PGQueue_H_
 
 #import <Rubicon/PGTools.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGLinkedListNode<__covariant T> : NSObject
+@interface PGQueue<__covariant T> : NSObject<NSLocking>
 
-    @property(atomic, readonly) BOOL                        isFirstNode;
-    @property(atomic, readonly, strong) T                   data;
-    @property(atomic, readonly, strong) PGLinkedListNode<T> *previousNode;
-    @property(atomic, readonly, strong) PGLinkedListNode<T> *nextNode;
+    @property(atomic, readonly) NSUInteger count;
 
-    @property(nonatomic, readonly) BOOL                        isLastNode;
-    @property(nonatomic, readonly, strong) PGLinkedListNode<T> *firstNode;
-    @property(nonatomic, readonly, strong) PGLinkedListNode<T> *lastNode;
+    -(instancetype)init;
 
-    -(instancetype)initWithData:(T)data;
+    -(instancetype)initWithItem:(T)item;
 
-    -(instancetype)append:(T)data;
+    -(instancetype)initWithNSArray:(NSArray<T> *)array;
 
-    -(instancetype)prepend:(T)data;
+    -(instancetype)initWithQueue:(PGQueue<T> *)queue;
 
-    -(instancetype)remove;
+    -(void)queue:(T)item;
 
-    -(T)replace:(T)data;
+    -(nullable T)peekQueue;
 
-    -(BOOL)isEqual:(id)other;
+    -(nullable T)dequeue;
 
-    -(BOOL)isEqualToNode:(PGLinkedListNode<T> *)node;
+    -(void)queueAllFromNSArray:(NSArray<T> *)array;
 
-    -(NSUInteger)hash;
+    -(void)queueAllFromQueue:(PGQueue<T> *)queue;
+
+    -(NSArray<T> *)dequeueAll;
+
+    -(NSArray<T> *)peekQueueAll;
 
     -(NSEnumerator<T> *)objectEnumerator;
 
     -(NSEnumerator<T> *)reverseObjectEnumerator;
 
+    -(void)clear;
+
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif //__Rubicon_PGLinkedListNode_H_
+#endif //__Rubicon_PGQueue_H_
