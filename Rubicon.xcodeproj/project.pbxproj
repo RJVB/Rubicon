@@ -35,7 +35,7 @@
 		1117D86E190AE0BF1ED8C58F /* PGMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DA275B678D9478E87A06 /* PGMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D892FFA2504EF88DFE13 /* PGTime.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D57792306E4C2744E086 /* PGTime.m */; };
 		1117D8C0D8FEA9BA9181C6E8 /* sem_timedwait.c in Sources */ = {isa = PBXBuildFile; fileRef = 1117D4804DC238152BA17B8A /* sem_timedwait.c */; };
-		1117D8D047B706C5F4AE1EF1 /* PGStack.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DA40A7107FFA3B41DC8C /* PGStack.h */; };
+		1117D8D047B706C5F4AE1EF1 /* PGStack.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DA40A7107FFA3B41DC8C /* PGStack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D9F77F007547086C011D /* PGTimedSemWait.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D72372608CDF9D460CCF /* PGTimedSemWait.h */; };
 		1117DA0BC598AF33FAA9CCD5 /* PGTimedReadLock.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D8576A8D6B3291FC3A1E /* PGTimedReadLock.h */; };
 		1117DA878A1A41B7896533D8 /* PGMacros.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D35A818616F0E99E59BA /* PGMacros.m */; };
@@ -519,11 +519,11 @@
 				1117D069BAC9E03BD3EEA723 /* PGLinkedListNode.h in Headers */,
 				1117DA0BC598AF33FAA9CCD5 /* PGTimedReadLock.h in Headers */,
 				1117D9F77F007547086C011D /* PGTimedSemWait.h in Headers */,
+				1117D8D047B706C5F4AE1EF1 /* PGStack.h in Headers */,
 				1117D7B5FA4AE594CEA52D83 /* PGBTreeNode.h in Headers */,
 				1117DD4081DB0393F9318DF2 /* PGRWLockCounts.h in Headers */,
 				1117DBB362320F47607B2FBF /* PGTimedWait.h in Headers */,
 				1117D0BACEE7BBFB719DBC09 /* sem_timedwait.h in Headers */,
-				1117D8D047B706C5F4AE1EF1 /* PGStack.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
