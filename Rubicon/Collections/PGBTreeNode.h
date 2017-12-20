@@ -1,12 +1,12 @@
 /******************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGBTreeNodePriv.h
+ *    FILENAME: PGBTreeNode.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 6/15/17 12:11 PM
+ *        DATE: 12/18/17 9:19 AM
  * DESCRIPTION:
  *
- * Copyright © 2017 Galen Rhodes All rights reserved.
+ * Copyright © 2017 Project Galen. All rights reserved.
  *
  * "It can hardly be a coincidence that no language on Earth has ever produced the expression 'As pretty as an airport.' Airports
  * are ugly. Some are very ugly. Some attain a degree of ugliness that can only be the result of special effort."
@@ -21,23 +21,41 @@
  * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *********************************************************************************************************************************/
 
-#ifndef __Rubicon_PGBTreeNodePriv_H_
-#define __Rubicon_PGBTreeNodePriv_H_
+#ifndef __Rubicon_PGBTreeNode_H_
+#define __Rubicon_PGBTreeNode_H_
 
-#import <Rubicon/PGBTreeNode.h>
+#import <Rubicon/PGTools.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGBTreeNode<__covariant T>()
+@interface PGBTreeNode<__covariant K, __covariant V> : NSObject
 
-    @property(nonatomic) BOOL           isRed;
+    @property(nonatomic, readonly, copy) K    nodeKey;
+    @property(nonatomic, readonly) V          nodeValue;
+    @property(nonatomic, readonly) BOOL       isRed;
+    @property(nonatomic, readonly) NSUInteger count;
 
-    -(instancetype)initWithData:(T)data isRed:(BOOL)isRed;
+    @property(nonatomic, readonly) PGBTreeNode<K, V> *parentNode;
+    @property(nonatomic, readonly) PGBTreeNode<K, V> *leftNode;
+    @property(nonatomic, readonly) PGBTreeNode<K, V> *rightNode;
+    @property(nonatomic, readonly) PGBTreeNode<K, V> *rootNode;
 
-    +(instancetype)nodeWithData:(T)data isRed:(BOOL)isRed;
+    -(instancetype)initWithValue:(id)value forKey:(id<NSCopying>)key;
+
+    -(void)deepRemove;
+
+    -(instancetype)findNodeForKey:(K)key;
+
+    -(instancetype)findNodeForKey:(K)key usingComparator:(NSComparator)comp;
+
+    -(instancetype)remove;
+
+    -(instancetype)insertValue:(V)value forKey:(K<NSCopying>)key;
+
+    -(instancetype)insertValue:(V)value forKey:(K<NSCopying>)key usingComparator:(NSComparator)comp;
 
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif //__Rubicon_PGBTreeNodePriv_H_
+#endif //__Rubicon_PGBTreeNode_H_

@@ -1,13 +1,12 @@
 /******************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGBTreeDictionaryKeyEnumerator.h
+ *    FILENAME: PGStack.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 7/3/17 12:37 PM
+ *        DATE: 12/19/17 3:51 PM
  * DESCRIPTION:
  *
- * Copyright © 2017 Project Galen. All rights reserved.
- *
+ * Copyright © 2017 Project Galen. All rights reserved. *
  * "It can hardly be a coincidence that no language on Earth has ever produced the expression 'As pretty as an airport.' Airports
  * are ugly. Some are very ugly. Some attain a degree of ugliness that can only be the result of special effort."
  * - Douglas Adams from "The Long Dark Tea-Time of the Soul"
@@ -21,41 +20,52 @@
  * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *********************************************************************************************************************************/
 
-#ifndef __Rubicon_PGBTreeDictionaryKeyEnumerator_H_
-#define __Rubicon_PGBTreeDictionaryKeyEnumerator_H_
+#ifndef __Rubicon_PGStack_H_
+#define __Rubicon_PGStack_H_
 
-#import <Rubicon/PGBTreeNode.h>
-#import <Rubicon/PGBTreeDictionary.h>
-#import <Rubicon/PGKeyValueData.h>
-#import <Rubicon/PGStack.h>
-#import <Rubicon/PGEmptyEnumerator.h>
+#import <Rubicon/PGTools.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGBTreeDictionaryKeyEnumerator : NSEnumerator
+@interface PGStack<__covariant T> : NSObject<NSLocking, NSCopying>
 
-    @property(retain) NSDictionary                  *dictionary;
-    @property(retain) PGBTreeNode<PGKeyValueData *> *current;
-    @property(retain) PGStack                       *stack;
+    @property(atomic, readonly) NSUInteger count;
+    @property(nonatomic, readonly) BOOL    isNotEmpty;
 
-    -(instancetype)initWithBTreeDictionary:(PGBTreeDictionary *)dict;
+    -(instancetype)init;
 
-    -(instancetype)initWithMutableBTreeDictionary:(PGBTreeMutableDictionary *)dict;
+    -(instancetype)initWithItem:(T)item;
 
-@end
+    -(instancetype)initWithStack:(PGStack<T> *)stack;
 
-@interface PGBTreeDictionary()
+    -(instancetype)initWithNSArray:(NSArray<T> *)array;
 
-    @property(nullable, readonly) PGBTreeNode<PGKeyValueData *> *root;
+    -(nullable T)peek;
 
-@end
+    -(nullable T)pop;
 
-@interface PGBTreeMutableDictionary()
+    -(void)push:(T)item;
 
-    @property(nullable, readonly) PGBTreeNode<PGKeyValueData *> *root;
+    -(void)pushAllFromNSArray:(NSArray<T> *)array;
+
+    -(void)pushAllFromStack:(PGStack<T> *)stack;
+
+    -(void)clear;
+
+    -(NSArray<T> *)popAll;
+
+    -(NSArray<T> *)peekAll;
+
+    -(id)copyWithZone:(nullable NSZone *)zone;
+
+    -(BOOL)isEqual:(id)other;
+
+    -(BOOL)isEqualToStack:(PGStack *)stack;
+
+    -(NSUInteger)hash;
 
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif //__Rubicon_PGBTreeDictionaryKeyEnumerator_H_
+#endif //__Rubicon_PGStack_H_
