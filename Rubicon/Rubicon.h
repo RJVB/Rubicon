@@ -39,6 +39,8 @@
 #import <Rubicon/PGLinkedListNode.h>
 #import <Rubicon/PGStack.h>
 #import <Rubicon/PGQueue.h>
+#import <Rubicon/PGEmptyEnumerator.h>
+#import <Rubicon/PGNestedEnumerator.h>
 
 FOUNDATION_EXPORT double              RubiconVersionNumber;
 FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
