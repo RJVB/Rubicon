@@ -1,6 +1,6 @@
 /******************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGEmptyEnumerator.m
+ *    FILENAME: PGEmptyEnumerator.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
  *        DATE: 12/20/17 12:34 PM
@@ -21,21 +21,20 @@
  * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *********************************************************************************************************************************/
 
-#import "PGEmptyEnumerator.h"
+#ifndef __Rubicon_PGEmptyEnumerator_H_
+#define __Rubicon_PGEmptyEnumerator_H_
 
-@implementation PGEmptyEnumerator {
-    }
+#import "PGTools.h"
 
-    -(instancetype)init {
-        return (self = [super init]);
-    }
+NS_ASSUME_NONNULL_BEGIN
 
-    +(instancetype)emptyEnumerator {
-        return [[self alloc] init];
-    }
+@interface PGEmptyEnumerator<__covariant T> : NSEnumerator<T>
 
-    -(id)nextObject {
-        return nil;
-    }
+    -(instancetype)init;
 
+    +(instancetype)emptyEnumerator;
 @end
+
+NS_ASSUME_NONNULL_END
+
+#endif //__Rubicon_PGEmptyEnumerator_H_

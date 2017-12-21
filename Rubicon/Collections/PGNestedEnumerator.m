@@ -1,9 +1,9 @@
 /******************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGEmptyEnumerator.h
+ *    FILENAME: PGNestedEnumerator.m
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 12/20/17 12:34 PM
+ *        DATE: 12/20/17 3:16 PM
  * DESCRIPTION:
  *
  * Copyright © 2017 Project Galen. All rights reserved.
@@ -21,20 +21,60 @@
  * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *********************************************************************************************************************************/
 
-#ifndef __Rubicon_PGEmptyEnumerator_H_
-#define __Rubicon_PGEmptyEnumerator_H_
+#import "PGNestedEnumerator.h"
 
-#import <Rubicon/PGTools.h>
+@implementation PGNestedEnumerator {
+        id           _owner;
+        NSEnumerator *_enumerator;
+    }
 
-NS_ASSUME_NONNULL_BEGIN
+    -(instancetype)initWithOwner:(id)owner andEnumerator:(NSEnumerator *)enumerator {
+        self = [super init];
 
-@interface PGEmptyEnumerator<__covariant T> : NSEnumerator<T>
+        if(self) {
+            _owner      = (enumerator ? owner : nil);
+            _enumerator = enumerator;
+        }
 
-    -(instancetype)init;
+        return self;
+    }
 
-    +(instancetype)emptyEnumerator;
+    -(id)nextObject {
+        id item = nil;
+
+        if(_enumerator) {
+            item = [_enumerator nextObject];
+
+            if(item == nil) {
+                _owner      = nil;
+                _enumerator = nil;
+            }
+        }
+
+        return item;
+    }
+
+    -(NSArray *)allObjects {
+        if(_enumerator) {
+            NSArray *array = _enumerator.allObjects;
+            _enumerator = nil;
+            _owner      = nil;
+            return array;
+        }
+        else {
+            return [NSArray new];
+        }
+    }
+
+    -(void)dealloc {
+        _owner      = nil;
+        _enumerator = nil;
+    }
+
+    -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained _Nullable[_Nonnull])buffer count:(NSUInteger)len {
+        NSUInteger count = [_enumerator countByEnumeratingWithState:state objects:buffer count:len];
+        if(count == 0) _owner = _enumerator = nil;
+        return count;
+    }
+
 @end
-
-NS_ASSUME_NONNULL_END
-
-#endif //__Rubicon_PGEmptyEnumerator_H_

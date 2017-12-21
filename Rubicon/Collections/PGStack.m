@@ -22,6 +22,7 @@
 
 #import "PGStack.h"
 #import "PGLinkedListNode.h"
+#import "PGEmptyEnumerator.h"
 
 @interface PGStack<__covariant T>()
 
@@ -138,22 +139,30 @@
         }
     }
 
+    -(void)pushAllFromNSEnumerator:(NSEnumerator *)enumerator {
+        if(enumerator) {
+            [self lock];
+
+            @try {
+                id item = enumerator.nextObject;
+
+                while(item) {
+                    [self _push:item];
+                    item = enumerator.nextObject;
+                }
+            }
+            @finally { [self unlock]; }
+        }
+    }
+
     -(void)pushAllFromNSArray:(NSArray *)array {
-        [self lock];
-        @try { for(id item in [array reverseObjectEnumerator]) [self _push:item]; } @finally { [self unlock]; }
+        [self pushAllFromNSEnumerator:[array reverseObjectEnumerator]];
     }
 
     -(void)pushAllFromStack:(PGStack *)stack {
         if(stack) {
             [stack lock];
-
-            @try {
-                if(stack.stackTop) {
-                    [self lock];
-                    @try { for(id item in [stack.stackTop.previousNode reverseObjectEnumerator]) [self _push:item]; } @finally { [self unlock]; }
-                }
-            }
-            @finally { [stack unlock]; }
+            @try { [self pushAllFromNSEnumerator:[stack reverseObjectEnumerator]]; } @finally { [stack unlock]; }
         }
     }
 
@@ -188,18 +197,9 @@
         [self lock];
 
         @try {
-            NSMutableArray   *array = [NSMutableArray arrayWithCapacity:self.count];
-            PGLinkedListNode *st    = self.stackTop;
+            NSMutableArray *array = [NSMutableArray arrayWithCapacity:self.count];
 
-            if(st) {
-                PGLinkedListNode *nd = st;
-
-                do {
-                    [array addObject:nd.data];
-                    nd = nd.nextNode;
-                } while(nd != st);
-            }
-
+            for(id item in self.objectEnumerator) [array addObject:item];
             return array;
         }
         @finally { [self unlock]; }
@@ -225,49 +225,57 @@
         if(stack) {
             if(self == stack) return YES;
             [self lock];
+            [stack lock];
 
             @try {
                 if(self.count == stack.count) {
-                    PGLinkedListNode *selfNode  = self.stackTop;
-                    PGLinkedListNode *stackNode = stack.stackTop;
+                    NSEnumerator *enum1 = self.objectEnumerator;
+                    NSEnumerator *enum2 = stack.objectEnumerator;
+                    id           i1     = enum1.nextObject;
+                    id           i2     = enum2.nextObject;
 
-                    if(selfNode && stackNode) {
-                        while(PGCompare(selfNode, stackNode)) {
-                            selfNode  = selfNode.nextNode;
-                            stackNode = stackNode.nextNode;
+                    while(i1 && i2 && PGObjectsEqual(i1, i2)) {
+                        i1 = enum1.nextObject;
+                        i2 = enum2.nextObject;
+                    }
 
-                            if(selfNode == self.stackTop) return (stackNode == stack.stackTop);
-                            if(stackNode == stack.stackTop) return NO;
-                        }
-                    }
-                    else {
-                        return (selfNode == stackNode);
-                    }
+                    return ((i1 == nil) && (i2 == nil));
                 }
             }
-            @finally { [self unlock]; }
+            @finally {
+                [stack unlock];
+                [self unlock];
+            }
         }
 
         return NO;
     }
 
     -(NSUInteger)hash {
+        NSUInteger hash = 1;
         [self lock];
 
         @try {
-            NSUInteger       hash  = (31u + self.count);
-            PGLinkedListNode *node = self.stackTop;
-
-            if(node) {
-                do {
-                    hash = ((hash * 31u) + [node hash]);
-                    node = node.nextNode;
-                } while(node != self.stackTop);
-            }
-
-            return hash;
+            hash = ((hash * 31u) + self.count);
+            for(id item in self.objectEnumerator) hash = ((hash * 31u) + [item hash]);
         }
         @finally { [self unlock]; }
+
+        return hash;
+    }
+
+    -(NSEnumerator *)objectEnumerator {
+        [self lock];
+        @try { return (self.stackTop ? self.stackTop.objectEnumerator : [PGEmptyEnumerator emptyEnumerator]); } @finally { [self unlock]; }
+    }
+
+    -(NSEnumerator *)reverseObjectEnumerator {
+        [self lock];
+        @try { return (self.stackTop ? self.stackTop.previousNode.reverseObjectEnumerator : [PGEmptyEnumerator emptyEnumerator]); } @finally { [self unlock]; }
+    }
+
+    -(void)dealloc {
+        [self clear];
     }
 
 @end

@@ -28,7 +28,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGQueue<__covariant T> : NSObject<NSLocking>
+@interface PGQueue<__covariant T> : NSObject<NSLocking, NSCopying>
 
     @property(atomic, readonly) NSUInteger count;
 
@@ -46,6 +46,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(nullable T)dequeue;
 
+    -(void)queueAllFromEnumerator:(NSEnumerator<T> *)enumerator;
+
     -(void)queueAllFromNSArray:(NSArray<T> *)array;
 
     -(void)queueAllFromQueue:(PGQueue<T> *)queue;
@@ -59,6 +61,14 @@ NS_ASSUME_NONNULL_BEGIN
     -(NSEnumerator<T> *)reverseObjectEnumerator;
 
     -(void)clear;
+
+    -(id)copyWithZone:(nullable NSZone *)zone;
+
+    -(BOOL)isEqual:(id)other;
+
+    -(BOOL)isEqualToQueue:(PGQueue<T> *)queue;
+
+    -(NSUInteger)hash;
 
 @end
 

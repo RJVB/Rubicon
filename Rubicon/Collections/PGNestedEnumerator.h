@@ -1,12 +1,13 @@
 /******************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGStack.h
+ *    FILENAME: PGNestedEnumerator.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 12/19/17 3:51 PM
+ *        DATE: 12/20/17 3:16 PM
  * DESCRIPTION:
  *
- * Copyright © 2017 Project Galen. All rights reserved. *
+ * Copyright © 2017 Project Galen. All rights reserved.
+ *
  * "It can hardly be a coincidence that no language on Earth has ever produced the expression 'As pretty as an airport.' Airports
  * are ugly. Some are very ugly. Some attain a degree of ugliness that can only be the result of special effort."
  * - Douglas Adams from "The Long Dark Tea-Time of the Soul"
@@ -20,58 +21,19 @@
  * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *********************************************************************************************************************************/
 
-#ifndef __Rubicon_PGStack_H_
-#define __Rubicon_PGStack_H_
+#ifndef __Rubicon_PGNestedEnumerator_H_
+#define __Rubicon_PGNestedEnumerator_H_
 
-#import <Rubicon/PGTools.h>
+#import "PGTools.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGStack<__covariant T> : NSObject<NSLocking, NSCopying>
+@interface PGNestedEnumerator<__covariant T> : NSEnumerator<T>
 
-    @property(atomic, readonly) NSUInteger count;
-    @property(nonatomic, readonly) BOOL    isNotEmpty;
-
-    -(instancetype)init;
-
-    -(instancetype)initWithItem:(T)item;
-
-    -(instancetype)initWithStack:(PGStack<T> *)stack;
-
-    -(instancetype)initWithNSArray:(NSArray<T> *)array;
-
-    -(nullable T)peek;
-
-    -(nullable T)pop;
-
-    -(void)push:(T)item;
-
-    -(void)pushAllFromNSEnumerator:(NSEnumerator<T> *)enumerator;
-
-    -(void)pushAllFromNSArray:(NSArray<T> *)array;
-
-    -(void)pushAllFromStack:(PGStack<T> *)stack;
-
-    -(void)clear;
-
-    -(NSArray<T> *)popAll;
-
-    -(NSArray<T> *)peekAll;
-
-    -(id)copyWithZone:(nullable NSZone *)zone;
-
-    -(BOOL)isEqual:(id)other;
-
-    -(BOOL)isEqualToStack:(PGStack<T> *)stack;
-
-    -(NSUInteger)hash;
-
-    -(NSEnumerator<T> *)objectEnumerator;
-
-    -(NSEnumerator<T> *)reverseObjectEnumerator;
+    -(instancetype)initWithOwner:(id)owner andEnumerator:(NSEnumerator<T> *)enumerator;
 
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif //__Rubicon_PGStack_H_
+#endif //__Rubicon_PGNestedEnumerator_H_

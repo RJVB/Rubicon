@@ -205,7 +205,7 @@
 
         if(self) {
             _startingNode = staringNode;
-            _nextNode     = nil;
+            _nextNode     = staringNode;
         }
 
         return self;
@@ -214,15 +214,14 @@
     -(id)nextObject {
         id item = nil;
 
-        if(_nextNode) {
-            if(_nextNode != _startingNode) {
-                item      = _nextNode.data;
-                _nextNode = _nextNode.nextNode;
+        if(_startingNode) {
+            item      = _nextNode.data;
+            _nextNode = _nextNode.nextNode;
+
+            if(_nextNode == _startingNode) {
+                _nextNode     = nil;
+                _startingNode = nil;
             }
-        }
-        else {
-            item      = _startingNode.data;
-            _nextNode = _startingNode.nextNode;
         }
 
         return item;
@@ -240,7 +239,7 @@
 
         if(self) {
             _startingNode = staringNode;
-            _previousNode = nil;
+            _previousNode = staringNode;
         }
 
         return self;
@@ -249,15 +248,14 @@
     -(id)nextObject {
         id item = nil;
 
-        if(_previousNode) {
-            if(_previousNode != _startingNode) {
-                item          = _previousNode.data;
-                _previousNode = _previousNode.previousNode;
+        if(_startingNode) {
+            item          = _previousNode.data;
+            _previousNode = _previousNode.previousNode;
+
+            if(_previousNode == _startingNode) {
+                _previousNode = nil;
+                _startingNode = nil;
             }
-        }
-        else {
-            item          = _startingNode.data;
-            _previousNode = _startingNode.previousNode;
         }
 
         return item;

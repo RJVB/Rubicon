@@ -37,6 +37,7 @@
     -(void)_queue:(id)item;
 
     -(id)_dequeue;
+
 @end
 
 @implementation PGQueue {
@@ -136,7 +137,7 @@
         return item;
     }
 
-    -(void)queueFromEnumerator:(NSEnumerator *)enumerator {
+    -(void)queueAllFromEnumerator:(NSEnumerator *)enumerator {
         if(enumerator) {
             [self lock];
 
@@ -162,7 +163,7 @@
     -(void)queueAllFromQueue:(PGQueue *)queue {
         if(queue) {
             [queue lock];
-            @try { [self queueFromEnumerator:queue.queueHead.objectEnumerator]; } @finally { [queue unlock]; }
+            @try { [self queueAllFromEnumerator:queue.queueHead.objectEnumerator]; } @finally { [queue unlock]; }
         }
     }
 
@@ -171,11 +172,10 @@
 
         @try {
             NSMutableArray *array = [NSMutableArray arrayWithCapacity:self.count];
-            id             item   = [self _dequeue];
 
-            while(item) {
-                [array addObject:item];
-                item = [self _dequeue];
+            while(self.queueHead) {
+                [array addObject:self.queueHead.data];
+                self.queueHead = [self.queueHead remove];
             }
 
             return array;
@@ -197,11 +197,13 @@
     }
 
     -(NSEnumerator *)objectEnumerator {
-        return (self.queueHead ? self.queueHead.objectEnumerator : [PGEmptyEnumerator emptyEnumerator]);
+        [self lock];
+        @try { return (self.queueHead ? self.queueHead.objectEnumerator : [PGEmptyEnumerator emptyEnumerator]); } @finally { [self unlock]; }
     }
 
     -(NSEnumerator *)reverseObjectEnumerator {
-        return (self.queueHead ? self.queueHead.previousNode.reverseObjectEnumerator : [PGEmptyEnumerator emptyEnumerator]);
+        [self lock];
+        @try { return (self.queueHead ? self.queueHead.previousNode.reverseObjectEnumerator : [PGEmptyEnumerator emptyEnumerator]); } @finally { [self unlock]; }
     }
 
     -(void)clear {
@@ -220,6 +222,61 @@
 
     -(void)unlock {
         [self unlock];
+    }
+
+    -(void)dealloc {
+        [self clear];
+    }
+
+    -(id)copyWithZone:(nullable NSZone *)zone {
+        return [(PGQueue *)[[self class] allocWithZone:zone] initWithQueue:self];
+    }
+
+    -(BOOL)isEqual:(id)other {
+        return (other && ((self == other) || ([other isMemberOfClass:[self class]] ? [self isEqualToQueue:other] : [super isEqual:other])));
+    }
+
+    -(BOOL)isEqualToQueue:(PGQueue *)queue {
+        if(queue) {
+            if(self == queue) return YES;
+            [queue lock];
+            [self lock];
+
+            @try {
+                if(self.count == queue.count) {
+                    NSEnumerator *e1 = self.objectEnumerator;
+                    NSEnumerator *e2 = queue.objectEnumerator;
+                    id           i1  = e1.nextObject;
+                    id           i2  = e2.nextObject;
+
+                    while(i1 && i2 && PGObjectsEqual(i1, i2)) {
+                        i1 = e1.nextObject;
+                        i2 = e2.nextObject;
+                    }
+
+                    return ((i1 == nil) && (i2 == nil));
+                }
+            }
+            @finally {
+                [self unlock];
+                [queue unlock];
+            }
+        }
+
+        return NO;
+    }
+
+    -(NSUInteger)hash {
+        NSUInteger hash = 1;
+        [self lock];
+
+        @try {
+            hash = ((hash * 31u) + self.count);
+            for(id item in self.objectEnumerator) hash = ((hash * 31u) + [item hash]);
+        }
+        @finally { [self unlock]; }
+
+        return hash;
     }
 
 @end
