@@ -32,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(instancetype)initWithOwner:(id)owner andEnumerator:(NSEnumerator<T> *)enumerator;
 
+    +(instancetype)enumeratorWithOwner:(id)owner andEnumerator:(NSEnumerator<T> *)enumerator;
+
 @end
 
 NS_ASSUME_NONNULL_END

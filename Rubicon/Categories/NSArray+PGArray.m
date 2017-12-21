@@ -79,4 +79,10 @@
         return [[self subarrayWithRange:range] componentsJoinedByString:string];
     }
 
+    -(NSArray *)arrayWithContentsReversed {
+        NSMutableArray *ar = [NSMutableArray arrayWithCapacity:self.count];
+        for(id         item in self.reverseObjectEnumerator) [ar addObject:item];
+        return ar;
+    }
+
 @end

@@ -24,6 +24,7 @@
 #import "PGQueue.h"
 #import "PGLinkedListNode.h"
 #import "PGEmptyEnumerator.h"
+#import "PGNestedEnumerator.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Woverriding-method-mismatch"
@@ -42,6 +43,7 @@
 
 @implementation PGQueue {
         NSRecursiveLock *_lock;
+        unsigned long   _modifiedCount;
     }
 
     @synthesize count = _count;
@@ -51,7 +53,8 @@
         self = [super init];
 
         if(self) {
-            _lock = [NSRecursiveLock new];
+            _lock          = [NSRecursiveLock new];
+            _modifiedCount = 0;
             self.count     = 0;
             self.queueHead = nil;
         }
@@ -109,6 +112,8 @@
                 self.queueHead = [[PGLinkedListNode alloc] initWithData:item];
                 self.count     = 1;
             }
+
+            _modifiedCount++;
         }
         else {
             @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Item is null." userInfo:nil];
@@ -131,6 +136,7 @@
         if(item) {
             self.queueHead = [self.queueHead remove];
             self.count     = (self.queueHead ? self.count - 1 : 0);
+            _modifiedCount++;
         }
         else self.count = 0;
 
@@ -156,14 +162,14 @@
     -(void)queueAllFromNSArray:(NSArray *)array {
         if(array.count) {
             [self lock];
-            @try { for(id item in array) [self _queue:item]; } @finally { [self unlock]; }
+            @try { [self queueAllFromEnumerator:array.objectEnumerator]; } @finally { [self unlock]; }
         }
     }
 
     -(void)queueAllFromQueue:(PGQueue *)queue {
         if(queue) {
             [queue lock];
-            @try { [self queueAllFromEnumerator:queue.queueHead.objectEnumerator]; } @finally { [queue unlock]; }
+            @try { [self queueAllFromEnumerator:queue.objectEnumerator]; } @finally { [queue unlock]; }
         }
     }
 
@@ -172,10 +178,11 @@
 
         @try {
             NSMutableArray *array = [NSMutableArray arrayWithCapacity:self.count];
+            id             item   = [self _dequeue];
 
-            while(self.queueHead) {
-                [array addObject:self.queueHead.data];
-                self.queueHead = [self.queueHead remove];
+            while(item) {
+                [array addObject:item];
+                item = [self _dequeue];
             }
 
             return array;
@@ -189,8 +196,7 @@
         @try {
             NSMutableArray *array = [NSMutableArray arrayWithCapacity:self.count];
 
-            for(id item in self.queueHead.objectEnumerator) [array addObject:item];
-
+            for(id item in self) [array addObject:item];
             return array;
         }
         @finally { [self unlock]; }
@@ -198,20 +204,28 @@
 
     -(NSEnumerator *)objectEnumerator {
         [self lock];
-        @try { return (self.queueHead ? self.queueHead.objectEnumerator : [PGEmptyEnumerator emptyEnumerator]); } @finally { [self unlock]; }
+        @try { return (self.queueHead ? [PGNestedEnumerator enumeratorWithOwner:self andEnumerator:self.queueHead.objectEnumerator] : [PGEmptyEnumerator emptyEnumerator]); }
+        @finally { [self unlock]; }
     }
 
     -(NSEnumerator *)reverseObjectEnumerator {
         [self lock];
-        @try { return (self.queueHead ? self.queueHead.previousNode.reverseObjectEnumerator : [PGEmptyEnumerator emptyEnumerator]); } @finally { [self unlock]; }
+        @try {
+            return (self.queueHead ?
+                    [PGNestedEnumerator enumeratorWithOwner:self andEnumerator:self.queueHead.previousNode.reverseObjectEnumerator] :
+                    [PGEmptyEnumerator emptyEnumerator]);
+        }
+        @finally { [self unlock]; }
     }
 
     -(void)clear {
         [self lock];
 
         @try {
+            NSUInteger cc = self.count;
             while(self.queueHead) self.queueHead = [self.queueHead remove];
             self.count = 0;
+            _modifiedCount += (unsigned long)cc;
         }
         @finally { [self unlock]; }
     }
@@ -272,11 +286,40 @@
 
         @try {
             hash = ((hash * 31u) + self.count);
-            for(id item in self.objectEnumerator) hash = ((hash * 31u) + [item hash]);
+            for(id item in self) hash = ((hash * 31u) + [item hash]);
         }
         @finally { [self unlock]; }
 
         return hash;
+    }
+
+    -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained _Nullable[_Nonnull])buffer count:(NSUInteger)len {
+        NSUInteger count = 0;
+        [self lock];
+
+        @try {
+            PGLinkedListNode *__unsafe_unretained nextNode = (__bridge PGLinkedListNode *)(void *)state->state;
+
+            if(nextNode == nil) {
+                /*
+                 * Need to initialize...
+                 */
+                nextNode = self.queueHead;
+                state->mutationsPtr = &_modifiedCount;
+                state->extra[0] = (nextNode ? 1 : 0);
+            }
+
+            while(state->extra[0] && count < len) {
+                buffer[count++] = nextNode;
+                nextNode = nextNode.nextNode;
+                if(nextNode == self.queueHead) state->extra[0] = 0;
+            }
+
+            state->state = (unsigned long)(__bridge void *)nextNode;
+        }
+        @finally { [self unlock]; }
+
+        return count;
     }
 
 @end

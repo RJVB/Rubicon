@@ -23,6 +23,7 @@
 #import "PGStack.h"
 #import "PGLinkedListNode.h"
 #import "PGEmptyEnumerator.h"
+#import "PGNestedEnumerator.h"
 
 @interface PGStack<__covariant T>()
 
@@ -40,6 +41,7 @@
 
 @implementation PGStack {
         NSRecursiveLock *_lock;
+        unsigned long   _modifiedCount;
     }
 
     @synthesize count = _count;
@@ -49,7 +51,8 @@
         self = [super init];
 
         if(self) {
-            _lock = [NSRecursiveLock new];
+            _lock          = [NSRecursiveLock new];
+            _modifiedCount = 0;
             /*
              * Not needed but I'm OCD.
              */
@@ -112,6 +115,7 @@
             item = self.stackTop.data;
             self.stackTop = [self.stackTop remove];
             self.count    = (self.stackTop ? (self.count - 1) : 0);
+            _modifiedCount++;
         }
         else if(self.count) self.count = 0;
 
@@ -133,6 +137,8 @@
                 self.stackTop = [[PGLinkedListNode alloc] initWithData:item];
                 self.count    = 1;
             }
+
+            _modifiedCount++;
         }
         else {
             @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Item is null." userInfo:nil];
@@ -170,8 +176,10 @@
         [self lock];
 
         @try {
+            NSUInteger cc = self.count;
             while(self.stackTop) self.stackTop = [self.stackTop remove];
             self.count = 0;
+            _modifiedCount += (unsigned long)cc;
         }
         @finally { [self unlock]; }
     }
@@ -199,7 +207,7 @@
         @try {
             NSMutableArray *array = [NSMutableArray arrayWithCapacity:self.count];
 
-            for(id item in self.objectEnumerator) [array addObject:item];
+            for(id item in self) [array addObject:item];
             return array;
         }
         @finally { [self unlock]; }
@@ -257,7 +265,7 @@
 
         @try {
             hash = ((hash * 31u) + self.count);
-            for(id item in self.objectEnumerator) hash = ((hash * 31u) + [item hash]);
+            for(id item in self) hash = ((hash * 31u) + [item hash]);
         }
         @finally { [self unlock]; }
 
@@ -266,16 +274,51 @@
 
     -(NSEnumerator *)objectEnumerator {
         [self lock];
-        @try { return (self.stackTop ? self.stackTop.objectEnumerator : [PGEmptyEnumerator emptyEnumerator]); } @finally { [self unlock]; }
+        @try { return (self.stackTop ? [PGNestedEnumerator enumeratorWithOwner:self andEnumerator:self.stackTop.objectEnumerator] : [PGEmptyEnumerator emptyEnumerator]); }
+        @finally { [self unlock]; }
     }
 
     -(NSEnumerator *)reverseObjectEnumerator {
         [self lock];
-        @try { return (self.stackTop ? self.stackTop.previousNode.reverseObjectEnumerator : [PGEmptyEnumerator emptyEnumerator]); } @finally { [self unlock]; }
+        @try {
+            return (self.stackTop ?
+                    [PGNestedEnumerator enumeratorWithOwner:self andEnumerator:self.stackTop.previousNode.reverseObjectEnumerator] :
+                    [PGEmptyEnumerator emptyEnumerator]);
+        }
+        @finally { [self unlock]; }
     }
 
     -(void)dealloc {
         [self clear];
+    }
+
+    -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained _Nullable[_Nonnull])buffer count:(NSUInteger)len {
+        NSUInteger count = 0;
+        [self lock];
+
+        @try {
+            PGLinkedListNode *__unsafe_unretained nextNode = (__bridge PGLinkedListNode *)(void *)state->state;
+
+            if(nextNode == nil) {
+                /*
+                 * Need to initialize...
+                 */
+                nextNode = self.stackTop;
+                state->mutationsPtr = &_modifiedCount;
+                state->extra[0] = (nextNode ? 1 : 0);
+            }
+
+            while(state->extra[0] && count < len) {
+                buffer[count++] = nextNode;
+                nextNode = nextNode.nextNode;
+                if(nextNode == self.stackTop) state->extra[0] = 0;
+            }
+
+            state->state = (unsigned long)(__bridge void *)nextNode;
+        }
+        @finally { [self unlock]; }
+
+        return count;
     }
 
 @end

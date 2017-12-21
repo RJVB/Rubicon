@@ -27,7 +27,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGStack<__covariant T> : NSObject<NSLocking, NSCopying>
+@interface PGStack<__covariant T> : NSObject<NSLocking, NSCopying, NSFastEnumeration>
 
     @property(atomic, readonly) NSUInteger count;
     @property(nonatomic, readonly) BOOL    isNotEmpty;

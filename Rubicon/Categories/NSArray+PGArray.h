@@ -40,6 +40,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(NSString *)componentsJoinedByString:(NSString *)string inRange:(NSRange)range;
 
+    -(NSArray *)arrayWithContentsReversed;
+
 @end
 
 NS_ASSUME_NONNULL_END

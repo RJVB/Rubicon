@@ -39,6 +39,10 @@
         return self;
     }
 
+    +(instancetype)enumeratorWithOwner:(id)owner andEnumerator:(NSEnumerator *)enumerator {
+        return [[self alloc] initWithOwner:owner andEnumerator:enumerator];
+    }
+
     -(id)nextObject {
         id item = nil;
 
