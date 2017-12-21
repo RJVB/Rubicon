@@ -102,11 +102,31 @@
         @try { [self _queue:item]; } @finally { [self unlock]; }
     }
 
+    -(void)requeue:(id)item {
+        [self lock];
+        @try {
+            if(item) {
+                if(self.queueHead) {
+                    self.queueHead = [self.queueHead prepend:item];
+                    self.count++;
+                    _modifiedCount++;
+                }
+                else {
+                    [self _queue:item];
+                }
+            }
+            else {
+                @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Item is null." userInfo:nil];
+            }
+        }
+        @finally { [self unlock]; }
+    }
+
     -(void)_queue:(id)item {
         if(item) {
             if(self.queueHead) {
                 [self.queueTail append:item];
-                self.count += 1;
+                self.count++;
             }
             else {
                 self.queueHead = [[PGLinkedListNode alloc] initWithData:item];
@@ -135,7 +155,7 @@
 
         if(item) {
             self.queueHead = [self.queueHead remove];
-            self.count     = (self.queueHead ? self.count - 1 : 0);
+            self.count     = (self.queueHead ? (self.count - 1) : 0);
             _modifiedCount++;
         }
         else self.count = 0;

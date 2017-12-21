@@ -42,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(void)queue:(T)item;
 
+    -(void)requeue:(T)item;
+
     -(nullable T)peekQueue;
 
     -(nullable T)dequeue;
