@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(instancetype)init;
 
-    -(instancetype)initWithObjects:(const V[])objects forKeys:(const K<NSCopying>[])keys count:(NSUInteger)cnt;
+    -(instancetype)initWithObjects:(const V _Nonnull[_Nullable])objects forKeys:(const K<NSCopying> _Nonnull[_Nullable])keys count:(NSUInteger)cnt;
 
     -(void)removeObjectForKey:(K)aKey;
 

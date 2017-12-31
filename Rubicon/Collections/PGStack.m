@@ -297,24 +297,29 @@
         [self lock];
 
         @try {
-            PGLinkedListNode *__unsafe_unretained nextNode = (__bridge PGLinkedListNode *)(void *)state->state;
+            PGLinkedListNode *__unsafe_unretained nextNode = nil;
 
-            if(nextNode == nil) {
-                /*
-                 * Need to initialize...
-                 */
-                nextNode = self.stackTop;
-                state->mutationsPtr = &_modifiedCount;
-                state->extra[0] = (nextNode ? 1 : 0);
+            switch(state->state) {
+                case 0:
+                    state->state        = 1;
+                    state->mutationsPtr = &_modifiedCount;
+                    state->extra[0] = ((unsigned long)(__bridge void *)self.stackTop);
+                    // Fall through to the case 1....
+                case 1:
+                    nextNode = (__bridge PGLinkedListNode *)(void *)state->extra[0];
+
+                    while((state->state == 1) && (count < len)) {
+                        buffer[count++] = nextNode.data;
+                        nextNode = nextNode.nextNode;
+                        if(nextNode == self.stackTop) state->state = 2;
+                    }
+
+                    // Probably don't have to do this but OCD.
+                    state->extra[0] = ((state->state == 1) ? ((unsigned long)(__bridge void *)nextNode) : 0);
+                    break;
+                default:
+                    break;
             }
-
-            while(state->extra[0] && count < len) {
-                buffer[count++] = nextNode;
-                nextNode = nextNode.nextNode;
-                if(nextNode == self.stackTop) state->extra[0] = 0;
-            }
-
-            state->state = (unsigned long)(__bridge void *)nextNode;
         }
         @finally { [self unlock]; }
 

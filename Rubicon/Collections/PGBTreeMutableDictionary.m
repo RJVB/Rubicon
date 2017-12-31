@@ -90,12 +90,6 @@
         @try { return [PGBTreeNodeValueEnumerator enumeratorWithDictionary:self]; } @finally { [self unlock]; }
     }
 
-    -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained _Nullable[_Nonnull])buffer count:(NSUInteger)len {
-        NSUInteger count = 0;
-
-        return count;
-    }
-
     -(void)lock {
         [self lock];
     }
