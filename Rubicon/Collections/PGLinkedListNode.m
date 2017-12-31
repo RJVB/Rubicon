@@ -22,21 +22,10 @@
  *********************************************************************************************************************************/
 
 #import "PGLinkedListNode.h"
+#import "PGLinkedListNodeEnumerator.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Woverriding-method-mismatch"
-
-@interface PGLinkedListNodeEnumerator<__covariant T> : NSEnumerator<T>
-
-    -(instancetype)initWithStartingNode:(PGLinkedListNode *)staringNode;
-
-@end
-
-@interface PGLinkedListNodeReverseEnumerator<__covariant T> : NSEnumerator<T>
-
-    -(instancetype)initWithStartingNode:(PGLinkedListNode *)staringNode;
-
-@end
 
 @interface PGLinkedListNode<__covariant T>()
 
@@ -191,74 +180,6 @@
 
     -(NSEnumerator *)reverseObjectEnumerator {
         return [[PGLinkedListNodeReverseEnumerator alloc] initWithStartingNode:self];
-    }
-
-@end
-
-@implementation PGLinkedListNodeEnumerator {
-        PGLinkedListNode *_startingNode;
-        PGLinkedListNode *_nextNode;
-    }
-
-    -(instancetype)initWithStartingNode:(PGLinkedListNode *)staringNode {
-        self = [super init];
-
-        if(self) {
-            _startingNode = staringNode;
-            _nextNode     = staringNode;
-        }
-
-        return self;
-    }
-
-    -(id)nextObject {
-        id item = nil;
-
-        if(_startingNode) {
-            item      = _nextNode.data;
-            _nextNode = _nextNode.nextNode;
-
-            if(_nextNode == _startingNode) {
-                _nextNode     = nil;
-                _startingNode = nil;
-            }
-        }
-
-        return item;
-    }
-
-@end
-
-@implementation PGLinkedListNodeReverseEnumerator {
-        PGLinkedListNode *_startingNode;
-        PGLinkedListNode *_previousNode;
-    }
-
-    -(instancetype)initWithStartingNode:(PGLinkedListNode *)staringNode {
-        self = [super init];
-
-        if(self) {
-            _startingNode = staringNode;
-            _previousNode = staringNode;
-        }
-
-        return self;
-    }
-
-    -(id)nextObject {
-        id item = nil;
-
-        if(_startingNode) {
-            item          = _previousNode.data;
-            _previousNode = _previousNode.previousNode;
-
-            if(_previousNode == _startingNode) {
-                _previousNode = nil;
-                _startingNode = nil;
-            }
-        }
-
-        return item;
     }
 
 @end

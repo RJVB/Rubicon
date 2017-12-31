@@ -174,13 +174,13 @@ void ignoreSignal(int _signal) {
 #pragma clang diagnostic pop
 
 void threadCleanup(void *obj) {
-    PGTimedWait *timedWait = ((__bridge PGTimedWait *)obj);
+    PGTimedWait *__unsafe_unretained timedWait = ((__bridge PGTimedWait *)obj);
     [timedWait cleanup];
 }
 
 void *waitThread(void *obj) {
-    PGTimedWait *timedWait = ((__bridge PGTimedWait *)obj);
-    long        errorNo    = ((long)[timedWait wait]);
+    PGTimedWait *__unsafe_unretained timedWait = ((__bridge PGTimedWait *)obj);
+    long errorNo = ((long)[timedWait wait]);
     return ((void *)errorNo);
 }
 

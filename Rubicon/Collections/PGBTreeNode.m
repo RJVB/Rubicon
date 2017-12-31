@@ -34,6 +34,10 @@
     @property(nonatomic, retain) PGBTreeNode<K, V> *rightNode;
     @property(nonatomic, retain) PGBTreeNode<K, V> *leftNode;
 
+    -(instancetype)farLeft;
+
+    -(instancetype)farRight;
+
 @end
 
 @implementation PGBTreeNode {
@@ -182,7 +186,7 @@
         PGBTreeNode *r = self.rightNode;
 
         if(l && r) {
-            while(r.leftNode) r = r.leftNode;
+            r = r.farLeft;
             self.nodeKey   = r.nodeKey;
             self.nodeValue = r.nodeValue;
             return [r remove];
@@ -306,6 +310,14 @@
         PGBTreeNode *p = self.parentNode;
         if(self == p.leftNode) p.leftNode = node; else if(self == p.rightNode) p.rightNode = node;
         return self;
+    }
+
+    -(instancetype)farLeft {
+        return (self.leftNode ? self.leftNode.farLeft : self);
+    }
+
+    -(instancetype)farRight {
+        return (self.rightNode ? self.rightNode.farRight : self);
     }
 
 @end
