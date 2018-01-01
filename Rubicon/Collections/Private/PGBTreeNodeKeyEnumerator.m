@@ -27,7 +27,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Woverriding-method-mismatch"
 
-@interface PGBTreeNodeKeyEnumerator<__covariant T>()
+@interface PGBTreeNodeKeyEnumerator<T>()
 
     @property(atomic, retain) PGBTreeMutableDictionary<T, id> *dictionary;
     @property(atomic, retain) PGStack<PGBTreeNode<T, id> *>   *stack;
@@ -36,7 +36,7 @@
 
 @end
 
-@interface PGBTreeNodeValueEnumerator<__covariant T>()
+@interface PGBTreeNodeValueEnumerator<T>()
 
     @property(atomic, retain) PGBTreeMutableDictionary<id, T> *dictionary;
     @property(atomic, retain) PGStack<PGBTreeNode<id, T> *>   *stack;

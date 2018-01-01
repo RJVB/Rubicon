@@ -28,53 +28,53 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGBTreeMutableDictionary<__covariant K, __covariant V> : NSMutableDictionary<K, V><NSLocking>
+@interface PGBTreeMutableDictionary<__covariant KeyType, __covariant ObjectType> : NSMutableDictionary<KeyType, ObjectType><NSLocking>
 
     -(instancetype)init;
 
-    -(instancetype)initWithObjects:(const V _Nonnull[_Nullable])objects forKeys:(const K<NSCopying> _Nonnull[_Nullable])keys count:(NSUInteger)cnt;
+    -(instancetype)initWithObjects:(const ObjectType _Nonnull[_Nullable])objects forKeys:(const KeyType<NSCopying> _Nonnull[_Nullable])keys count:(NSUInteger)cnt;
 
-    -(void)removeObjectForKey:(K)aKey;
+    -(void)removeObjectForKey:(KeyType)aKey;
 
-    -(void)setObject:(V)anObject forKey:(K<NSCopying>)aKey;
+    -(void)setObject:(ObjectType)anObject forKey:(KeyType<NSCopying>)aKey;
 
-    -(V)objectForKey:(K)aKey;
+    -(ObjectType)objectForKey:(KeyType)aKey;
 
-    -(NSEnumerator<K> *)keyEnumerator;
+    -(NSEnumerator<KeyType> *)keyEnumerator;
 
-    -(NSEnumerator<K> *)objectEnumerator;
+    -(NSEnumerator<KeyType> *)objectEnumerator;
 
 @end
 
-@interface NSMutableDictionary<__covariant K, __covariant V>(PGBTreeMutableDictionary)
+@interface NSMutableDictionary<KeyType, ObjectType>(PGBTreeMutableDictionary)
 
-    +(PGBTreeMutableDictionary<K, V> *)binaryTreeDictionary;
+    +(PGBTreeMutableDictionary<KeyType, ObjectType> *)binaryTreeDictionary;
 
-    +(PGBTreeMutableDictionary<K, V> *)binaryTreeDictionaryWithObject:(V)object forKey:(K<NSCopying>)key;
+    +(PGBTreeMutableDictionary<KeyType, ObjectType> *)binaryTreeDictionaryWithObject:(ObjectType)object forKey:(KeyType<NSCopying>)key;
 
 #if TARGET_OS_WIN32
 
-    +(PGBTreeMutableDictionary<K, V> *)binaryTreeDictionaryWithObjects:(const V _Nonnull [_Nullable])objects forKeys:(const K _Nonnull [_Nullable])keys count:(NSUInteger)cnt;
+    +(PGBTreeMutableDictionary<KeyType, ObjectType> *)binaryTreeDictionaryWithObjects:(const ObjectType _Nonnull [_Nullable])objects forKeys:(const KeyType _Nonnull [_Nullable])keys count:(NSUInteger)cnt;
 
 #else
 
     /*  @formatter:off */
-    +(PGBTreeMutableDictionary<K, V> *)binaryTreeDictionaryWithObjects:(const V _Nonnull[_Nullable])objects forKeys:(const K<NSCopying> _Nonnull[_Nullable])keys count:(NSUInteger)cnt;
+    +(PGBTreeMutableDictionary<KeyType, ObjectType> *)binaryTreeDictionaryWithObjects:(const ObjectType _Nonnull[_Nullable])objects forKeys:(const KeyType<NSCopying> _Nonnull[_Nullable])keys count:(NSUInteger)cnt;
     /* @formatter:on */
 
 #endif
 
-    +(PGBTreeMutableDictionary<K, V> *)binaryTreeDictionaryWithDictionary:(NSDictionary<K, V> *)dict;
+    +(PGBTreeMutableDictionary<KeyType, ObjectType> *)binaryTreeDictionaryWithDictionary:(NSDictionary<KeyType, ObjectType> *)dict;
 
-    +(PGBTreeMutableDictionary<K, V> *)binaryTreeDictionaryWithObjects:(NSArray<V> *)objects forKeys:(NSArray<K<NSCopying>> *)keys;
+    +(PGBTreeMutableDictionary<KeyType, ObjectType> *)binaryTreeDictionaryWithObjects:(NSArray<ObjectType> *)objects forKeys:(NSArray<KeyType<NSCopying>> *)keys;
 
     /* Reads dictionary stored in NSPropertyList format from the specified url. @formatter:off */
-    +(nullable PGBTreeMutableDictionary<NSString *, V> *)binaryTreeDictionaryWithContentsOfURL:(NSURL *)url error:(NSError **)error API_AVAILABLE(macos(10.13), ios(11.0), watchos(4.0), tvos(11.0)) NS_SWIFT_UNAVAILABLE("Use initializer instead");
+    +(nullable PGBTreeMutableDictionary<NSString *, ObjectType> *)binaryTreeDictionaryWithContentsOfURL:(NSURL *)url error:(NSError **)error API_AVAILABLE(macos(10.13), ios(11.0), watchos(4.0), tvos(11.0)) NS_SWIFT_UNAVAILABLE("Use initializer instead");
     /* @formatter:on */
 
-    +(nullable PGBTreeMutableDictionary<K, V> *)binaryTreeDictionaryWithContentsOfFile:(NSString *)path;
+    +(nullable PGBTreeMutableDictionary<KeyType, ObjectType> *)binaryTreeDictionaryWithContentsOfFile:(NSString *)path;
 
-    +(nullable PGBTreeMutableDictionary<K, V> *)binaryTreeDictionaryWithContentsOfURL:(NSURL *)url;
+    +(nullable PGBTreeMutableDictionary<KeyType, ObjectType> *)binaryTreeDictionaryWithContentsOfURL:(NSURL *)url;
 
 @end
 

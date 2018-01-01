@@ -38,13 +38,7 @@
 
         if(self) {
             self.macroHandler = macroHandler;
-
-            if(macroRegex.length == 0) {
-                self.macroRegex = PGDefaultMacroRegex;
-            }
-            else {
-                self.macroRegex = macroRegex;
-            }
+            self.macroRegex   = ((macroRegex.length == 0) ? PGDefaultMacroRegex : macroRegex);
         }
 
         return self;
@@ -77,24 +71,27 @@
                     NSString *repl  = self.macroHandler(subs, aString, result.range);
 
                     if(lastLocation < result.range.location) {
-                        [rString appendString:[aString substringWithRange:NSMakeRange(lastLocation, (result.range.location - lastLocation))]];
+                        NSRange  range = NSMakeRange(lastLocation, (result.range.location - lastLocation));
+                        NSString *str  = [aString substringWithRange:range];
+                        [rString appendString:str];
                     }
 
-                    if(repl.length) {
-                        [rString appendString:repl];
-                    }
-
+                    if(repl.length) [rString appendString:repl];
                     lastLocation = (result.range.location + result.range.length);
                 }
 
                 if(lastLocation < aString.length) {
-                    [rString appendString:[aString substringFromIndex:lastLocation]];
+                    NSString *str = [aString substringFromIndex:lastLocation];
+                    [rString appendString:str];
                 }
             }
         }
         else {
             NSString     *reason   = @"Given string is nil.";
-            NSDictionary *userInfo = @{ NSLocalizedDescriptionKey:reason, NSLocalizedFailureReasonErrorKey:reason };
+            NSDictionary *userInfo = @{
+                NSLocalizedDescriptionKey       :reason,
+                NSLocalizedFailureReasonErrorKey:reason
+            };
             lerror = [NSError errorWithDomain:PGErrorDomain code:1 userInfo:userInfo];
         }
 

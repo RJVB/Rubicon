@@ -29,7 +29,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGBTreeMutableDictionary<__covariant K, V>()
+@interface PGBTreeMutableDictionary<K, V>()
 
     @property(atomic, retain, nullable) PGBTreeNode<K, V> *rootNode;
 
