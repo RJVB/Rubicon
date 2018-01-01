@@ -40,19 +40,19 @@ NS_ASSUME_NONNULL_BEGIN
     @property(nonatomic, readonly) PGBTreeNode<K, V> *rightNode;
     @property(nonatomic, readonly) PGBTreeNode<K, V> *rootNode;
 
-    -(instancetype)initWithValue:(id)value forKey:(id<NSCopying>)key;
-
-    -(void)deepRemove;
+    -(instancetype)initWithValue:(V)value forKey:(K<NSCopying>)key;
 
     -(instancetype)findNodeForKey:(K)key;
 
     -(instancetype)findNodeForKey:(K)key usingComparator:(NSComparator)comp;
 
-    -(instancetype)remove;
-
     -(instancetype)insertValue:(V)value forKey:(K<NSCopying>)key;
 
     -(instancetype)insertValue:(V)value forKey:(K<NSCopying>)key usingComparator:(NSComparator)comp;
+
+    -(instancetype)remove;
+
+    -(void)deepRemove;
 
 @end
 

@@ -28,7 +28,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGBTreeMutableDictionary<__covariant K, V> : NSMutableDictionary<K, V><NSLocking>
+@interface PGBTreeMutableDictionary<__covariant K, __covariant V> : NSMutableDictionary<K, V><NSLocking>
 
     -(instancetype)init;
 
@@ -43,6 +43,38 @@ NS_ASSUME_NONNULL_BEGIN
     -(NSEnumerator<K> *)keyEnumerator;
 
     -(NSEnumerator<K> *)objectEnumerator;
+
+@end
+
+@interface NSMutableDictionary<__covariant K, __covariant V>(PGBTreeMutableDictionary)
+
+    +(PGBTreeMutableDictionary<K, V> *)binaryTreeDictionary;
+
+    +(PGBTreeMutableDictionary<K, V> *)binaryTreeDictionaryWithObject:(V)object forKey:(K<NSCopying>)key;
+
+#if TARGET_OS_WIN32
+
+    +(PGBTreeMutableDictionary<K, V> *)binaryTreeDictionaryWithObjects:(const V _Nonnull [_Nullable])objects forKeys:(const K _Nonnull [_Nullable])keys count:(NSUInteger)cnt;
+
+#else
+
+    /*  @formatter:off */
+    +(PGBTreeMutableDictionary<K, V> *)binaryTreeDictionaryWithObjects:(const V _Nonnull[_Nullable])objects forKeys:(const K<NSCopying> _Nonnull[_Nullable])keys count:(NSUInteger)cnt;
+    /* @formatter:on */
+
+#endif
+
+    +(PGBTreeMutableDictionary<K, V> *)binaryTreeDictionaryWithDictionary:(NSDictionary<K, V> *)dict;
+
+    +(PGBTreeMutableDictionary<K, V> *)binaryTreeDictionaryWithObjects:(NSArray<V> *)objects forKeys:(NSArray<K<NSCopying>> *)keys;
+
+    /* Reads dictionary stored in NSPropertyList format from the specified url. @formatter:off */
+    +(nullable PGBTreeMutableDictionary<NSString *, V> *)binaryTreeDictionaryWithContentsOfURL:(NSURL *)url error:(NSError **)error API_AVAILABLE(macos(10.13), ios(11.0), watchos(4.0), tvos(11.0)) NS_SWIFT_UNAVAILABLE("Use initializer instead");
+    /* @formatter:on */
+
+    +(nullable PGBTreeMutableDictionary<K, V> *)binaryTreeDictionaryWithContentsOfFile:(NSString *)path;
+
+    +(nullable PGBTreeMutableDictionary<K, V> *)binaryTreeDictionaryWithContentsOfURL:(NSURL *)url;
 
 @end
 

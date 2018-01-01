@@ -100,4 +100,42 @@
 
 @end
 
+@implementation NSMutableDictionary(PGBTreeMutableDictionary)
+
+    +(PGBTreeMutableDictionary *)binaryTreeDictionaryWithObjects:(const id[])objects forKeys:(const id<NSCopying>[])keys count:(NSUInteger)cnt {
+        return [[PGBTreeMutableDictionary alloc] initWithObjects:objects forKeys:keys count:cnt];
+    }
+
+    +(PGBTreeMutableDictionary *)binaryTreeDictionary {
+        return [[PGBTreeMutableDictionary alloc] init];
+    }
+
+    +(PGBTreeMutableDictionary *)binaryTreeDictionaryWithObject:(id)object forKey:(id<NSCopying>)key {
+        PGBTreeMutableDictionary *dictionary = [[PGBTreeMutableDictionary alloc] init];
+        dictionary[key] = object;
+        return dictionary;
+    }
+
+    +(PGBTreeMutableDictionary *)binaryTreeDictionaryWithDictionary:(NSDictionary<id<NSCopying>, id> *)dict {
+        return [[PGBTreeMutableDictionary alloc] initWithDictionary:dict];
+    }
+
+    +(PGBTreeMutableDictionary *)binaryTreeDictionaryWithObjects:(NSArray *)objects forKeys:(NSArray<id<NSCopying>> *)keys {
+        return [[PGBTreeMutableDictionary alloc] initWithObjects:objects forKeys:keys];
+    }
+
+    +(nullable PGBTreeMutableDictionary<NSString *, id> *)binaryTreeDictionaryWithContentsOfURL:(NSURL *)url error:(NSError **)error {
+        return [PGBTreeMutableDictionary binaryTreeDictionaryWithDictionary:[NSDictionary dictionaryWithContentsOfURL:url error:error]];
+    }
+
+    +(nullable PGBTreeMutableDictionary *)binaryTreeDictionaryWithContentsOfFile:(NSString *)path {
+        return [PGBTreeMutableDictionary binaryTreeDictionaryWithDictionary:[NSDictionary dictionaryWithContentsOfFile:path]];
+    }
+
+    +(nullable PGBTreeMutableDictionary *)binaryTreeDictionaryWithContentsOfURL:(NSURL *)url {
+        return [PGBTreeMutableDictionary binaryTreeDictionaryWithDictionary:[NSDictionary dictionaryWithContentsOfURL:url]];
+    }
+
+@end
+
 #pragma clang diagnostic pop
