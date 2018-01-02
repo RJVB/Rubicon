@@ -80,6 +80,22 @@
         @try { return [self.rootNode findNodeForKey:aKey].nodeValue; } @finally { [self unlock]; }
     }
 
+    -(void)removeAllObjects {
+        [self lock];
+        @try { [self _removeAllObjects]; } @finally { [self unlock]; }
+    }
+
+    -(void)_removeAllObjects {
+        if(self.rootNode) {
+            [self.rootNode deepRemove];
+            self.rootNode = nil;
+        }
+    }
+
+    -(void)dealloc {
+        [self _removeAllObjects];
+    }
+
     -(NSEnumerator<id> *)keyEnumerator {
         [self lock];
         @try { return [PGBTreeNodeKeyEnumerator enumeratorWithDictionary:self]; } @finally { [self unlock]; }

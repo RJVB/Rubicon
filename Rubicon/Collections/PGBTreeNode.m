@@ -113,11 +113,11 @@
     }
 
     -(void)clearFields {
-        self.leftNode   = nil;
-        self.rightNode  = nil;
-        self.parentNode = nil;
-        self.nodeValue  = nil;
-        self.nodeKey    = nil;
+        _leftNode   = nil;
+        _rightNode  = nil;
+        _parentNode = nil;
+        _nodeKey    = nil;
+        _nodeValue  = nil;
     }
 
 #pragma clang diagnostic push
