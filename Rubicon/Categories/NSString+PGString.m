@@ -27,6 +27,14 @@ const NSUInteger PGUNotFound = NSUIntegerMax;
 
 @implementation NSString(PGString)
 
+    -(NSString *)nullIfEmpty {
+        return (self.length ? self : nil);
+    }
+
+    -(NSString *)nullIfTrimEmpty {
+        return [[self trim] nullIfEmpty];
+    }
+
     -(NSUInteger)indexOfCharacter:(unichar)c {
         for(NSUInteger i = 0, j = self.length; i < j; i++) {
             if(c == [self characterAtIndex:i]) {

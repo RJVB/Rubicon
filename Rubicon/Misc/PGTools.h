@@ -34,6 +34,16 @@
 #define PGFieldsPerPixel (4)
 
 /**************************************************************************************************//**
+ * If the given string reference is null then return an empty string literal. (@"")
+ *
+ * @param str the string reference.
+ * @return the same string reference or @"" if the string reference is null.
+ */
+NS_INLINE NSString *_Nonnull PGEmptyIfNull(NSString *const _Nullable str) {
+    return (str ? str : @"");
+}
+
+/**************************************************************************************************//**
  * Test the equality of two objects. Safely handles the case of either or both objects being NULL.
  * Two objects are considered equal if both are NULL or [obj1 isEquals:obj2] returns TRUE.
  *
@@ -118,5 +128,7 @@ FOUNDATION_EXPORT NSString *_Nonnull PGStrError(int osErrNo);
  * @return a new string.
  */
 FOUNDATION_EXPORT NSString *_Nonnull PGFormat(NSString *_Nonnull fmt, ...) NS_FORMAT_FUNCTION(1, 2);
+
+FOUNDATION_EXPORT NSString *_Nonnull PGJoinAsHarvardList(NSArray<NSString *> *_Nullable list);
 
 #endif //__Rubicon_PGTools_H_
