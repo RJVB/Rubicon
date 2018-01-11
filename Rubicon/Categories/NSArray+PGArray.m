@@ -62,27 +62,53 @@
         return NO;
     }
 
-    -(NSString *)componentsJoinedByString:(NSString *)string fromIndex:(NSUInteger)idx {
-        if(idx > self.count) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Index out of bounds." userInfo:nil];
-        if(idx == self.count) return @"";
-        return [[self subarrayWithRange:NSMakeRange(idx, self.count - idx)] componentsJoinedByString:string];
+    -(NSString *)_componentsJoinedByString:(NSString *)string fromIndex:(NSUInteger)from toIndex:(NSUInteger)to {
+        NSMutableString *str = [NSMutableString new];
+
+        if(!string) string = @"";
+
+        if(from < to) {
+            [str appendString:self[from++]];
+            while(from < to) {
+                [str appendString:string];
+                [str appendString:self[from++]];
+            }
+        }
+
+        return str;
     }
 
-    -(NSString *)componentsJoinedByString:(NSString *)string toIndex:(NSUInteger)idx {
-        if(idx > self.count) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Index out of bounds." userInfo:nil];
-        if(idx == self.count) return [self componentsJoinedByString:string];
-        if(idx == 0) return @"";
-        return [[self subarrayWithRange:NSMakeRange(0, idx)] componentsJoinedByString:string];
+    -(NSString *)componentsJoinedByString:(NSString *)separator fromIndex:(NSUInteger)fromIdx {
+        return [self _componentsJoinedByString:separator fromIndex:fromIdx toIndex:self.count];
     }
 
-    -(NSString *)componentsJoinedByString:(NSString *)string inRange:(NSRange)range {
-        return [[self subarrayWithRange:range] componentsJoinedByString:string];
+    -(NSString *)componentsJoinedByString:(NSString *)separator toIndex:(NSUInteger)toIdx {
+        return [self _componentsJoinedByString:separator fromIndex:0 toIndex:MIN(self.count, toIdx)];
+    }
+
+    -(NSString *)componentsJoinedByString:(NSString *)separator fromIndex:(NSUInteger)fromIdx toIndex:(NSUInteger)toIdx {
+        return [self _componentsJoinedByString:separator fromIndex:fromIdx toIndex:MIN(self.count, toIdx)];
+    }
+
+    -(NSString *)componentsJoinedByString:(NSString *)separator inRange:(NSRange)range {
+        return [self _componentsJoinedByString:separator fromIndex:range.location toIndex:(range.location + range.length)];
     }
 
     -(NSArray *)arrayWithContentsReversed {
-        NSMutableArray *ar = [NSMutableArray arrayWithCapacity:self.count];
-        for(id         item in self.reverseObjectEnumerator) [ar addObject:item];
-        return ar;
+        NSUInteger i = self.count;
+
+        if(i) {
+            NSMutableArray *ar = [NSMutableArray arrayWithCapacity:i];
+
+            do {
+                [ar addObject:self[--i]];
+            } while(i > 0);
+
+            return ar;
+        }
+        else {
+            return @[];
+        }
     }
 
 @end

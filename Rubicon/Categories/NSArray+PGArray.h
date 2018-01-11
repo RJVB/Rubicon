@@ -34,11 +34,13 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(BOOL)containsIdenticalObjectsAsArray:(NSArray<T> *)array;
 
-    -(NSString *)componentsJoinedByString:(NSString *)string fromIndex:(NSUInteger)idx;
+    -(NSString *)componentsJoinedByString:(NSString *)separator fromIndex:(NSUInteger)fromIdx;
 
-    -(NSString *)componentsJoinedByString:(NSString *)string toIndex:(NSUInteger)idx;
+    -(NSString *)componentsJoinedByString:(NSString *)separator toIndex:(NSUInteger)toIdx;
 
-    -(NSString *)componentsJoinedByString:(NSString *)string inRange:(NSRange)range;
+    -(NSString *)componentsJoinedByString:(NSString *)separator fromIndex:(NSUInteger)fromIdx toIndex:(NSUInteger)toIdx;
+
+    -(NSString *)componentsJoinedByString:(NSString *)separator inRange:(NSRange)range;
 
     -(NSArray *)arrayWithContentsReversed;
 

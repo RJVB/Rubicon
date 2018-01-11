@@ -22,8 +22,7 @@
  *******************************************************************************/
 
 #import "NSString+PGString.h"
-
-const NSUInteger PGUNotFound = NSUIntegerMax;
+#import "NSArray+PGArray.h"
 
 @implementation NSString(PGString)
 
@@ -42,7 +41,31 @@ const NSUInteger PGUNotFound = NSUIntegerMax;
             }
         }
 
-        return PGUNotFound;
+        return NSNotFound;
+    }
+
+    -(NSArray<NSString *> *)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit {
+        if(limit) {
+            if(separator.length && limit > 1) {
+                NSArray<NSString *> *icomp = [self componentsSeparatedByString:separator];
+                NSUInteger          icc    = icomp.count;
+
+                if(icc <= limit) {
+                    return icomp;
+                }
+                else {
+                    NSMutableArray<NSString *> *ocomp = [NSMutableArray arrayWithCapacity:limit];
+
+                    for(NSUInteger i = 0; i < (limit - 1); i++) [ocomp addObject:icomp[i]];
+                    [ocomp addObject:[icomp componentsJoinedByString:separator fromIndex:limit]];
+                }
+            }
+
+            return @[ self ];
+        }
+        else {
+            return @[];
+        }
     }
 
     -(NSString *)limitLength:(NSUInteger)maxLength {

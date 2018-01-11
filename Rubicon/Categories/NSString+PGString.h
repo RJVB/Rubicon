@@ -27,8 +27,6 @@
 
 #import <Rubicon/PGTools.h>
 
-FOUNDATION_EXPORT const NSUInteger PGUNotFound;
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface NSString(PGString)
@@ -38,6 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
     -(nullable NSString *)nullIfTrimEmpty;
 
     -(NSUInteger)indexOfCharacter:(unichar)c;
+
+    -(NSArray<NSString *> *)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit;
 
     -(NSString *)limitLength:(NSUInteger)maxLength;
 
