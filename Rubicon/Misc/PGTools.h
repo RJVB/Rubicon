@@ -129,6 +129,4 @@ FOUNDATION_EXPORT NSString *_Nonnull PGStrError(int osErrNo);
  */
 FOUNDATION_EXPORT NSString *_Nonnull PGFormat(NSString *_Nonnull fmt, ...) NS_FORMAT_FUNCTION(1, 2);
 
-FOUNDATION_EXPORT NSString *_Nonnull PGJoinAsHarvardList(NSArray<NSString *> *_Nullable list);
-
 #endif //__Rubicon_PGTools_H_

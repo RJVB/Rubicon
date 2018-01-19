@@ -23,6 +23,12 @@
 
 #import "NSArray+PGArray.h"
 
+@interface NSArray()
+
+    -(NSException *)invArgExc:(NSString *)reason;
+
+@end
+
 @implementation NSArray(PGArray)
 
     -(BOOL)containsIdenticalObjectsOutOfOrderAsArray:(NSArray<id> *)array {
@@ -62,52 +68,102 @@
         return NO;
     }
 
-    -(NSString *)_componentsJoinedByString:(NSString *)string fromIndex:(NSUInteger)from toIndex:(NSUInteger)to {
-        NSMutableString *str = [NSMutableString new];
+#define PGItem(idx)   ([self[idx] description])
+#define PGRIdx(range) (range.location + range.length)
+#define PGRLen(range) (self.count - range.location)
 
-        if(!string) string = @"";
-
-        if(from < to) {
-            [str appendString:self[from++]];
-            while(from < to) {
-                [str appendString:string];
-                [str appendString:self[from++]];
-            }
+    -(NSString *)_componentsJoinedAsHarvardList:(NSString *)conjunction fromIndex:(NSUInteger)fromIdx toIndex:(NSUInteger)toIdx {
+        /*
+         * ASSUMPTION: All parameters have already been validated.
+         */
+        switch(toIdx - fromIdx) { // @f:0
+            case 0:  return @"";
+            case 1:  return [PGItem(fromIdx) copy];
+            case 2:  return PGFormat(@"%@ %@ %@", PGItem(fromIdx), conjunction, PGItem(fromIdx + 1));
+            default: return PGFormat(@"%@, %@ %@", [self _componentsJoinedByString:@", " fromIndex:fromIdx toIndex:toIdx - 1], conjunction, PGItem(toIdx - 1)); // @f:1
         }
+    }
 
-        return str;
+    -(NSString *)componentsJoinedAsHarvardList:(NSString *)conjunction fromIndex:(NSUInteger)fromIdx {
+        return [self componentsJoinedAsHarvardList:conjunction fromIndex:fromIdx toIndex:self.count];
+    }
+
+    -(NSString *)componentsJoinedAsHarvardList:(NSString *)conjunction toIndex:(NSUInteger)toIdx {
+        return [self componentsJoinedAsHarvardList:conjunction fromIndex:0 toIndex:toIdx];
+    }
+
+    -(NSString *)componentsJoinedAsHarvardList:(NSString *)conjunction fromIndex:(NSUInteger)fromIdx toIndex:(NSUInteger)toIdx {
+        NSUInteger cc = self.count;
+        if(fromIdx > cc) @throw [self invArgExc:PGFormat(@"Invalid starting index: %lu > %lu", fromIdx, cc)];
+        if(toIdx > cc) @throw [self invArgExc:PGFormat(@"Invalid ending index: %lu > %lu", toIdx, cc)];
+        if(toIdx < fromIdx) @throw [self invArgExc:PGFormat(@"Invalid ending index: %lu < %lu", toIdx, fromIdx)];
+        return [self _componentsJoinedAsHarvardList:conjunction ? : @"and" fromIndex:fromIdx toIndex:toIdx];
+    }
+
+    -(NSString *)componentsJoinedAsHarvardList:(NSString *)conjunction inRange:(NSRange)range {
+        if(range.location > self.count) @throw [self invArgExc:PGFormat(@"Invalid starting location: %lu > %lu", range.location, self.count)];
+        if(PGRIdx(range) > self.count) @throw [self invArgExc:PGFormat(@"Invalid length: %lu > %lu", range.length, PGRLen(range))];
+        return [self _componentsJoinedAsHarvardList:conjunction ? : @"and" fromIndex:range.location toIndex:PGRIdx(range)];
+    }
+
+    -(NSString *)_componentsJoinedByString:(NSString *)string fromIndex:(NSUInteger)fromIdx toIndex:(NSUInteger)toIdx {
+        /*
+         * ASSUMPTION: All parameters have already been validated.
+         */
+        switch(toIdx - fromIdx) { // @f:0
+            case 0: return @"";
+            case 1: return [PGItem(fromIdx) copy];
+            default:{
+                NSMutableString *str = [NSMutableString stringWithString:PGItem(fromIdx++)];
+                while(fromIdx < toIdx) {
+                    [str appendString:string];
+                    [str appendString:PGItem(fromIdx++)];
+                }
+                return str;
+            } // @f:1
+        }
     }
 
     -(NSString *)componentsJoinedByString:(NSString *)separator fromIndex:(NSUInteger)fromIdx {
-        return [self _componentsJoinedByString:separator fromIndex:fromIdx toIndex:self.count];
+        return [self componentsJoinedByString:separator fromIndex:fromIdx toIndex:self.count];
     }
 
     -(NSString *)componentsJoinedByString:(NSString *)separator toIndex:(NSUInteger)toIdx {
-        return [self _componentsJoinedByString:separator fromIndex:0 toIndex:MIN(self.count, toIdx)];
+        return [self componentsJoinedByString:separator fromIndex:0 toIndex:toIdx];
     }
 
     -(NSString *)componentsJoinedByString:(NSString *)separator fromIndex:(NSUInteger)fromIdx toIndex:(NSUInteger)toIdx {
-        return [self _componentsJoinedByString:separator fromIndex:fromIdx toIndex:MIN(self.count, toIdx)];
+        NSUInteger cc = self.count;
+        if(fromIdx > cc) @throw [self invArgExc:PGFormat(@"Invalid starting index: %lu > %lu", fromIdx, cc)];
+        if(toIdx < fromIdx) @throw [self invArgExc:PGFormat(@"Invalid ending index: %lu < %lu", toIdx, fromIdx)];
+        if(toIdx > cc) @throw [self invArgExc:PGFormat(@"Invalid ending index: %lu > %lu", toIdx, cc)];
+        return [self _componentsJoinedByString:separator ? : @"" fromIndex:fromIdx toIndex:toIdx];
     }
 
     -(NSString *)componentsJoinedByString:(NSString *)separator inRange:(NSRange)range {
-        return [self _componentsJoinedByString:separator fromIndex:range.location toIndex:(range.location + range.length)];
+        if(range.location > self.count) @throw [self invArgExc:PGFormat(@"Invalid starting location: %lu > %lu", range.location, self.count)];
+        if(PGRIdx(range) > self.count) @throw [self invArgExc:PGFormat(@"Invalid length: %lu > %lu", range.length, PGRLen(range))];
+        return [self _componentsJoinedByString:separator ? : @"" fromIndex:range.location toIndex:PGRIdx(range)];
+    }
+
+    -(NSException *)invArgExc:(NSString *)reason {
+        return [NSException exceptionWithName:NSInvalidArgumentException reason:reason userInfo:nil];
     }
 
     -(NSArray *)arrayWithContentsReversed {
         NSUInteger i = self.count;
-
-        if(i) {
-            NSMutableArray *ar = [NSMutableArray arrayWithCapacity:i];
-
-            do {
-                [ar addObject:self[--i]];
-            } while(i > 0);
-
-            return ar;
-        }
-        else {
-            return @[];
+        switch(i) { // @f:0
+            case 0: return @[];
+            case 1: return @[ self[0] ];
+            case 2: return @[ self[1], self[0] ];
+            case 3: return @[ self[2], self[1], self[0] ];
+            case 4: return @[ self[3], self[2], self[1], self[0] ];
+            case 5: return @[ self[4], self[3], self[2], self[1], self[0] ];
+            default: {
+                NSMutableArray *ar = [NSMutableArray arrayWithCapacity:i];
+                do { [ar addObject:self[--i]]; } while(i > 0);
+                return ar;
+            } // @f:1
         }
     }
 

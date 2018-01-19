@@ -34,6 +34,14 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(BOOL)containsIdenticalObjectsAsArray:(NSArray<T> *)array;
 
+    -(NSString *)componentsJoinedAsHarvardList:(NSString *)conjunction fromIndex:(NSUInteger)fromIdx;
+
+    -(NSString *)componentsJoinedAsHarvardList:(NSString *)conjunction toIndex:(NSUInteger)toIdx;
+
+    -(NSString *)componentsJoinedAsHarvardList:(NSString *)conjunction fromIndex:(NSUInteger)fromIdx toIndex:(NSUInteger)toIdx;
+
+    -(NSString *)componentsJoinedAsHarvardList:(NSString *)conjunction inRange:(NSRange)range;
+
     -(NSString *)componentsJoinedByString:(NSString *)separator fromIndex:(NSUInteger)fromIdx;
 
     -(NSString *)componentsJoinedByString:(NSString *)separator toIndex:(NSUInteger)toIdx;

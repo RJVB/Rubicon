@@ -99,28 +99,3 @@ NSComparisonResult _PGCompare(id obj1, id obj2) {
 NSComparisonResult PGCompare(id obj1, id obj2) {
     return ((obj1 == obj2) ? NSOrderedSame : ((obj1 && obj2) ? _PGCompare(obj1, obj2) : (obj2 ? NSOrderedAscending : NSOrderedDescending)));
 }
-
-NSString *PGJoinAsHarvardList(NSArray<NSString *> *list) {
-    NSUInteger cc = list.count;
-
-    if(cc) {
-        NSMutableString *str = [NSMutableString string];
-        NSUInteger      i    = 0;
-        NSUInteger      j    = (cc - 1);
-
-        [str appendString:list[i++]];
-        if(i < cc) {
-            if(i < j) {
-                while(i < j) [str appendFormat:@", %@", list[i++]];
-                [str appendString:@","];
-            }
-
-            [str appendFormat:@" and %@", list[i]];
-        }
-
-        return str;
-    }
-    else {
-        return @"";
-    }
-}
