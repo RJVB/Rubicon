@@ -23,12 +23,6 @@
 
 #import "NSArray+PGArray.h"
 
-@interface NSArray()
-
-    -(NSException *)invArgExc:(NSString *)reason;
-
-@end
-
 @implementation NSArray(PGArray)
 
     -(BOOL)containsIdenticalObjectsOutOfOrderAsArray:(NSArray<id> *)array {
@@ -104,6 +98,10 @@
         if(range.location > self.count) @throw [self invArgExc:PGFormat(@"Invalid starting location: %lu > %lu", range.location, self.count)];
         if(PGRIdx(range) > self.count) @throw [self invArgExc:PGFormat(@"Invalid length: %lu > %lu", range.length, PGRLen(range))];
         return [self _componentsJoinedAsHarvardList:conjunction ? : @"and" fromIndex:range.location toIndex:PGRIdx(range)];
+    }
+
+    -(NSString *)componentsJoinedAsHarvardList:(NSString *)conjunction {
+        return [self _componentsJoinedAsHarvardList:conjunction ? : @"and" fromIndex:0 toIndex:self.count];
     }
 
     -(NSString *)_componentsJoinedByString:(NSString *)string fromIndex:(NSUInteger)fromIdx toIndex:(NSUInteger)toIdx {

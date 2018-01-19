@@ -42,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(NSString *)componentsJoinedAsHarvardList:(NSString *)conjunction inRange:(NSRange)range;
 
+    -(NSString *)componentsJoinedAsHarvardList:(NSString *)conjunction;
+
     -(NSString *)componentsJoinedByString:(NSString *)separator fromIndex:(NSUInteger)fromIdx;
 
     -(NSString *)componentsJoinedByString:(NSString *)separator toIndex:(NSUInteger)toIdx;
