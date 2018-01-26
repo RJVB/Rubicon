@@ -22,14 +22,25 @@
  *******************************************************************************/
 
 #import "NSString+PGString.h"
-#import "NSArray+PGArray.h"
 
 @implementation NSString(PGString)
 
+    /**************************************************************************************************//**
+     * If the length of this string is zero (0) then this method returns a NULL value (nil), otherwise
+     * this NSString object is returned.
+     *
+     * @return Either this NSString object or nil if this string is empty.
+     */
     -(NSString *)nullIfEmpty {
         return (self.length ? self : nil);
     }
 
+    /**************************************************************************************************//**
+     * This method is the equivilent of calling [[self trim] nullIfEmpty]. Either NULL (nil) or a copy
+     * of this NSString is always returned.
+     *
+     * @return Either a copy of this NSString object or nil if this string is empty.
+     */
     -(NSString *)nullIfTrimEmpty {
         return [[self trim] nullIfEmpty];
     }
@@ -44,34 +55,103 @@
         return NSNotFound;
     }
 
-    -(NSArray<NSString *> *)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit {
-        if(limit) {
-            if(separator.length && limit > 1) {
-                NSArray<NSString *> *icomp = [self componentsSeparatedByString:separator];
-                NSUInteger          icc    = icomp.count;
-
-                if(icc <= limit) {
-                    return icomp;
-                }
-                else {
-                    NSMutableArray<NSString *> *ocomp = [NSMutableArray arrayWithCapacity:limit];
-
-                    for(NSUInteger i = 0; i < (limit - 1); i++) [ocomp addObject:icomp[i]];
-                    [ocomp addObject:[icomp componentsJoinedByString:separator fromIndex:limit]];
-                }
-            }
-
-            return @[ self ];
-        }
-        else {
-            return @[];
-        }
+    NS_INLINE NSRange PGRangeFromIndexes(NSUInteger loc1, NSUInteger loc2) {
+        NSRange range;
+        range.location = MIN(loc1, loc2);
+        range.length = (MAX(loc1, loc2) - range.location);
+        return range;
     }
 
+    -(NSRange)rangeOfString:(NSString *)searchString options:(NSStringCompareOptions)options from:(NSUInteger)from {
+        if(from > self.length) {
+            NSString *reason = PGFormat(@"Starting location \"from\" is greater than the length of the string: %lu > %lu", from, self.length);
+            @throw [NSException exceptionWithName:NSRangeException reason:reason userInfo:nil];
+        }
+        return ((from == self.length) ? NSMakeRange(NSNotFound, 0) : [self rangeOfString:searchString options:options range:NSMakeRange(from, self.length - from)]);
+    }
+
+    -(NSRange)rangeOfString:(NSString *)searchString options:(NSStringCompareOptions)options to:(NSUInteger)to {
+        if(to > self.length) {
+            NSString *reason = PGFormat(@"Ending location \"to\" is greater than the length of the string: %lu > %lu", to, self.length);
+            @throw [NSException exceptionWithName:NSRangeException reason:reason userInfo:nil];
+        }
+        return ((to == 0) ? NSMakeRange(NSNotFound, 0) : [self rangeOfString:searchString options:options range:PGRangeFromIndexes(0, to)]);
+    }
+
+    /**************************************************************************************************//**
+     * This method functions like the componentsSeparatedByString: method except that it allows you to
+     * specify a limit to the number of components that are created. If the limit is zero (0) then an
+     * instance of an empty NSArray will be returned. If the limit is greater than zero (0) then an
+     * instance of NSArray will be returned with at most that number of components. The last element
+     * in the instance of NSArray will be the remainder of the string.
+     *
+     * @param separator The separator string.
+     * @param limit The maximum number of elements that the returned NSArray object will contain.
+     * @return An NSArray object containing substrings from the receiver that have been divided by separator.
+     */
+    -(NSArray<NSString *> *)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit {
+        /*
+         * If the limit is zero then return an empty array.
+         */
+        if(limit) {
+            /*
+             * If the limit is only 1, the separator is empty, or the separator is longer
+             * than this string then return a copy of this string as the only element in the array.
+             */
+            if(((--limit) > 0) && (separator.length > 0) && (separator.length < self.length)) {
+                NSUInteger currPoint  = 0;
+                NSRange    foundRange = [self rangeOfString:separator options:0 from:currPoint];
+
+                /*
+                 * If instances of the separator do not exist in this string then
+                 * fall thru and return a copy of this string as the only element
+                 * in the array. Otherwise continue into the body of the IF
+                 * statement.
+                 */
+                if(foundRange.location != NSNotFound) {
+                    /*
+                     * At this point we know two things:
+                     *
+                     * 1) the limit is at least 2
+                     * 2) we found at least one instance of the separator
+                     *
+                     * So we know that the resulting array is going to have at least two elements.
+                     */
+                    NSMutableArray *array = [NSMutableArray arrayWithCapacity:limit + 1];
+
+                    do {
+                        [array addObject:[self substringWithRange:PGRangeFromIndexes(currPoint, foundRange.location)]];
+                        currPoint = (foundRange.location + foundRange.length);
+                        if((--limit) == 0) break;
+                        foundRange = [self rangeOfString:separator options:0 from:currPoint];
+                    } while(foundRange.location != NSNotFound);
+
+                    [array addObject:[self substringWithRange:PGRangeFromIndexes(currPoint, self.length)]];
+                    return array;
+                }
+            }
+            return @[[self copy]];
+        }
+        return @[];
+    }
+
+    /**************************************************************************************************//**
+     * If this string's length is greater than the 'maxLength' provided then this method returns a copy
+     * of this string truncated to the 'maxLength'. Otherwise this string is returned - not a copy.
+     *
+     * @param maxLength the max length.
+     * @return either this string or a copy that is truncated to the 'maxLength'.
+     */
     -(NSString *)limitLength:(NSUInteger)maxLength {
         return ((self.length > maxLength) ? [self substringWithRange:NSMakeRange(0, maxLength)] : self);
     }
 
+    /**************************************************************************************************//**
+     * Returns a copy of this string with the leading and trailing whitespace and control characters
+     * removed. This method always returns a copy of this string even if nothing had to be removed.
+     *
+     * @return a copy of this string with any leading or trailing whitespace and control characters removed.
+     */
     -(NSString *)trim {
         NSString *re1 = [self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         NSString *re2 = [re1 stringByTrimmingCharactersInSet:[NSCharacterSet controlCharacterSet]];
