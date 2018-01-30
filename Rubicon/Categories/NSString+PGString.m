@@ -298,4 +298,25 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
         [NSGraphicsContext restoreGraphicsState];
     }
 
+    +(NSString *)stringByConcatenatingStrings:(NSString *)firstString, ... {
+        va_list         args;
+        NSMutableString *str = [NSMutableString string];
+
+        if(firstString) {
+            [str appendString:firstString];
+
+            va_start(args, firstString);
+            NSObject *obj = va_arg(args, NSObject *);
+
+            while(obj) {
+                [str appendString:[obj description]];
+                obj = va_arg(args, NSObject *);
+            }
+
+            va_end(args);
+        }
+
+        return str;
+    }
+
 @end

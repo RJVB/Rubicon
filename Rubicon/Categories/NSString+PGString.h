@@ -170,6 +170,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(void)drawDeadCentered:(NSRect)textRect fontAttributes:(NSDictionary *)fontAttribs;
 
+    +(NSString *)stringByConcatenatingStrings:(NSString *)firstString, ... NS_REQUIRES_NIL_TERMINATION;
+
 @end
 
 NS_ASSUME_NONNULL_END

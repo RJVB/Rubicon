@@ -28,6 +28,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface NSMutableArray<T>(PGMutableArray)
+
+    -(BOOL)replaceObjectIdenticalTo:(T)oldObject withObject:(T)newObject;
+
+@end
+
 @interface NSArray<__covariant T>(PGArray)
 
     -(BOOL)containsIdenticalObjectsOutOfOrderAsArray:(NSArray<T> *)array;

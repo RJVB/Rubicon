@@ -166,3 +166,23 @@
     }
 
 @end
+
+@implementation NSMutableArray(PGMutableArray)
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverriding-method-mismatch"
+
+    -(BOOL)replaceObjectIdenticalTo:(NSObject *)oldObject withObject:(NSObject *)newObject {
+        if(oldObject == nil) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"\"oldObject\" is nil." userInfo:nil];
+        if(newObject == nil) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"\"newObject\" is nil." userInfo:nil];
+
+        NSUInteger index = [self indexOfObjectIdenticalTo:oldObject];
+        BOOL       found = (index != NSNotFound);
+
+        if(found) self[index] = newObject;
+        return found;
+    }
+
+#pragma clang diagnostic pop
+
+@end
