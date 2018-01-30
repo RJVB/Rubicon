@@ -23,6 +23,27 @@
 
 #import "NSString+PGString.h"
 
+typedef void (^EnumBlock)(NSString *substring, NSRange substringRange, NSRange enclosingRange, BOOL *end);
+
+NS_INLINE NSRange PGRangeFromIndexes(NSUInteger loc1, NSUInteger loc2) {
+    NSRange range;
+    if(loc1 <= loc2) {
+        range.location = loc1;
+        range.length   = (loc2 - loc1);
+    }
+    else {
+        range.location = loc2;
+        range.length   = (loc1 - loc2);
+    }
+    return range;
+}
+
+NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange range) {
+    if(range.location < string.length && NSMaxRange(range) < string.length) return nil;
+    NSString *r = PGFormat(@"Range {%lu, %lu} out of bounds; string length %lu", range.location, range.length, string.length);
+    return [NSException exceptionWithName:NSRangeException reason:r userInfo:nil];
+}
+
 @implementation NSString(PGString)
 
     /**************************************************************************************************//**
@@ -46,36 +67,81 @@
     }
 
     -(NSUInteger)indexOfCharacter:(unichar)c {
-        for(NSUInteger i = 0, j = self.length; i < j; i++) {
-            if(c == [self characterAtIndex:i]) {
-                return i;
-            }
+        return [self indexOfCharacter:c inRange:NSMakeRange(0, self.length)];
+    }
+
+    -(NSUInteger)indexOfCharacter:(unichar)c from:(NSUInteger)startIndex {
+        return [self indexOfCharacter:c inRange:PGRangeFromIndexes(startIndex, self.length)];
+    }
+
+    -(NSUInteger)indexOfCharacter:(unichar)c to:(NSUInteger)endIndex {
+        return [self indexOfCharacter:c inRange:NSMakeRange(0, endIndex)];
+    }
+
+    -(NSUInteger)indexOfCharacter:(unichar)c inRange:(NSRange)range {
+        for(NSUInteger i = range.location, j = NSMaxRange(range); i < j; i++) {
+            if(c == [self characterAtIndex:i]) return i;
         }
 
         return NSNotFound;
     }
 
-    NS_INLINE NSRange PGRangeFromIndexes(NSUInteger loc1, NSUInteger loc2) {
-        NSRange range;
-        range.location = MIN(loc1, loc2);
-        range.length = (MAX(loc1, loc2) - range.location);
-        return range;
+    -(BOOL)isEqualToString:(nullable NSString *)string from:(NSUInteger)fromIndex {
+        return [self isEqualToString:string inRange:PGRangeFromIndexes(fromIndex, self.length)];
+    }
+
+    -(BOOL)isEqualToString:(nullable NSString *)string to:(NSUInteger)toIndex {
+        return [self isEqualToString:string inRange:NSMakeRange(0, toIndex)];
+    }
+
+    -(BOOL)isEqualToString:(nullable NSString *)string inRange:(NSRange)range {
+        NSException *e = PGValidateRange(self, range);
+        if(e) @throw e;
+        if(string == nil) return NO;
+        range = [self rangeOfComposedCharacterSequencesForRange:range];
+        if(string.length != range.length) return NO;
+        for(NSUInteger i = 0; i < range.length; i++) {
+            if([self characterAtIndex:range.location++] != [string characterAtIndex:i]) return NO;
+        }
+        return YES;
+    }
+
+    -(BOOL)isEqualToString:(NSString *)string stringRange:(NSRange)stringRange receiverRange:(NSRange)receiverRange {
+        NSException *e = PGValidateRange(self, receiverRange);
+        if(e) @throw e;
+        e = PGValidateRange(string, stringRange);
+        if(e) @throw e;
+
+        if(receiverRange.length != stringRange.length) return NO;
+
+        while(receiverRange.length) {
+            unichar c1 = [self characterAtIndex:receiverRange.location++];
+            unichar c2 = [string characterAtIndex:stringRange.location++];
+            if(c1 != c2) return NO;
+            receiverRange.length--;
+        }
+
+        return YES;
+    }
+
+    -(NSRange)rangeOfString:(NSString *)searchString from:(NSUInteger)fromIndex {
+        return [self rangeOfString:searchString options:0 range:PGRangeFromIndexes(fromIndex, self.length)];
+    }
+
+    -(NSRange)rangeOfString:(NSString *)searchString to:(NSUInteger)toIndex {
+        return [self rangeOfString:searchString options:0 range:NSMakeRange(0, toIndex)];
+    }
+
+    -(NSRange)rangeOfString:(NSString *)searchString range:(NSRange)range {
+        return [self rangeOfString:searchString options:0 range:range];
     }
 
     -(NSRange)rangeOfString:(NSString *)searchString options:(NSStringCompareOptions)options from:(NSUInteger)from {
-        if(from > self.length) {
-            NSString *reason = PGFormat(@"Starting location \"from\" is greater than the length of the string: %lu > %lu", from, self.length);
-            @throw [NSException exceptionWithName:NSRangeException reason:reason userInfo:nil];
-        }
-        return ((from == self.length) ? NSMakeRange(NSNotFound, 0) : [self rangeOfString:searchString options:options range:NSMakeRange(from, self.length - from)]);
+        return [self rangeOfString:searchString options:options range:PGRangeFromIndexes(from, self.length)];
     }
 
     -(NSRange)rangeOfString:(NSString *)searchString options:(NSStringCompareOptions)options to:(NSUInteger)to {
-        if(to > self.length) {
-            NSString *reason = PGFormat(@"Ending location \"to\" is greater than the length of the string: %lu > %lu", to, self.length);
-            @throw [NSException exceptionWithName:NSRangeException reason:reason userInfo:nil];
-        }
-        return ((to == 0) ? NSMakeRange(NSNotFound, 0) : [self rangeOfString:searchString options:options range:PGRangeFromIndexes(0, to)]);
+        return [self rangeOfString:searchString options:options range:NSMakeRange(0, to)];
     }
 
     /**************************************************************************************************//**
@@ -98,15 +164,14 @@
              * If the limit is only 1, the separator is empty, or the separator is longer
              * than this string then return a copy of this string as the only element in the array.
              */
-            if(((--limit) > 0) && (separator.length > 0) && (separator.length < self.length)) {
-                NSUInteger currPoint  = 0;
-                NSRange    foundRange = [self rangeOfString:separator options:0 from:currPoint];
+            if((limit > 1) && (separator.length > 0) && (separator.length < self.length)) {
+                NSRange remaining  = NSMakeRange(0, self.length);
+                NSRange foundRange = [self rangeOfString:separator options:0 range:remaining];
 
                 /*
-                 * If instances of the separator do not exist in this string then
-                 * fall thru and return a copy of this string as the only element
-                 * in the array. Otherwise continue into the body of the IF
-                 * statement.
+                 * If instances of the separator do not exist in the first place then
+                 * fall thru and return a copy of this string as the only element in
+                 * the array. Otherwise continue into the body of the IF statement.
                  */
                 if(foundRange.location != NSNotFound) {
                     /*
@@ -117,16 +182,23 @@
                      *
                      * So we know that the resulting array is going to have at least two elements.
                      */
-                    NSMutableArray *array = [NSMutableArray arrayWithCapacity:limit + 1];
+                    NSMutableArray *array = [NSMutableArray arrayWithCapacity:limit];
 
                     do {
-                        [array addObject:[self substringWithRange:PGRangeFromIndexes(currPoint, foundRange.location)]];
-                        currPoint = (foundRange.location + foundRange.length);
-                        if((--limit) == 0) break;
-                        foundRange = [self rangeOfString:separator options:0 from:currPoint];
+                        [array addObject:[self substringWithRange:PGRangeFromIndexes(remaining.location, foundRange.location)]];
+                        remaining = PGRangeFromIndexes(NSMaxRange(foundRange), self.length);
+                        /*
+                         * See if we're done...
+                         */
+                        if(limit < 3) break;
+                        /*
+                         * We're not done so keep going until no more found...
+                         */
+                        limit--;
+                        foundRange = [self rangeOfString:separator options:0 range:remaining];
                     } while(foundRange.location != NSNotFound);
 
-                    [array addObject:[self substringWithRange:PGRangeFromIndexes(currPoint, self.length)]];
+                    [array addObject:[self substringWithRange:remaining]];
                     return array;
                 }
             }

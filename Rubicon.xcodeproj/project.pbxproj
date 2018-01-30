@@ -219,7 +219,7 @@
 		83CC448C1E0B037700DDE50D /* Rubicon.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Rubicon.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		83CC448F1E0B037700DDE50D /* Rubicon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Rubicon.h; sourceTree = "<group>"; };
 		83CC44951E0B037700DDE50D /* RubiconTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RubiconTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		83CC449A1E0B037700DDE50D /* RubiconTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RubiconTests.m; sourceTree = "<group>"; };
+		83CC449A1E0B037700DDE50D /* RubiconTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RubiconTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */

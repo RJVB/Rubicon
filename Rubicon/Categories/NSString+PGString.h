@@ -47,9 +47,92 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(nullable NSString *)nullIfTrimEmpty;
 
+    /**************************************************************************************************//**
+     * This method accepts only a single UTF-16 code point as input and searchs for the first instance
+     * of that code point in this entire string. If you would rather search for a composed character
+     * sequence (such as an emoji 🤯) then instead use the rangeOfString: method and pass the composed
+     * character sequence as a string.
+     *
+     * This method simply calls:
+     *     [self indexOfCharacter:c inRange:NSMakeRange(0, self.length)]
+     *
+     * @param c the UTF-16 unicode code point to search for.
+     * @return the index of the first instance of the character in this string or NSNotFound.
+     */
     -(NSUInteger)indexOfCharacter:(unichar)c;
 
+    /**************************************************************************************************//**
+     * This method accepts only a single UTF-16 code point as input and searchs for the first instance
+     * of that code point in this string beginning at 'startIndex'. If you would rather search for a
+     * composed character sequence (such as an emoji 🤯) then instead use the rangeOfString:from: method
+     * and pass the composed character sequence as a string.
+     *
+     * This method simply calls:
+     *     [self indexOfCharacter:c inRange:NSMakeRange(startIndex, self.length - startIndex)]
+     *
+     * @param c the UTF-16 unicode code point to search for.
+     * @param startIndex the position in this string to begin searching at.
+     * @return the index of the first instance of the character in this string or NSNotFound.
+     */
+    -(NSUInteger)indexOfCharacter:(unichar)c from:(NSUInteger)startIndex;
+
+    /**************************************************************************************************//**
+     * This method accepts only a single UTF-16 code point as input and searchs for the first instance
+     * of that code point in this string up to just before 'toIndex'. If you would rather search for a
+     * composed character sequence (such as an emoji 🤯) then instead use the rangeOfString:to: method and
+     * pass the composed character sequence as a string.
+     *
+     * This method simply calls:
+     *     [self indexOfCharacter:c inRange:NSMakeRange(0, toIndex)]
+     *
+     * @param c the UTF-16 unicode code point to search for.
+     * @param endIndex the position in this string to stop searching before.
+     * @return the index of the first instance of the character in this string or NSNotFound.
+     */
+    -(NSUInteger)indexOfCharacter:(unichar)c to:(NSUInteger)endIndex;
+
+    /**************************************************************************************************//**
+     * This method accepts only a single UTF-16 code point as input and searchs for the first instance
+     * of that code point in this string within the supplied range. If you would rather search for a
+     * composed character sequence (such as an emoji 🤯) then instead use the rangeOfString:range: method
+     * and pass the composed character sequence as a string.
+     *
+     * @param c the UTF-16 unicode code point to search for.
+     * @param range the range of this string to search over.
+     * @return the index of the first instance of the character in this string or NSNotFound.
+     */
+    -(NSUInteger)indexOfCharacter:(unichar)c inRange:(NSRange)range;
+
+    -(BOOL)isEqualToString:(nullable NSString *)other from:(NSUInteger)fromIndex;
+
+    -(BOOL)isEqualToString:(nullable NSString *)other to:(NSUInteger)toIndex;
+
+    /**************************************************************************************************//**
+     * This method exists to allow you to compare a substring of this string to another string without
+     * having to actually create a separate NSString object to begin with. It replaces a call that would
+     * look something like this:
+     *     [aString isEqualToString:[otherString substringWithRange:aRange]]
+     *
+     * Instead you can now do something like the following and not actually create a new object:
+     *     [otherString isEqualToString:aString inRange:aRange]
+     *
+     * @param other the other string.
+     * @param range the range within this string to compare the other string to.
+     * @return YES if the range of this string equals the other string.
+     */
+    -(BOOL)isEqualToString:(nullable NSString *)other inRange:(NSRange)range;
+
+    -(BOOL)isEqualToString:(NSString *)other stringRange:(NSRange)stringRange receiverRange:(NSRange)receiverRange;
+
+    -(NSRange)rangeOfString:(NSString *)searchString from:(NSUInteger)fromIndex;
+
+    -(NSRange)rangeOfString:(NSString *)searchString to:(NSUInteger)toIndex;
+
+    -(NSRange)rangeOfString:(NSString *)searchString range:(NSRange)range;
+
     -(NSRange)rangeOfString:(NSString *)searchString options:(NSStringCompareOptions)options from:(NSUInteger)from;
+
+    -(NSRange)rangeOfString:(NSString *)searchString options:(NSStringCompareOptions)options to:(NSUInteger)to;
 
     /**************************************************************************************************//**
      * This method functions like the componentsSeparatedByString: method except that it allows you to

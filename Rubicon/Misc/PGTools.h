@@ -45,7 +45,7 @@ NS_INLINE NSString *_Nonnull PGEmptyIfNull(NSString *const _Nullable str) {
 
 /**************************************************************************************************//**
  * Test the equality of two objects. Safely handles the case of either or both objects being NULL.
- * Two objects are considered equal if both are NULL or [obj1 isEquals:obj2] returns TRUE.
+ * Two objects are considered equal if both are NULL or [obj1 isEqual:obj2] returns TRUE.
  *
  * @param obj1 the first object.
  * @param obj2 the second object.
@@ -53,6 +53,18 @@ NS_INLINE NSString *_Nonnull PGEmptyIfNull(NSString *const _Nullable str) {
  */
 NS_INLINE BOOL PGObjectsEqual(id _Nullable obj1, id _Nullable obj2) {
     return ((obj1 == nil) ? (obj2 == nil) : ((obj2 == nil) ? NO : [obj1 isEqual:obj2]));
+}
+
+/**************************************************************************************************//**
+ * Test the equality of two strings. Safely handles the case of either or both strings being NULL.
+ * Two strings are considered equal if both are NULL or [str1 isEqualToString:str2] returns TRUE.
+ *
+ * @param str1 the first string.
+ * @param str2 the second string.
+ * @return YES if both strings are either NULL or equal according to the isEqualToString: selector.
+ */
+NS_INLINE BOOL PGStringsEqual(NSString *const _Nullable str1, NSString *const _Nullable str2) {
+    return ((str1 == nil) ? (str2 == nil) : (str2 == nil) ? NO : [str1 isEqualToString:str2]);
 }
 
 /**************************************************************************************************//**
