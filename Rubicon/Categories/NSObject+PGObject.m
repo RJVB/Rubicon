@@ -76,8 +76,11 @@
 	 ******************************************************************************************************/
     +(NSComparator)defaultComparator {
         return ^NSComparisonResult(id obj1, id obj2) {
-            if(obj1 && obj2) {
-                if(obj1 == obj2 || [obj1 isEqual:obj2]) {
+            if(obj1 == obj2) {
+                return NSOrderedSame;
+            }
+            else if(obj1 && obj2) {
+                if([obj1 isEqual:obj2]) {
                     return NSOrderedSame;
                 }
                 else if([[obj1 superclassInCommonWith:obj2] instancesRespondToSelector:@selector(compare:)]) {
@@ -85,7 +88,7 @@
                 }
             }
 
-            return ((obj1 < obj2) ? NSOrderedAscending : ((obj1 > obj2) ? NSOrderedDescending : NSOrderedSame));
+            return ((obj1 < obj2) ? NSOrderedAscending : NSOrderedDescending);
         };
     }
 
