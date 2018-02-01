@@ -29,7 +29,7 @@
 		1117D6095D42FD0C2B03B102 /* PGNodeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D3C2D6F21016997CC7A7 /* PGNodeView.m */; };
 		1117D63E9D2E4D166A347214 /* NSString+PGString.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D82A3FCEF61B52811265 /* NSString+PGString.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D671A9EE61407CCCF5BB /* PGNestedEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D98CC9D8896CA6643ADA /* PGNestedEnumerator.m */; };
-		1117D6732640D20604F75231 /* NSException+PGException.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D03BB4C108D051651F81 /* NSException+PGException.h */; };
+		1117D6732640D20604F75231 /* NSException+PGException.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D03BB4C108D051651F81 /* NSException+PGException.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D67B5DD2C2DF4474BA0F /* PGEmptyEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D2814A46700C7AF7A992 /* PGEmptyEnumerator.m */; };
 		1117D6881CA110CA2CC8E350 /* PGBTreeNodeKeyEnumerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D24C311094175170428F /* PGBTreeNodeKeyEnumerator.h */; };
 		1117D69CF7A8C3940966004F /* PGBase64OutputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DE3904471B3FE31696AB /* PGBase64OutputStream.m */; };
@@ -564,6 +564,7 @@
 				1117D9F77F007547086C011D /* PGTimedSemWait.h in Headers */,
 				1117D8D047B706C5F4AE1EF1 /* PGStack.h in Headers */,
 				1117D0BACEE7BBFB719DBC09 /* sem_timedwait.h in Headers */,
+				1117D6732640D20604F75231 /* NSException+PGException.h in Headers */,
 				1117D7B5FA4AE594CEA52D83 /* PGBTreeNode.h in Headers */,
 				1117DD4081DB0393F9318DF2 /* PGRWLockCounts.h in Headers */,
 				1117DBB362320F47607B2FBF /* PGTimedWait.h in Headers */,
@@ -572,7 +573,6 @@
 				1117DB55116BA45C02D357F8 /* PGEmptyEnumerator.h in Headers */,
 				1117D84A15C1E9D812789C88 /* PGLinkedListNodeEnumerator.h in Headers */,
 				1117D6881CA110CA2CC8E350 /* PGBTreeNodeKeyEnumerator.h in Headers */,
-				1117D6732640D20604F75231 /* NSException+PGException.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

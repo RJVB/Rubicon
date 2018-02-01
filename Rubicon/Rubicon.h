@@ -29,6 +29,7 @@
 #import <Rubicon/NSBitmapImageRep+PGBitmapImageRep.h>
 #import <Rubicon/NSArray+PGArray.h>
 #import <Rubicon/NSData+PGData.h>
+#import <Rubicon/NSException+PGException.h>
 #import <Rubicon/PGMacros.h>
 #import <Rubicon/PGSemaphore.h>
 #import <Rubicon/PGReadWriteLock.h>
