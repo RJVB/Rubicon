@@ -164,6 +164,17 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSString *)trim;
 
+    /**************************************************************************************************//**
+     * If this string contains any leading or trailing whitespace or control characters then this method
+     * returns a copy of this string with the leading and trailing whitespace and control characters
+     * removed. This method will return this string (not a copy) if there were no whitespace or control
+     * characters to remove.
+     *
+     * @return this string or a copy of this string if any leading or trailing whitespace and control
+     *         characters were removed.
+     */
+    -(NSString *)trimNoCopy;
+
     -(void)drawDeadCentered:(NSRect)textRect fontName:(NSString *)fontName fontSize:(NSFloat)fontSize fontColor:(NSColor *)fontColor;
 
     -(void)drawDeadCentered:(NSRect)textRect font:(NSFont *)font fontColor:(NSColor *)fontColor;

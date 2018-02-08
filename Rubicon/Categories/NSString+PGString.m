@@ -225,9 +225,21 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
      * @return a copy of this string with any leading or trailing whitespace and control characters removed.
      */
     -(NSString *)trim {
-        NSString *re1 = [self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        NSString *re2 = [re1 stringByTrimmingCharactersInSet:[NSCharacterSet controlCharacterSet]];
-        return ((self == re2) ? [self copy] : re2);
+        NSString *trimmed = self.trimNoCopy;
+        return ((self == trimmed) ? [self copy] : trimmed);
+    }
+
+    /**************************************************************************************************//**
+     * If this string contains any leading or trailing whitespace or control characters then this method
+     * returns a copy of this string with the leading and trailing whitespace and control characters
+     * removed. This method will return this string (not a copy) if there were no whitespace or control
+     * characters to remove.
+     *
+     * @return this string or a copy of this string if any leading or trailing whitespace and control
+     *         characters were removed.
+     */
+    -(NSString *)trimNoCopy {
+        return [[self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] stringByTrimmingCharactersInSet:[NSCharacterSet controlCharacterSet]];
     }
 
     -(NSDictionary *)makeAlignmentCentered:(NSDictionary *)fontAttribs {
