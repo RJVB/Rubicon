@@ -71,7 +71,7 @@
         [NSGraphicsContext restoreGraphicsState];
 
         NSString *aString = @"Galen Rhodes gyjqp";
-        [aString drawDeadCentered:dirtyRect fontName:@".HelveticaNeueDeskInterface-MediumP4" fontSize:self.fontSize fontColor:NSColor.blackColor];
+        [aString drawDeadCentered:dirtyRect fontName:@".HelveticaNeueDeskInterface-MediumP4" size:self.fontSize color:NSColor.blackColor];
     }
 
 @end

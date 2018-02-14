@@ -29,6 +29,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#define PG_DEFAULT_SYS_FONT_SIZE  (13)
+#define PG_DEFAULT_SYS_FONT_COLOR (NSColor.blackColor)
+
 @interface NSString(PGString)
 
     /**************************************************************************************************//**
@@ -175,11 +178,11 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSString *)trimNoCopy;
 
-    -(void)drawDeadCentered:(NSRect)textRect fontName:(NSString *)fontName fontSize:(NSFloat)fontSize fontColor:(NSColor *)fontColor;
+    -(void)drawDeadCentered:(NSRect)clipRect fontName:(NSString *)fontName size:(NSFloat)fontSize color:(NSColor *)fontColor;
 
-    -(void)drawDeadCentered:(NSRect)textRect font:(NSFont *)font fontColor:(NSColor *)fontColor;
+    -(void)drawDeadCentered:(NSRect)clipRect font:(NSFont *)font color:(NSColor *)fontColor;
 
-    -(void)drawDeadCentered:(NSRect)textRect fontAttributes:(NSDictionary *)fontAttribs;
+    -(void)drawDeadCentered:(NSRect)clipRect fontAttributes:(NSDictionary *)attribs;
 
     +(NSString *)stringByConcatenatingStrings:(NSString *)firstString, ... NS_REQUIRES_NIL_TERMINATION;
 

@@ -67,7 +67,7 @@
             // [self.rootNode draw:self.frame];
         }
         else {
-            [@"Nothing to show" drawDeadCentered:dirtyRect fontName:@"AmericanTypewriter-Light" fontSize:18 fontColor:[NSColor blackColor]];
+            [@"Nothing to show" drawDeadCentered:dirtyRect fontName:@"AmericanTypewriter-Light" size:18 color:[NSColor blackColor]];
         }
     }
 

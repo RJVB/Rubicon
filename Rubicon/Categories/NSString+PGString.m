@@ -23,6 +23,12 @@
 
 #import "NSString+PGString.h"
 
+#if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 101200)
+    #define PGTextAlignmentCenter NSCenterTextAlignment
+#else
+    #define PGTextAlignmentCenter NSTextAlignmentCenter
+#endif
+
 typedef void (^EnumBlock)(NSString *substring, NSRange substringRange, NSRange enclosingRange, BOOL *end);
 
 NS_INLINE NSRange PGRangeFromIndexes(NSUInteger loc1, NSUInteger loc2) {
@@ -196,7 +202,8 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
                          */
                         limit--;
                         foundRange = [self rangeOfString:separator options:0 range:remaining];
-                    } while(foundRange.location != NSNotFound);
+                    }
+                    while(foundRange.location != NSNotFound);
 
                     [array addObject:[self substringWithRange:remaining]];
                     return array;
@@ -239,7 +246,8 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
      *         characters were removed.
      */
     -(NSString *)trimNoCopy {
-        return [[self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] stringByTrimmingCharactersInSet:[NSCharacterSet controlCharacterSet]];
+        return [[self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]
+                stringByTrimmingCharactersInSet:[NSCharacterSet controlCharacterSet]];
     }
 
     -(NSDictionary *)makeAlignmentCentered:(NSDictionary *)fontAttribs {
@@ -248,66 +256,61 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
 
             if(style == nil) {
                 NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary:fontAttribs];
-                dict[NSParagraphStyleAttributeName] = (style = [[NSMutableParagraphStyle alloc] init]);
+                dict[NSParagraphStyleAttributeName] = style = [NSMutableParagraphStyle new];
                 fontAttribs = [NSDictionary dictionaryWithDictionary:dict];
             }
 
-#if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 101200)
-            style.alignment = NSCenterTextAlignment;
-#else
-            style.alignment = NSTextAlignmentCenter;
-#endif
+            style.alignment = PGTextAlignmentCenter;
         }
         else {
-            NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
-#if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 101200)
-            style.alignment = NSCenterTextAlignment;
-#else
-            style.alignment = NSTextAlignmentCenter;
-#endif
-            fontAttribs = @{
-                NSFontAttributeName           :[NSFont systemFontOfSize:13], // Font
-                NSForegroundColorAttributeName:[NSColor blackColor],         // Color
-                NSParagraphStyleAttributeName :style                         // Style
-            };
+            fontAttribs = [self fontAttribsWithFont:nil color:nil alignment:PGTextAlignmentCenter];
         }
 
         return fontAttribs;
     }
 
-    -(void)drawDeadCentered:(NSRect)textRect fontName:(NSString *)fontName fontSize:(NSFloat)fontSize fontColor:(NSColor *)fontColor {
-        NSFont *aFont = (fontName.length ? [NSFont fontWithName:fontName size:fontSize] : [NSFont systemFontOfSize:fontSize]);
-        [self drawDeadCentered:textRect font:aFont fontColor:fontColor];
-    }
-
-    -(void)drawDeadCentered:(NSRect)textRect font:(NSFont *)font fontColor:(NSColor *)fontColor {
-        NSDictionary *textFontAttributes = @{
-            NSFontAttributeName           :(font ? font : [NSFont systemFontOfSize:13]),  // Draw Font
-            NSForegroundColorAttributeName:(fontColor ? fontColor : [NSColor blackColor]) // Draw Color
+    -(NSDictionary *)fontAttribsWithFont:(NSFont *)font color:(NSColor *)fontColor alignment:(NSTextAlignment)textAlignment {
+        NSMutableParagraphStyle *style = NSParagraphStyle.defaultParagraphStyle.mutableCopy;
+        style.alignment = textAlignment;
+        return @{
+                NSFontAttributeName           : (font ? font : [NSFont systemFontOfSize:PG_DEFAULT_SYS_FONT_SIZE]), // Font
+                NSForegroundColorAttributeName: (fontColor ? fontColor : PG_DEFAULT_SYS_FONT_COLOR),                // Color
+                NSParagraphStyleAttributeName : style                                                               // Style
         };
-
-        [self drawDeadCentered:textRect fontAttributes:textFontAttributes];
     }
 
-    -(void)drawDeadCentered:(NSRect)textRect fontAttributes:(NSDictionary *)fontAttribs {
-        [self _drawDeadCentered:textRect fontAttribs:[self makeAlignmentCentered:fontAttribs]];
+    -(NSFloat)calcYOffest:(NSDictionary *)attrs {
+        NSFont *fnt = attrs[NSFontAttributeName];
+        return (ceil(0 - fnt.descender - (fnt.ascender - fnt.capHeight) / 2.0) * (NSGraphicsContext.currentContext.isFlipped ? -1 : 1));
     }
 
-    -(void)_drawDeadCentered:(NSRect)textRect fontAttribs:(NSDictionary *)fontAttribs {
-        NSFont  *textFont  = fontAttribs[NSFontAttributeName];
-        NSFloat textHeight = ceil(NSHeight([self boundingRectWithSize:textRect.size options:NSStringDrawingUsesLineFragmentOrigin attributes:fontAttribs]));
-        NSRect  textRect2  = NSMakeRect(NSMinX(textRect), ceil(NSMinY(textRect) + (NSHeight(textRect) - textHeight) / 2), NSWidth(textRect), textHeight);
-        double  offset     = ceil(0 - textFont.descender - (textFont.ascender - textFont.capHeight) / 2.0);
-
+    -(void)_drawDeadCentered:(NSRect)clipRect fontAttribs:(NSDictionary *)attribs {
+        NSStringDrawingOptions opts = NSStringDrawingUsesLineFragmentOrigin;
         [NSGraphicsContext saveGraphicsState];
 
-        if([NSGraphicsContext currentContext].isFlipped) {
-            offset *= -1;
-        }
+        CGSize  txsz = clipRect.size;
+        NSFloat hght = ceil(NSHeight([self boundingRectWithSize:txsz options:opts attributes:attribs]));
+        NSFloat posy = ceil(NSMinY(clipRect) + (NSHeight(clipRect) - hght) / 2);
+        NSFloat offs = [self calcYOffest:attribs];
 
-        NSRectClip(textRect);
-        [self drawInRect:NSOffsetRect(textRect2, 0, offset) withAttributes:fontAttribs];
+        NSRectClip(clipRect);
+        [self drawInRect:NSOffsetRect(NSMakeRect(NSMinX(clipRect), posy, NSWidth(clipRect), hght), 0, offs) withAttributes:attribs];
+
         [NSGraphicsContext restoreGraphicsState];
+    }
+
+    -(void)drawDeadCentered:(NSRect)clipRect fontName:(NSString *)fontName size:(NSFloat)fontSize color:(NSColor *)fontColor {
+        [self drawDeadCentered:clipRect
+                          font:(fontName.length ? [NSFont fontWithName:fontName size:fontSize] : [NSFont systemFontOfSize:fontSize])
+                         color:fontColor];
+    }
+
+    -(void)drawDeadCentered:(NSRect)clipRect font:(NSFont *)font color:(NSColor *)fontColor {
+        [self _drawDeadCentered:clipRect fontAttribs:[self fontAttribsWithFont:font color:fontColor alignment:PGTextAlignmentCenter]];
+    }
+
+    -(void)drawDeadCentered:(NSRect)clipRect fontAttributes:(NSDictionary *)attribs {
+        [self _drawDeadCentered:clipRect fontAttribs:[self makeAlignmentCentered:attribs]];
     }
 
     +(NSString *)stringByConcatenatingStrings:(NSString *)firstString, ... {
