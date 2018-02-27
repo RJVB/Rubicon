@@ -30,6 +30,7 @@
 #import <Rubicon/NSArray+PGArray.h>
 #import <Rubicon/NSData+PGData.h>
 #import <Rubicon/NSException+PGException.h>
+#import <Rubicon/NSError+PGError.h>
 #import <Rubicon/PGMacros.h>
 #import <Rubicon/PGSemaphore.h>
 #import <Rubicon/PGReadWriteLock.h>

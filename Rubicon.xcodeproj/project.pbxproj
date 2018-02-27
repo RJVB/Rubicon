@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1117D05733B3E04B9910044A /* NSError+PGError.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D9DC70BE474C3D16B0BA /* NSError+PGError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D069BAC9E03BD3EEA723 /* PGLinkedListNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D5CB94B0DCEFCB4DAFB5 /* PGLinkedListNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D071ACCE10329E438EB4 /* PGDefines.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D54FB85F0E618EB2B3A0 /* PGDefines.m */; };
 		1117D08C283C1BA68BF7FE31 /* NSObject+PGObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D197529716B32098E317 /* NSObject+PGObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -65,6 +66,7 @@
 		1117DD5B5C124EE0016D1D57 /* PGFilterOutputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D61AFE6CD5656E2C1E16 /* PGFilterOutputStream.m */; };
 		1117DD73DF30CDC0246D6A9F /* PGReadWriteLock.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D6A994ECA7ADD8C2A7B5 /* PGReadWriteLock.m */; };
 		1117DD76914D702AFED62966 /* NSString+PGString.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D0903BA71BEB8EA0F955 /* NSString+PGString.m */; };
+		1117DD796BB480D119952B42 /* NSError+PGError.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DA17973976E3538BA524 /* NSError+PGError.m */; };
 		1117DD82392B4CC03CA3379D /* NSBitmapImageRep+PGBitmapImageRep.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DB46991A725AC415BF87 /* NSBitmapImageRep+PGBitmapImageRep.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117DD877864305D7FEE9CD9 /* NSObject+PGObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DF8222D67F4383089DCF /* NSObject+PGObject.m */; };
 		1117DDFF0E70F976E626B860 /* PGLinkedListNodeEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D7D139A66E60784824DE /* PGLinkedListNodeEnumerator.m */; };
@@ -188,8 +190,10 @@
 		1117D91CB932BC51C194C049 /* PGFilterOutputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFilterOutputStream.h; sourceTree = "<group>"; };
 		1117D96AC9AAF96394E7BA36 /* PGTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTools.h; sourceTree = "<group>"; };
 		1117D98CC9D8896CA6643ADA /* PGNestedEnumerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGNestedEnumerator.m; sourceTree = "<group>"; };
+		1117D9DC70BE474C3D16B0BA /* NSError+PGError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSError+PGError.h"; sourceTree = "<group>"; };
 		1117D9DDB04FC50AB41C3219 /* PGSemaphore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGSemaphore.m; sourceTree = "<group>"; };
 		1117DA05E75519D531131324 /* PGTimedWait.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTimedWait.m; sourceTree = "<group>"; };
+		1117DA17973976E3538BA524 /* NSError+PGError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSError+PGError.m"; sourceTree = "<group>"; };
 		1117DA275B678D9478E87A06 /* PGMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGMacros.h; sourceTree = "<group>"; };
 		1117DA40A7107FFA3B41DC8C /* PGStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGStack.h; sourceTree = "<group>"; };
 		1117DAD7F761481916EB3AEE /* PGTimedReadLock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTimedReadLock.m; sourceTree = "<group>"; };
@@ -378,6 +382,8 @@
 				1117DB46991A725AC415BF87 /* NSBitmapImageRep+PGBitmapImageRep.h */,
 				1117D67458555B2FB7089EA7 /* NSException+PGException.m */,
 				1117D03BB4C108D051651F81 /* NSException+PGException.h */,
+				1117DA17973976E3538BA524 /* NSError+PGError.m */,
+				1117D9DC70BE474C3D16B0BA /* NSError+PGError.h */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -571,6 +577,7 @@
 				1117D8D047B706C5F4AE1EF1 /* PGStack.h in Headers */,
 				1117D0BACEE7BBFB719DBC09 /* sem_timedwait.h in Headers */,
 				1117D6732640D20604F75231 /* NSException+PGException.h in Headers */,
+				1117D05733B3E04B9910044A /* NSError+PGError.h in Headers */,
 				1117D7B5FA4AE594CEA52D83 /* PGBTreeNode.h in Headers */,
 				1117DD4081DB0393F9318DF2 /* PGRWLockCounts.h in Headers */,
 				1117DBB362320F47607B2FBF /* PGTimedWait.h in Headers */,
@@ -824,6 +831,7 @@
 				1117D551D63280B2E237AB6F /* PGBTreeNodeKeyEnumerator.m in Sources */,
 				1117D3B6D293EFCC6B79A730 /* NSException+PGException.m in Sources */,
 				1117DD5B5C124EE0016D1D57 /* PGFilterOutputStream.m in Sources */,
+				1117DD796BB480D119952B42 /* NSError+PGError.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
