@@ -28,7 +28,13 @@
 #import <Rubicon/GNUstep.h>
 
 typedef long long NSLong;
-typedef CGFloat   NSFloat;  // For the Sheldon Cooper in me.
+typedef uint8_t   NSByte;
+
+#if defined(CGFLOAT_IS_DOUBLE) && CGFLOAT_IS_DOUBLE
+typedef CGFloat NSFloat;  // For the Sheldon Cooper in me.
+#else
+typedef double NSFloat;
+#endif
 
 static const NSUInteger NSUNotFound = NSUIntegerMax;
 

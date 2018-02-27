@@ -32,7 +32,7 @@ static const NSUInteger PGDataReadBufferSize = 8196;
 
         if(fd >= 0) {
             NSMutableData *data = [NSMutableData dataWithCapacity:PGDataReadBufferSize];
-            uint8_t       buffer[PGDataReadBufferSize];
+            NSByte        buffer[PGDataReadBufferSize];
             ssize_t       ss    = read(fd, buffer, PGDataReadBufferSize);
 
             while(ss > 0) {

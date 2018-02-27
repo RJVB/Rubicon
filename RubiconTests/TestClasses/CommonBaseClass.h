@@ -30,6 +30,7 @@
 @interface CommonBaseClass : NSObject
 
     -(NSString *)description;
+
 @end
 
 @interface Subclass1A : CommonBaseClass

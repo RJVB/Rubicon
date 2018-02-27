@@ -246,8 +246,7 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
      *         characters were removed.
      */
     -(NSString *)trimNoCopy {
-        return [[self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]
-                stringByTrimmingCharactersInSet:[NSCharacterSet controlCharacterSet]];
+        return [[self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] stringByTrimmingCharactersInSet:[NSCharacterSet controlCharacterSet]];
     }
 
     -(NSDictionary *)makeAlignmentCentered:(NSDictionary *)fontAttribs {
@@ -300,9 +299,7 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
     }
 
     -(void)drawDeadCentered:(NSRect)clipRect fontName:(NSString *)fontName size:(NSFloat)fontSize color:(NSColor *)fontColor {
-        [self drawDeadCentered:clipRect
-                          font:(fontName.length ? [NSFont fontWithName:fontName size:fontSize] : [NSFont systemFontOfSize:fontSize])
-                         color:fontColor];
+        [self drawDeadCentered:clipRect font:(fontName.length ? [NSFont fontWithName:fontName size:fontSize] : [NSFont systemFontOfSize:fontSize]) color:fontColor];
     }
 
     -(void)drawDeadCentered:(NSRect)clipRect font:(NSFont *)font color:(NSColor *)fontColor {
@@ -332,6 +329,136 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
         }
 
         return str;
+    }
+
+    +(NSString *)stringWithBytes:(const NSByte *)bytes length:(NSUInteger)length {
+        return [self stringWithBytes:bytes length:length encoding:NSUTF8StringEncoding];
+    }
+
+    +(NSString *)stringWithBytes:(const NSByte *)bytes length:(NSUInteger)length encoding:(NSStringEncoding)encoding {
+        if(bytes && length) {
+            return [[NSString alloc] initWithBytes:bytes length:length encoding:encoding];
+//            NSString *str  = nil;
+//            char     *cstr = (char *)malloc(length + 1);
+//
+//            if(cstr) {
+//                memcpy(cstr, bytes, length);
+//                cstr[length] = 0;
+//                str = [NSString stringWithCString:cstr encoding:encoding ?: NSUTF8StringEncoding];
+//                free(cstr);
+//            }
+//
+//            return str;
+        }
+
+        return @"";
+    }
+
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern {
+        return [self componentsSeparatedByPattern:pattern limit:NSUIntegerMax options:0 keepSeparator:NO error:nil];
+    }
+
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern error:(NSError **)error {
+        return [self componentsSeparatedByPattern:pattern limit:NSUIntegerMax options:0 keepSeparator:NO error:error];
+    }
+
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit {
+        return [self componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:NO error:nil];
+    }
+
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options {
+        return [self componentsSeparatedByPattern:pattern limit:NSUIntegerMax options:options keepSeparator:NO error:nil];
+    }
+
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options error:(NSError **)error {
+        return [self componentsSeparatedByPattern:pattern limit:NSUIntegerMax options:options keepSeparator:NO error:error];
+    }
+
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit options:(NSRegularExpressionOptions)options {
+        return [self componentsSeparatedByPattern:pattern limit:limit options:options keepSeparator:NO error:nil];
+    }
+
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit error:(NSError **)error {
+        return [self componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:NO error:error];
+    }
+
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern keepSeparator:(BOOL)keepSeparator {
+        return [self componentsSeparatedByPattern:pattern limit:NSUIntegerMax options:0 keepSeparator:keepSeparator error:nil];
+    }
+
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern keepSeparator:(BOOL)keepSeparator error:(NSError **)error {
+        return [self componentsSeparatedByPattern:pattern limit:NSUIntegerMax options:0 keepSeparator:keepSeparator error:error];
+    }
+
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator {
+        return [self componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:keepSeparator error:nil];
+    }
+
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator {
+        return [self componentsSeparatedByPattern:pattern limit:NSUIntegerMax options:options keepSeparator:keepSeparator error:nil];
+    }
+
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator error:(NSError **)error {
+        return [self componentsSeparatedByPattern:pattern limit:NSUIntegerMax options:options keepSeparator:keepSeparator error:error];
+    }
+
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator {
+        return [self componentsSeparatedByPattern:pattern limit:limit options:options keepSeparator:keepSeparator error:nil];
+    }
+
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator error:(NSError **)error {
+        return [self componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:keepSeparator error:error];
+    }
+
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern
+                                                   limit:(NSUInteger)limit
+                                                 options:(NSRegularExpressionOptions)options
+                                           keepSeparator:(BOOL)keepSeparator
+                                                   error:(NSError **)error {
+
+        // Make sure we actually have a pattern.
+        if(self.length && pattern.length) {
+            NSError             *err   = nil;
+            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:options error:&err];
+            // Return any error set by the NSRegularExpression class.
+            if(error) *error = err;
+
+            // If the regex is null then return null to indicate there was an error.
+            if(regex) {
+                // If limit is zero then that means no limit.
+                if(limit == 0) limit = NSUIntegerMax;
+
+                __block NSUInteger         startingPoint = 0;
+                NSMutableArray<NSString *> *array        = [NSMutableArray arrayWithCapacity:MIN(limit, 100)]; // Let's not get crazy!
+
+                [regex enumerateMatchesInString:self options:0 range:NSMakeRange(0, self.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+                    if(array.count < limit) { // Safety Check
+                        NSRange    rng    = result.range;
+                        NSUInteger rngend = NSMaxRange(rng);
+                        NSRange    subrng = NSMakeRange(startingPoint, ((keepSeparator ? rngend : rng.location) - startingPoint));
+
+                        [array addObject:[self substringWithRange:subrng]];
+                        startingPoint = rngend;
+                        if(array.count == limit) *stop = YES;
+                    }
+                    else {
+                        *stop = YES;
+                    }
+                }];
+
+                if(array.count < limit) {
+                    NSUInteger loc = MIN(startingPoint, self.length);
+                    NSUInteger len = (self.length - loc);
+                    [array addObject:(loc ? (len ? [self substringWithRange:NSMakeRange(loc, len)] : @"") : self.copy)];
+                }
+
+                return array;
+            }
+
+            return nil;
+        }
+        // If there is no pattern or our string is empty then it wouldn't match so just return a copy of ourselves.
+        return @[ self.copy ];
     }
 
 @end

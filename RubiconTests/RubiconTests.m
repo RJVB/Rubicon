@@ -12,7 +12,16 @@
 
 NSString *const GuideString = @"0---------1---------2---------3---------4---------5---------6---------7---------8";
 NSString *const TestString  = @"Now is the time for all good men 🤯 to come to the aid of their country."; // 7
-NSString *const TestString2 = @"The quick brown fox jumps over the lazy dog."; // 31
+NSString *const TestString1 = @"The quick brown fox jumps over the lazy dog.";                             // 31
+NSString *const TestString2 = @"The-quick+brown-fox+jumps-over+the-lazy+dog.";                             // 31
+
+//NSString *const Base64Input  = @"Now is the time for all good programmers to come to the aid of their terminals.";    // 7
+//NSString *const Base64Output = @"Tm93IGlzIHRoZSB0aW1lIGZvciBhbGwgZ29vZCBwcm9ncmFtbWVycyB0byBjb21lIHRvIHRoZSBhaWQgb2YgdGhlaXIgdGVybWluYWxzLg==";
+
+NSString *const Base64Input  = @"Now is the time for all good men 🤯 to come to the aid of their country.";    // 7
+NSString *const Base64Output = @"Tm93IGlzIHRoZSB0aW1lIGZvciBhbGwgZ29vZCBtZW4g8J+kryB0byBjb21lIHRvIHRoZSBhaWQgb2YgdGhlaXIgY291bnRyeS4=";
+
+static NSString *const BAR = @"------------------------------------------------------------------------------------------------------------------------";
 
 @interface RubiconTests : XCTestCase
 
@@ -20,7 +29,7 @@ NSString *const TestString2 = @"The quick brown fox jumps over the lazy dog."; /
 
 NS_INLINE void Output(NSString *string) {
     [string writeToFile:@"/dev/stdout" atomically:NO encoding:NSUTF8StringEncoding error:nil];
-    [@"\n" writeToFile:@"/dev/stdout" atomically:NO encoding:NSUTF8StringEncoding error:nil];
+    [@"\r\n" writeToFile:@"/dev/stdout" atomically:NO encoding:NSUTF8StringEncoding error:nil];
 }
 
 @implementation RubiconTests
@@ -35,44 +44,116 @@ NS_INLINE void Output(NSString *string) {
         [super tearDown];
     }
 
-    -(void)te2stPGFormat {
-        NSLog(@"New String = \"%@\"", PGFormat(@"Galen %@", @"Rhodes"));
+    -(void)testFilterOutputStream {
+        const char     *cInput   = Base64Input.UTF8String;
+        size_t         cInputLen = strlen(cInput);
+        NSOutputStream *output   = [PGFilterOutputStream streamWithOutputStream:[NSOutputStream outputStreamToFileAtPath:@"/dev/stdout" append:YES] chunk:10];
+
+        [output open];
+        NSInteger written = [output write:(const uint8_t *)cInput maxLength:cInputLen];
+        [output close];
+
+        NSLog(@"%@", BAR);
+        NSLog(@"        Bytes Provided: %zu", cInputLen);
+        NSLog(@"         Bytes Written: %@", @(written));
+        NSLog(@"%@", BAR);
     }
 
-    -(void)te2stCompareWithClass:(id)obj {
-        NSLog(@"Class %@ responds to \"compare:\": %@", NSStringFromClass([obj class]), @([obj respondsToSelector:@selector(compare:)]));
+    -(void)testBase64Function {
+        size_t     outlen        = 0;
+        const char *base64Input  = Base64Input.UTF8String;
+        NSUInteger zz            = [Base64Input lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
+        size_t     inputLen      = strlen(base64Input);
+        char       *output       = PGEncodeBase64((const uint8_t *)base64Input, inputLen, &outlen);
+        NSString   *base64Output = [NSString stringWithUTF8String:output];
+
+        Output(BAR);
+        Output(Base64Input);
+        Output(BAR);
+
+        NSLog(BAR);
+        NSLog(@"   String Input: %@ (%zu, %lu)", Base64Input, inputLen, zz);
+        NSLog(@"  Base64 Output: %@ (%zu)", base64Output, strlen(output));
+        NSLog(@"Expected Output: %@", Base64Output);
+        NSLog(@"        Correct: %@", [Base64Output isEqualToString:base64Output] ? @"YES" : @"NO");
+        NSLog(BAR);
+        free(output);
     }
 
-    -(void)te2stMacros {
-        PGMacros *macros = [PGMacros macrosWithHandler:^NSString *(NSString *label, NSString *whole, NSRange range) {
-            NSLog(@"Found Macro: %@", label);
-            return [NSString stringWithFormat:@"*** %@%@ ***", label, NSStringFromRange(range)];
-        }];
+    -(void)testBase64OutputStream {
+        const char           *base64Input = Base64Input.UTF8String;
+        size_t               capacity     = 1024;
+        uint8_t              *bytes       = (uint8_t *)calloc(1, 1024);
+        PGBase64OutputStream *b64         = [[PGBase64OutputStream alloc] initWithOutputStream:[NSOutputStream outputStreamToBuffer:bytes capacity:capacity] chunk:10];
+        NSInteger            written      = 0;
+        NSInteger            fwritten     = 0;
 
-        NSError  *error  = nil;
-        NSString *result = [macros stringByProcessingMacrosIn:@"Now is the ${ time_space} for all good ${men } to come to the ${ aid } of their ${country}." error:&error];
+        [b64 open];
+        written  = [b64 write:(const uint8_t *)base64Input maxLength:strlen(base64Input)];
+        fwritten = [b64 flush];
 
-        if(error) {
-            XCTFail(@"Error: %@", [error description]);
+        NSLog(@"%@", BAR);
+        NSLog(@"         Bytes Written: %@", @(written));
+        NSLog(@"Bytes Written by Flush: %@", @(fwritten));
+        NSLog(@"         Output Length: %zu", strlen((const char *)bytes));
+        NSLog(@"                Output: \"%s\"", (const char *)bytes);
+        NSLog(@"       Expected Output: \"%@\"", Base64Output);
+        NSLog(@"%@", BAR);
+
+        [b64 close];
+        b64 = nil;
+        free(bytes);
+    }
+
+    -(void)testSplitByPattern {
+        NSError             *error    = nil;
+        NSArray<NSString *> *patterns = @[ @"(?:\\-|\\+)", @"\\+", @"\\-", @"\\|", @"\\.", @"", @"\\R" ];
+        NSArray<NSNumber *> *limits   = @[ @(0), @(4), @(1), @(99), @(9) ];
+        NSArray<NSNumber *> *keeps    = @[ @(NO), @(YES) ];
+
+        for(NSString *pattern in patterns) {
+            for(NSNumber *v in keeps) {
+                for(NSNumber *limit in limits) {
+                    NSArray<NSString *> *array = [TestString2 componentsSeparatedByPattern:pattern limit:limit.unsignedLongValue options:0 keepSeparator:v.boolValue error:&error];
+                    XCTAssertNil(error, @"REGEX ERROR: %@", error.description);
+
+                    NSLog(@"%@", BAR);
+                    NSLog(@"         Splitting: \"%@\"", TestString2);
+                    NSLog(@"      With Pattern: \"%@\"", pattern);
+                    NSLog(@"             Limit: %@", limit);
+                    NSLog(@"Keeping Separators: %@", v.boolValue ? @"YES" : @"NO");
+                    NSLog(@"%@", BAR);
+
+                    for(NSUInteger i = 0, j = array.count; i < j;) {
+                        NSString *str = array[i];
+                        NSLog(@"%3lu> \"%@\"", ++i, str);
+                    }
+                }
+            }
         }
-        else {
-            NSLog(@"Results: \"%@\"", result);
-        }
     }
 
-    -(void)te2stCompare {
-        [self te2stCompareWithClass:[[NSObject alloc] init]];
-        [self te2stCompareWithClass:@(123)];
-        [self te2stCompareWithClass:@"Galen"];
-        [self te2stCompareWithClass:[NSString stringWithFormat:@"My name is %@!", @"Galen"]];
-        [self te2stCompareWithClass:@[
-            @"a",
-            @"b",
-            @"c"
-        ]];
+    -(void)testPGFormat {
+        NSLog(@"New String = \"%@\"", PGFormat(@"Galen %@", TestString));
     }
 
-    -(void)te2stCommonBaseClass {
+    -(void)testCompareWithClass:(id)obj {
+        NSLog(@"Class %@ responds to \"compare:\": %@", NSStringFromClass([obj class]), [obj respondsToSelector:@selector(compare:)] ? @"YES" : @"NO");
+    }
+
+    -(void)testCompare {
+        CommonBaseClass *c1 = [Subclass1A new];
+        CommonBaseClass *c2 = [Subclass1B new];
+        CommonBaseClass *c3 = [Subclass1C new];
+        CommonBaseClass *c4 = [Subclass1D new];
+
+        [self testCompareWithClass:c1];
+        [self testCompareWithClass:c2];
+        [self testCompareWithClass:c3];
+        [self testCompareWithClass:c4];
+    }
+
+    -(void)testCommonBaseClass {
         Subclass1D *c1 = [[Subclass1D alloc] init];
         Subclass2C *c2 = [[Subclass2C alloc] init];
         NSString   *s1 = @"String #1";
@@ -97,117 +178,6 @@ NS_INLINE void Output(NSString *string) {
             XCTFail(@"Class %@ and class %@ do not have a common base class.", c1Name, c2Name);
             XCTFail(@"Class %@ and class %@ do not have a common base class.", s1Name, s2Name);
             XCTFail(@"Class %@ and class %@ do not have a common base class.", s1Name, c1Name);
-        }
-    }
-
-    -(NSInteger)performWithReturnInTry {
-        NSInteger aNumber = 3;
-
-        @try {
-            return aNumber;
-        }
-        @finally {
-            NSLog(@"Finally block has been executed.");
-        }
-    }
-
-    -(void)te2stFinallyExecutedWithReturnFromTry {
-        NSLog(@"Value returned: %@", @([self performWithReturnInTry]));
-    }
-
-    -(void)ifthentest:(BOOL)a b:(BOOL)b {
-        if(a) if(b) NSLog(@"if(b)"); else NSLog(@"else b"); else NSLog(@"else a");
-    }
-
-    -(void)te2stIfThenElse {
-        [self ifthentest:NO b:NO];
-        [self ifthentest:NO b:YES];
-        [self ifthentest:YES b:YES];
-        [self ifthentest:YES b:NO];
-    }
-
-    -(void)te2stTrim {
-        NSString *a1 = @"BOB";
-        NSString *b1 = @" BOB \r\n";
-
-        NSString *a2 = [a1 stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        NSString *b2 = [b1 stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-
-        NSLog(@"a1 = %p", (__bridge void *)a1);
-        NSLog(@"a2 = %p", (__bridge void *)a2);
-        NSLog(@"b1 = %p", (__bridge void *)b1);
-        NSLog(@"b2 = %p", (__bridge void *)b2);
-    }
-
-    -(void)testIndexOfCharacter {
-        NSUInteger foundIndex = [TestString indexOfCharacter:'.'];
-
-        if(foundIndex == NSNotFound) Output(@"\n\nCharacter not found!!!!!\n\n");
-        else Output(PGFormat(@"\n\nCharacter found at index %lu.\n\n", foundIndex));
-    }
-
-    -(void)testComposedCharacterEnumeration {
-        NSUInteger __block foundIndex = NSNotFound;
-
-        [TestString enumerateSubstringsInRange:NSMakeRange(0, TestString.length)
-                                       options:NSStringEnumerationByComposedCharacterSequences
-                                    usingBlock:^(NSString *substring, NSRange substringRange, NSRange enclosingRange, BOOL *stop) {
-                                        NSUInteger startIndex = substringRange.location;
-                                        NSUInteger length     = substringRange.length;
-                                        NSUInteger endIndex   = (startIndex + length - 1);
-
-                                        Output(PGFormat(@"Range> %2lu to %2lu; length> %2lu; Character> \"%@\"", startIndex, endIndex, length, substring));
-
-                                        if(length > 1 && foundIndex == NSNotFound) {
-                                            foundIndex = startIndex;
-                                            *stop = YES;
-                                        }
-                                    }];
-
-        if(foundIndex == NSNotFound) Output(@"\nEmoji not found!!!!!\n");
-        else Output(PGFormat(@"\nEmoji found at index %lu.\n", foundIndex));
-    }
-
-    -(void)testIsEqualString {
-        NSRange r1 = NSMakeRange(7, 3);
-        NSRange r2 = NSMakeRange(31, 3);
-        NSRange r3 = NSMakeRange(30, 3);
-
-        Output(PGFormat(@"\nString 1> %@\nString 2> %@", TestString, TestString2));
-
-        Output(PGFormat(@"\n\"%@\" == \"%@\"", [TestString substringWithRange:r1], [TestString2 substringWithRange:r2]));
-        if([TestString isEqualToString:TestString2 stringRange:r2 receiverRange:r1]) {
-            Output(@"\tEQUAL!!!!\n");
-        }
-        else {
-            Output(@"\tNOT EQUAL!!!!\n");
-        }
-
-        Output(PGFormat(@"\n\"%@\" == \"%@\"", [TestString substringWithRange:r1], [TestString2 substringWithRange:r3]));
-        if([TestString isEqualToString:TestString2 stringRange:r3 receiverRange:r1]) {
-            Output(@"\tEQUAL!!!!\n");
-        }
-        else {
-            Output(@"\tNOT EQUAL!!!!\n");
-        }
-    }
-
-    -(void)testStringBoundsException {
-        NSRange r1 = NSMakeRange(0, TestString.length + 2);
-        NSRange r2 = NSMakeRange(TestString.length + 2, 1);
-
-        @try {
-            Output([TestString substringWithRange:r1]);
-        }
-        @catch(NSException *e) {
-            Output([e description]);
-        }
-
-        @try {
-            Output([TestString substringWithRange:r2]);
-        }
-        @catch(NSException *e) {
-            Output([e description]);
         }
     }
 

@@ -35,6 +35,7 @@
 #import <Rubicon/PGReadWriteLock.h>
 #import <Rubicon/PGTimeSpec.h>
 #import <Rubicon/PGTimedWait.h>
+#import <Rubicon/PGFilterOutputStream.h>
 #import <Rubicon/PGBase64OutputStream.h>
 #import <Rubicon/PGBTreeNode.h>
 #import <Rubicon/PGLinkedListNode.h>

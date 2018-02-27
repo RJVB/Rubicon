@@ -32,6 +32,7 @@
         [description appendString:@">"];
         return description;
     }
+
 @end
 
 @implementation Subclass1A {
@@ -44,6 +45,11 @@
 
 @implementation Subclass1C {
     }
+
+    -(NSComparisonResult)compare:(id)obj {
+        return NSOrderedSame;
+    }
+
 @end
 
 @implementation Subclass1D {

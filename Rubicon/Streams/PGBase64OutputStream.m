@@ -1,163 +1,232 @@
-/***************************************************************************//**
+/*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
  *    FILENAME: PGBase64OutputStream.m
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
  *        DATE: 3/8/17 11:13 AM
  * DESCRIPTION:
- *     While the class NSData provides base64 encoding operations, these class
- *     require that the entire data set be held in memory before the encoding
- *     begins.  This class, which inherits from NSOutputStream, allows for the
- *     streaming of data to a file and have it encoded "on the fly" without
- *     having to retain the entire data set in memory.
+ *     While the class NSData provides base64 encoding operations, these class require that the entire data set be held in memory before the encoding begins.  This class, which
+ *     inherits from NSOutputStream, allows for the streaming of data to a file and have it encoded "on the fly" without having to retain the entire data set in memory.
  *
  * Copyright © 2017 Project Galen. All rights reserved.
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
+ * Permission to use, copy, modify, and distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this
+ * permission notice appear in all copies.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *******************************************************************************/
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO
+ * EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+ * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ **********************************************************************************************************************************************************************************/
 
 #import "PGBase64OutputStream.h"
 
-static const char      CODES[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-static const NSInteger XXX[]   = { 0, 0, 1, 2, 3 };
+#define INPUT_BLOCK_SIZE  ((NSUInteger)(3))
+#define OUTPUT_BLOCK_SIZE ((NSUInteger)(4))
+#define MASK(n)           ((NSByte)((n) & (0x3f)))
+#define FOO(a)            (((NSUInteger)(a) * INPUT_BLOCK_SIZE) / OUTPUT_BLOCK_SIZE)
+#define BAR(a)            (((NSUInteger)(a) / INPUT_BLOCK_SIZE) * OUTPUT_BLOCK_SIZE)
+#define MULT(a, m)        (((NSUInteger)(a) / (NSUInteger)(m)) * (NSUInteger)(m))
 
-char *PGBase64Encode(uint8_t ra[3], char ar[4]) {
-    // @formatter:off
-	ar[0] = CODES[       (ra[0] >> 2)                               ];
-	ar[1] = CODES[077 & ((ra[0] << 4) | (ra[1] >> 4))               ];
-	ar[2] = CODES[077 &                ((ra[1] << 2) | (ra[2] >> 6))];
-	ar[3] = CODES[077 &                                (ra[2])      ];
-	// @formatter:on
-    return ar;
+const NSByte *CODES = (const NSByte *)"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+void PGEncodeBase64Final(const NSByte *input, NSByte *output, NSInteger remain);
+
+NS_INLINE void PGBase64EncodeBlock(const NSByte *input, NSByte *output) {
+    output[0] = CODES[input[0] >> 2];
+    output[1] = CODES[MASK(input[0] << 4) | (input[1] >> 4)];
+    output[2] = CODES[MASK(input[1] << 2) | (input[2] >> 6)];
+    output[3] = CODES[MASK(input[2])];
+}
+
+NS_INLINE void PGBase64EncodeFull(const NSByte *input, NSByte *output, NSUInteger inlen, NSUInteger *inidx, NSUInteger *outidx) {
+    while((*inidx) < inlen) {
+        PGBase64EncodeBlock((input + (*inidx)), (output + (*outidx)));
+        (*inidx) += INPUT_BLOCK_SIZE;
+        (*outidx) += OUTPUT_BLOCK_SIZE;
+    }
 }
 
 @implementation PGBase64OutputStream {
-        uint8_t _inputBuffer[3];
-        char    _outputBuffer[4];
-        int     _inputIndex;
+        NSByte     _rem[INPUT_BLOCK_SIZE];
+        NSUInteger _remlen;
+        NSError    *_error;
     }
 
-    /**************************************************************************************************//**
-	 * Keeps writting until 4 bytes have been written, the output buffer cannot accept anymore data,
-	 * or an error occurs.
-	 *
-	 * @param buffer the data buffer.
-	 * @param results a pointer to an NSInteger that will receive the results.
-	 * @return the number of bytes written or zero if an error occurs.
-	 ******************************************************************************************************/
-    -(NSInteger)write:(const uint8_t *)buffer results:(NSInteger *)results {
-        NSUInteger written = 0;
+    -(instancetype)initWithOutputStream:(NSOutputStream *)outputStream {
+        self = [super initWithOutputStream:outputStream chunk:(16384 * 3)];
 
-        while(written < 4) {
-            NSInteger cc = [super write:(buffer + written) maxLength:(4 - written)];
+        if(self) {
+            _remlen = 0;
+            _error  = nil;
+        }
 
-            if(cc <= 0) {
-                *results = cc;
-                return (cc < 0 ? 0 : XXX[written]);
+        return self;
+    }
+
+    -(instancetype)initWithOutputStream:(NSOutputStream *)outputStream chunk:(NSUInteger)chunk {
+        self = [super initWithOutputStream:outputStream chunk:chunk];
+
+        if(self) {
+            _remlen = 0;
+            _error  = nil;
+        }
+
+        return self;
+    }
+
+    // . Now is the time for all good men
+    // LiBO b3cg aXMg dGhl IHRp bWUg Zm9y IGFs bCBn b29k IG1l bg==
+
+    /**
+     * Try to fill the 'remainder' block with any bytes from the input buffer.
+     *
+     * @param s the 'self' pointer.
+     * @param in the input buffer.
+     * @param ilen the length of the input buffer.
+     * @param idx the current pointer into the input buffer.
+     * @param rlen the length of the 'remainder' buffer.
+     * @return the updated pointer into the input buffer.
+     */
+    NS_INLINE NSUInteger fillRemainder(PGBase64OutputStream *s, const NSByte *in, NSUInteger ilen, NSUInteger idx, NSUInteger rlen) {
+        while((s->_remlen < rlen) && (idx < ilen)) {
+            s->_rem[s->_remlen++] = in[idx++];
+        }
+        return idx;
+    }
+
+    /**
+     * Encode any remaining bytes from the previous invocation by filling out the input block with one or two bytes from this
+     * invocation.
+     *
+     * @param s the 'self' pointer.
+     * @param in the input buffer.
+     * @param ilen the length of the input buffer.
+     * @param out the output buffer.
+     * @param idx the current pointer into the input buffer.
+     * @param odx the current pointer into the output buffer.
+     * @return 'YES' if we didn't have enough bytes in the input buffer to finish the block.
+     */
+    NS_INLINE BOOL writeRem(PGBase64OutputStream *s, const NSByte *in, NSUInteger ilen, NSByte *out, NSUInteger *idx, NSUInteger *odx) {
+        if(s->_remlen) {
+            if(s->_remlen < INPUT_BLOCK_SIZE) {
+                *idx = fillRemainder(s, in, ilen, *idx, INPUT_BLOCK_SIZE);
+                if(s->_remlen < INPUT_BLOCK_SIZE) return YES;
             }
-
-            written += cc;
+            s->_remlen = 0;
+            *odx = OUTPUT_BLOCK_SIZE;
+            PGBase64EncodeBlock(s->_rem, out);
         }
 
-        *results = written;
-        return XXX[written];
+        return NO;
     }
 
-    -(NSInteger)write:(const uint8_t *)buffer maxLength:(NSUInteger)len {
-        if(buffer && len) {
-            @synchronized(self) {
-                NSUInteger written = 0;
-                NSInteger  results = 0;
+    -(NSInteger)writeFiltered:(const NSByte *)buffer maxLength:(NSUInteger)len {
+        if(_remlen > INPUT_BLOCK_SIZE) {
+            NSDictionary *dict = @{ NSLocalizedDescriptionKey: @"Internal Inconsistency Error!" };
+            _error = [NSError errorWithDomain:PGErrorDomain code:1003 userInfo:dict];
+            return -1;
+        }
 
-                for(NSUInteger i = 0; i < len; i++) {
-                    _inputBuffer[_inputIndex++] = buffer[i];
+        NSUInteger remlen  = _remlen;
+        NSUInteger outlen  = BAR(len + remlen);
+        NSByte     *output = (NSByte *)malloc(outlen * sizeof(NSByte));
 
-                    if(_inputIndex >= 3) {
-                        _inputIndex = 0;
-                        PGBase64Encode(_inputBuffer, _outputBuffer);
-                        written += [self write:(uint8_t const *)_outputBuffer results:&results];
-                        if(results <= 0) return results;
-                    }
-                }
+        if(output) {
+            @try {
+                NSUInteger inidx  = 0;
+                NSUInteger outidx = 0;
 
-                return written;
+                if(writeRem(self, buffer, len, output, &inidx, &outidx)) return inidx;
+                PGBase64EncodeFull(buffer, output, (MULT((len - inidx), INPUT_BLOCK_SIZE) + inidx), &inidx, &outidx);
+
+                NSInteger count = [super writeFiltered:output maxLength:outidx];
+                if(count <= 0) return count;
+                /*
+                 * We subtract the original number of remaining bytes so that we don't include
+                 * those in the sent totals for this invocation.
+                 */
+                if(count < outidx) return (FOO(count) - remlen);
+                return fillRemainder(self, buffer, len, inidx, (INPUT_BLOCK_SIZE - 1));
+            }
+            @finally { free(output); }
+        }
+
+        NSDictionary *dict = @{ NSLocalizedDescriptionKey: @"Out of memory!" };
+        _error = [NSError errorWithDomain:PGErrorDomain code:1004 userInfo:dict];
+        return -1;
+    }
+
+    -(NSError *)streamError {
+        NSError *lerror = nil;
+        [self lock];
+
+        @try {
+            lerror = (_error ?: super.streamError);
+            _error = nil;
+        }
+        @finally { [self unlock]; }
+
+        return lerror;
+    }
+
+    -(NSInteger)flush {
+        NSInteger written = 0;
+        [self lock];
+
+        @try {
+            if(_remlen) {
+                NSByte output[OUTPUT_BLOCK_SIZE];
+                PGEncodeBase64Final(_rem, output, _remlen);
+                _remlen = 0;
+                NSInteger res = [super writeFiltered:output maxLength:OUTPUT_BLOCK_SIZE];
+                written = ((res > 0) ? (NSInteger)FOO(res) : res);
             }
         }
-        else {
-            return [super write:buffer maxLength:len];
-        }
-    }
+        @finally { [self unlock]; }
 
-    -(void)close {
-        [self flush];
-        [super close];
-    }
-
-    -(void)flush {
-        @synchronized(self) {
-            if(_inputIndex) {
-                for(int i = _inputIndex; i < 3; i++) _inputBuffer[i] = 0;
-                PGBase64Encode(_inputBuffer, _outputBuffer);
-                _outputBuffer[3]                      = CODES[64];
-                if(_inputIndex == 1) _outputBuffer[2] = CODES[64];
-                _inputIndex = 0;
-                [self write:(uint8_t const *)_outputBuffer results:NULL];
-            }
-        }
-    }
-
-    -(BOOL)hasSpaceAvailable {
-        return super.hasSpaceAvailable;
-    }
-
-    -(instancetype)initToMemory {
-        self = [super initToMemory];
-        if(self) _inputIndex = 0;
-        return self;
-    }
-
-    -(instancetype)initToBuffer:(uint8_t *)buffer capacity:(NSUInteger)capacity {
-        self = [super initToBuffer:buffer capacity:capacity];
-        if(self) _inputIndex = 0;
-        return self;
-    }
-
-    -(instancetype)initWithURL:(NSURL *)url append:(BOOL)shouldAppend {
-        self = [super initWithURL:url append:shouldAppend];
-        if(self) _inputIndex = 0;
-        return self;
-    }
-
-    -(instancetype)initToFileAtPath:(NSString *)path append:(BOOL)shouldAppend {
-        self = [super initToFileAtPath:path append:shouldAppend];
-        if(self) _inputIndex = 0;
-        return self;
-    }
-
-    +(instancetype)outputStreamToMemory {
-        return [[self alloc] initToMemory];
-    }
-
-    +(instancetype)outputStreamToBuffer:(uint8_t *)buffer capacity:(NSUInteger)capacity {
-        return [[self alloc] initToBuffer:buffer capacity:capacity];
-    }
-
-    +(instancetype)outputStreamToFileAtPath:(NSString *)path append:(BOOL)shouldAppend {
-        return [[self alloc] initToFileAtPath:path append:shouldAppend];
-    }
-
-    +(instancetype)outputStreamWithURL:(NSURL *)url append:(BOOL)shouldAppend {
-        return [[self alloc] initWithURL:url append:shouldAppend];
+        return written;
     }
 
 @end
+
+void PGEncodeBase64Final(const NSByte *input, NSByte *output, NSInteger remain) {
+    if(remain--) {
+        /*
+         * 'remain' is going to be equal to 0 or 1.
+         */
+        output[0] = CODES[input[0] >> 2];
+        output[3] = '=';
+
+        if(remain) {
+            output[1] = CODES[MASK(input[0] << 4) | (input[1] >> 4)];
+            output[2] = CODES[MASK(input[1] << 2)];
+        }
+        else {
+            output[1] = CODES[MASK(input[0] << 4)];
+            output[2] = '=';
+        }
+    }
+}
+
+char *PGEncodeBase64(const NSByte *input, NSUInteger inlen, NSUInteger *outlen) {
+    NSByte *output = NULL;
+
+    if(inlen) {
+        /*
+         * The size of a char should always be 1 but just in case...
+         */
+        *outlen = BAR(inlen + (OUTPUT_BLOCK_SIZE - 1));
+        output = (NSByte *)malloc((*outlen + 1) * sizeof(NSByte));
+
+        if(output) {
+            NSUInteger inidx  = 0;
+            NSUInteger outidx = 0;
+
+            PGBase64EncodeFull(input, output, MULT(inlen, INPUT_BLOCK_SIZE), &inidx, &outidx);
+            if(inidx < inlen) PGEncodeBase64Final((input + inidx), (output + outidx), (inlen - inidx));
+            output[*outlen] = 0;
+        }
+    }
+
+    return (char *)output;
+}
