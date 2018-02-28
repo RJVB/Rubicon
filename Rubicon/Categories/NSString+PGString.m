@@ -416,30 +416,32 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
                                            keepSeparator:(BOOL)keepSeparator
                                                    error:(NSError **)error {
 
+        // If limit is zero then that means no limit.
+        if(limit == 0) limit = NSUIntegerMax;
+
         // Make sure we actually have a pattern.
-        if(self.length && pattern.length) {
+        if(self.length && pattern.length && (limit > 1)) {
             NSError             *err   = nil;
             NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:options error:&err];
+
             // Return any error set by the NSRegularExpression class.
             if(error) *error = err;
 
             // If the regex is null then return null to indicate there was an error.
             if(regex) {
-                // If limit is zero then that means no limit.
-                if(limit == 0) limit = NSUIntegerMax;
-
                 __block NSUInteger         startingPoint = 0;
+                NSUInteger                 subLimit      = (limit - 1);
                 NSMutableArray<NSString *> *array        = [NSMutableArray arrayWithCapacity:MIN(limit, 100)]; // Let's not get crazy!
 
                 [regex enumerateMatchesInString:self options:0 range:NSMakeRange(0, self.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
-                    if(array.count < limit) { // Safety Check
+                    if(array.count < subLimit) { // Safety Check
                         NSRange    rng    = result.range;
                         NSUInteger rngend = NSMaxRange(rng);
                         NSRange    subrng = NSMakeRange(startingPoint, ((keepSeparator ? rngend : rng.location) - startingPoint));
 
                         [array addObject:[self substringWithRange:subrng]];
                         startingPoint = rngend;
-                        if(array.count == limit) *stop = YES;
+                        if(array.count == subLimit) *stop = YES;
                     }
                     else {
                         *stop = YES;
@@ -449,7 +451,7 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
                 if(array.count < limit) {
                     NSUInteger loc = MIN(startingPoint, self.length);
                     NSUInteger len = (self.length - loc);
-                    [array addObject:(loc ? (len ? [self substringWithRange:NSMakeRange(loc, len)] : @"") : self.copy)];
+                    [array addObject:(len ? [self substringWithRange:NSMakeRange(loc, len)] : @"")];
                 }
 
                 return array;
@@ -457,7 +459,8 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
 
             return nil;
         }
-        // If there is no pattern or our string is empty then it wouldn't match so just return a copy of ourselves.
+
+        // If the limit is 1, there is no pattern, or our string is empty then just return a copy of ourselves.
         return @[ self.copy ];
     }
 

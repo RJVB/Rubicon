@@ -67,7 +67,7 @@ typedef TimeVal         *PTimeVal;
 #define PG_NANOS_PER_YEAR     (((NSLong)(PG_NANOS_PER_MICRO)) * ((NSLong)(PG_MICROS_PER_YEAR)))
 
 #define I64(i) ((NSLong)(i))
-#define D64(d) ((double)(d))
+#define D64(d) ((NSFloat)(d))
 
 /**************************************************************************************************//**
  * Convert a time value to a long long int containing the number of nanoseconds.
@@ -168,7 +168,7 @@ NS_INLINE NSComparisonResult PGCompareTimeVals(PTimeVal tv1, PTimeVal tv2) {
 #import <sys/time.h>
 
 FOUNDATION_EXPORT mach_timebase_info_data_t machTimebaseInfo;
-FOUNDATION_EXPORT double                    machTimeFactor;
+FOUNDATION_EXPORT NSFloat                   machTimeFactor;
 
 /**************************************************************************************************//**
  * Get the current system cpu time in nano seconds. Generally speaking this is the number of

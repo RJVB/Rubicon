@@ -25,7 +25,7 @@
 
 #if defined(__APPLE__)
 mach_timebase_info_data_t machTimebaseInfo = { 0, 0 };
-double                    machTimeFactor   = 0;
+NSFloat                   machTimeFactor   = 0;
 
 #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 101200)
 
