@@ -414,6 +414,20 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
         return [self componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:keepSeparator error:error];
     }
 
+    /**************************************************************************************************//**
+     * This method is similar in function to componentsSeparatedByString:limit:keepSeparator: except that
+     * pattern is a string that contains a Regular Expression that will be searched for instead of a
+     * simple string. NSRegularExpression is used.
+     *
+     * @param pattern the regular expression pattern.
+     * @param limit The maximum number of elements that the returned NSArray object will contain.
+     * @param options The options for the regular expression. These are the same as for NSRegularExpression.
+     * @param keepSeparator if 'YES' then the separator is preserved at the end of each substring.
+     * @param error if the regular expression contained an error then it will be returned in this field.
+     * @return An NSArray object containing substrings from the receiver that have been divided by
+     *         separator. If there was an error in the regular expression then a NULL value will be
+     *         returned.
+     */
     -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern
                                                    limit:(NSUInteger)limit
                                                  options:(NSRegularExpressionOptions)options

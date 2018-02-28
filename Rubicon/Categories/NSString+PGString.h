@@ -141,13 +141,14 @@ NS_ASSUME_NONNULL_BEGIN
 
     /**************************************************************************************************//**
      * This method functions like the componentsSeparatedByString: method except that it allows you to
-     * specify a limit to the number of components that are created. If the limit is zero (0) then an
-     * instance of an empty NSArray will be returned. If the limit is greater than zero (0) then an
-     * instance of NSArray will be returned with at most that number of components. The last element
-     * in the instance of NSArray will be the remainder of the string.
+     * specify a limit to the number of components that are created. If the limit is zero (0) then no
+     * limit is assumed. If the limit is greater than zero (0) then an instance of NSArray will be
+     * returned with at most that number of components. The last element in the instance of NSArray will
+     * be the remainder of the string.
      *
      * @param separator The separator string.
      * @param limit The maximum number of elements that the returned NSArray object will contain.
+     * @param keepSeparator if 'YES' then the separator is preserved at the end of each substring.
      * @return An NSArray object containing substrings from the receiver that have been divided by separator.
      */
     -(NSArray<NSString *> *)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator;
@@ -186,39 +187,204 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(void)drawDeadCentered:(NSRect)clipRect fontAttributes:(NSDictionary *)attribs;
 
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern;
-
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern error:(NSError **)error;
-
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit;
-
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options;
-
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options error:(NSError **)error;
-
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit options:(NSRegularExpressionOptions)options;
-
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit error:(NSError **)error;
-
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern keepSeparator:(BOOL)keepSeparator;
-
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern keepSeparator:(BOOL)keepSeparator error:(NSError **)error;
-
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator;
-
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator;
-
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator error:(NSError **)error;
-
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator;
-
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator error:(NSError **)error;
-
+    /**************************************************************************************************//**
+     * This method is similar in function to componentsSeparatedByString:limit:keepSeparator: except that
+     * pattern is a string that contains a Regular Expression that will be searched for instead of a
+     * simple string. NSRegularExpression is used.
+     *
+     * @param pattern the regular expression pattern.
+     * @param limit The maximum number of elements that the returned NSArray object will contain.
+     * @param options The options for the regular expression. These are the same as for NSRegularExpression.
+     * @param keepSeparator if 'YES' then the separator is preserved at the end of each substring.
+     * @param error if the regular expression contained an error then it will be returned in this field.
+     * @return An NSArray object containing substrings from the receiver that have been divided by
+     *         separator. If there was an error in the regular expression then a NULL value will be
+     *         returned.
+     */
     -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern
                                                    limit:(NSUInteger)limit
                                                  options:(NSRegularExpressionOptions)options
                                            keepSeparator:(BOOL)keepSeparator
                                                    error:(NSError **)error;
+
+    /**************************************************************************************************//**
+     * Convienience method for:
+     *           [string componentsSeparatedByPattern:pattern limit:0 options:0 keepSeparator:NO error:nil]
+     *
+     * @param pattern the regular expression pattern.
+     * @return An NSArray object containing substrings from the receiver that have been divided by
+     *         separator. If there was an error in the regular expression then a NULL value will be
+     *         returned.
+     */
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern;
+
+    /**************************************************************************************************//**
+     * Convienience method for:
+     *      [string componentsSeparatedByPattern:pattern limit:0 options:0 keepSeparator:NO error:error]
+     *
+     * @param pattern the regular expression pattern.
+     * @param error if the regular expression contained an error then it will be returned in this field.
+     * @return An NSArray object containing substrings from the receiver that have been divided by
+     *         separator. If there was an error in the regular expression then a NULL value will be
+     *         returned.
+     */
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern error:(NSError **)error;
+
+    /**************************************************************************************************//**
+     * Convienience method for:
+     *      [string componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:NO error:nil]
+     *
+     * @param pattern the regular expression pattern.
+     * @param limit The maximum number of elements that the returned NSArray object will contain.
+     * @return An NSArray object containing substrings from the receiver that have been divided by
+     *         separator. If there was an error in the regular expression then a NULL value will be
+     *         returned.
+     */
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit;
+
+    /**************************************************************************************************//**
+     * Convienience method for:
+     *      [string componentsSeparatedByPattern:pattern limit:0 options:options keepSeparator:NO error:nil]
+     *
+     * @param pattern the regular expression pattern.
+     * @param options The options for the regular expression. These are the same as for NSRegularExpression.
+     * @return An NSArray object containing substrings from the receiver that have been divided by
+     *         separator. If there was an error in the regular expression then a NULL value will be
+     *         returned.
+     */
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options;
+
+    /**************************************************************************************************//**
+     * Convienience method for:
+     *      [string componentsSeparatedByPattern:pattern limit:0 options:options keepSeparator:NO error:error]
+     *
+     * @param pattern the regular expression pattern.
+     * @param options The options for the regular expression. These are the same as for NSRegularExpression.
+     * @param error if the regular expression contained an error then it will be returned in this field.
+     * @return An NSArray object containing substrings from the receiver that have been divided by
+     *         separator. If there was an error in the regular expression then a NULL value will be
+     *         returned.
+     */
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options error:(NSError **)error;
+
+    /**************************************************************************************************//**
+     * Convienience method for:
+     *      [string componentsSeparatedByPattern:pattern limit:limit options:options keepSeparator:NO error:nil]
+     *
+     * @param pattern the regular expression pattern.
+     * @param limit The maximum number of elements that the returned NSArray object will contain.
+     * @param options The options for the regular expression. These are the same as for NSRegularExpression.
+     * @return An NSArray object containing substrings from the receiver that have been divided by
+     *         separator. If there was an error in the regular expression then a NULL value will be
+     *         returned.
+     */
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit options:(NSRegularExpressionOptions)options;
+
+    /**************************************************************************************************//**
+     * Convienience method for:
+     *      [string componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:NO error:error]
+     *
+     * @param pattern the regular expression pattern.
+     * @param limit The maximum number of elements that the returned NSArray object will contain.
+     * @param error if the regular expression contained an error then it will be returned in this field.
+     * @return An NSArray object containing substrings from the receiver that have been divided by
+     *         separator. If there was an error in the regular expression then a NULL value will be
+     *         returned.
+     */
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit error:(NSError **)error;
+
+    /**************************************************************************************************//**
+     * Convienience method for:
+     *      [string componentsSeparatedByPattern:pattern limit:0 options:0 keepSeparator:keepSeparator error:nil]
+     *
+     * @param pattern the regular expression pattern.
+     * @param keepSeparator if 'YES' then the separator is preserved at the end of each substring.
+     * @return An NSArray object containing substrings from the receiver that have been divided by
+     *         separator. If there was an error in the regular expression then a NULL value will be
+     *         returned.
+     */
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern keepSeparator:(BOOL)keepSeparator;
+
+    /**************************************************************************************************//**
+     * Convienience method for:
+     *      [string componentsSeparatedByPattern:pattern limit:0 options:0 keepSeparator:keepSeparator error:error]
+     *
+     * @param pattern the regular expression pattern.
+     * @param keepSeparator if 'YES' then the separator is preserved at the end of each substring.
+     * @param error if the regular expression contained an error then it will be returned in this field.
+     * @return An NSArray object containing substrings from the receiver that have been divided by
+     *         separator. If there was an error in the regular expression then a NULL value will be
+     *         returned.
+     */
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern keepSeparator:(BOOL)keepSeparator error:(NSError **)error;
+
+    /**************************************************************************************************//**
+     * Convienience method for:
+     *      [string componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:keepSeparator error:nil]
+     *
+     * @param pattern the regular expression pattern.
+     * @param limit The maximum number of elements that the returned NSArray object will contain.
+     * @param keepSeparator if 'YES' then the separator is preserved at the end of each substring.
+     * @return An NSArray object containing substrings from the receiver that have been divided by
+     *         separator. If there was an error in the regular expression then a NULL value will be
+     *         returned.
+     */
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator;
+
+    /**************************************************************************************************//**
+     * Convienience method for:
+     *      [string componentsSeparatedByPattern:pattern limit:0 options:options keepSeparator:keepSeparator error:nil]
+     *
+     * @param pattern the regular expression pattern.
+     * @param options The options for the regular expression. These are the same as for NSRegularExpression.
+     * @param keepSeparator if 'YES' then the separator is preserved at the end of each substring.
+     * @return An NSArray object containing substrings from the receiver that have been divided by
+     *         separator. If there was an error in the regular expression then a NULL value will be
+     *         returned.
+     */
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator;
+
+    /**************************************************************************************************//**
+     * Convienience method for:
+     *      [string componentsSeparatedByPattern:pattern limit:0 options:options keepSeparator:keepSeparator error:error]
+     *
+     * @param pattern the regular expression pattern.
+     * @param options The options for the regular expression. These are the same as for NSRegularExpression.
+     * @param keepSeparator if 'YES' then the separator is preserved at the end of each substring.
+     * @param error if the regular expression contained an error then it will be returned in this field.
+     * @return An NSArray object containing substrings from the receiver that have been divided by
+     *         separator. If there was an error in the regular expression then a NULL value will be
+     *         returned.
+     */
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator error:(NSError **)error;
+
+    /**************************************************************************************************//**
+     * Convienience method for:
+     *      [string componentsSeparatedByPattern:pattern limit:limit options:options keepSeparator:keepSeparator error:nil]
+     *
+     * @param pattern the regular expression pattern.
+     * @param limit The maximum number of elements that the returned NSArray object will contain.
+     * @param options The options for the regular expression. These are the same as for NSRegularExpression.
+     * @param keepSeparator if 'YES' then the separator is preserved at the end of each substring.
+     * @return An NSArray object containing substrings from the receiver that have been divided by
+     *         separator. If there was an error in the regular expression then a NULL value will be
+     *         returned.
+     */
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator;
+
+    /**************************************************************************************************//**
+     * Convienience method for:
+     *      [string componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:keepSeparator error:error]
+     *
+     * @param pattern the regular expression pattern.
+     * @param limit The maximum number of elements that the returned NSArray object will contain.
+     * @param keepSeparator if 'YES' then the separator is preserved at the end of each substring.
+     * @param error if the regular expression contained an error then it will be returned in this field.
+     * @return An NSArray object containing substrings from the receiver that have been divided by
+     *         separator. If there was an error in the regular expression then a NULL value will be
+     *         returned.
+     */
+    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator error:(NSError **)error;
 
     +(NSString *)stringByConcatenatingStrings:(NSString *)firstString, ... NS_REQUIRES_NIL_TERMINATION;
 
