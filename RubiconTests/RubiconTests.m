@@ -105,6 +105,34 @@ NS_INLINE void Output(NSString *string) {
         free(bytes);
     }
 
+    -(void)testSplitByString {
+        NSArray<NSString *> *patterns = @[ @"-", @"+", @".", @"|" ];
+        NSArray<NSNumber *> *limits   = @[ @(0), @(4), @(1), @(99), @(9) ];
+        NSArray<NSNumber *> *keeps    = @[ @(NO), @(YES) ];
+
+        for(NSString *pattern in patterns) {
+            for(NSNumber *v in keeps) {
+                BOOL keep = v.boolValue;
+
+                for(NSNumber *limit in limits) {
+                    NSArray<NSString *> *array = [TestString2 componentsSeparatedByString:pattern limit:limit.unsignedLongValue keepSeparator:keep];
+
+                    NSLog(@"%@", BAR);
+                    NSLog(@"         Splitting: \"%@\"", TestString2);
+                    NSLog(@"       With String: \"%@\"", pattern);
+                    NSLog(@"             Limit: %@", limit);
+                    NSLog(@"Keeping Separators: %@", (keep ? @"YES" : @"NO"));
+                    NSLog(@"%@", BAR);
+
+                    for(NSUInteger i = 0, j = array.count; i < j;) {
+                        NSString *str = array[i];
+                        NSLog(@"%3lu> \"%@\"", ++i, str);
+                    }
+                }
+            }
+        }
+    }
+
     -(void)testSplitByPattern {
         NSError             *error    = nil;
         NSArray<NSString *> *patterns = @[ @"(?:\\-|\\+)", @"\\+", @"\\-", @"\\|", @"\\.", @"", @"\\R" ];
@@ -113,15 +141,17 @@ NS_INLINE void Output(NSString *string) {
 
         for(NSString *pattern in patterns) {
             for(NSNumber *v in keeps) {
+                BOOL keep = v.boolValue;
+
                 for(NSNumber *limit in limits) {
-                    NSArray<NSString *> *array = [TestString2 componentsSeparatedByPattern:pattern limit:limit.unsignedLongValue options:0 keepSeparator:v.boolValue error:&error];
+                    NSArray<NSString *> *array = [TestString2 componentsSeparatedByPattern:pattern limit:limit.unsignedLongValue options:0 keepSeparator:keep error:&error];
                     XCTAssertNil(error, @"REGEX ERROR: %@", error.description);
 
                     NSLog(@"%@", BAR);
                     NSLog(@"         Splitting: \"%@\"", TestString2);
                     NSLog(@"      With Pattern: \"%@\"", pattern);
                     NSLog(@"             Limit: %@", limit);
-                    NSLog(@"Keeping Separators: %@", v.boolValue ? @"YES" : @"NO");
+                    NSLog(@"Keeping Separators: %@", (keep ? @"YES" : @"NO"));
                     NSLog(@"%@", BAR);
 
                     for(NSUInteger i = 0, j = array.count; i < j;) {

@@ -150,68 +150,72 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
         return [self rangeOfString:searchString options:options range:NSMakeRange(0, to)];
     }
 
+    -(NSArray<NSString *> *)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit {
+        return [self componentsSeparatedByString:separator limit:limit keepSeparator:NO];
+    }
+
     /**************************************************************************************************//**
      * This method functions like the componentsSeparatedByString: method except that it allows you to
-     * specify a limit to the number of components that are created. If the limit is zero (0) then an
-     * instance of an empty NSArray will be returned. If the limit is greater than zero (0) then an
-     * instance of NSArray will be returned with at most that number of components. The last element
-     * in the instance of NSArray will be the remainder of the string.
+     * specify a limit to the number of components that are created. If the limit is zero (0) then no
+     * limit is assumed. If the limit is greater than zero (0) then an instance of NSArray will be
+     * returned with at most that number of components. The last element in the instance of NSArray will
+     * be the remainder of the string.
      *
      * @param separator The separator string.
      * @param limit The maximum number of elements that the returned NSArray object will contain.
+     * @param keepSeparator if 'YES' then the separator is preserved at the end of each substring.
      * @return An NSArray object containing substrings from the receiver that have been divided by separator.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit {
+    -(NSArray<NSString *> *)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator {
+        if(limit == 0) limit = NSUIntegerMax; // zero means no limit.
         /*
-         * If the limit is zero then return an empty array.
+         * If the limit is only one, the separator is empty, or the separator is longer
+         * than this string then return a copy of this string as the only element in the array.
          */
-        if(limit) {
+        if((limit > 1) && (separator.length > 0) && (separator.length < self.length)) {
+            NSRange remaining  = NSMakeRange(0, self.length);
+            NSRange foundRange = [self rangeOfString:separator options:0 range:remaining];
+
             /*
-             * If the limit is only 1, the separator is empty, or the separator is longer
-             * than this string then return a copy of this string as the only element in the array.
+             * If instances of the separator do not exist in the first place then
+             * fall thru and return a copy of this string as the only element in
+             * the array. Otherwise continue into the body of the IF statement.
              */
-            if((limit > 1) && (separator.length > 0) && (separator.length < self.length)) {
-                NSRange remaining  = NSMakeRange(0, self.length);
-                NSRange foundRange = [self rangeOfString:separator options:0 range:remaining];
-
+            if(foundRange.location != NSNotFound) {
                 /*
-                 * If instances of the separator do not exist in the first place then
-                 * fall thru and return a copy of this string as the only element in
-                 * the array. Otherwise continue into the body of the IF statement.
+                 * At this point we know two things:
+                 *
+                 * 1) the limit is at least 2
+                 * 2) we found at least one instance of the separator
+                 *
+                 * So we know that the resulting array is going to have at least two elements.
                  */
-                if(foundRange.location != NSNotFound) {
+                NSMutableArray *array = [NSMutableArray arrayWithCapacity:limit];
+
+                do {
+                    NSUInteger endOfMatch = NSMaxRange(foundRange);
+                    NSRange    itemRange  = PGRangeFromIndexes(remaining.location, (keepSeparator ? endOfMatch : foundRange.location));
+
+                    [array addObject:[self substringWithRange:itemRange]];
+                    remaining = PGRangeFromIndexes(endOfMatch, self.length);
                     /*
-                     * At this point we know two things:
-                     *
-                     * 1) the limit is at least 2
-                     * 2) we found at least one instance of the separator
-                     *
-                     * So we know that the resulting array is going to have at least two elements.
+                     * See if we're done...
                      */
-                    NSMutableArray *array = [NSMutableArray arrayWithCapacity:limit];
-
-                    do {
-                        [array addObject:[self substringWithRange:PGRangeFromIndexes(remaining.location, foundRange.location)]];
-                        remaining = PGRangeFromIndexes(NSMaxRange(foundRange), self.length);
-                        /*
-                         * See if we're done...
-                         */
-                        if(limit < 3) break;
-                        /*
-                         * We're not done so keep going until no more found...
-                         */
-                        limit--;
-                        foundRange = [self rangeOfString:separator options:0 range:remaining];
-                    }
-                    while(foundRange.location != NSNotFound);
-
-                    [array addObject:[self substringWithRange:remaining]];
-                    return array;
+                    if(limit < 3) break;
+                    /*
+                     * We're not done so keep going until no more found...
+                     */
+                    limit--;
+                    foundRange = [self rangeOfString:separator options:0 range:remaining];
                 }
+                while(foundRange.location != NSNotFound);
+
+                [array addObject:[self substringWithRange:remaining]];
+                return array;
             }
-            return @[[self copy]];
         }
-        return @[];
+
+        return @[ self.copy ];
     }
 
     /**************************************************************************************************//**

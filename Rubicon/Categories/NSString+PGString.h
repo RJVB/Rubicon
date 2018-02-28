@@ -137,6 +137,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(NSRange)rangeOfString:(NSString *)searchString options:(NSStringCompareOptions)options to:(NSUInteger)to;
 
+    -(NSArray<NSString *> *)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit;
+
     /**************************************************************************************************//**
      * This method functions like the componentsSeparatedByString: method except that it allows you to
      * specify a limit to the number of components that are created. If the limit is zero (0) then an
@@ -148,7 +150,7 @@ NS_ASSUME_NONNULL_BEGIN
      * @param limit The maximum number of elements that the returned NSArray object will contain.
      * @return An NSArray object containing substrings from the receiver that have been divided by separator.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit;
+    -(NSArray<NSString *> *)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator;
 
     /**************************************************************************************************//**
      * If this string's length is greater than the 'maxLength' provided then this method returns a copy
