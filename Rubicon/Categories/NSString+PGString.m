@@ -52,6 +52,56 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
 
 @implementation NSString(PGString)
 
+    -(NSString *)stringByFrontPaddingToLength:(NSUInteger)len withString:(NSString *)str startingAtIndex:(NSUInteger)idx {
+        NSUInteger slflen = self.length;
+
+        if(slflen == len) return self;
+        if(slflen > len) return [self substringWithRange:NSMakeRange(slflen - len, len)];
+
+        NSUInteger      needed = (len - slflen);
+        NSUInteger      slen   = str.length;
+        NSMutableString *pad   = [NSMutableString stringWithCapacity:len];
+        NSRange         r      = NSMakeRange(idx, MIN((slen - idx), needed));
+
+        [pad appendString:[str substringWithRange:r]];
+        NSUInteger padlen = pad.length;
+
+        while((padlen + slen) < needed) {
+            [pad appendString:str];
+            padlen = pad.length;
+        }
+
+        if(padlen < needed) [pad appendString:[str substringWithRange:NSMakeRange(0, (needed - padlen))]];
+        [pad appendString:self];
+        return pad;
+    }
+
+    -(NSString *)stringByCenteringInPaddingOfLength:(NSUInteger)len withString:(NSString *)str startingAtIndex:(NSUInteger)idx {
+        if(len == 0) return @"";
+
+        NSUInteger slflen = self.length;
+        NSUInteger padlen = str.length;
+
+        if(slflen == len) return self;
+        if(slflen > len) return [self substringWithRange:NSMakeRange(((slflen - len) / 2), len)];
+
+        NSMutableString *res = [NSMutableString stringWithCapacity:len];
+        NSRange         rng  = NSMakeRange(idx, MIN(len, (padlen - idx)));
+
+        [res appendString:[str substringWithRange:rng]];
+        NSUInteger reslen = res.length;
+
+        while((reslen + padlen) < len) {
+            [res appendString:str];
+            reslen = res.length;
+        }
+
+        if(reslen < len) [res appendString:[str substringWithRange:NSMakeRange(0, (len - reslen))]];
+
+        [res replaceCharactersInRange:NSMakeRange(((len - slflen) / 2), slflen) withString:self];
+        return res;
+    }
+
     /**************************************************************************************************//**
      * If the length of this string is zero (0) then this method returns a NULL value (nil), otherwise
      * this NSString object is returned.
@@ -190,7 +240,7 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
                  *
                  * So we know that the resulting array is going to have at least two elements.
                  */
-                NSMutableArray *array = [NSMutableArray arrayWithCapacity:limit];
+                NSMutableArray *array = [NSMutableArray arrayWithCapacity:MIN(limit, 100)]; // Let's not get carried away...
 
                 do {
                     NSUInteger endOfMatch = NSMaxRange(foundRange);

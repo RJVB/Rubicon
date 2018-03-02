@@ -34,6 +34,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSString(PGString)
 
+    -(NSString *)stringByFrontPaddingToLength:(NSUInteger)len withString:(NSString *)str startingAtIndex:(NSUInteger)idx;
+
+    -(NSString *)stringByCenteringInPaddingOfLength:(NSUInteger)len withString:(NSString *)str startingAtIndex:(NSUInteger)idx;
+
     /**************************************************************************************************//**
      * If the length of this string is zero (0) then this method returns a NULL value (nil), otherwise
      * this NSString object is returned.
