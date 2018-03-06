@@ -20,7 +20,7 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *******************************************************************************/
+ */
 
 #ifndef __Rubicon_PGSemaphore_H_
 #define __Rubicon_PGSemaphore_H_
@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(BOOL)tryWait;
 
-    /**************************************************************************************************//**
+    /**
 	 * Mimics the POSIX sem_timedwait(2p) function.
 	 *
 	 * This method shall lock the semaphore referenced by this object as in the wait method. However, if
@@ -73,7 +73,7 @@ NS_ASSUME_NONNULL_BEGIN
 	 * @param abstime The absolute time, based on the wall clock, that this method will timeout waiting.
 	 * @return YES if it was able to successfully lock the semaphore before the timeout occurred.
 	 * @see http://man7.org/linux/man-pages/man3/sem_timedwait.3p.html
-	 ******************************************************************************************************/
+	 */
     -(BOOL)timedWait:(PGTimeSpec *)abstime;
 
 @end

@@ -20,7 +20,7 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *******************************************************************************/
+ */
 
 #ifndef __Rubicon_NSObject_PGObject__H_
 #define __Rubicon_NSObject_PGObject__H_
@@ -43,7 +43,7 @@ Class PGCommonSuperclass(Class c1, Class c2);
 
 @interface NSObject(PGObject)
 
-    /**************************************************************************************************//**
+    /**
 	 * This method returns the first superclass that this object has in common with the given object.
 	 * For example, if you have two objects that are descendents of NSString but neither is a descendent
 	 * of the other then calling this method on one of the objects and passing the other will return the
@@ -52,35 +52,35 @@ Class PGCommonSuperclass(Class c1, Class c2);
 	 *
 	 * @param obj the other object.
 	 * @return the first superclass that both this object and the given class have in common.
-	 ******************************************************************************************************/
+	 */
     -(Class)superclassInCommonWith:(id)obj;
 
-    /**************************************************************************************************//**
+    /**
 	 * Created because the definition of isKindOf:(Class) and isMemberOf:(Class) is hard for me to
 	 * remember for some reason.
 	 *
 	 * @param clazz the class to compare to.
 	 * @return YES if this object is an instance of clazz or one of it's subclasses.
-	 ******************************************************************************************************/
+	 */
     -(BOOL)isInstanceOf:(Class)clazz;
 
     -(BOOL)isInstanceOfObject:(id)obj;
 
-    /**************************************************************************************************//**
+    /**
 	 * Created because the definition of isKindOf:(Class) and isMemberOf:(Class) is hard for me to
 	 * remember for some reason.
 	 *
 	 * @param clazz the class to compare to.
 	 * @return YES if this object is an instance of clazz.
-	 ******************************************************************************************************/
+	 */
     -(BOOL)isExactInstanceOf:(Class)clazz;
 
     -(BOOL)isExactInstanceOfObject:(id)obj;
 
-    /**************************************************************************************************//**
+    /**
 	 * Returns a default generic comparator that will make a best attempt at comparing this object with
 	 * another object.
-	 ******************************************************************************************************/
+	 */
     +(NSComparator)defaultComparator;
 
 @end

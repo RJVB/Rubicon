@@ -19,7 +19,7 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR
  * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
  * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *********************************************************************************************************************************/
+ */
 
 #import "NSData+PGData.h"
 
@@ -47,11 +47,11 @@ static const NSUInteger PGDataReadBufferSize = 8196;
                 if(error) *error = nil;
             }
             else if(error) {
-                *error = [NSError errorWithDomain:PGErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey:PGStrError(errno) }];
+                *error = [NSError errorWithDomain:PGErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: PGStrError(errno) }];
             }
         }
         else if(error) {
-            *error = [NSError errorWithDomain:PGErrorDomain code:1000 userInfo:@{ NSLocalizedDescriptionKey:@"Stream not open." }];
+            *error = [NSError errorWithDomain:PGErrorDomain code:1000 userInfo:@{ NSLocalizedDescriptionKey: @"Stream not open." }];
         }
 
         return results;

@@ -20,7 +20,7 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *******************************************************************************/
+ */
 
 #ifndef __Rubicon_PGTimeSpec_H_
 #define __Rubicon_PGTimeSpec_H_
@@ -29,7 +29,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/**************************************************************************************************//**
+/**
  * This is simply an object wrapper around the standard C timespec structure.  This class makes no
  * assumptions about the meaning of the time that it has stored other than the seconds field must be
  * >= zero and the nanoseconds field must be in the range 0..999,999,999 inclusive. In most cases it
@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
  * was powered on or from the epoch (midnight, January 1, 1970 GMT).  It may also indicate a timeout
  * value such as a certain number of nanoseconds that they nanosleep() function will suspend execution
  * of the current thread.
- ******************************************************************************************************/
+ */
 @interface PGTimeSpec : NSObject<NSCopying>
 
     @property(nonatomic, readonly) NSLong years;

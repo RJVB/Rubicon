@@ -20,7 +20,7 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *******************************************************************************/
+ */
 
 #ifndef __Rubicon_PGMacros_H_
 #define __Rubicon_PGMacros_H_
@@ -29,13 +29,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/**************************************************************************************************//**
+/**
  * Default macro regex definition. This regex sees a macro as anything in the form of "${sometext}"
  * (not including the quotes) where "sometext" is the macro label.
- ******************************************************************************************************/
+ */
 #define PGDefaultMacroRegex @"\\$\\{\\s*(\\w+)\\s*\\}"
 
-/**************************************************************************************************//**
+/**
  * The block definition for a block that provides the replacement string for each macro in the string.
  *
  * @param label is the label of the macro. Using the default regex above the label for the macro
@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param whole this is the entire string that is being searched for macros.
  * @param range this is the range within the whole string that this macro occupies.
  * @return the replacement string that will be substituted for this macro in the end result.
- ******************************************************************************************************/
+ */
 typedef NSString *_Nonnull (^PGMacroHandler)(NSString *_Nonnull label, NSString *_Nonnull whole, NSRange range);
 
 @interface PGMacros : NSObject
@@ -51,7 +51,7 @@ typedef NSString *_Nonnull (^PGMacroHandler)(NSString *_Nonnull label, NSString 
     @property(nonatomic, copy) PGMacroHandler macroHandler;
     @property(nonatomic, copy) NSString       *macroRegex;
 
-    /**************************************************************************************************//**
+    /**
 	 * Initiialize the object with the given macro handler.
 	 *
 	 * @param macroHandler the macro handler.
@@ -59,7 +59,7 @@ typedef NSString *_Nonnull (^PGMacroHandler)(NSString *_Nonnull label, NSString 
 	 */
     -(instancetype)initWithHandler:(PGMacroHandler)macroHandler;
 
-    /**************************************************************************************************//**
+    /**
 	 * Initialize the object with the given regular expression and macro handler.
 	 *
 	 * @param macroRegex the regular expression to search for macro instances with.

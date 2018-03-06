@@ -20,7 +20,7 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *******************************************************************************/
+ */
 
 #ifndef __Rubicon_PGTime_H_
 #define __Rubicon_PGTime_H_
@@ -69,23 +69,23 @@ typedef TimeVal         *PTimeVal;
 #define I64(i) ((NSLong)(i))
 #define D64(d) ((NSFloat)(d))
 
-/**************************************************************************************************//**
+/**
  * Convert a time value to a long long int containing the number of nanoseconds.
  *
  * @param tv the time value.
  * @return the number of nanoseconds representing the time value as a long long int.
- ******************************************************************************************************/
+ */
 NS_INLINE NSLong PGTimeValToNanos(PTimeVal tv) {
     return (tv ? ((I64(tv->tv_sec) * PG_NANOS_PER_SECOND) + (I64(tv->tv_usec) * PG_NANOS_PER_MICRO)) : 0);
 }
 
-/**************************************************************************************************//**
+/**
  * Convert the time given in nanoseconds to a time value (struct timeval).
  *
  * @param tv a pointer to a time value that will receive the converted time.
  * @param nanos a time in nanoseconds.
  * @return the pointer to the same time value structure.
- ******************************************************************************************************/
+ */
 NS_INLINE PTimeVal PGNanosToTimeVal(PTimeVal tv, NSLong nanos) {
     if(!tv) {
         tv = (PTimeVal)malloc(sizeof(TimeVal));
@@ -99,23 +99,23 @@ NS_INLINE PTimeVal PGNanosToTimeVal(PTimeVal tv, NSLong nanos) {
     return tv;
 }
 
-/**************************************************************************************************//**
+/**
  * Convert a time specification to a long long int containing the number of nanoseconds.
  *
  * @param tp the time specification.
  * @return the number of nanoseconds representing the time specification as a long long int.
- ******************************************************************************************************/
+ */
 NS_INLINE NSLong PGTimeSpecToNanos(const PTimeSpec tp) {
     return (NSLong)(tp ? ((I64(tp->tv_sec) * PG_NANOS_PER_SECOND) + I64(tp->tv_nsec)) : 0);
 }
 
-/**************************************************************************************************//**
+/**
  * Convert the time given in nanoseconds to a time specification (struct timespec).
  *
  * @param tp a pointer to a time specification that will receive the converted time.
  * @param nanos a time in nanoseconds.
  * @return the pointer to the same time specification structure.
- ******************************************************************************************************/
+ */
 NS_INLINE PTimeSpec PGNanosToTimeSpec(PTimeSpec tp, NSLong nanos) {
     if(tp) {
         tp->tv_sec  = (long)(nanos / PG_NANOS_PER_SECOND);
@@ -125,38 +125,38 @@ NS_INLINE PTimeSpec PGNanosToTimeSpec(PTimeSpec tp, NSLong nanos) {
     return tp;
 }
 
-/**************************************************************************************************//**
+/**
  * Add the specified number of nanoseconds to the given time specifier.
  *
  * @param tp the time specifier.
  * @param nanos the number of nanoseconds to add to the time specifier. May be negative.
  * @return the time specifier.
- ******************************************************************************************************/
+ */
 NS_INLINE PTimeSpec PGAddNanosToTimeSpec(PTimeSpec tp, NSLong nanos) {
     return PGNanosToTimeSpec(tp, (PGTimeSpecToNanos(tp) + nanos));
 }
 
-/**************************************************************************************************//**
+/**
  * Compare two time specifiers for order.
  *
  * @param tp1 the first time specifier
  * @param tp2 the second time specifier
  * @return NSOrderedSame if tp1 and tp2 represent the same time. NSOrderedAscending if tp1 occurs before
  *      tp2. NSOrderedDescending if tp1 occurs after tp2.
- ******************************************************************************************************/
+ */
 NS_INLINE NSComparisonResult PGCompareTimeSpecs(PTimeSpec tp1, PTimeSpec tp2) {
     NSLong n1 = PGTimeSpecToNanos(tp1), n2 = PGTimeSpecToNanos(tp2);
     return (n1 < n2 ? NSOrderedAscending : (n1 > n2 ? NSOrderedDescending : NSOrderedSame));
 }
 
-/**************************************************************************************************//**
+/**
  * Compare two time values for order.
  *
  * @param tv1 the first time specifier
  * @param tv2 the second time specifier
  * @return NSOrderedSame if tv1 and tv2 represent the same time. NSOrderedAscending if tv1 occurs before
  *      tv2. NSOrderedDescending if tv1 occurs after tv2.
- ******************************************************************************************************/
+ */
 NS_INLINE NSComparisonResult PGCompareTimeVals(PTimeVal tv1, PTimeVal tv2) {
     NSLong n1 = PGTimeValToNanos(tv1), n2 = PGTimeValToNanos(tv2);
     return (n1 < n2 ? NSOrderedAscending : (n1 > n2 ? NSOrderedDescending : NSOrderedSame));
@@ -170,13 +170,13 @@ NS_INLINE NSComparisonResult PGCompareTimeVals(PTimeVal tv1, PTimeVal tv2) {
 FOUNDATION_EXPORT mach_timebase_info_data_t machTimebaseInfo;
 FOUNDATION_EXPORT NSFloat                   machTimeFactor;
 
-/**************************************************************************************************//**
+/**
  * Get the current system cpu time in nano seconds. Generally speaking this is the number of
  * nanoseconds that have elapsed since the system was powered on or rebooted.
  *
  * @param delta additional nanoseconds to add to the time read from the system clock.
  * @return The value of the system clock plus any additional time.
- ******************************************************************************************************/
+ */
 NS_INLINE NSLong PGSystemCPUTime(NSLong delta) {
     if(machTimebaseInfo.denom == 0) {
         mach_timebase_info(&machTimebaseInfo);
@@ -186,13 +186,13 @@ NS_INLINE NSLong PGSystemCPUTime(NSLong delta) {
     return (I64(D64(mach_absolute_time()) * machTimeFactor) + delta);
 }
 
-/**************************************************************************************************//**
+/**
  * Get the current time in nano seconds. This time represents the number of nanoseconds since the
  * epoch (Midnight, January 1, 1970, UTC).
  *
  * @param delta additional nanoseconds to add to the time read from the system clock.
  * @return The value of the system clock plus any additional time.
- ******************************************************************************************************/
+ */
 NS_INLINE NSLong PGSystemRealTime(NSLong delta) {
     TimeVal tv;
     gettimeofday(&tv, NULL);
@@ -201,10 +201,10 @@ NS_INLINE NSLong PGSystemRealTime(NSLong delta) {
 
 #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 101200)
 
-/**************************************************************************************************//**
+/**
  * And, of course, for some reason, Mac OS X didn't have this function or it's associated defines
  * until version 10.12.
- ******************************************************************************************************/
+ */
 int clock_gettime(int clk_id, PTimeSpec tp);
 
 #define CLOCK_REALTIME           (0)
@@ -221,7 +221,7 @@ int clock_gettime(int clk_id, PTimeSpec tp);
  *
  * @param delta additional nanoseconds to add to the time read from the system clock.
  * @return The value of the system clock plus any additional time.
- ******************************************************************************************************/
+ */
 NS_INLINE NSLong PGSystemRealTime(NSLong delta) {
     TimeSpec tm = { 0, 0 };
 
@@ -232,13 +232,13 @@ NS_INLINE NSLong PGSystemRealTime(NSLong delta) {
     return (PGTimeSpecToNanos(&tm) + delta);
 }
 
-/**************************************************************************************************//**
+/**
  * Get the current system cpu time in nano seconds. Generally speaking this is the number of
  * nanoseconds that have elapsed since the system was powered on or rebooted.
  *
  * @param delta additional nanoseconds to add to the time read from the system clock.
  * @return The value of the system clock plus any additional time.
- ******************************************************************************************************/
+ */
 NS_INLINE NSLong PGSystemCPUTime(NSLong delta) {
     TimeSpec tm = { 0, 0 };
 

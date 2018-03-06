@@ -20,7 +20,7 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *******************************************************************************/
+ */
 
 #ifndef __Rubicon_NSString_PGString__H_
 #define __Rubicon_NSString_PGString__H_
@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(NSString *)stringByCenteringInPaddingOfLength:(NSUInteger)len withString:(NSString *)str startingAtIndex:(NSUInteger)idx;
 
-    /**************************************************************************************************//**
+    /**
      * If the length of this string is zero (0) then this method returns a NULL value (nil), otherwise
      * this NSString object is returned.
      *
@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(nullable NSString *)nullIfEmpty;
 
-    /**************************************************************************************************//**
+    /**
      * This method is the equivilent of calling [[self trim] nullIfEmpty]. Either NULL (nil) or a copy
      * of this NSString is always returned.
      *
@@ -54,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(nullable NSString *)nullIfTrimEmpty;
 
-    /**************************************************************************************************//**
+    /**
      * This method accepts only a single UTF-16 code point as input and searchs for the first instance
      * of that code point in this entire string. If you would rather search for a composed character
      * sequence (such as an emoji 🤯) then instead use the rangeOfString: method and pass the composed
@@ -68,7 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSUInteger)indexOfCharacter:(unichar)c;
 
-    /**************************************************************************************************//**
+    /**
      * This method accepts only a single UTF-16 code point as input and searchs for the first instance
      * of that code point in this string beginning at 'startIndex'. If you would rather search for a
      * composed character sequence (such as an emoji 🤯) then instead use the rangeOfString:from: method
@@ -83,7 +83,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSUInteger)indexOfCharacter:(unichar)c from:(NSUInteger)startIndex;
 
-    /**************************************************************************************************//**
+    /**
      * This method accepts only a single UTF-16 code point as input and searchs for the first instance
      * of that code point in this string up to just before 'toIndex'. If you would rather search for a
      * composed character sequence (such as an emoji 🤯) then instead use the rangeOfString:to: method and
@@ -98,7 +98,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSUInteger)indexOfCharacter:(unichar)c to:(NSUInteger)endIndex;
 
-    /**************************************************************************************************//**
+    /**
      * This method accepts only a single UTF-16 code point as input and searchs for the first instance
      * of that code point in this string within the supplied range. If you would rather search for a
      * composed character sequence (such as an emoji 🤯) then instead use the rangeOfString:range: method
@@ -114,7 +114,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(BOOL)isEqualToString:(nullable NSString *)other to:(NSUInteger)toIndex;
 
-    /**************************************************************************************************//**
+    /**
      * This method exists to allow you to compare a substring of this string to another string without
      * having to actually create a separate NSString object to begin with. It replaces a call that would
      * look something like this:
@@ -143,7 +143,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(NSArray<NSString *> *)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit;
 
-    /**************************************************************************************************//**
+    /**
      * This method functions like the componentsSeparatedByString: method except that it allows you to
      * specify a limit to the number of components that are created. If the limit is zero (0) then no
      * limit is assumed. If the limit is greater than zero (0) then an instance of NSArray will be
@@ -157,7 +157,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSArray<NSString *> *)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator;
 
-    /**************************************************************************************************//**
+    /**
      * If this string's length is greater than the 'maxLength' provided then this method returns a copy
      * of this string truncated to the 'maxLength'. Otherwise this string is returned - not a copy.
      *
@@ -166,7 +166,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSString *)limitLength:(NSUInteger)maxLength;
 
-    /**************************************************************************************************//**
+    /**
      * Returns a copy of this string with the leading and trailing whitespace and control characters
      * removed. This method always returns a copy of this string even if nothing had to be removed.
      *
@@ -174,7 +174,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSString *)trim;
 
-    /**************************************************************************************************//**
+    /**
      * If this string contains any leading or trailing whitespace or control characters then this method
      * returns a copy of this string with the leading and trailing whitespace and control characters
      * removed. This method will return this string (not a copy) if there were no whitespace or control
@@ -191,7 +191,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(void)drawDeadCentered:(NSRect)clipRect fontAttributes:(NSDictionary *)attribs;
 
-    /**************************************************************************************************//**
+    /**
      * This method is similar in function to componentsSeparatedByString:limit:keepSeparator: except that
      * pattern is a string that contains a Regular Expression that will be searched for instead of a
      * simple string. NSRegularExpression is used.
@@ -211,7 +211,7 @@ NS_ASSUME_NONNULL_BEGIN
                                            keepSeparator:(BOOL)keepSeparator
                                                    error:(NSError **)error;
 
-    /**************************************************************************************************//**
+    /**
      * Convienience method for:
      *           [string componentsSeparatedByPattern:pattern limit:0 options:0 keepSeparator:NO error:nil]
      *
@@ -222,7 +222,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern;
 
-    /**************************************************************************************************//**
+    /**
      * Convienience method for:
      *      [string componentsSeparatedByPattern:pattern limit:0 options:0 keepSeparator:NO error:error]
      *
@@ -234,7 +234,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern error:(NSError **)error;
 
-    /**************************************************************************************************//**
+    /**
      * Convienience method for:
      *      [string componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:NO error:nil]
      *
@@ -246,7 +246,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit;
 
-    /**************************************************************************************************//**
+    /**
      * Convienience method for:
      *      [string componentsSeparatedByPattern:pattern limit:0 options:options keepSeparator:NO error:nil]
      *
@@ -258,7 +258,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options;
 
-    /**************************************************************************************************//**
+    /**
      * Convienience method for:
      *      [string componentsSeparatedByPattern:pattern limit:0 options:options keepSeparator:NO error:error]
      *
@@ -271,7 +271,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options error:(NSError **)error;
 
-    /**************************************************************************************************//**
+    /**
      * Convienience method for:
      *      [string componentsSeparatedByPattern:pattern limit:limit options:options keepSeparator:NO error:nil]
      *
@@ -284,7 +284,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit options:(NSRegularExpressionOptions)options;
 
-    /**************************************************************************************************//**
+    /**
      * Convienience method for:
      *      [string componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:NO error:error]
      *
@@ -297,7 +297,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit error:(NSError **)error;
 
-    /**************************************************************************************************//**
+    /**
      * Convienience method for:
      *      [string componentsSeparatedByPattern:pattern limit:0 options:0 keepSeparator:keepSeparator error:nil]
      *
@@ -309,7 +309,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern keepSeparator:(BOOL)keepSeparator;
 
-    /**************************************************************************************************//**
+    /**
      * Convienience method for:
      *      [string componentsSeparatedByPattern:pattern limit:0 options:0 keepSeparator:keepSeparator error:error]
      *
@@ -322,7 +322,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern keepSeparator:(BOOL)keepSeparator error:(NSError **)error;
 
-    /**************************************************************************************************//**
+    /**
      * Convienience method for:
      *      [string componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:keepSeparator error:nil]
      *
@@ -335,7 +335,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator;
 
-    /**************************************************************************************************//**
+    /**
      * Convienience method for:
      *      [string componentsSeparatedByPattern:pattern limit:0 options:options keepSeparator:keepSeparator error:nil]
      *
@@ -348,7 +348,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator;
 
-    /**************************************************************************************************//**
+    /**
      * Convienience method for:
      *      [string componentsSeparatedByPattern:pattern limit:0 options:options keepSeparator:keepSeparator error:error]
      *
@@ -362,7 +362,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator error:(NSError **)error;
 
-    /**************************************************************************************************//**
+    /**
      * Convienience method for:
      *      [string componentsSeparatedByPattern:pattern limit:limit options:options keepSeparator:keepSeparator error:nil]
      *
@@ -376,7 +376,7 @@ NS_ASSUME_NONNULL_BEGIN
      */
     -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator;
 
-    /**************************************************************************************************//**
+    /**
      * Convienience method for:
      *      [string componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:keepSeparator error:error]
      *

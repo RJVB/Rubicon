@@ -19,7 +19,7 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *******************************************************************************/
+ */
 
 #import "PGTools.h"
 #import "NSObject+PGObject.h"
@@ -80,7 +80,7 @@ NSComparisonResult _PGCompare(id obj1, id obj2) {
                                  userInfo:nil];
 }
 
-/**************************************************************************************************//**
+/**
  * This function attempts to generically compare two objects to determine their sort ordering. Two
  * objects are fully comparable if 1) they share a common superclass and 2) instances of that
  * superclass implement the "compare:" selector.

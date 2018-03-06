@@ -19,14 +19,14 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *******************************************************************************/
+ */
 
 #import "NSObject+PGObject.h"
 #import <objc/runtime.h>
 
 @implementation NSObject(PGObject)
 
-    /**************************************************************************************************//**
+    /**
 	 * This method returns the first superclass that this object has in common with the given object.
 	 * For example, if you have two objects that are descendents of NSString but neither is a descendent
 	 * of the other then calling this method on one of the objects and passing the other will return the
@@ -35,18 +35,18 @@
 	 *
 	 * @param obj the other object.
 	 * @return the first superclass that both this object and the given class have in common.
-	 ******************************************************************************************************/
+	 */
     -(Class)superclassInCommonWith:(id)obj {
         return (obj ? PGCommonSuperclass([self class], [obj class]) : nil);
     }
 
-    /**************************************************************************************************//**
+    /**
 	 * Created because the definition of isKindOf:(Class) and isMemberOf:(Class) is hard for me to
 	 * remember for some reason.
 	 *
 	 * @param clazz the class to compare to.
 	 * @return YES if this object is an instance of clazz or one of it's subclasses.
-	 ******************************************************************************************************/
+	 */
     -(BOOL)isInstanceOf:(Class)clazz {
         return [self isKindOfClass:clazz];
     }
@@ -55,13 +55,13 @@
         return [self isInstanceOf:[obj class]];
     }
 
-    /**************************************************************************************************//**
+    /**
 	 * Created because the definition of isKindOf:(Class) and isMemberOf:(Class) is hard for me to
 	 * remember for some reason.
 	 *
 	 * @param clazz the class to compare to.
 	 * @return YES if this object is an instance of clazz.
-	 ******************************************************************************************************/
+	 */
     -(BOOL)isExactInstanceOf:(Class)clazz {
         return [self isMemberOfClass:clazz];
     }
@@ -70,10 +70,10 @@
         return [self isExactInstanceOf:[obj class]];
     }
 
-    /**************************************************************************************************//**
+    /**
 	 * Returns a default generic comparator that will make a best attempt at comparing this object with
 	 * another object.
-	 ******************************************************************************************************/
+	 */
     +(NSComparator)defaultComparator {
         return ^NSComparisonResult(id obj1, id obj2) {
             if(obj1 == obj2) {
@@ -94,7 +94,7 @@
 
 @end
 
-/**************************************************************************************************//**
+/**
  * The purpose of this function is to attempt to find a class that is the first common superclass of the two
  * provided classes.  If not common superclass can be found then Nil is returned.  Usually, all classes in
  * normal Objective-C programs share at least one superclass, the root class NSObject.  However, this

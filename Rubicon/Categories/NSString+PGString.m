@@ -19,7 +19,7 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *******************************************************************************/
+ */
 
 #import "NSString+PGString.h"
 
@@ -102,7 +102,7 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
         return res;
     }
 
-    /**************************************************************************************************//**
+    /**
      * If the length of this string is zero (0) then this method returns a NULL value (nil), otherwise
      * this NSString object is returned.
      *
@@ -112,7 +112,7 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
         return (self.length ? self : nil);
     }
 
-    /**************************************************************************************************//**
+    /**
      * This method is the equivilent of calling [[self trim] nullIfEmpty]. Either NULL (nil) or a copy
      * of this NSString is always returned.
      *
@@ -204,7 +204,7 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
         return [self componentsSeparatedByString:separator limit:limit keepSeparator:NO];
     }
 
-    /**************************************************************************************************//**
+    /**
      * This method functions like the componentsSeparatedByString: method except that it allows you to
      * specify a limit to the number of components that are created. If the limit is zero (0) then no
      * limit is assumed. If the limit is greater than zero (0) then an instance of NSArray will be
@@ -268,7 +268,7 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
         return @[ self.copy ];
     }
 
-    /**************************************************************************************************//**
+    /**
      * If this string's length is greater than the 'maxLength' provided then this method returns a copy
      * of this string truncated to the 'maxLength'. Otherwise this string is returned - not a copy.
      *
@@ -279,7 +279,7 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
         return ((self.length > maxLength) ? [self substringWithRange:NSMakeRange(0, maxLength)] : self);
     }
 
-    /**************************************************************************************************//**
+    /**
      * Returns a copy of this string with the leading and trailing whitespace and control characters
      * removed. This method always returns a copy of this string even if nothing had to be removed.
      *
@@ -290,7 +290,7 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
         return ((self == trimmed) ? [self copy] : trimmed);
     }
 
-    /**************************************************************************************************//**
+    /**
      * If this string contains any leading or trailing whitespace or control characters then this method
      * returns a copy of this string with the leading and trailing whitespace and control characters
      * removed. This method will return this string (not a copy) if there were no whitespace or control
@@ -464,7 +464,7 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
         return [self componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:keepSeparator error:error];
     }
 
-    /**************************************************************************************************//**
+    /**
      * This method is similar in function to componentsSeparatedByString:limit:keepSeparator: except that
      * pattern is a string that contains a Regular Expression that will be searched for instead of a
      * simple string. NSRegularExpression is used.
