@@ -21,6 +21,7 @@
  * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#import "PGInternal.h"
 #import "NSData+PGData.h"
 
 static const NSUInteger PGDataReadBufferSize = 8196;

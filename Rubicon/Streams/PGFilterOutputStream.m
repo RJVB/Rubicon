@@ -20,6 +20,7 @@
 
 #import "PGFilterOutputStream.h"
 #import "NSException+PGException.h"
+#import "PGInternal.h"
 
 @interface PGFilterOutputStream()
 
@@ -56,7 +57,8 @@
                 _delegate = nil;
             }
             else {
-                @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"\"outputStream\" is null."];
+                NSString *reason = NSLocalizedString(@"PGNullOutStream", @"");
+                @throw [NSException exceptionWithName:NSInvalidArgumentException reason:reason];
             }
         }
 

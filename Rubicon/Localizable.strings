@@ -1,0 +1,9 @@
+/*
+  Localizable.strings
+  Rubicon
+
+  Created by Galen Rhodes on 3/7/18.
+  Copyright © 2018 Project Galen. All rights reserved.
+*/
+
+"PGNullOutStream" = "\"outputStream\" is null.";

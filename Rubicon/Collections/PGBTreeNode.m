@@ -21,6 +21,7 @@
  * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#import "PGInternal.h"
 #import "PGBTreeNode.h"
 
 @interface PGBTreeNode<__covariant K, __covariant V>()

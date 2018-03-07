@@ -21,6 +21,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#import "PGInternal.h"
 #import "NSObject+PGObject.h"
 #import <objc/runtime.h>
 

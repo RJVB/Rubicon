@@ -21,6 +21,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#import "PGInternal.h"
 #include <semaphore.h>
 #import "PGSemaphore.h"
 #import "NSString+PGString.h"

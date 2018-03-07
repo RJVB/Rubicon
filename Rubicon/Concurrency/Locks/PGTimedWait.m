@@ -28,6 +28,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#import "PGInternal.h"
 #include <pthread.h>
 #import "PGTimedWait.h"
 

@@ -22,6 +22,8 @@
  */
 
 #ifndef __APPLE__
+#import "Rubicon.h"
+#ifndef __APPLE__
 
 extern const unsigned char RubiconVersionString[];
 extern const double RubiconVersionNumber;
@@ -29,4 +31,5 @@ extern const double RubiconVersionNumber;
 const unsigned char RubiconVersionString[] __attribute__ ((used)) = "@(#)PROGRAM:Rubicon  PROJECT:Rubicon-1" "\n";
 const double RubiconVersionNumber __attribute__ ((used)) = (double)1.;
 
+#endif
 #endif
