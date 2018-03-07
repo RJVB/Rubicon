@@ -63,7 +63,7 @@ NS_INLINE BOOL PGStringsEqual(NSString *const _Nullable str1, NSString *const _N
 }
 
 /**
- * Safely set a value by reference without having to constantly write code to check the pointers validaty.
+ * Safely set a value by reference without having to constantly write code to check the pointers validity.
  * If the value of reference is not nil then the pointer will be de-referenced and the value val will be
  * stored.  Otherwise the value val is simply returned.
  *
