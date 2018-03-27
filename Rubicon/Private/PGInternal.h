@@ -26,27 +26,31 @@
     #define NSLocalizedString(key, comment) [RubiconBundle localizedStringForKey:(key) value:@"" table:nil]
 #endif
 
-#import "sem_timedwait.h"
-#import "NSObject+PGObject.h"
-#import "NSString+PGString.h"
-#import "NSRegularExpression+PGRegularExpression.h"
-#import "NSBitmapImageRep+PGBitmapImageRep.h"
+NS_INLINE NSString *_Nullable PGLocalizedString(NSString *_Nonnull key) {
+    return [[NSBundle bundleWithIdentifier:@"com.projectgalen.Rubicon"] localizedStringForKey:key value:nil table:nil];
+}
+
 #import "NSArray+PGArray.h"
+#import "NSBitmapImageRep+PGBitmapImageRep.h"
 #import "NSData+PGData.h"
-#import "NSException+PGException.h"
 #import "NSError+PGError.h"
+#import "NSException+PGException.h"
+#import "NSObject+PGObject.h"
+#import "NSRegularExpression+PGRegularExpression.h"
+#import "NSString+PGString.h"
+#import "PGBase64OutputStream.h"
+#import "PGEmptyEnumerator.h"
+#import "PGFilterOutputStream.h"
+#import "PGLinkedListNode.h"
 #import "PGMacros.h"
-#import "PGSemaphore.h"
+#import "PGMutableBinaryTreeDictionary.h"
+#import "PGNestedEnumerator.h"
+#import "PGQueue.h"
 #import "PGReadWriteLock.h"
+#import "PGSemaphore.h"
+#import "PGStack.h"
 #import "PGTimeSpec.h"
 #import "PGTimedWait.h"
-#import "PGFilterOutputStream.h"
-#import "PGBase64OutputStream.h"
-#import "PGLinkedListNode.h"
-#import "PGStack.h"
-#import "PGQueue.h"
-#import "PGEmptyEnumerator.h"
-#import "PGNestedEnumerator.h"
-#import "PGMutableBinaryTreeDictionary.h"
+#import "sem_timedwait.h"
 
 #endif //RUBICON_PGINTERNAL_H
