@@ -21,7 +21,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#import "PGTime.h"
+#import "PGInternal.h"
 
 #if defined(__APPLE__)
 mach_timebase_info_data_t machTimebaseInfo = { 0, 0 };

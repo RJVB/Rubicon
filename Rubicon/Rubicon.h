@@ -38,13 +38,12 @@
 #import <Rubicon/PGTimedWait.h>
 #import <Rubicon/PGFilterOutputStream.h>
 #import <Rubicon/PGBase64OutputStream.h>
-#import <Rubicon/PGBTreeNode.h>
 #import <Rubicon/PGLinkedListNode.h>
 #import <Rubicon/PGStack.h>
 #import <Rubicon/PGQueue.h>
 #import <Rubicon/PGEmptyEnumerator.h>
 #import <Rubicon/PGNestedEnumerator.h>
-#import <Rubicon/PGBTreeMutableDictionary.h>
+#import <Rubicon/PGMutableBinaryTreeDictionary.h>
 
 FOUNDATION_EXPORT double              RubiconVersionNumber;
 FOUNDATION_EXPORT const unsigned char RubiconVersionString[];

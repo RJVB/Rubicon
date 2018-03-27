@@ -21,10 +21,6 @@
  */
 
 #import "PGInternal.h"
-#import "PGStack.h"
-#import "PGLinkedListNode.h"
-#import "PGEmptyEnumerator.h"
-#import "PGNestedEnumerator.h"
 
 @interface PGStack<__covariant T>()
 

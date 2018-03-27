@@ -22,7 +22,6 @@
  */
 
 #import "PGInternal.h"
-#import "PGLinkedListNode.h"
 #import "PGLinkedListNodeEnumerator.h"
 
 #pragma clang diagnostic push

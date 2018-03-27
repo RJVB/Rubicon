@@ -22,7 +22,6 @@
  */
 
 #import "PGInternal.h"
-#import "NSObject+PGObject.h"
 #import <objc/runtime.h>
 
 @implementation NSObject(PGObject)

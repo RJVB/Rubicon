@@ -22,7 +22,6 @@
  */
 
 #import "PGInternal.h"
-#import "NSBitmapImageRep+PGBitmapImageRep.h"
 
 @implementation NSBitmapImageRep(PGBitmapImageRep)
 

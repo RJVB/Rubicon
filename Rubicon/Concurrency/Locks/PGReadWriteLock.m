@@ -23,7 +23,6 @@
 
 #import "PGInternal.h"
 #include <pthread.h>
-#import "PGReadWriteLock.h"
 #import "PGTimedReadLock.h"
 #import "PGRWLockCounts.h"
 

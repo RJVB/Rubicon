@@ -26,4 +26,27 @@
     #define NSLocalizedString(key, comment) [RubiconBundle localizedStringForKey:(key) value:@"" table:nil]
 #endif
 
+#import "sem_timedwait.h"
+#import "NSObject+PGObject.h"
+#import "NSString+PGString.h"
+#import "NSRegularExpression+PGRegularExpression.h"
+#import "NSBitmapImageRep+PGBitmapImageRep.h"
+#import "NSArray+PGArray.h"
+#import "NSData+PGData.h"
+#import "NSException+PGException.h"
+#import "NSError+PGError.h"
+#import "PGMacros.h"
+#import "PGSemaphore.h"
+#import "PGReadWriteLock.h"
+#import "PGTimeSpec.h"
+#import "PGTimedWait.h"
+#import "PGFilterOutputStream.h"
+#import "PGBase64OutputStream.h"
+#import "PGLinkedListNode.h"
+#import "PGStack.h"
+#import "PGQueue.h"
+#import "PGEmptyEnumerator.h"
+#import "PGNestedEnumerator.h"
+#import "PGMutableBinaryTreeDictionary.h"
+
 #endif //RUBICON_PGINTERNAL_H

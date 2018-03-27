@@ -22,7 +22,6 @@
  */
 
 #import "PGInternal.h"
-#import "PGTimeSpec.h"
 
 @implementation PGTimeSpec {
         TimeSpec _timeSpec;

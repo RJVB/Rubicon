@@ -22,7 +22,6 @@
  */
 
 #import "PGInternal.h"
-#import "NSArray+PGArray.h"
 
 @implementation NSArray(PGArray)
 
@@ -182,6 +181,17 @@
 
         if(found) self[index] = newObject;
         return found;
+    }
+
+    -(id)popLastObject {
+        id lo = nil;
+
+        if(self.count) {
+            lo = self.lastObject;
+            [self removeLastObject];
+        }
+
+        return lo;
     }
 
 #pragma clang diagnostic pop

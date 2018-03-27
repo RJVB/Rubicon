@@ -30,7 +30,6 @@
 
 #import "PGInternal.h"
 #include <pthread.h>
-#import "PGTimedWait.h"
 
 void ignoreSignal(int _signal);
 

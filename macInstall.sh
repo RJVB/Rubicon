@@ -24,13 +24,19 @@
 
 PDIR=$(dirname $(readlink -f "$0"))
 PROJECT=`find "${PDIR}" -name "*.xcodeproj" -exec basename -s .xcodeproj {} \;`
+DSTROOT="${HOME}"
+INSTALL_PATH="Library/Frameworks"
 
-echo "Project Directory: \"${PDIR}\""
-echo "     Project Name: \"${PROJECT}\""
+echo "      Project Directory: \"${PDIR}\""
+echo "           Project Name: \"${PROJECT}\""
+echo "                DSTROOT: \"${DSTROOT}\""
+echo "Frameworks Install Path: \"${DSTROOT}/${INSTALL_PATH}\""
 
-pushd "${PDIR}"
 rm -fr "${HOME}/Library/Frameworks/${PROJECT}.framework"
-xcodebuild -project "${PROJECT}.xcodeproj" -target "${PROJECT}" -configuration Release clean build install DSTROOT="${HOME}/" SKIP_INSTALL=No
+
+xcodebuild -project "${PROJECT}.xcodeproj" -target "${PROJECT}" -configuration Release \
+    clean build install DSTROOT="${DSTROOT}/" INSTALL_PATH="/${INSTALL_PATH}" SKIP_INSTALL=No \
+    > "${PDIR}/Build.log"
+
 res="$?"
-popd
 exit "${res}"

@@ -22,7 +22,6 @@
  */
 
 #import "PGInternal.h"
-#import "NSData+PGData.h"
 
 static const NSUInteger PGDataReadBufferSize = 8196;
 

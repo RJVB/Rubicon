@@ -15,7 +15,6 @@
  */
 
 #import "PGInternal.h"
-#import "NSError+PGError.h"
 
 NSExceptionName const PGErrorAsException = @"PGErrorAsException";
 

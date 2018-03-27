@@ -14,32 +14,26 @@
 		1117D0BACEE7BBFB719DBC09 /* sem_timedwait.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D607B5EF87616FC650DE /* sem_timedwait.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D0BCEBD1FB02042DAC4A /* PGRWLockCounts.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D391F03918AED5A6575A /* PGRWLockCounts.m */; };
 		1117D0EFEC5609199A60B88F /* NSArray+PGArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D815FD8832412F83E9E5 /* NSArray+PGArray.m */; };
-		1117D0F289F01EE2D2FD75B6 /* PGBTreeMutableDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DC668BC54F2AD1A11779 /* PGBTreeMutableDictionary.m */; };
-		1117D12BB97F489E19308BDF /* PGBTreeNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D668039D0A2FC16D6CD7 /* PGBTreeNode.m */; };
 		1117D1743DC5EF45CA9869B1 /* PGTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D08BDB7E4A79C30AC920 /* PGTools.m */; };
 		1117D1F67CB02C278E03555C /* PGQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D815E4D43B304A71F4E6 /* PGQueue.m */; };
 		1117D3724C2A43950E8FB710 /* PGTime.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D5A22062D907B9F4DBE6 /* PGTime.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D387AED31074F4073E0D /* PGInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D40DB6F3545D8817E328 /* PGInternal.h */; };
 		1117D3B6D293EFCC6B79A730 /* NSException+PGException.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D67458555B2FB7089EA7 /* NSException+PGException.m */; };
 		1117D43A0D1A8FC2E08604C8 /* GNUstep.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D613575E1934C599AC49 /* GNUstep.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1117D44078E92C7EE16A48DE /* PGMutableBinaryTreeDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D0AA07D1EBBB41EE031C /* PGMutableBinaryTreeDictionary.m */; };
 		1117D448C9396CD024971C97 /* NSData+PGData.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D2F717122C3EB529C8F9 /* NSData+PGData.m */; };
 		1117D4644A03DBBCBC84FF60 /* CommonBaseClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D0018483764220700B13 /* CommonBaseClass.m */; };
-		1117D5134D391E189F84ABF3 /* PGTestView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D4FFD90ED7502EA2A871 /* PGTestView.m */; };
-		1117D5452A4357171D4A7F61 /* PGSplitView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D8D7FA877AB382169852 /* PGSplitView.m */; };
-		1117D551D63280B2E237AB6F /* PGBTreeNodeKeyEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D117C07A1E99A738ADC9 /* PGBTreeNodeKeyEnumerator.m */; };
 		1117D568385D863CC434E5C3 /* PGTimedReadLock.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DAD7F761481916EB3AEE /* PGTimedReadLock.m */; };
-		1117D6095D42FD0C2B03B102 /* PGNodeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D3C2D6F21016997CC7A7 /* PGNodeView.m */; };
 		1117D63E9D2E4D166A347214 /* NSString+PGString.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D82A3FCEF61B52811265 /* NSString+PGString.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D671A9EE61407CCCF5BB /* PGNestedEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D98CC9D8896CA6643ADA /* PGNestedEnumerator.m */; };
 		1117D6732640D20604F75231 /* NSException+PGException.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D03BB4C108D051651F81 /* NSException+PGException.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D67B5DD2C2DF4474BA0F /* PGEmptyEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D2814A46700C7AF7A992 /* PGEmptyEnumerator.m */; };
-		1117D6881CA110CA2CC8E350 /* PGBTreeNodeKeyEnumerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D24C311094175170428F /* PGBTreeNodeKeyEnumerator.h */; };
 		1117D69CF7A8C3940966004F /* PGBase64OutputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DE3904471B3FE31696AB /* PGBase64OutputStream.m */; };
+		1117D69D5AF1A9A9A0FE03FA /* PGMutableBinaryTreeDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D10686AEC4A9ACF2FBD3 /* PGMutableBinaryTreeDictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D6ADF31D5110F601C39B /* PGLinkedListNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DBEB3654905B02DBFB7D /* PGLinkedListNode.m */; };
 		1117D6E85E4673C780D1C3FF /* Rubicon.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DB4FEBB7782769750FB9 /* Rubicon.m */; };
 		1117D72FD20B775B8F0898A7 /* PGSemaphore.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D4FAE743F64015E5637A /* PGSemaphore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D749C5FEC2DD2562CBC9 /* PGSemaphore.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D9DDB04FC50AB41C3219 /* PGSemaphore.m */; };
-		1117D7B5FA4AE594CEA52D83 /* PGBTreeNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D4B5B1D4796CDCF6EAC1 /* PGBTreeNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D80F07D735F5E5F14637 /* PGStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D4397E73BCFE583FF7AC /* PGStack.m */; };
 		1117D82C071E4B56245A3D39 /* PGBase64OutputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DC59A7B77EC63A993424 /* PGBase64OutputStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D84A15C1E9D812789C88 /* PGLinkedListNodeEnumerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D64853BD482690EF6B74 /* PGLinkedListNodeEnumerator.h */; };
@@ -74,39 +68,16 @@
 		1117DDB86452C586CB24951D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1117D5FC5AC2445232A672C5 /* Localizable.strings */; };
 		1117DDFF0E70F976E626B860 /* PGLinkedListNodeEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D7D139A66E60784824DE /* PGLinkedListNodeEnumerator.m */; };
 		1117DE54512876B454A00C72 /* PGTools.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D96AC9AAF96394E7BA36 /* PGTools.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		1117DE80028BE7400FFFED01 /* PGBTreeMutableDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D31ED466A8AE02171108 /* PGBTreeMutableDictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117DEBDC16D9C4476A99387 /* NSRegularExpression+PGRegularExpression.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D0AF6BE265A96DA07535 /* NSRegularExpression+PGRegularExpression.m */; };
 		1117DF0F963B8A7436A2692F /* NSData+PGData.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D5B762B0A787500E4A06 /* NSData+PGData.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117DFB65E9C10CB25417E42 /* PGDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D58A6A010B8353C7EAA3 /* PGDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		830C11031E2B2E5D00B143DC /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 830C11021E2B2E5D00B143DC /* main.c */; };
-		836E18DE1E3AD67500FAEE56 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 836E18DD1E3AD67500FAEE56 /* main.m */; };
-		836E18E41E3AD6A800FAEE56 /* Rubicon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83CC448C1E0B037700DDE50D /* Rubicon.framework */; };
-		83B587761E16DC17009FEE50 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B587751E16DC17009FEE50 /* AppDelegate.m */; };
-		83B587791E16DC17009FEE50 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B587781E16DC17009FEE50 /* main.m */; };
-		83B5877B1E16DC17009FEE50 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83B5877A1E16DC17009FEE50 /* Assets.xcassets */; };
-		83B5877E1E16DC17009FEE50 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 83B5877C1E16DC17009FEE50 /* MainMenu.xib */; };
-		83B587851E16DC48009FEE50 /* Rubicon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83CC448C1E0B037700DDE50D /* Rubicon.framework */; };
-		83B587881E16DE4A009FEE50 /* WindowDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 83B587871E16DE4A009FEE50 /* WindowDelegate.m */; };
+		8397791E20697979007D3746 /* libRedBlackTrees.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8397791D20697979007D3746 /* libRedBlackTrees.a */; };
 		83CC44961E0B037700DDE50D /* Rubicon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83CC448C1E0B037700DDE50D /* Rubicon.framework */; };
 		83CC449B1E0B037700DDE50D /* RubiconTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 83CC449A1E0B037700DDE50D /* RubiconTests.m */; };
 		83CC449D1E0B037700DDE50D /* Rubicon.h in Headers */ = {isa = PBXBuildFile; fileRef = 83CC448F1E0B037700DDE50D /* Rubicon.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		836E18E21E3AD67E00FAEE56 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 83CC44831E0B037600DDE50D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 83CC448B1E0B037600DDE50D;
-			remoteInfo = Rubicon;
-		};
-		83B587831E16DC28009FEE50 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 83CC44831E0B037600DDE50D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 83CC448B1E0B037600DDE50D;
-			remoteInfo = Rubicon;
-		};
 		83CC44971E0B037700DDE50D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 83CC44831E0B037600DDE50D /* Project object */;
@@ -116,56 +87,31 @@
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		830C10FE1E2B2E5D00B143DC /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-		836E18D91E3AD67400FAEE56 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		1117D0018483764220700B13 /* CommonBaseClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonBaseClass.m; sourceTree = "<group>"; };
 		1117D03BB4C108D051651F81 /* NSException+PGException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSException+PGException.h"; sourceTree = "<group>"; };
 		1117D08BDB7E4A79C30AC920 /* PGTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTools.m; sourceTree = "<group>"; };
 		1117D0903BA71BEB8EA0F955 /* NSString+PGString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+PGString.m"; sourceTree = "<group>"; };
+		1117D0AA07D1EBBB41EE031C /* PGMutableBinaryTreeDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGMutableBinaryTreeDictionary.m; sourceTree = "<group>"; };
 		1117D0AF6BE265A96DA07535 /* NSRegularExpression+PGRegularExpression.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSRegularExpression+PGRegularExpression.m"; sourceTree = "<group>"; };
 		1117D0BE395B9D1B4A80AAEA /* PGInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGInternal.m; sourceTree = "<group>"; };
-		1117D117C07A1E99A738ADC9 /* PGBTreeNodeKeyEnumerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBTreeNodeKeyEnumerator.m; sourceTree = "<group>"; };
+		1117D10686AEC4A9ACF2FBD3 /* PGMutableBinaryTreeDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGMutableBinaryTreeDictionary.h; sourceTree = "<group>"; };
 		1117D197529716B32098E317 /* NSObject+PGObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+PGObject.h"; sourceTree = "<group>"; };
 		1117D1C50288D6AC04C60456 /* CommonBaseClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonBaseClass.h; sourceTree = "<group>"; };
 		1117D1CEBF5C6EAF6C17FB77 /* NSRegularExpression+PGRegularExpression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSRegularExpression+PGRegularExpression.h"; sourceTree = "<group>"; };
-		1117D24C311094175170428F /* PGBTreeNodeKeyEnumerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBTreeNodeKeyEnumerator.h; sourceTree = "<group>"; };
 		1117D2814A46700C7AF7A992 /* PGEmptyEnumerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGEmptyEnumerator.m; sourceTree = "<group>"; };
 		1117D2F717122C3EB529C8F9 /* NSData+PGData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+PGData.m"; sourceTree = "<group>"; };
-		1117D31ED466A8AE02171108 /* PGBTreeMutableDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBTreeMutableDictionary.h; sourceTree = "<group>"; };
 		1117D35A818616F0E99E59BA /* PGMacros.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGMacros.m; sourceTree = "<group>"; };
 		1117D390242A1E73E804A1B6 /* PGNestedEnumerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGNestedEnumerator.h; sourceTree = "<group>"; };
 		1117D391F03918AED5A6575A /* PGRWLockCounts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGRWLockCounts.m; sourceTree = "<group>"; };
-		1117D3C2D6F21016997CC7A7 /* PGNodeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGNodeView.m; sourceTree = "<group>"; };
 		1117D403ABABEF7B2D24D3B7 /* PGReadWriteLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGReadWriteLock.h; sourceTree = "<group>"; };
 		1117D40DB6F3545D8817E328 /* PGInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGInternal.h; sourceTree = "<group>"; };
 		1117D42C28C03BA65BFF47BD /* NSArray+PGArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+PGArray.h"; sourceTree = "<group>"; };
 		1117D4397E73BCFE583FF7AC /* PGStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGStack.m; sourceTree = "<group>"; };
 		1117D463C022A1138BE2FD57 /* PGTimeSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTimeSpec.m; sourceTree = "<group>"; };
 		1117D4804DC238152BA17B8A /* sem_timedwait.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sem_timedwait.c; sourceTree = "<group>"; };
-		1117D4B5B1D4796CDCF6EAC1 /* PGBTreeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBTreeNode.h; sourceTree = "<group>"; };
 		1117D4F5141FA28E3D53EF7F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.info; path = Info.plist; sourceTree = "<group>"; };
 		1117D4FAE743F64015E5637A /* PGSemaphore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGSemaphore.h; sourceTree = "<group>"; };
-		1117D4FFD90ED7502EA2A871 /* PGTestView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTestView.m; sourceTree = "<group>"; };
 		1117D54FB85F0E618EB2B3A0 /* PGDefines.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDefines.m; sourceTree = "<group>"; };
 		1117D550FFEF73E278501378 /* PGTimedSemWait.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTimedSemWait.m; sourceTree = "<group>"; };
 		1117D57792306E4C2744E086 /* PGTime.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTime.m; sourceTree = "<group>"; };
@@ -178,7 +124,6 @@
 		1117D613575E1934C599AC49 /* GNUstep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GNUstep.h; sourceTree = "<group>"; };
 		1117D61AFE6CD5656E2C1E16 /* PGFilterOutputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFilterOutputStream.m; sourceTree = "<group>"; };
 		1117D64853BD482690EF6B74 /* PGLinkedListNodeEnumerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGLinkedListNodeEnumerator.h; sourceTree = "<group>"; };
-		1117D668039D0A2FC16D6CD7 /* PGBTreeNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBTreeNode.m; sourceTree = "<group>"; };
 		1117D67458555B2FB7089EA7 /* NSException+PGException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSException+PGException.m"; sourceTree = "<group>"; };
 		1117D6A994ECA7ADD8C2A7B5 /* PGReadWriteLock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGReadWriteLock.m; sourceTree = "<group>"; };
 		1117D6B32FC0E11216D8EC0B /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
@@ -191,8 +136,6 @@
 		1117D8576A8D6B3291FC3A1E /* PGTimedReadLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTimedReadLock.h; sourceTree = "<group>"; };
 		1117D85B443E90ECB14646B9 /* macInstall.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = macInstall.sh; sourceTree = "<group>"; };
 		1117D863C6B27B3A2A6436EB /* PGTimeSpec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTimeSpec.h; sourceTree = "<group>"; };
-		1117D8D7FA877AB382169852 /* PGSplitView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGSplitView.m; sourceTree = "<group>"; };
-		1117D8DAB9EA6F96191C2EC0 /* PGNodeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGNodeView.h; sourceTree = "<group>"; };
 		1117D91CB932BC51C194C049 /* PGFilterOutputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFilterOutputStream.h; sourceTree = "<group>"; };
 		1117D96AC9AAF96394E7BA36 /* PGTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTools.h; sourceTree = "<group>"; };
 		1117D98CC9D8896CA6643ADA /* PGNestedEnumerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGNestedEnumerator.m; sourceTree = "<group>"; };
@@ -203,7 +146,6 @@
 		1117DA275B678D9478E87A06 /* PGMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGMacros.h; sourceTree = "<group>"; };
 		1117DA40A7107FFA3B41DC8C /* PGStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGStack.h; sourceTree = "<group>"; };
 		1117DAD7F761481916EB3AEE /* PGTimedReadLock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTimedReadLock.m; sourceTree = "<group>"; };
-		1117DADBF8762107CBC48012 /* PGTestView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTestView.h; sourceTree = "<group>"; };
 		1117DB2858BE8AE820FE2E19 /* PGEmptyEnumerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGEmptyEnumerator.h; sourceTree = "<group>"; };
 		1117DB46991A725AC415BF87 /* NSBitmapImageRep+PGBitmapImageRep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBitmapImageRep+PGBitmapImageRep.h"; sourceTree = "<group>"; };
 		1117DB4FEBB7782769750FB9 /* Rubicon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Rubicon.m; sourceTree = "<group>"; };
@@ -213,27 +155,13 @@
 		1117DC0934B0E763DA6F459C /* PGTimedWait.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTimedWait.h; sourceTree = "<group>"; };
 		1117DC59A7B77EC63A993424 /* PGBase64OutputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBase64OutputStream.h; sourceTree = "<group>"; };
 		1117DC59B8CAD45138536EEC /* PGQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGQueue.h; sourceTree = "<group>"; };
-		1117DC668BC54F2AD1A11779 /* PGBTreeMutableDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBTreeMutableDictionary.m; sourceTree = "<group>"; };
 		1117DCCC597057A2315B1AC8 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		1117DD0B79903344E5C7ABB4 /* PGSplitView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGSplitView.h; sourceTree = "<group>"; };
 		1117DE3904471B3FE31696AB /* PGBase64OutputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBase64OutputStream.m; sourceTree = "<group>"; };
 		1117DE55C2614EA73873CDE6 /* NSBitmapImageRep+PGBitmapImageRep.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSBitmapImageRep+PGBitmapImageRep.m"; sourceTree = "<group>"; };
 		1117DE79E4A8E257C25DE703 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		1117DF142B39004BD5A5EB74 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		1117DF8222D67F4383089DCF /* NSObject+PGObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+PGObject.m"; sourceTree = "<group>"; };
-		830C11001E2B2E5D00B143DC /* TypeSizes */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TypeSizes; sourceTree = BUILT_PRODUCTS_DIR; };
-		830C11021E2B2E5D00B143DC /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		836E18DB1E3AD67400FAEE56 /* RubiconTimedWaitTester */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RubiconTimedWaitTester; sourceTree = BUILT_PRODUCTS_DIR; };
-		836E18DD1E3AD67500FAEE56 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		83B587721E16DC17009FEE50 /* RubiconUITests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RubiconUITests.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		83B587741E16DC17009FEE50 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		83B587751E16DC17009FEE50 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		83B587781E16DC17009FEE50 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		83B5877A1E16DC17009FEE50 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		83B5877D1E16DC17009FEE50 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		83B5877F1E16DC17009FEE50 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		83B587861E16DE4A009FEE50 /* WindowDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowDelegate.h; sourceTree = "<group>"; };
-		83B587871E16DE4A009FEE50 /* WindowDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WindowDelegate.m; sourceTree = "<group>"; };
+		8397791D20697979007D3746 /* libRedBlackTrees.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libRedBlackTrees.a; path = ../RedBlackTrees/Release/lib/static/libRedBlackTrees.a; sourceTree = "<group>"; };
 		83CC448C1E0B037700DDE50D /* Rubicon.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Rubicon.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		83CC448F1E0B037700DDE50D /* Rubicon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Rubicon.h; sourceTree = "<group>"; };
 		83CC44951E0B037700DDE50D /* RubiconTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RubiconTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -241,33 +169,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		830C10FD1E2B2E5D00B143DC /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		836E18D81E3AD67400FAEE56 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				836E18E41E3AD6A800FAEE56 /* Rubicon.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		83B5876F1E16DC16009FEE50 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				83B587851E16DC48009FEE50 /* Rubicon.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		83CC44881E0B037600DDE50D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8397791E20697979007D3746 /* libRedBlackTrees.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -309,8 +215,6 @@
 			isa = PBXGroup;
 			children = (
 				1117D55B9DBE32757B1D82A8 /* Private */,
-				1117D668039D0A2FC16D6CD7 /* PGBTreeNode.m */,
-				1117D4B5B1D4796CDCF6EAC1 /* PGBTreeNode.h */,
 				1117DBEB3654905B02DBFB7D /* PGLinkedListNode.m */,
 				1117D5CB94B0DCEFCB4DAFB5 /* PGLinkedListNode.h */,
 				1117D4397E73BCFE583FF7AC /* PGStack.m */,
@@ -321,8 +225,8 @@
 				1117D390242A1E73E804A1B6 /* PGNestedEnumerator.h */,
 				1117DB2858BE8AE820FE2E19 /* PGEmptyEnumerator.h */,
 				1117D98CC9D8896CA6643ADA /* PGNestedEnumerator.m */,
-				1117DC668BC54F2AD1A11779 /* PGBTreeMutableDictionary.m */,
-				1117D31ED466A8AE02171108 /* PGBTreeMutableDictionary.h */,
+				1117D0AA07D1EBBB41EE031C /* PGMutableBinaryTreeDictionary.m */,
+				1117D10686AEC4A9ACF2FBD3 /* PGMutableBinaryTreeDictionary.h */,
 			);
 			path = Collections;
 			sourceTree = "<group>";
@@ -366,8 +270,6 @@
 			children = (
 				1117D7D139A66E60784824DE /* PGLinkedListNodeEnumerator.m */,
 				1117D64853BD482690EF6B74 /* PGLinkedListNodeEnumerator.h */,
-				1117D117C07A1E99A738ADC9 /* PGBTreeNodeKeyEnumerator.m */,
-				1117D24C311094175170428F /* PGBTreeNodeKeyEnumerator.h */,
 			);
 			path = Private;
 			sourceTree = "<group>";
@@ -466,49 +368,12 @@
 			path = Macros;
 			sourceTree = "<group>";
 		};
-		830C11011E2B2E5D00B143DC /* TypeSizes */ = {
+		839778FF20694997007D3746 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				830C11021E2B2E5D00B143DC /* main.c */,
+				8397791D20697979007D3746 /* libRedBlackTrees.a */,
 			);
-			path = TypeSizes;
-			sourceTree = "<group>";
-		};
-		836E18DC1E3AD67500FAEE56 /* RubiconTimedWaitTester */ = {
-			isa = PBXGroup;
-			children = (
-				836E18DD1E3AD67500FAEE56 /* main.m */,
-			);
-			path = RubiconTimedWaitTester;
-			sourceTree = "<group>";
-		};
-		83B587731E16DC17009FEE50 /* RubiconUITests */ = {
-			isa = PBXGroup;
-			children = (
-				83B587741E16DC17009FEE50 /* AppDelegate.h */,
-				83B587751E16DC17009FEE50 /* AppDelegate.m */,
-				83B587861E16DE4A009FEE50 /* WindowDelegate.h */,
-				83B587871E16DE4A009FEE50 /* WindowDelegate.m */,
-				1117DADBF8762107CBC48012 /* PGTestView.h */,
-				1117D4FFD90ED7502EA2A871 /* PGTestView.m */,
-				83B5877A1E16DC17009FEE50 /* Assets.xcassets */,
-				83B5877C1E16DC17009FEE50 /* MainMenu.xib */,
-				83B5877F1E16DC17009FEE50 /* Info.plist */,
-				83B587771E16DC17009FEE50 /* Supporting Files */,
-				1117D8D7FA877AB382169852 /* PGSplitView.m */,
-				1117DD0B79903344E5C7ABB4 /* PGSplitView.h */,
-				1117D3C2D6F21016997CC7A7 /* PGNodeView.m */,
-				1117D8DAB9EA6F96191C2EC0 /* PGNodeView.h */,
-			);
-			path = RubiconUITests;
-			sourceTree = "<group>";
-		};
-		83B587771E16DC17009FEE50 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				83B587781E16DC17009FEE50 /* main.m */,
-			);
-			name = "Supporting Files";
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		83CC44821E0B037600DDE50D = {
@@ -516,11 +381,9 @@
 			children = (
 				83CC448E1E0B037700DDE50D /* Rubicon */,
 				83CC44991E0B037700DDE50D /* RubiconTests */,
-				83B587731E16DC17009FEE50 /* RubiconUITests */,
-				830C11011E2B2E5D00B143DC /* TypeSizes */,
-				836E18DC1E3AD67500FAEE56 /* RubiconTimedWaitTester */,
 				83CC448D1E0B037700DDE50D /* Products */,
 				1117DCDB154DA26365CAEF76 /* SupportingFiles */,
+				839778FF20694997007D3746 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -529,9 +392,6 @@
 			children = (
 				83CC448C1E0B037700DDE50D /* Rubicon.framework */,
 				83CC44951E0B037700DDE50D /* RubiconTests.xctest */,
-				83B587721E16DC17009FEE50 /* RubiconUITests.app */,
-				830C11001E2B2E5D00B143DC /* TypeSizes */,
-				836E18DB1E3AD67400FAEE56 /* RubiconTimedWaitTester */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -595,15 +455,13 @@
 				1117D0BACEE7BBFB719DBC09 /* sem_timedwait.h in Headers */,
 				1117D6732640D20604F75231 /* NSException+PGException.h in Headers */,
 				1117D05733B3E04B9910044A /* NSError+PGError.h in Headers */,
-				1117D7B5FA4AE594CEA52D83 /* PGBTreeNode.h in Headers */,
 				1117DD4081DB0393F9318DF2 /* PGRWLockCounts.h in Headers */,
 				1117DBB362320F47607B2FBF /* PGTimedWait.h in Headers */,
+				1117D69D5AF1A9A9A0FE03FA /* PGMutableBinaryTreeDictionary.h in Headers */,
 				1117DA8772DE599BAF065F40 /* PGFilterOutputStream.h in Headers */,
-				1117DE80028BE7400FFFED01 /* PGBTreeMutableDictionary.h in Headers */,
 				1117DA4BA1B8AAB1B951B8E4 /* PGNestedEnumerator.h in Headers */,
 				1117DB55116BA45C02D357F8 /* PGEmptyEnumerator.h in Headers */,
 				1117D84A15C1E9D812789C88 /* PGLinkedListNodeEnumerator.h in Headers */,
-				1117D6881CA110CA2CC8E350 /* PGBTreeNodeKeyEnumerator.h in Headers */,
 				1117D387AED31074F4073E0D /* PGInternal.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -611,59 +469,6 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		830C10FF1E2B2E5D00B143DC /* TypeSizes */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 830C11041E2B2E5D00B143DC /* Build configuration list for PBXNativeTarget "TypeSizes" */;
-			buildPhases = (
-				830C10FC1E2B2E5D00B143DC /* Sources */,
-				830C10FD1E2B2E5D00B143DC /* Frameworks */,
-				830C10FE1E2B2E5D00B143DC /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = TypeSizes;
-			productName = TypeSizes;
-			productReference = 830C11001E2B2E5D00B143DC /* TypeSizes */;
-			productType = "com.apple.product-type.tool";
-		};
-		836E18DA1E3AD67400FAEE56 /* RubiconTimedWaitTester */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 836E18E11E3AD67500FAEE56 /* Build configuration list for PBXNativeTarget "RubiconTimedWaitTester" */;
-			buildPhases = (
-				836E18D71E3AD67400FAEE56 /* Sources */,
-				836E18D81E3AD67400FAEE56 /* Frameworks */,
-				836E18D91E3AD67400FAEE56 /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				836E18E31E3AD67E00FAEE56 /* PBXTargetDependency */,
-			);
-			name = RubiconTimedWaitTester;
-			productName = RubiconTimedWaitTester;
-			productReference = 836E18DB1E3AD67400FAEE56 /* RubiconTimedWaitTester */;
-			productType = "com.apple.product-type.tool";
-		};
-		83B587711E16DC16009FEE50 /* RubiconUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 83B587801E16DC17009FEE50 /* Build configuration list for PBXNativeTarget "RubiconUITests" */;
-			buildPhases = (
-				83B5876E1E16DC16009FEE50 /* Sources */,
-				83B5876F1E16DC16009FEE50 /* Frameworks */,
-				83B587701E16DC16009FEE50 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				83B587841E16DC28009FEE50 /* PBXTargetDependency */,
-			);
-			name = RubiconUITests;
-			productName = RubiconUITests;
-			productReference = 83B587721E16DC17009FEE50 /* RubiconUITests.app */;
-			productType = "com.apple.product-type.application";
-		};
 		83CC448B1E0B037600DDE50D /* Rubicon */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 83CC44A01E0B037700DDE50D /* Build configuration list for PBXNativeTarget "Rubicon" */;
@@ -709,21 +514,6 @@
 				LastUpgradeCheck = 0920;
 				ORGANIZATIONNAME = "Project Galen";
 				TargetAttributes = {
-					830C10FF1E2B2E5D00B143DC = {
-						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = Q5XWZ7S7E9;
-						ProvisioningStyle = Automatic;
-					};
-					836E18DA1E3AD67400FAEE56 = {
-						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = Q5XWZ7S7E9;
-						ProvisioningStyle = Automatic;
-					};
-					83B587711E16DC16009FEE50 = {
-						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = Q5XWZ7S7E9;
-						ProvisioningStyle = Automatic;
-					};
 					83CC448B1E0B037600DDE50D = {
 						CreatedOnToolsVersion = 8.2;
 						DevelopmentTeam = Q5XWZ7S7E9;
@@ -751,23 +541,11 @@
 			targets = (
 				83CC448B1E0B037600DDE50D /* Rubicon */,
 				83CC44941E0B037700DDE50D /* RubiconTests */,
-				83B587711E16DC16009FEE50 /* RubiconUITests */,
-				830C10FF1E2B2E5D00B143DC /* TypeSizes */,
-				836E18DA1E3AD67400FAEE56 /* RubiconTimedWaitTester */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		83B587701E16DC16009FEE50 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				83B5877B1E16DC17009FEE50 /* Assets.xcassets in Resources */,
-				83B5877E1E16DC17009FEE50 /* MainMenu.xib in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		83CC448A1E0B037600DDE50D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -786,35 +564,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		830C10FC1E2B2E5D00B143DC /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				830C11031E2B2E5D00B143DC /* main.c in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		836E18D71E3AD67400FAEE56 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				836E18DE1E3AD67500FAEE56 /* main.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		83B5876E1E16DC16009FEE50 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				83B587881E16DE4A009FEE50 /* WindowDelegate.m in Sources */,
-				83B587791E16DC17009FEE50 /* main.m in Sources */,
-				83B587761E16DC17009FEE50 /* AppDelegate.m in Sources */,
-				1117D5134D391E189F84ABF3 /* PGTestView.m in Sources */,
-				1117D5452A4357171D4A7F61 /* PGSplitView.m in Sources */,
-				1117D6095D42FD0C2B03B102 /* PGNodeView.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		83CC44871E0B037600DDE50D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -839,19 +588,17 @@
 				1117D0EFEC5609199A60B88F /* NSArray+PGArray.m in Sources */,
 				1117D448C9396CD024971C97 /* NSData+PGData.m in Sources */,
 				1117DB99B47C4A8C4D14647A /* NSBitmapImageRep+PGBitmapImageRep.m in Sources */,
-				1117D12BB97F489E19308BDF /* PGBTreeNode.m in Sources */,
 				1117D6ADF31D5110F601C39B /* PGLinkedListNode.m in Sources */,
 				1117D80F07D735F5E5F14637 /* PGStack.m in Sources */,
 				1117D1F67CB02C278E03555C /* PGQueue.m in Sources */,
 				1117D67B5DD2C2DF4474BA0F /* PGEmptyEnumerator.m in Sources */,
 				1117D671A9EE61407CCCF5BB /* PGNestedEnumerator.m in Sources */,
 				1117DDFF0E70F976E626B860 /* PGLinkedListNodeEnumerator.m in Sources */,
-				1117D0F289F01EE2D2FD75B6 /* PGBTreeMutableDictionary.m in Sources */,
-				1117D551D63280B2E237AB6F /* PGBTreeNodeKeyEnumerator.m in Sources */,
 				1117D3B6D293EFCC6B79A730 /* NSException+PGException.m in Sources */,
 				1117DD5B5C124EE0016D1D57 /* PGFilterOutputStream.m in Sources */,
 				1117DD796BB480D119952B42 /* NSError+PGError.m in Sources */,
 				1117DB5B50D595913FF98DF6 /* PGInternal.m in Sources */,
+				1117D44078E92C7EE16A48DE /* PGMutableBinaryTreeDictionary.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -867,16 +614,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		836E18E31E3AD67E00FAEE56 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 83CC448B1E0B037600DDE50D /* Rubicon */;
-			targetProxy = 836E18E21E3AD67E00FAEE56 /* PBXContainerItemProxy */;
-		};
-		83B587841E16DC28009FEE50 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 83CC448B1E0B037600DDE50D /* Rubicon */;
-			targetProxy = 83B587831E16DC28009FEE50 /* PBXContainerItemProxy */;
-		};
 		83CC44981E0B037700DDE50D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 83CC448B1E0B037600DDE50D /* Rubicon */;
@@ -884,76 +621,7 @@
 		};
 /* End PBXTargetDependency section */
 
-/* Begin PBXVariantGroup section */
-		83B5877C1E16DC17009FEE50 /* MainMenu.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				83B5877D1E16DC17009FEE50 /* Base */,
-			);
-			name = MainMenu.xib;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
 /* Begin XCBuildConfiguration section */
-		830C11051E2B2E5D00B143DC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DEVELOPMENT_TEAM = Q5XWZ7S7E9;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		830C11061E2B2E5D00B143DC /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DEVELOPMENT_TEAM = Q5XWZ7S7E9;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
-		836E18DF1E3AD67500FAEE56 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DEVELOPMENT_TEAM = Q5XWZ7S7E9;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		836E18E01E3AD67500FAEE56 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DEVELOPMENT_TEAM = Q5XWZ7S7E9;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
-		83B587811E16DC17009FEE50 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = Q5XWZ7S7E9;
-				INFOPLIST_FILE = RubiconUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.projectgalen.RubiconUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		83B587821E16DC17009FEE50 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = Q5XWZ7S7E9;
-				INFOPLIST_FILE = RubiconUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.projectgalen.RubiconUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 		83CC449E1E0B037700DDE50D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1007,6 +675,7 @@
 				SDKROOT = macosx;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
+				WARNING_CFLAGS = "-Qunused-arguments";
 			};
 			name = Debug;
 		};
@@ -1057,6 +726,7 @@
 				SDKROOT = macosx;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
+				WARNING_CFLAGS = "-Qunused-arguments";
 			};
 			name = Release;
 		};
@@ -1072,9 +742,11 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = "$(HOME)/Projects/2017/RedBlackTrees/Release/include";
 				INFOPLIST_FILE = Rubicon/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(HOME)/Projects/2017/RedBlackTrees/Release/lib/static";
 				PRODUCT_BUNDLE_IDENTIFIER = com.projectgalen.Rubicon;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1093,9 +765,11 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
 				GCC_OPTIMIZATION_LEVEL = fast;
+				HEADER_SEARCH_PATHS = "$(HOME)/Projects/2017/RedBlackTrees/Release/include";
 				INFOPLIST_FILE = Rubicon/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(HOME)/Projects/2017/RedBlackTrees/Release/lib/static";
 				PRODUCT_BUNDLE_IDENTIFIER = com.projectgalen.Rubicon;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1129,33 +803,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		830C11041E2B2E5D00B143DC /* Build configuration list for PBXNativeTarget "TypeSizes" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				830C11051E2B2E5D00B143DC /* Debug */,
-				830C11061E2B2E5D00B143DC /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		836E18E11E3AD67500FAEE56 /* Build configuration list for PBXNativeTarget "RubiconTimedWaitTester" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				836E18DF1E3AD67500FAEE56 /* Debug */,
-				836E18E01E3AD67500FAEE56 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		83B587801E16DC17009FEE50 /* Build configuration list for PBXNativeTarget "RubiconUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				83B587811E16DC17009FEE50 /* Debug */,
-				83B587821E16DC17009FEE50 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		83CC44861E0B037600DDE50D /* Build configuration list for PBXProject "Rubicon" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

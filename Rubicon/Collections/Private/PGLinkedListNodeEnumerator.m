@@ -23,7 +23,6 @@
 
 #import "PGInternal.h"
 #import "PGLinkedListNodeEnumerator.h"
-#import "PGLinkedListNode.h"
 
 @implementation PGLinkedListNodeEnumerator {
         PGLinkedListNode *_startingNode;

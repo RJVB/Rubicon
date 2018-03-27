@@ -22,10 +22,6 @@
  */
 
 #import "PGInternal.h"
-#import "PGQueue.h"
-#import "PGLinkedListNode.h"
-#import "PGEmptyEnumerator.h"
-#import "PGNestedEnumerator.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Woverriding-method-mismatch"

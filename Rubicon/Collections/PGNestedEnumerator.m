@@ -22,7 +22,6 @@
  */
 
 #import "PGInternal.h"
-#import "PGNestedEnumerator.h"
 
 @implementation PGNestedEnumerator {
         id           _owner;

@@ -22,7 +22,6 @@
  */
 
 #import "PGInternal.h"
-#import "NSRegularExpression+PGRegularExpression.h"
 
 @implementation NSRegularExpression(PGRegularExpression)
 

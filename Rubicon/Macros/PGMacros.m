@@ -22,7 +22,6 @@
  */
 
 #import "PGInternal.h"
-#import "PGMacros.h"
 
 @implementation PGMacros {
     }

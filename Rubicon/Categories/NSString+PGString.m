@@ -22,7 +22,6 @@
  */
 
 #import "PGInternal.h"
-#import "NSString+PGString.h"
 
 #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 101200)
     #define PGTextAlignmentCenter NSCenterTextAlignment

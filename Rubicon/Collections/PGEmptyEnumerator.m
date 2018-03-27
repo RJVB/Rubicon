@@ -22,7 +22,6 @@
  */
 
 #import "PGInternal.h"
-#import "PGEmptyEnumerator.h"
 
 @implementation PGEmptyEnumerator {
     }

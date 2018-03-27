@@ -32,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(BOOL)replaceObjectIdenticalTo:(T)oldObject withObject:(T)newObject;
 
+    -(T)popLastObject;
+
 @end
 
 @interface NSArray<__covariant T>(PGArray)

@@ -22,7 +22,6 @@
  */
 
 #import "PGInternal.h"
-#import "NSException+PGException.h"
 
 @implementation NSException(PGException)
 
