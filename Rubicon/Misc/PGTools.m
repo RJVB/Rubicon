@@ -99,3 +99,23 @@ NSComparisonResult _PGCompare(id obj1, id obj2) {
 NSComparisonResult PGCompare(id obj1, id obj2) {
     return ((obj1 == obj2) ? NSOrderedSame : ((obj1 && obj2) ? _PGCompare(obj1, obj2) : (obj2 ? NSOrderedAscending : NSOrderedDescending)));
 }
+
+NSURL *PGTemporaryDirectory(NSError **error) {
+    return [[NSFileManager defaultManager]
+                           URLForDirectory:NSItemReplacementDirectory
+                                  inDomain:NSUserDomainMask
+                         appropriateForURL:[NSURL fileURLWithPath:NSHomeDirectory() isDirectory:YES]
+                                    create:YES
+                                     error:error];
+}
+
+NSURL *PGTemporaryFile(NSString *filenamePostfix, NSError **error) {
+    NSURL *tempDir = PGTemporaryDirectory(error);
+
+    if(tempDir) {
+        if(filenamePostfix.length == 0) filenamePostfix = @"temp.tmp";
+        return [tempDir URLByAppendingPathComponent:PGFormat(@"%@_%@", [[NSProcessInfo processInfo] globallyUniqueString], filenamePostfix)];
+    }
+
+    return nil;
+}

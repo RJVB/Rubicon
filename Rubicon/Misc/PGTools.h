@@ -136,4 +136,21 @@ FOUNDATION_EXPORT NSString *_Nonnull PGStrError(int osErrNo);
  */
 FOUNDATION_EXPORT NSString *_Nonnull PGFormat(NSString *_Nonnull fmt, ...) NS_FORMAT_FUNCTION(1, 2);
 
+/**
+ * Convenience function for getting the user's temporary file directory.
+ *
+ * @param error a pointer to an error object field that will receive an error object if an error occurs.
+ * @return a URL to the temporary directory or NULL if an error occurs.
+ */
+FOUNDATION_EXPORT NSURL *_Nullable PGTemporaryDirectory(NSError *_Nullable *_Nullable error);
+
+/**
+ * Convenience function for getting a URL to a temporary file.
+ *
+ * @param filenamePostfix the string to append to the unique filename of the temporary file.
+ * @param error a pointer to an error object field that will receive an error object if an error occurs.
+ * @return a URL to a temporary file or NULL if an error occurs.
+ */
+FOUNDATION_EXPORT NSURL *_Nullable PGTemporaryFile(NSString *_Nonnull filenamePostfix, NSError *_Nullable *_Nullable error);
+
 #endif //__Rubicon_PGTools_H_
