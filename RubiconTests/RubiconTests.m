@@ -49,6 +49,22 @@ NS_INLINE void Output(NSString *string) {
         [super tearDown];
     }
 
+    -(void)test93TemporaryDirectories {
+        NSError *error = nil;
+        NSLog(@"Temporary Directory: \"%@\"", PGTemporaryDirectory(&error).absoluteString);
+        if(error) {
+            XCTFail(@"Error: %@", error.description);
+        }
+    }
+
+    -(void)test93TemporaryFiles {
+        NSError *error = nil;
+        NSLog(@"Temporary File: \"%@\"", PGTemporaryFile(@"Test.txt", &error).absoluteString);
+        if(error) {
+            XCTFail(@"Error: %@", error.description);
+        }
+    }
+
     -(void)test94StringByCenteringInPaddingOfLength {
         NSArray<NSString *> *strings = @[ @"Galen", @"Galen Rhodes", @"GalenGlenn", @"" ];
         NSArray<NSString *> *results = @[ @"=+Galen+=+", @"alen Rhode", @"GalenGlenn", @"=+-+=+-+=+" ];
