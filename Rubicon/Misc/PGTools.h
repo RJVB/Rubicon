@@ -22,6 +22,8 @@
 
 #import <Rubicon/PGTime.h>
 
+@class NSStream;
+
 /*
  * Definitions for standard 32-bit RGBA color model.
  */

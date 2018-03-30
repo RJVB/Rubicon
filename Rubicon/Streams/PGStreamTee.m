@@ -26,14 +26,6 @@ NS_INLINE BOOL badStatus(NSStreamStatus status) {
     }
 }
 
-NS_INLINE BOOL canClose(NSStreamStatus status) {
-    switch(status) {
-        case NSStreamStatusNotOpen:
-        case NSStreamStatusClosed: return NO;
-        default: return YES;
-    }
-}
-
 @interface PGStreamTee()
 
     @property(readonly) BOOL closeOutputWhenClosed;
@@ -62,7 +54,7 @@ NS_INLINE BOOL canClose(NSStreamStatus status) {
 
     -(void)close {
         [super close];
-        if(self.closeOutputWhenClosed && canClose(self.outputStream.streamStatus)) [self.outputStream close];
+        if(self.closeOutputWhenClosed && self.outputStream.shouldClose) [self.outputStream close];
     }
 
     -(NSInteger)read:(uint8_t *)buffer maxLength:(NSUInteger)len {

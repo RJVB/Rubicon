@@ -92,3 +92,16 @@
     }
 
 @end
+
+@implementation NSStream(PGStream)
+
+    -(BOOL)shouldClose {
+        switch(self.streamStatus) {
+            // case NSStreamStatusError: // Might still be good to close even if the connection was severed just to free up any resources.
+            case NSStreamStatusNotOpen:
+            case NSStreamStatusClosed: return NO;
+            default: return YES;
+        }
+    }
+
+@end

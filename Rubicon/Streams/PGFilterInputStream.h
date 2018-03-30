@@ -35,6 +35,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface NSStream(PGStream)
+
+    -(BOOL)shouldClose;
+
+@end
+
 NS_ASSUME_NONNULL_END
 
 #endif //RUBICON_PGFILTERINPUTSTREAM_H
