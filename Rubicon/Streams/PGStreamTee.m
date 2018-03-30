@@ -57,6 +57,10 @@ NS_INLINE BOOL badStatus(NSStreamStatus status) {
         if(self.closeOutputWhenClosed && self.outputStream.shouldClose) [self.outputStream close];
     }
 
+    -(void)dealloc {
+        [self close];
+    }
+
     -(NSInteger)read:(uint8_t *)buffer maxLength:(NSUInteger)len {
         NSInteger cc = [super read:buffer maxLength:len];
         if((len > 0) && (cc > 0)) [self writeBytes:buffer length:len];
