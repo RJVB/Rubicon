@@ -44,6 +44,8 @@
 #import <Rubicon/PGEmptyEnumerator.h>
 #import <Rubicon/PGNestedEnumerator.h>
 #import <Rubicon/PGMutableBinaryTreeDictionary.h>
+#import <Rubicon/PGFilterInputStream.h>
+#import <Rubicon/PGStreamTee.h>
 
 FOUNDATION_EXPORT double              RubiconVersionNumber;
 FOUNDATION_EXPORT const unsigned char RubiconVersionString[];
