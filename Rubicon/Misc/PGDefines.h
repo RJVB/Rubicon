@@ -29,6 +29,8 @@
 
 typedef long long NSLong;
 typedef uint8_t   NSByte;
+typedef NSByte    *NSBytePtr;
+typedef void      *NSVoidPtr;
 
 #if defined(CGFLOAT_IS_DOUBLE) && CGFLOAT_IS_DOUBLE
 typedef CGFloat NSFloat;  // For the Sheldon Cooper in me.

@@ -54,5 +54,6 @@ NS_INLINE NSString *_Nullable PGLocalizedString(NSString *_Nonnull key) {
 #import "PGStreamTee.h"
 #import "PGTimeSpec.h"
 #import "PGTimedWait.h"
+#import "PGDynamicBuffers.h"
 
 #endif //RUBICON_PGINTERNAL_H
