@@ -38,6 +38,8 @@ typedef BOOL (^PGDynamicBufferOpBlock)(NSBytePtr buffer, NSUInteger size, NSUInt
 
     -(instancetype)initWithInitialSize:(NSUInteger)initialSize NS_DESIGNATED_INITIALIZER;
 
+    -(instancetype)initWithBytesNoCopy:(NSBytePtr)bytes count:(NSUInteger)cnt length:(NSUInteger)len freeWhenDone:(BOOL)freeWhenDone NS_DESIGNATED_INITIALIZER;
+
     -(id)copyWithZone:(nullable NSZone *)zone;
 
     -(NSInteger)peekHead;

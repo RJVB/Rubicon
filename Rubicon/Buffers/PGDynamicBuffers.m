@@ -20,6 +20,7 @@
 NS_INLINE NSVoidPtr PGRealloc(NSVoidPtr _ptr, size_t _cnt, size_t _sz) {
     size_t    nsz  = (_cnt * _sz);
     NSVoidPtr nptr = (_ptr ? realloc(_ptr, nsz) : malloc(nsz));
+
     if(nptr) return nptr;
     else @throw [NSException exceptionWithName:NSMallocException reason:@"Out of memory"];
 }
@@ -38,7 +39,10 @@ NS_INLINE NSUInteger prevIdx(NSUInteger idx, NSUInteger sz) {
     @property(nonatomic) /*     */ NSUInteger tail;
     @property(nonatomic) /*     */ NSUInteger size;
     @property(nonatomic) /*     */ NSBytePtr  buffer;
+    @property(nonatomic, readonly) BOOL       freeWhenDone;
     @property(nonatomic, readonly) NSUInteger realSize;
+
+    -(NSBytePtr)copyBuffer:(BOOL)trim count:(NSUInteger *)cnt size:(NSUInteger *)size;
 
     -(NSUInteger)growBuffer;
 
@@ -51,6 +55,7 @@ NS_INLINE NSUInteger prevIdx(NSUInteger idx, NSUInteger sz) {
     @synthesize tail = _tail;
     @synthesize size = _size;
     @synthesize buffer = _buffer;
+    @synthesize freeWhenDone = _freeWhenDone;
 
     -(instancetype)init {
         return (self = [self initWithInitialSize:0]);
@@ -61,10 +66,25 @@ NS_INLINE NSUInteger prevIdx(NSUInteger idx, NSUInteger sz) {
 
         if(self) {
             NSUInteger is = (initialSize ?: (64 * 1024));
-            _size   = (is - 1);
-            _head   = 0;
-            _tail   = 0;
-            _buffer = PGRealloc(NULL, is, sizeof(NSByte));
+            _size         = (is - 1);
+            _head         = 0;
+            _tail         = 0;
+            _buffer       = PGRealloc(NULL, is, sizeof(NSByte));
+            _freeWhenDone = YES;
+        }
+
+        return self;
+    }
+
+    -(instancetype)initWithBytesNoCopy:(NSBytePtr)bytes count:(NSUInteger)cnt length:(NSUInteger)len freeWhenDone:(BOOL)freeWhenDone {
+        self = [super init];
+
+        if(self) {
+            _size         = (len - 1);
+            _head         = 0;
+            _tail         = cnt;
+            _buffer       = bytes;
+            _freeWhenDone = freeWhenDone;
         }
 
         return self;
@@ -93,39 +113,45 @@ NS_INLINE NSUInteger prevIdx(NSUInteger idx, NSUInteger sz) {
     }
 
     -(void)dealloc {
-        if(_buffer) {
-            free(_buffer);
-            _buffer = NULL;
+        if(self.freeWhenDone && self.buffer) {
+            free(self.buffer);
+            self.buffer = NULL;
         }
-        _head = _tail = _size = 0;
+        self.head = self.tail = self.size = 0;
+    }
+
+    -(NSBytePtr)copyBuffer:(BOOL)trim count:(NSUInteger *)cnt size:(NSUInteger *)size {
+        NSBytePtr  buf   = NULL;
+        NSUInteger count = self.count;
+        NSUInteger rsize = self.realSize;
+
+        if(count || !trim) {
+            buf = PGRealloc(NULL, (trim ? count : rsize), sizeof(NSByte));
+
+            if(count) {
+                NSBytePtr  obuf   = self.buffer;
+                NSUInteger head   = self.head;
+                NSUInteger tail   = self.tail;
+                BOOL       normal = (head <= tail);
+                NSUInteger top    = ((normal ? tail : rsize) - head);
+
+                memcpy(buf, (obuf + head), top);
+                if(tail && !normal) memcpy((buf + top), obuf, tail);
+            }
+        }
+
+        if(size) *size = rsize;
+        if(cnt) *cnt   = count;
+        return buf;
     }
 
     -(id)copyWithZone:(nullable NSZone *)zone {
-        PGDynamicByteQueue *copy = [((PGDynamicByteQueue *)[[self class] allocWithZone:zone]) init];
+        NSUInteger         count = 0;
+        NSUInteger         size  = 0;
+        NSBytePtr          buf   = [self copyBuffer:NO count:&count size:&size];
+        PGDynamicByteQueue *copy = [((PGDynamicByteQueue *)[[self class] allocWithZone:zone]) initWithBytesNoCopy:buf count:count length:size freeWhenDone:YES];
 
-        if(copy) {
-            NSUInteger rsz = self.realSize;
-            NSBytePtr  cb  = PGRealloc(NULL, rsz, sizeof(NSByte));
-            NSBytePtr  b   = self.buffer;
-            NSUInteger h   = self.head;
-            NSUInteger t   = self.tail;
-            NSUInteger ct  = (((h <= t) ? t : rsz) - h);
-
-            if(ct) {
-                memcpy(cb, (b + h), ct);
-
-                if((t < h) && (t > 0)) {
-                    memcpy(cb + ct, b, t);
-                    ct += t;
-                }
-            }
-
-            copy.buffer = cb;
-            copy.head   = 0;
-            copy.tail   = ct;
-            copy.size   = self.size;
-        }
-
+        if(!copy) free(buf);
         return copy;
     }
 
@@ -280,27 +306,9 @@ NS_INLINE NSUInteger prevIdx(NSUInteger idx, NSUInteger sz) {
     }
 
     -(NSData *)data {
-        NSUInteger count = self.count;
-
-        if(count) {
-            NSBytePtr  buf  = PGRealloc(NULL, count, sizeof(NSByte));
-            NSBytePtr  obuf = self.buffer;
-            NSUInteger head = self.head;
-            NSUInteger tail = self.tail;
-            NSUInteger top  = (((head <= tail) ? tail : self.realSize) - head);
-
-            memcpy(buf, (obuf + head), top);
-
-            if((head > tail) && (tail > 0)) {
-                memcpy((buf + top), obuf, tail);
-                top += tail;
-            }
-
-            return [[NSData alloc] initWithBytesNoCopy:buf length:top freeWhenDone:YES];
-        }
-        else {
-            return [NSData new];
-        }
+        NSUInteger length = 0;
+        NSBytePtr  cpybuf = [self copyBuffer:YES count:&length size:NULL];
+        return (length ? [[NSData alloc] initWithBytesNoCopy:cpybuf length:length freeWhenDone:YES] : [NSData new]);
     }
 
 @end
