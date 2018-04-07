@@ -40,5 +40,5 @@ xcodebuild -project "${PROJECT}.xcodeproj" -target "${PROJECT}" -configuration R
     > "${PDIR}/Build.log"
 
 res="$?"
-ls -alhG "${FULL_FINAL_PATH}/"
+ls -alhG "${FULL_FINAL_PATH}/Headers/"
 exit "${res}"
