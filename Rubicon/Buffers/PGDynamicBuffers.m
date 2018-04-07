@@ -173,12 +173,12 @@ NS_INLINE NSUInteger prevIdx(NSUInteger idx, NSUInteger sz) {
 
     -(NSInteger)peekHead {
         NSUInteger head = self.head;
-        return ((head == self.tail) ? (-1) : ((NSInteger)self.buffer[head]));
+        return ((head == self.tail) ? (EOF) : ((NSInteger)self.buffer[head]));
     }
 
     -(NSInteger)peekTail {
         NSUInteger tail = self.tail;
-        return ((self.head == self.tail) ? (-1) : ((NSInteger)self.buffer[prevIdx(tail, self.realSize)]));
+        return ((self.head == tail) ? (EOF) : ((NSInteger)self.buffer[prevIdx(tail, self.realSize)]));
     }
 
     -(void)queue:(NSByte)byte {
@@ -237,14 +237,14 @@ NS_INLINE NSUInteger prevIdx(NSUInteger idx, NSUInteger sz) {
 
     -(NSInteger)dequeue {
         NSUInteger head = self.head;
-        if(head == self.tail) return -1;
+        if(head == self.tail) return EOF;
         self.head = nextIdx(head, self.realSize);
         return (NSInteger)self.buffer[head];
     }
 
     -(NSInteger)pop {
         NSUInteger tail = self.tail;
-        if(self.head == tail) return -1;
+        if(self.head == tail) return EOF;
         self.tail = tail = prevIdx(tail, self.realSize);
         return self.buffer[tail];
     }
