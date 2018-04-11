@@ -55,7 +55,22 @@ NS_INLINE void Output(NSString *string) {
         [queue queueString:test];
         [queue queueString:@"EFGH"];
         [queue requeueString:@"0123456789"];
-        PGPrintf(@"QUEUE: \"%@\"\n", queue.string);
+        PGPrintf(@"\n\nQUEUE: \"%@\"\n", queue.string);
+        NSInteger a = queue.pop;
+        NSInteger b = queue.pop;
+        NSInteger c = queue.dequeue;
+        NSInteger d = queue.dequeue;
+        PGPrintf(@"VALUES: a = %li ('%c'); b = %li ('%c'); c = %li ('%c'); d = %li ('%c');\n",
+                 a,
+                 (char)(a & 0x00ff),
+                 b,
+                 (char)(b & 0x00ff),
+                 c,
+                 (char)(c & 0x00ff),
+                 d,
+                 (char)(d & 0x00ff));
+
+        PGPrintf(@"QUEUE: \"%@\"\n\n\n", queue.string);
     }
 
     -(void)test93TemporaryDirectories {
