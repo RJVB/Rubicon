@@ -27,50 +27,50 @@ typedef BOOL (^PGDynamicBufferOpBlock)(NSBytePtr buffer, NSUInteger size, NSUInt
 
 @interface PGDynamicByteQueue : NSObject<NSCopying>
 
-    @property(nonatomic, readonly) NSUInteger head;
-    @property(nonatomic, readonly) NSUInteger tail;
-    @property(nonatomic, readonly) NSUInteger size;
     @property(nonatomic, readonly) NSUInteger count;
-    @property(nonatomic, readonly) NSUInteger available;
     @property(nonatomic, readonly) BOOL       isEmtpy;
-    @property(nonatomic, readonly) BOOL       isFull;
-    @property(nonatomic, readonly) NSBytePtr  buffer;
 
     -(instancetype)initWithInitialSize:(NSUInteger)initialSize NS_DESIGNATED_INITIALIZER;
 
     -(instancetype)initWithBytesNoCopy:(NSBytePtr)bytes count:(NSUInteger)cnt length:(NSUInteger)len freeWhenDone:(BOOL)freeWhenDone NS_DESIGNATED_INITIALIZER;
 
-    -(id)copyWithZone:(nullable NSZone *)zone;
+    -(instancetype)initWithNSData:(NSData *)data NS_DESIGNATED_INITIALIZER;
 
-    -(NSInteger)peekHead;
-
-    -(NSInteger)peekTail;
-
-    -(void)queue:(NSByte)byte;
-
-    -(void)queue:(const NSBytePtr)bytes length:(NSUInteger)len;
-
-    -(void)queue:(const NSBytePtr)bytes startingAt:(NSUInteger)index length:(NSUInteger)len;
-
-    -(void)requeue:(NSByte)byte;
-
-    -(void)requeue:(const NSBytePtr)bytes length:(NSUInteger)len;
-
-    -(void)requeue:(const NSBytePtr)bytes startingAt:(NSUInteger)index length:(NSUInteger)len;
+    -(NSBytePtr)copyBuffer:(NSUInteger *)cnt;
 
     -(NSInteger)dequeue;
 
     -(NSUInteger)dequeue:(NSBytePtr)buffer maxLength:(NSUInteger)len;
 
-    -(BOOL)bulkOperationUsingBlock:(PGDynamicBufferOpBlock)opBlock restoreOnFailure:(BOOL)restoreOnFailure;
+    -(NSInteger)pop;
 
-    -(BOOL)bulkOperationUsingBlock:(PGDynamicBufferOpBlock)opBlock;
+    -(NSUInteger)pop:(NSBytePtr)buffer maxLength:(NSUInteger)len;
+
+    -(void)queue:(NSByte)byte;
+
+    -(void)queue:(NSBytePtr)buffer length:(NSUInteger)len;
+
+    -(void)queueString:(NSString *)string;
+
+    -(void)queueFromQueue:(PGDynamicByteQueue *)queue length:(NSUInteger)length;
+
+    -(void)requeue:(NSByte)byte;
+
+    -(void)requeue:(NSBytePtr)buffer length:(NSUInteger)len;
+
+    -(void)requeueString:(NSString *)string;
+
+    -(void)requeueFromQueue:(PGDynamicByteQueue *)queue length:(NSUInteger)length;
 
     -(NSData *)data;
 
-    -(void)push:(NSByte)byte;
+    -(NSString *)string;
 
-    -(NSInteger)pop;
+    +(instancetype)queueWithInitialSize:(NSUInteger)initialSize;
+
+    +(instancetype)queueWithBytesNoCopy:(NSBytePtr)bytes count:(NSUInteger)cnt length:(NSUInteger)len freeWhenDone:(BOOL)freeWhenDone;
+
+    +(instancetype)queueWithNSData:(NSData *)data;
 
 @end
 

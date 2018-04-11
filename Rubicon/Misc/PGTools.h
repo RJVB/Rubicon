@@ -30,6 +30,15 @@
 #define PGBitsPerField   (8)
 #define PGFieldsPerPixel (4)
 
+#define PGThrowOutOfMemoryException @throw [NSException exceptionWithName:NSMallocException reason:@"Out of memory" userInfo:nil]
+
+NSBytePtr PGMemoryReverse(NSBytePtr buffer, NSUInteger length);
+
+NS_INLINE NSVoidPtr PGRealloc(NSVoidPtr _ptr, size_t _sz) {
+    NSVoidPtr nptr = (_ptr ? realloc(_ptr, _sz) : malloc(_sz));
+    if(nptr) return nptr; else PGThrowOutOfMemoryException;
+}
+
 /**
  * If the given string reference is null then return an empty string literal. (@"")
  *

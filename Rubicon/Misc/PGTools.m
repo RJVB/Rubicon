@@ -119,3 +119,17 @@ NSURL *PGTemporaryFile(NSString *filenamePostfix, NSError **error) {
 
     return nil;
 }
+
+NSBytePtr PGMemoryReverse(NSBytePtr buffer, NSUInteger length) {
+    if(buffer && length > 1) {
+        NSBytePtr a = buffer, b = (buffer + length);
+
+        while((b - a) > 1) {
+            NSByte t = *a;
+            *(a++) = *(--b);
+            *b     = t;
+        }
+    }
+
+    return buffer;
+}
