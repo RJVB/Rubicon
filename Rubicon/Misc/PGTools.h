@@ -147,6 +147,18 @@ FOUNDATION_EXPORT NSString *_Nonnull PGStrError(int osErrNo);
  */
 FOUNDATION_EXPORT NSString *_Nonnull PGFormat(NSString *_Nonnull fmt, ...) NS_FORMAT_FUNCTION(1, 2);
 
+FOUNDATION_EXPORT void PGPrintf(NSString *fmt, ...) NS_FORMAT_FUNCTION(1, 2);
+
+FOUNDATION_EXPORT void PGFPrintf(NSString *filename, NSError **error, NSString *fmt, ...) NS_FORMAT_FUNCTION(3, 4);
+
+FOUNDATION_EXPORT void PGSPrintf(NSOutputStream *outs, NSString *fmt, ...) NS_FORMAT_FUNCTION(2, 3);
+
+FOUNDATION_EXPORT void PGSPrintfVA(NSOutputStream *outs, NSString *fmt, va_list args);
+
+FOUNDATION_EXPORT void PGFPrintfVA(NSString *filename, NSError **error, NSString *fmt, va_list args);
+
+FOUNDATION_EXPORT NSString *PGFormatVA(NSString *fmt, va_list args);
+
 /**
  * Convenience function for getting the user's temporary file directory.
  *

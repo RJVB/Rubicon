@@ -51,13 +51,56 @@ NSString *PGStrError(int osErrNo) {
     return [NSString stringWithUTF8String:strerror(osErrNo)];
 }
 
+NSString *PGFormatVA(NSString *fmt, va_list args) {
+    return [[NSString alloc] initWithFormat:fmt arguments:args];
+}
+
 NSString *PGFormat(NSString *fmt, ...) {
-    va_list  args;
-    NSString *str = nil;
+    va_list args;
     va_start(args, fmt);
-    str = [[NSString alloc] initWithFormat:fmt arguments:args];
+    NSString *str = [[NSString alloc] initWithFormat:fmt arguments:args];
     va_end(args);
     return str;
+}
+
+void PGFPrintfVA(NSString *filename, NSError **error, NSString *fmt, va_list args) {
+    NSError *err = nil;
+    [PGFormatVA(fmt, args) writeToFile:filename atomically:NO encoding:NSUTF8StringEncoding error:&err];
+    if(error) *error = err;
+}
+
+void PGFPrintf(NSString *filename, NSError **error, NSString *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    PGFPrintfVA(filename, error, fmt, args);
+    va_end(args);
+}
+
+void PGPrintf(NSString *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    PGFPrintfVA(@"/dev/stdout", nil, fmt, args);
+    va_end(args);
+}
+
+void PGSPrintfVA(NSOutputStream *outs, NSString *fmt, va_list args) {
+    NSString   *str    = PGFormatVA(fmt, args);
+    const char *buffer = str.UTF8String;
+    size_t     bufflen = strlen(buffer);
+    size_t     buffsnt = 0;
+
+    while(buffsnt < bufflen) {
+        NSInteger r = [outs write:(const uint8_t *)(buffer + buffsnt) maxLength:(bufflen - buffsnt)];
+        if(r <= 0) break;
+        buffsnt += r;
+    }
+}
+
+void PGSPrintf(NSOutputStream *outs, NSString *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    PGSPrintfVA(outs, fmt, args);
+    va_end(args);
 }
 
 NSComparisonResult PGDateCompare(NSDate *d1, NSDate *d2) {

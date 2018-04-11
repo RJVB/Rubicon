@@ -49,6 +49,15 @@ NS_INLINE void Output(NSString *string) {
         [super tearDown];
     }
 
+    -(void)test92DynamicByteQueue {
+        PGDynamicByteQueue *queue = [PGDynamicByteQueue queueWithInitialSize:5];
+        NSString           *test  = @"ABCD";
+        [queue queueString:test];
+        [queue queueString:@"EFGH"];
+        [queue requeueString:@"0123456789"];
+        PGPrintf(@"QUEUE: \"%@\"\n", queue.string);
+    }
+
     -(void)test93TemporaryDirectories {
         NSError *error = nil;
         NSLog(@"Temporary Directory: \"%@\"", PGTemporaryDirectory(&error).absoluteString);

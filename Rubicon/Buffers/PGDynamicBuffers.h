@@ -23,6 +23,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSByte, PGNormalizeType) {
+    PGNormalizeNone = 0,  // Don't move the data.
+    PGNormalizeBeginning, // Move the data to the beginning of the queue.
+    PGNormalizeEnd        // Move the data to the end of the queue.
+};
+
 typedef BOOL (^PGDynamicBufferOpBlock)(NSBytePtr buffer, NSUInteger size, NSUInteger *pHead, NSUInteger *pTail);
 
 @interface PGDynamicByteQueue : NSObject<NSCopying>
@@ -36,7 +42,7 @@ typedef BOOL (^PGDynamicBufferOpBlock)(NSBytePtr buffer, NSUInteger size, NSUInt
 
     -(instancetype)initWithNSData:(NSData *)data NS_DESIGNATED_INITIALIZER;
 
-    -(NSBytePtr)copyBuffer:(NSUInteger *)cnt;
+    -(NSBytePtr)copyBuffer:(NSUInteger *)cnt trim:(BOOL)trimFlag;
 
     -(NSInteger)dequeue;
 
@@ -64,7 +70,15 @@ typedef BOOL (^PGDynamicBufferOpBlock)(NSBytePtr buffer, NSUInteger size, NSUInt
 
     -(NSData *)data;
 
+    -(NSMutableData *)appendToData:(NSMutableData *)mdata;
+
     -(NSString *)string;
+
+    -(BOOL)queueOperationWithBlock:(PGDynamicBufferOpBlock)opBlock normalizeBefore:(PGNormalizeType)normalizeType restoreOnFailure:(BOOL)restoreOnFailure;
+
+    -(BOOL)queueOperationWithBlock:(PGDynamicBufferOpBlock)opBlock restoreOnFailure:(BOOL)restoreOnFailure;
+
+    -(BOOL)queueOperationWithBlock:(PGDynamicBufferOpBlock)opBlock;
 
     +(instancetype)queueWithInitialSize:(NSUInteger)initialSize;
 

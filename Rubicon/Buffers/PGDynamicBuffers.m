@@ -20,12 +20,6 @@
 #define nextIdx(i, s) (((i) + 1) % (s))
 #define prevIdx(i, s) (((i) ?: (s)) - 1)
 
-typedef NS_ENUM(NSByte, PGNormalizeType) {
-    PGNormalizeNone,      // Don't move the data.
-    PGNormalizeBeginning, // Move the data to the beginning of the queue.
-    PGNormalizeEnd        // Move the data to the end of the queue.
-};
-
 @interface PGDynamicByteQueue()
 
     @property(nonatomic, readonly) BOOL       freeWhenDone;
@@ -120,7 +114,7 @@ typedef NS_ENUM(NSByte, PGNormalizeType) {
 
     -(id)copyWithZone:(nullable NSZone *)zone {
         NSUInteger count   = 0;
-        NSBytePtr  bytePtr = [self copyBuffer:&count];
+        NSBytePtr  bytePtr = [self copyBuffer:&count trim:NO];
         return [(PGDynamicByteQueue *)[[self class] allocWithZone:zone] initWithBytesNoCopy:bytePtr count:count length:size freeWhenDone:YES];
     }
 
@@ -215,8 +209,8 @@ typedef NS_ENUM(NSByte, PGNormalizeType) {
         if(self.capacity < length) [self grow:length normalize:PGNormalizeNone];
     }
 
-    -(NSBytePtr)copyBuffer:(NSUInteger *)cnt {
-        NSBytePtr bytePtr = PGRealloc(NULL, size);
+    -(NSBytePtr)copyBuffer:(NSUInteger *)cnt trim:(BOOL)trimFlag {
+        NSBytePtr bytePtr = PGRealloc(NULL, (trimFlag ? queueCount : size));
         *cnt = (((head <= tail) ? tail : size) - head);
 
         memcpy(bytePtr, byteQueue + head, *cnt);
@@ -290,11 +284,7 @@ typedef NS_ENUM(NSByte, PGNormalizeType) {
         NSUInteger count = MIN(length, queue.count);
         if(count) {
             [self ensure:count];
-            BOOL       wrapped = (queue->tail < queue->head);
-            NSUInteger top     = ((wrapped ? queue->size : queue->tail) - head);
-
-            [self queue:(queue->byteQueue + queue->head) length:top];
-            if(wrapped && (queue->tail > 0)) [self queue:queue->byteQueue length:queue->tail];
+            for(NSUInteger i = 0; i < count; i++) [self queue:((NSByte)(queue.dequeue & 0x00ff))];
         }
     }
 
@@ -317,6 +307,11 @@ typedef NS_ENUM(NSByte, PGNormalizeType) {
     }
 
     -(void)requeueFromQueue:(PGDynamicByteQueue *)queue length:(NSUInteger)length {
+        NSUInteger count = MIN(length, queue.count);
+        if(count) {
+            [self ensure:count];
+            for(NSUInteger i = 0; i < count; i++) [self requeue:((NSByte)(queue.pop & 0x00ff))];
+        }
     }
 
     -(void)queueString:(NSString *)string {
@@ -330,20 +325,66 @@ typedef NS_ENUM(NSByte, PGNormalizeType) {
     }
 
     -(NSString *)string {
-        NSBytePtr  cstr = calloc(1, (self.count + 1));
-        NSUInteger cnt  = (((head <= tail) ? tail : size) - head);
-
-        if(!cstr) PGThrowOutOfMemoryException;
-        memcpy(cstr, (byteQueue + head), cnt);
-        if((tail < head) && (tail > 0)) memcpy((cstr + cnt), byteQueue, tail);
-        return [[NSString alloc] initWithBytesNoCopy:cstr length:strlen((const char *)cstr) encoding:NSUTF8StringEncoding freeWhenDone:YES];
+        NSUInteger len  = 0;
+        NSBytePtr  cstr = [self copyBuffer:&len trim:YES];
+        return [[NSString alloc] initWithBytesNoCopy:cstr length:len encoding:NSUTF8StringEncoding freeWhenDone:YES];
     }
 
     -(NSData *)data {
         if(head == tail) return [NSData new];
         NSUInteger length = 0;
-        NSBytePtr  bytes  = [self copyBuffer:&length];
+        NSBytePtr  bytes  = [self copyBuffer:&length trim:YES];
         return [[NSData alloc] initWithBytesNoCopy:bytes length:length freeWhenDone:YES];
+    }
+
+    -(NSMutableData *)appendToData:(NSMutableData *)mdata {
+        NSUInteger count = queueCount;
+
+        if(!mdata) mdata = (count ? [NSMutableData dataWithCapacity:count] : [NSMutableData new]);
+
+        if(count) {
+            [mdata appendBytes:(byteQueue + head) length:(((head <= tail) ? tail : size) - head)];
+            if((tail < head) && (tail > 0)) [mdata appendBytes:byteQueue length:tail];
+        }
+
+        return mdata;
+    }
+
+    -(BOOL)queueOperationWithBlock:(PGDynamicBufferOpBlock)opBlock normalizeBefore:(PGNormalizeType)normalizeType restoreOnFailure:(BOOL)restoreOnFailure {
+        [self normalizeQueue:normalizeType];
+
+        if(restoreOnFailure) {
+            NSUInteger _head      = head;
+            NSUInteger _tail      = tail;
+            NSBytePtr  _byteQueue = PGRealloc(NULL, size);
+            BOOL       success;
+
+            @try {
+                memcpy(_byteQueue, byteQueue, size);
+                success = opBlock(_byteQueue, size, &_head, &_tail);
+
+                if(success) {
+                    memcpy(byteQueue, _byteQueue, size);
+                    head = _head;
+                    tail = _tail;
+                }
+            }
+            @finally {
+                free(_byteQueue);
+            }
+
+            return success;
+        }
+
+        return opBlock(byteQueue, size, &head, &tail);
+    }
+
+    -(BOOL)queueOperationWithBlock:(PGDynamicBufferOpBlock)opBlock restoreOnFailure:(BOOL)restoreOnFailure {
+        return [self queueOperationWithBlock:opBlock normalizeBefore:PGNormalizeNone restoreOnFailure:restoreOnFailure];
+    }
+
+    -(BOOL)queueOperationWithBlock:(PGDynamicBufferOpBlock)opBlock {
+        return [self queueOperationWithBlock:opBlock restoreOnFailure:NO];
     }
 
 @end
