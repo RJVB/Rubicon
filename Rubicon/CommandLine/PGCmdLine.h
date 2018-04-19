@@ -22,12 +22,12 @@
 #import <Rubicon/PGTools.h>
 
 typedef NS_OPTIONS(uint8_t, PGCmdLineParseOptions) {
-    PGCmdLineParseOptionDisallowLongOptionNames         = (uint8_t)(1u << 0),  // Allow long options. Default is NO.
-    PGCmdLineParseOptionDisallowNonOptions              = (uint8_t)(1u << 1),  // Do not allow non-options. Default is NO.
-    PGCmdLineParseOptionAllowMixingOptionsAndNonOptions = (uint8_t)(1u << 2),  // Allow mixing of options and non-options. Default is NO.
-    PGCmdLineParseOptionDisallowDuplicates              = (uint8_t)(1u << 3),  // Do not allow duplicate options. Default is NO.
-    PGCmdLineParseOptionDuplicatesKeepFirst             = (uint8_t)(1u << 4),  // In case of duplicates, keep the first one found. Default is to keep the last one found.
-    PGCmdLineParseOptionDisallowUnknownOptions          = (uint8_t)(1u << 5),  // Do not allow unknown options.  Default is NO.
+    PGCmdLineParseOptionDisallowLongOptionNames            = (uint8_t)(1u << 0),  // Allow long options. Default is NO.
+    PGCmdLineParseOptionDisallowNonOptions                 = (uint8_t)(1u << 1),  // Do not allow non-options. Default is NO.
+    PGCmdLineParseOptionDisallowMixingOptionsAndNonOptions = (uint8_t)(1u << 2),  // Do not allow mixing of options and non-options. Default is NO.
+    PGCmdLineParseOptionDisallowDuplicates                 = (uint8_t)(1u << 3),  // Do not allow duplicate options. Default is NO.
+    PGCmdLineParseOptionDuplicatesKeepFirst                = (uint8_t)(1u << 4),  // In case of duplicates, keep the first one found. Default is to keep the last one found.
+    PGCmdLineParseOptionDisallowUnknownOptions             = (uint8_t)(1u << 5),  // Do not allow unknown options.  Default is NO.
 };
 
 typedef NS_OPTIONS(uint8_t, PGCmdLineItemType) {
@@ -61,8 +61,8 @@ NS_ASSUME_NONNULL_BEGIN
     @property(readonly) /* */ NSDictionary<NSString *, id> *options;      // Options.
     @property(readonly) /* */ BOOL                         parseOptionDisallowLongOptionNames;
     @property(readonly) /* */ BOOL                         parseOptionDisallowNonOptions;
-    @property(readonly) /* */ BOOL                         parseOptionAllowMixedOptionsAndNonOptions;
-    @property(readonly) /* */ BOOL                         parseOptionErrorOnDuplicates;
+    @property(readonly) /* */ BOOL                         parseOptionDisallowMixingOptionsAndNonOptions;
+    @property(readonly) /* */ BOOL                         parseOptionDisallowDuplicates;
     @property(readonly) /* */ BOOL                         parseOptionDuplicatesKeepFirst;
     @property(readonly) /* */ BOOL                         parseOptionDisallowUknownOptions;
 
@@ -74,6 +74,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(instancetype)initWithArguments:(const char **)argv length:(NSUInteger)argc parseOptions:(PGCmdLineParseOptions)parseOptions error:(NSError **)error;
 
+    -(PGCmdLineItemType)validateOption:(NSString *)option item:(NSString *)item index:(NSUInteger)idx error:(NSError **)error;
 @end
 
 NS_ASSUME_NONNULL_END
