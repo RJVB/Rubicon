@@ -176,3 +176,10 @@ NSBytePtr PGMemoryReverse(NSBytePtr buffer, NSUInteger length) {
 
     return buffer;
 }
+
+NSVoidPtr PGMemDup(const NSVoidPtr src, size_t size) {
+    void *dest = PGRealloc(NULL, size);
+    memcpy(dest, src, size);
+    return dest;
+}
+

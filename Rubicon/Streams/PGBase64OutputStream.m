@@ -123,37 +123,31 @@ NS_INLINE void PGBase64EncodeFull(const NSByte *input, NSByte *output, NSUIntege
     -(NSInteger)writeFiltered:(const NSByte *)buffer maxLength:(NSUInteger)len {
         if(_remlen > INPUT_BLOCK_SIZE) {
             NSDictionary *dict = @{ NSLocalizedDescriptionKey: @"Internal Inconsistency Error!" };
-            _error = [NSError errorWithDomain:PGErrorDomain code:1003 userInfo:dict];
+            _error = [NSError errorWithDomain:PGErrorDomain code:PGErrorCodeIOError userInfo:dict];
             return -1;
         }
 
         NSUInteger remlen  = _remlen;
         NSUInteger outlen  = BAR(len + remlen);
-        NSByte     *output = (NSByte *)malloc(outlen * sizeof(NSByte));
+        NSByte     *output = PGRealloc(NULL, outlen * sizeof(NSByte));
 
-        if(output) {
-            @try {
-                NSUInteger inidx  = 0;
-                NSUInteger outidx = 0;
+        @try {
+            NSUInteger inidx  = 0;
+            NSUInteger outidx = 0;
 
-                if(writeRem(self, buffer, len, output, &inidx, &outidx)) return inidx;
-                PGBase64EncodeFull(buffer, output, (MULT((len - inidx), INPUT_BLOCK_SIZE) + inidx), &inidx, &outidx);
+            if(writeRem(self, buffer, len, output, &inidx, &outidx)) return inidx;
+            PGBase64EncodeFull(buffer, output, (MULT((len - inidx), INPUT_BLOCK_SIZE) + inidx), &inidx, &outidx);
 
-                NSInteger count = [super writeFiltered:output maxLength:outidx];
-                if(count <= 0) return count;
-                /*
-                 * We subtract the original number of remaining bytes so that we don't include
-                 * those in the sent totals for this invocation.
-                 */
-                if(count < outidx) return (FOO(count) - remlen);
-                return fillRemainder(self, buffer, len, inidx, (INPUT_BLOCK_SIZE - 1));
-            }
-            @finally { free(output); }
+            NSInteger count = [super writeFiltered:output maxLength:outidx];
+            if(count <= 0) return count;
+            /*
+             * We subtract the original number of remaining bytes so that we don't include
+             * those in the sent totals for this invocation.
+             */
+            if(count < outidx) return (FOO(count) - remlen);
+            return fillRemainder(self, buffer, len, inidx, (INPUT_BLOCK_SIZE - 1));
         }
-
-        NSDictionary *dict = @{ NSLocalizedDescriptionKey: @"Out of memory!" };
-        _error = [NSError errorWithDomain:PGErrorDomain code:1004 userInfo:dict];
-        return -1;
+        @finally { free(output); }
     }
 
     -(NSError *)streamError {

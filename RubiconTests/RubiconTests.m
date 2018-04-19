@@ -34,8 +34,14 @@ NS_INLINE void NOutput(NSString *string) {
 }
 
 NS_INLINE void Output(NSString *string) {
-    NOutput(PGFormat(@"%@\r\n", string));
+    NOutput(PGFormat(@"%@\n", string));
 }
+
+NS_INLINE NSString *quote(NSString *string) {
+    return (string ? PGFormat(@"\"%@\"", string) : @"<NIL>");
+}
+
+void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
 
 @implementation RubiconTests
 
@@ -47,6 +53,108 @@ NS_INLINE void Output(NSString *string) {
     -(void)tearDown {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         [super tearDown];
+    }
+
+    -(void)test90OptionCleanup {
+        NSError    *err     = nil;
+        NSString   *pattern = @"^(?:\\s*(\\-\\-)\\s*(?:([^\\s]+)\\s*(\\=)?)?|\\s*(\\-)\\s*)";
+        NSUInteger maxWidth = 0;
+
+        NSArray<NSString *> *samples = @[ /* @f:0 */
+                @"--foo",
+                @"-foo",
+                @"  --foo",
+                @"  -foo",
+                @"-- foo",
+                @"-  foo",
+                @"   --   foo",
+                @"     -   foo",
+                @"--",
+                @"  --",
+                @"--foo   ",
+                @"-foo   ",
+                @"  --foo   ",
+                @"  -foo   ",
+                @"-- foo   ",
+                @"-  foo   ",
+                @"   --   foo   ",
+                @"     -   foo   ",
+                @"--   ",
+                @"  --   ",
+                @"-",
+                @"     -",
+                @"-        ",
+                @"       -           ",
+                @"foo",
+                @"             foo",
+                @"foo           ",
+                @"             foo                 ",
+                @"  --  foo = now is the time.  "
+                /* @f:1 */
+        ];
+
+        PGRegexFilterBlock blk = ^NSString *(NSString *str, NSString *sub, NSUInteger num, NSTextCheckingResult *res, NSString *last, BOOL *stop) {
+//            FOutput(@"str: \"%@\"", str);
+//            FOutput(@"sub: \"%@\"", sub);
+//            FOutput(@"ranges: %lu", res.numberOfRanges);
+//            for(NSUInteger i = 0, j = res.numberOfRanges; i < j; i++) {
+//                FOutput(@"------> %@", NSStringFromRange([res rangeAtIndex:i]));
+//            }
+            NSMutableString *mstr = [NSMutableString new];
+            for(NSUInteger  i     = 1, j = res.numberOfRanges; i < j; i++) {
+                NSRange r = [res rangeAtIndex:i];
+                if(r.location != NSNotFound) [mstr appendString:[str substringWithRange:r]];
+            }
+            return mstr;
+        };
+
+        for(NSString *str in samples) maxWidth = MAX(maxWidth, str.length + 2);
+
+        NSLog(@"%@", BAR);
+        NSLog(@"%@", @"");
+
+        for(NSString *str in samples) {
+            NSString *fstr = [str stringByFilteringWithRegexPattern:pattern regexOptions:0 matchOptions:0 replacementBlock:blk error:&err];
+
+            if(fstr) NSLog(@"Input: %@; Output:%@", [quote(str) stringByFrontPaddingToLength:maxWidth withString:@" " startingAtIndex:0], quote(fstr));
+            else if(err) NSLog(@"Error: %@", err);
+            else NSLog(@"%@", @"Unknown Error.");
+        }
+
+        NSLog(@"%@", @"");
+        NSLog(@"%@", @"");
+        NSLog(@"%@", BAR);
+    }
+
+    -(void)test90StringByFilteringWithRegexPattern {
+        NSLog(@"%@", @"Beginning: test90StringByFilteringWithRegexPattern");
+
+        PGRegexFilterBlock blk = ^NSString *(NSString *str, NSString *sub, NSUInteger num, NSTextCheckingResult *res, NSString *last, BOOL *stop) {
+            return ([sub isEqualToString:@"men"] ? @"programmers" : @"users");
+        };
+
+        NSString *str = nil;
+
+        NSError *err = nil;
+        str = [TestString stringByFilteringWithRegexPattern:@"men|country" regexOptions:0 matchOptions:0 replacementBlock:blk error:&err];
+
+        FOutput(@"Unfiltered String: %@", TestString);
+        FOutput(@"  Filtered String: %@", str);
+
+        NSLog(@"%@", @"Finished: test90StringByFilteringWithRegexPattern");
+    }
+
+    -(void)test91EnumerateOverCharactersWithBlock {
+        NSString           *test   = [TestString copy];
+        NSRange            nsRange = NSMakeRange(30, 10);
+        __block NSUInteger cnt     = 0;
+
+        FOutput(@"Test String: %@", quote([test substringWithRange:nsRange]));
+
+        [test enumerateOverCharactersWithBlock:^BOOL(unichar c, unichar *dc, NSRange range, BOOL composed, NSString *before, NSString *after) {
+            FOutput(@"%2lu [%2lu,%2lu]: '%@'; before: %@; after: %@", cnt++, range.location, range.length, [test substringWithRange:range], quote(before), quote(after));
+            return NO;
+        }                                range:nsRange];
     }
 
     -(void)test92DynamicByteQueue {
@@ -382,3 +490,11 @@ NS_INLINE void Output(NSString *string) {
     //	}
 
 @end
+
+void FOutput(NSString *format, ...) {
+    va_list args;
+    va_start(args, format);
+    Output([[NSString alloc] initWithFormat:format arguments:args]);
+    va_end(args);
+}
+

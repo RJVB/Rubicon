@@ -29,25 +29,38 @@
     #define PGTextAlignmentCenter NSTextAlignmentCenter
 #endif
 
-typedef void (^EnumBlock)(NSString *substring, NSRange substringRange, NSRange enclosingRange, BOOL *end);
+#define UNICHAR_CHLEN ((size_t)(4))
+
+typedef void (^RegexEnumBlock)(NSTextCheckingResult *_Nullable result, NSMatchingFlags flags, BOOL *stop);
+
+typedef union {
+    uint64_t foo;
+    unichar  ch[UNICHAR_CHLEN];
+}            UNICHAR_UNION;
+
+NS_INLINE NSUInteger PGRangeLength(NSUInteger startingLoc, NSUInteger endingLoc) {
+    return (MAX(startingLoc, endingLoc) - MIN(startingLoc, endingLoc));
+}
 
 NS_INLINE NSRange PGRangeFromIndexes(NSUInteger loc1, NSUInteger loc2) {
-    NSRange range;
-    if(loc1 <= loc2) {
-        range.location = loc1;
-        range.length   = (loc2 - loc1);
-    }
-    else {
-        range.location = loc2;
-        range.length   = (loc1 - loc2);
-    }
-    return range;
+    return NSMakeRange(MIN(loc1, loc2), PGRangeLength(loc1, loc2));
 }
 
 NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange range) {
     if(range.location < string.length && NSMaxRange(range) < string.length) return nil;
     NSString *r = PGFormat(@"Range {%lu, %lu} out of bounds; string length %lu", range.location, range.length, string.length);
-    return [NSException exceptionWithName:NSRangeException reason:r userInfo:nil];
+    return [NSException exceptionWithName:NSRangeException reason:r];
+}
+
+NS_INLINE void fillCharBuffer(UNICHAR_UNION *buffer, NSString *string, NSRange range) {
+    buffer->foo      = 0;
+    for(NSUInteger k = 0, l = MIN(range.length, UNICHAR_CHLEN); k < l; k++) {
+        buffer->ch[k] = [string characterAtIndex:(range.location + k)];
+    }
+}
+
+NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUInteger idxTo) {
+    return ((idxFrom < idxTo) ? [string substringFrom:idxFrom to:idxTo] : nil);
 }
 
 @implementation NSString(PGString)
@@ -200,7 +213,7 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
         return [self rangeOfString:searchString options:options range:NSMakeRange(0, to)];
     }
 
-    -(NSArray<NSString *> *)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit {
+    -(NSStrArray)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit {
         return [self componentsSeparatedByString:separator limit:limit keepSeparator:NO];
     }
 
@@ -216,7 +229,7 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
      * @param keepSeparator if 'YES' then the separator is preserved at the end of each substring.
      * @return An NSArray object containing substrings from the receiver that have been divided by separator.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator {
+    -(NSStrArray)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator {
         if(limit == 0) limit = NSUIntegerMax; // zero means no limit.
         /*
          * If the limit is only one, the separator is empty, or the separator is longer
@@ -408,59 +421,59 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
         return @"";
     }
 
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern {
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern {
         return [self componentsSeparatedByPattern:pattern limit:NSUIntegerMax options:0 keepSeparator:NO error:nil];
     }
 
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern error:(NSError **)error {
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern error:(NSError **)error {
         return [self componentsSeparatedByPattern:pattern limit:NSUIntegerMax options:0 keepSeparator:NO error:error];
     }
 
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit {
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit {
         return [self componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:NO error:nil];
     }
 
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options {
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options {
         return [self componentsSeparatedByPattern:pattern limit:NSUIntegerMax options:options keepSeparator:NO error:nil];
     }
 
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options error:(NSError **)error {
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options error:(NSError **)error {
         return [self componentsSeparatedByPattern:pattern limit:NSUIntegerMax options:options keepSeparator:NO error:error];
     }
 
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit options:(NSRegularExpressionOptions)options {
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit options:(NSRegularExpressionOptions)options {
         return [self componentsSeparatedByPattern:pattern limit:limit options:options keepSeparator:NO error:nil];
     }
 
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit error:(NSError **)error {
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit error:(NSError **)error {
         return [self componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:NO error:error];
     }
 
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern keepSeparator:(BOOL)keepSeparator {
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern keepSeparator:(BOOL)keepSeparator {
         return [self componentsSeparatedByPattern:pattern limit:NSUIntegerMax options:0 keepSeparator:keepSeparator error:nil];
     }
 
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern keepSeparator:(BOOL)keepSeparator error:(NSError **)error {
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern keepSeparator:(BOOL)keepSeparator error:(NSError **)error {
         return [self componentsSeparatedByPattern:pattern limit:NSUIntegerMax options:0 keepSeparator:keepSeparator error:error];
     }
 
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator {
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator {
         return [self componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:keepSeparator error:nil];
     }
 
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator {
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator {
         return [self componentsSeparatedByPattern:pattern limit:NSUIntegerMax options:options keepSeparator:keepSeparator error:nil];
     }
 
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator error:(NSError **)error {
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator error:(NSError **)error {
         return [self componentsSeparatedByPattern:pattern limit:NSUIntegerMax options:options keepSeparator:keepSeparator error:error];
     }
 
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator {
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator {
         return [self componentsSeparatedByPattern:pattern limit:limit options:options keepSeparator:keepSeparator error:nil];
     }
 
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator error:(NSError **)error {
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator error:(NSError **)error {
         return [self componentsSeparatedByPattern:pattern limit:limit options:0 keepSeparator:keepSeparator error:error];
     }
 
@@ -478,11 +491,11 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
      *         separator. If there was an error in the regular expression then a NULL value will be
      *         returned.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern
-                                                   limit:(NSUInteger)limit
-                                                 options:(NSRegularExpressionOptions)options
-                                           keepSeparator:(BOOL)keepSeparator
-                                                   error:(NSError **)error {
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern
+                                        limit:(NSUInteger)limit
+                                      options:(NSRegularExpressionOptions)options
+                                keepSeparator:(BOOL)keepSeparator
+                                        error:(NSError **)error {
 
         // If limit is zero then that means no limit.
         if(limit == 0) limit = NSUIntegerMax;
@@ -497,9 +510,9 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
 
             // If the regex is null then return null to indicate there was an error.
             if(regex) {
-                __block NSUInteger         startingPoint = 0;
-                NSUInteger                 subLimit      = (limit - 1);
-                NSMutableArray<NSString *> *array        = [NSMutableArray arrayWithCapacity:MIN(limit, 100)]; // Let's not get crazy!
+                __block NSUInteger startingPoint = 0;
+                NSUInteger         subLimit      = (limit - 1);
+                NSMutableStrArray  array         = [NSMutableArray arrayWithCapacity:MIN(limit, 100)]; // Let's not get crazy!
 
                 [regex enumerateMatchesInString:self options:0 range:NSMakeRange(0, self.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
                     if(array.count < subLimit) { // Safety Check
@@ -530,6 +543,78 @@ NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange rang
 
         // If the limit is 1, there is no pattern, or our string is empty then just return a copy of ourselves.
         return @[ self.copy ];
+    }
+
+    -(NSString *)substringFrom:(NSUInteger)idx1 to:(NSUInteger)idx2 {
+        return [self substringWithRange:PGRangeFromIndexes(idx1, idx2)];
+    }
+
+    -(BOOL)enumerateOverCharactersWithBlock:(PGCharEnumBlock)enumBlock range:(NSRange)range {
+        if(range.length) {
+            NSRange       i = [self rangeOfComposedCharacterSequencesForRange:range]; // Make sure we're not slicing composed character sequences.
+            NSUInteger    j = i.location;
+            NSUInteger    k = j;
+            NSUInteger    l = NSMaxRange(i);
+            UNICHAR_UNION m;
+
+            while(k < l) {
+                NSRange    n = [self rangeOfComposedCharacterSequenceAtIndex:k];
+                NSUInteger o = n.location;
+                NSUInteger p = n.length;
+
+                k = (o + p);
+                fillCharBuffer(&m, self, n);
+                if(enumBlock(m.ch[0], m.ch, n, (p > 1), substringBetween(self, j, o), substringBetween(self, k, l))) return YES;
+            }
+        }
+
+        return NO;
+    }
+
+    -(NSString *)stringByFilteringWithRegexPattern:(NSString *)pattern
+                                      regexOptions:(NSRegularExpressionOptions)regexOptions
+                                      matchOptions:(NSMatchingOptions)matchOptions
+                                  replacementBlock:(PGRegexFilterBlock)replBlock
+                                             error:(NSError **)error {
+        NSError             *err   = nil;
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:regexOptions error:&err];
+
+        PGSetReference(error, err);
+
+        if(regex) {
+            __block NSMutableString *str             = nil;
+            __block NSString        *lastReplacement = nil;
+            __block NSUInteger      prefixStartIndex = 0;
+            __block NSUInteger      matchNumber      = 0;
+
+            RegexEnumBlock enumBlock = ^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+                if((result != nil) && (result.resultType == NSTextCheckingTypeRegularExpression)) {
+                    NSRange  range = result.range;
+                    NSString *mstr = [self substringWithRange:range];
+
+                    lastReplacement = replBlock(self, mstr, ++matchNumber, result, lastReplacement, stop);
+
+                    if((lastReplacement != nil) && ![lastReplacement isEqualToString:mstr]) {
+                        if(str == nil) str = [NSMutableString new];
+                        [str appendString:[self substringFrom:prefixStartIndex to:range.location]];
+                        [str appendString:lastReplacement];
+                        prefixStartIndex = NSMaxRange(range);
+                    }
+                }
+            };
+
+            [regex enumerateMatchesInString:self options:matchOptions range:NSMakeRange(0, self.length) usingBlock:enumBlock];
+
+            if(str) {
+                if(prefixStartIndex < self.length) [str appendString:[self substringFromIndex:prefixStartIndex]];
+                return str;
+            }
+            else {
+                return self;
+            }
+        }
+
+        return nil;
     }
 
 @end

@@ -32,7 +32,9 @@
 
 #define PGThrowOutOfMemoryException @throw [NSException exceptionWithName:NSMallocException reason:@"Out of memory" userInfo:nil]
 
-NSBytePtr PGMemoryReverse(NSBytePtr buffer, NSUInteger length);
+FOUNDATION_EXPORT NSBytePtr PGMemoryReverse(NSBytePtr buffer, NSUInteger length);
+
+FOUNDATION_EXPORT NSVoidPtr PGMemDup(const NSVoidPtr src, size_t size);
 
 NS_INLINE NSVoidPtr PGRealloc(NSVoidPtr _ptr, size_t _sz) {
     NSVoidPtr nptr = (_ptr ? realloc(_ptr, _sz) : malloc(_sz));

@@ -47,11 +47,11 @@ static const NSUInteger PGDataReadBufferSize = 8196;
                 if(error) *error = nil;
             }
             else if(error) {
-                *error = [NSError errorWithDomain:PGErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: PGStrError(errno) }];
+                *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: PGStrError(errno) }];
             }
         }
         else if(error) {
-            *error = [NSError errorWithDomain:PGErrorDomain code:1000 userInfo:@{ NSLocalizedDescriptionKey: @"Stream not open." }];
+            *error = [NSError errorWithDomain:PGErrorDomain code:PGErrorCodeIOError userInfo:@{ NSLocalizedDescriptionKey: @"Stream not open." }];
         }
 
         return results;

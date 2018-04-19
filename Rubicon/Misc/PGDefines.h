@@ -27,10 +27,12 @@
 
 #import <Rubicon/GNUstep.h>
 
-typedef long long NSLong;
-typedef uint8_t   NSByte;
-typedef NSByte    *NSBytePtr;
-typedef void      *NSVoidPtr;
+typedef long long                  NSLong;
+typedef uint8_t                    NSByte;
+typedef NSByte                     *NSBytePtr;
+typedef void                       *NSVoidPtr;
+typedef NSArray<NSString *>        *NSStrArray;
+typedef NSMutableArray<NSString *> *NSMutableStrArray;
 
 #if defined(CGFLOAT_IS_DOUBLE) && CGFLOAT_IS_DOUBLE
 typedef CGFloat NSFloat;  // For the Sheldon Cooper in me.
@@ -47,6 +49,12 @@ static const NSUInteger NSUNotFound = NSUIntegerMax;
 #endif
 
 FOUNDATION_EXPORT NSString *const PGErrorDomain;
+
+FOUNDATION_EXPORT const NSInteger PGErrorCodeExceptionAsError;
+FOUNDATION_EXPORT const NSInteger PGErrorCodeCmdLineParseError;
+FOUNDATION_EXPORT const NSInteger PGErrorCodeIOError;
+
+FOUNDATION_EXPORT NSString *const PGUnderlyingExceptionKey;
 
 FOUNDATION_EXPORT NSExceptionName const PGTimedWorkerException;
 FOUNDATION_EXPORT NSExceptionName const PGSemaphoreException;

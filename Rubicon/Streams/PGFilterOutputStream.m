@@ -104,12 +104,12 @@
                 }
 
                 NSDictionary *dict = @{ NSLocalizedDescriptionKey: @"Nothing to write. 'len' is zero." };
-                _error = [NSError errorWithDomain:PGErrorDomain code:1002 userInfo:dict];
+                _error = [NSError errorWithDomain:PGErrorDomain code:PGErrorCodeIOError userInfo:dict];
                 return -1;
             }
 
             NSDictionary *dict = @{ NSLocalizedDescriptionKey: @"Nothing to write. 'buffer' is NULL." };
-            _error = [NSError errorWithDomain:PGErrorDomain code:1001 userInfo:dict];
+            _error = [NSError errorWithDomain:PGErrorDomain code:PGErrorCodeIOError userInfo:dict];
             return -1;
         }
         @finally { [self unlock]; }

@@ -32,7 +32,19 @@ NS_ASSUME_NONNULL_BEGIN
 #define PG_DEFAULT_SYS_FONT_SIZE  (13)
 #define PG_DEFAULT_SYS_FONT_COLOR (NSColor.blackColor)
 
+typedef BOOL (^PGCharEnumBlock)(unichar c, unichar *dc, NSRange range, BOOL composed, NSString *_Nullable before, NSString *_Nullable after);
+
+typedef NSString *_Nullable (^PGRegexFilterBlock)(NSString *str, NSString *sub, NSUInteger num, NSTextCheckingResult *res, NSString *_Nullable last, BOOL *stop);
+
 @interface NSString(PGString)
+
+    -(BOOL)enumerateOverCharactersWithBlock:(NS_NOESCAPE PGCharEnumBlock)enumBlock range:(NSRange)range;
+
+    -(NSString *)stringByFilteringWithRegexPattern:(NSString *)pattern
+                                      regexOptions:(NSRegularExpressionOptions)regexOptions
+                                      matchOptions:(NSMatchingOptions)matchOptions
+                                  replacementBlock:(NS_NOESCAPE PGRegexFilterBlock)replBlock
+                                             error:(NSError **)error;
 
     -(NSString *)stringByFrontPaddingToLength:(NSUInteger)len withString:(NSString *)str startingAtIndex:(NSUInteger)idx;
 
@@ -141,7 +153,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(NSRange)rangeOfString:(NSString *)searchString options:(NSStringCompareOptions)options to:(NSUInteger)to;
 
-    -(NSArray<NSString *> *)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit;
+    -(NSStrArray)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit;
 
     /**
      * This method functions like the componentsSeparatedByString: method except that it allows you to
@@ -155,7 +167,7 @@ NS_ASSUME_NONNULL_BEGIN
      * @param keepSeparator if 'YES' then the separator is preserved at the end of each substring.
      * @return An NSArray object containing substrings from the receiver that have been divided by separator.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator;
+    -(NSStrArray)componentsSeparatedByString:(NSString *)separator limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator;
 
     /**
      * If this string's length is greater than the 'maxLength' provided then this method returns a copy
@@ -205,11 +217,13 @@ NS_ASSUME_NONNULL_BEGIN
      *         separator. If there was an error in the regular expression then a NULL value will be
      *         returned.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern
-                                                   limit:(NSUInteger)limit
-                                                 options:(NSRegularExpressionOptions)options
-                                           keepSeparator:(BOOL)keepSeparator
-                                                   error:(NSError **)error;
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern
+                                        limit:(NSUInteger)limit
+                                      options:(NSRegularExpressionOptions)options
+                                keepSeparator:(BOOL)keepSeparator
+                                        error:(NSError **)error;
+
+    -(NSString *)substringFrom:(NSUInteger)idx1 to:(NSUInteger)idx2;
 
     /**
      * Convienience method for:
@@ -220,7 +234,7 @@ NS_ASSUME_NONNULL_BEGIN
      *         separator. If there was an error in the regular expression then a NULL value will be
      *         returned.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern;
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern;
 
     /**
      * Convienience method for:
@@ -232,7 +246,7 @@ NS_ASSUME_NONNULL_BEGIN
      *         separator. If there was an error in the regular expression then a NULL value will be
      *         returned.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern error:(NSError **)error;
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern error:(NSError **)error;
 
     /**
      * Convienience method for:
@@ -244,7 +258,7 @@ NS_ASSUME_NONNULL_BEGIN
      *         separator. If there was an error in the regular expression then a NULL value will be
      *         returned.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit;
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit;
 
     /**
      * Convienience method for:
@@ -256,7 +270,7 @@ NS_ASSUME_NONNULL_BEGIN
      *         separator. If there was an error in the regular expression then a NULL value will be
      *         returned.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options;
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options;
 
     /**
      * Convienience method for:
@@ -269,7 +283,7 @@ NS_ASSUME_NONNULL_BEGIN
      *         separator. If there was an error in the regular expression then a NULL value will be
      *         returned.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options error:(NSError **)error;
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options error:(NSError **)error;
 
     /**
      * Convienience method for:
@@ -282,7 +296,7 @@ NS_ASSUME_NONNULL_BEGIN
      *         separator. If there was an error in the regular expression then a NULL value will be
      *         returned.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit options:(NSRegularExpressionOptions)options;
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit options:(NSRegularExpressionOptions)options;
 
     /**
      * Convienience method for:
@@ -295,7 +309,7 @@ NS_ASSUME_NONNULL_BEGIN
      *         separator. If there was an error in the regular expression then a NULL value will be
      *         returned.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit error:(NSError **)error;
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit error:(NSError **)error;
 
     /**
      * Convienience method for:
@@ -307,7 +321,7 @@ NS_ASSUME_NONNULL_BEGIN
      *         separator. If there was an error in the regular expression then a NULL value will be
      *         returned.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern keepSeparator:(BOOL)keepSeparator;
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern keepSeparator:(BOOL)keepSeparator;
 
     /**
      * Convienience method for:
@@ -320,7 +334,7 @@ NS_ASSUME_NONNULL_BEGIN
      *         separator. If there was an error in the regular expression then a NULL value will be
      *         returned.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern keepSeparator:(BOOL)keepSeparator error:(NSError **)error;
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern keepSeparator:(BOOL)keepSeparator error:(NSError **)error;
 
     /**
      * Convienience method for:
@@ -333,7 +347,7 @@ NS_ASSUME_NONNULL_BEGIN
      *         separator. If there was an error in the regular expression then a NULL value will be
      *         returned.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator;
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator;
 
     /**
      * Convienience method for:
@@ -346,7 +360,7 @@ NS_ASSUME_NONNULL_BEGIN
      *         separator. If there was an error in the regular expression then a NULL value will be
      *         returned.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator;
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator;
 
     /**
      * Convienience method for:
@@ -360,7 +374,7 @@ NS_ASSUME_NONNULL_BEGIN
      *         separator. If there was an error in the regular expression then a NULL value will be
      *         returned.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator error:(NSError **)error;
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator error:(NSError **)error;
 
     /**
      * Convienience method for:
@@ -374,7 +388,7 @@ NS_ASSUME_NONNULL_BEGIN
      *         separator. If there was an error in the regular expression then a NULL value will be
      *         returned.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator;
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit options:(NSRegularExpressionOptions)options keepSeparator:(BOOL)keepSeparator;
 
     /**
      * Convienience method for:
@@ -388,13 +402,14 @@ NS_ASSUME_NONNULL_BEGIN
      *         separator. If there was an error in the regular expression then a NULL value will be
      *         returned.
      */
-    -(NSArray<NSString *> *)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator error:(NSError **)error;
+    -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator error:(NSError **)error;
 
     +(NSString *)stringByConcatenatingStrings:(NSString *)firstString, ... NS_REQUIRES_NIL_TERMINATION;
 
     +(NSString *)stringWithBytes:(const NSByte *)bytes length:(NSUInteger)length;
 
     +(NSString *)stringWithBytes:(const NSByte *)bytes length:(NSUInteger)length encoding:(NSStringEncoding)encoding;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -31,4 +31,9 @@
         return [self exceptionWithName:exName reason:r userInfo:ui];
     }
 
+    -(NSError *)makeError {
+        NSDictionary *ui = @{ NSLocalizedDescriptionKey: self.description, PGUnderlyingExceptionKey: self };
+        return [NSError errorWithDomain:PGErrorDomain code:PGErrorCodeExceptionAsError userInfo:ui];
+    }
+
 @end

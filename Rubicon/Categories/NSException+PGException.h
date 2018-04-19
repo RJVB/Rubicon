@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     +(instancetype)exceptionWithName:(NSExceptionName)exName reason:(NSString *)exReason;
 
+    -(NSError *)makeError;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -32,3 +32,8 @@ NSExceptionName const PGOSErrorException       = @"PGOSErrorException";
 
 NSString *const PGDefaultSemaphoreNamePrefix = @"/sem";
 
+const NSInteger PGErrorCodeExceptionAsError  = 100;
+const NSInteger PGErrorCodeCmdLineParseError = 200;
+const NSInteger PGErrorCodeIOError           = 1000;
+
+NSString *const PGUnderlyingExceptionKey = @"PGUnderlyingExceptionKey";
