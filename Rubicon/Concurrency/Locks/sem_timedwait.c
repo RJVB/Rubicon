@@ -566,7 +566,7 @@ static void* giverThreadMain (void* passedPtr)
  *   similar random time as the timeout for the sem_timedwait() call. It
  *   then checks that what happens is what it expects.
  *
- *   The pogram takes two optional arguments. The first is an integer giving
+ *   The pogram takes two optional nonOptionArguments. The first is an integer giving
  *   the nuber of sem_timedwait() calls it is to attempt (default 10) and the
  *   second is a floatig point value that gives the time scale - it is the
  *   maximum time in seconds for the two random times that are generated for
@@ -608,7 +608,7 @@ int main (
    float timeScaleSecs = 1.0;               /* Time scale - from command line */
    int maxCount = 10;      /* Times through the test loop - from command line */
 
-   /*  Get the command line arguments, the number of tries, and the time
+   /*  Get the command line nonOptionArguments, the number of tries, and the time
     *  scale to use.
     */
 

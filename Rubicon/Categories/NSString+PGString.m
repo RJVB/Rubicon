@@ -65,6 +65,11 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
 
 @implementation NSString(PGString)
 
+    -(NSRange)range {
+        NSRange r = { .location = 0, .length = self.length };
+        return r;
+    }
+
     -(NSString *)stringByFrontPaddingToLength:(NSUInteger)len withString:(NSString *)str startingAtIndex:(NSUInteger)idx {
         NSUInteger slflen = self.length;
 
@@ -136,7 +141,7 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
     }
 
     -(NSUInteger)indexOfCharacter:(unichar)c {
-        return [self indexOfCharacter:c inRange:NSMakeRange(0, self.length)];
+        return [self indexOfCharacter:c inRange:self.range];
     }
 
     -(NSUInteger)indexOfCharacter:(unichar)c from:(NSUInteger)startIndex {
@@ -236,7 +241,7 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
          * than this string then return a copy of this string as the only element in the array.
          */
         if((limit > 1) && (separator.length > 0) && (separator.length < self.length)) {
-            NSRange remaining  = NSMakeRange(0, self.length);
+            NSRange remaining  = self.range;
             NSRange foundRange = [self rangeOfString:separator options:0 range:remaining];
 
             /*
@@ -514,7 +519,7 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
                 NSUInteger         subLimit      = (limit - 1);
                 NSMutableStrArray  array         = [NSMutableArray arrayWithCapacity:MIN(limit, 100)]; // Let's not get crazy!
 
-                [regex enumerateMatchesInString:self options:0 range:NSMakeRange(0, self.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+                [regex enumerateMatchesInString:self options:0 range:self.range usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
                     if(array.count < subLimit) { // Safety Check
                         NSRange    rng    = result.range;
                         NSUInteger rngend = NSMaxRange(rng);
@@ -547,6 +552,10 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
 
     -(NSString *)substringFrom:(NSUInteger)idx1 to:(NSUInteger)idx2 {
         return [self substringWithRange:PGRangeFromIndexes(idx1, idx2)];
+    }
+
+    -(BOOL)enumerateOverCharactersWithBlock:(PGCharEnumBlock)enumBlock {
+        return [self enumerateOverCharactersWithBlock:enumBlock range:self.range];
     }
 
     -(BOOL)enumerateOverCharactersWithBlock:(PGCharEnumBlock)enumBlock range:(NSRange)range {
@@ -603,7 +612,7 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
                 }
             };
 
-            [regex enumerateMatchesInString:self options:matchOptions range:NSMakeRange(0, self.length) usingBlock:enumBlock];
+            [regex enumerateMatchesInString:self options:matchOptions range:self.range usingBlock:enumBlock];
 
             if(str) {
                 if(prefixStartIndex < self.length) [str appendString:[self substringFromIndex:prefixStartIndex]];

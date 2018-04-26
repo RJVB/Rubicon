@@ -38,6 +38,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSArray<__covariant T>(PGArray)
 
+    -(NSRange)range;
+
     -(BOOL)containsIdenticalObjectsOutOfOrderAsArray:(NSArray<T> *)array;
 
     -(BOOL)containsIdenticalObjectsAsArray:(NSArray<T> *)array;

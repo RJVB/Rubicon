@@ -39,31 +39,54 @@
     }
 
     -(BOOL)matches:(NSString *)string {
-        return [self matches:string range:NSMakeRange(0, string.length)];
+        return [self matches:string range:string.range];
+    }
+
+    -(NSString *)stringByReplacingMatchesInString:(NSString *)str options:(NSMatchingOptions)options withTemplate:(NSString *)template {
+        return [self stringByReplacingMatchesInString:str options:options range:str.range withTemplate:template];
     }
 
     +(NSRegularExpression *)cachedRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options error:(NSError **)error {
+        return [self cachedRegex:pattern options:options prefix:nil error:error];
+    }
+
+    +(NSRegularExpression *)cachedRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options prefix:(NSString *)prefix error:(NSError **)error {
         static NSMutableDictionary *regexCache = nil;
         NSRegularExpression        *regex      = nil;
 
-        if(pattern.length) {
-            @synchronized([NSRegularExpression class]) {
-                NSString *key = PGFormat(@"%@|%@", pattern, @(options));
-
-                if(regexCache == nil) regexCache = [NSMutableDictionary new]; else regex = regexCache[key];
-
-                if(regex == nil) {
-                    regex = [NSRegularExpression regularExpressionWithPattern:pattern options:options error:error];
-                    if(regex) regexCache[key] = regex;
+        if(pattern) {
+            if(regexCache == nil) {
+                @synchronized([NSRegularExpression class]) {
+                    if(regexCache == nil) regexCache = [NSMutableDictionary new];
                 }
             }
+
+            NSString *key = PGFormat(@"%@❖%@❖%@", (prefix.length ? prefix : @"☞"), @(options), pattern);
+
+            regex = regexCache[key];
+
+            if(regex == nil) {
+                @synchronized(regexCache) {
+                    if((regex = regexCache[key]) == nil) {
+                        regex = [NSRegularExpression regularExpressionWithPattern:pattern options:options error:error];
+                        if(regex) regexCache[key] = regex;
+                    }
+                }
+            }
+        }
+        else if(error) {
+            (*error) = [NSError errorWithDomain:PGErrorDomain code:PGErrorCodeRegexPatternIsNULL userInfo:@{ NSLocalizedDescriptionKey: PGErrorMsgRegexPatternIsNULL }];
         }
 
         return regex;
     }
 
     +(NSRegularExpression *)cachedRegex:(NSString *)pattern error:(NSError **)error {
-        return [self cachedRegex:pattern options:0 error:error];
+        return [self cachedRegex:pattern options:0 prefix:nil error:error];
+    }
+
+    +(NSRegularExpression *)cachedRegex:(NSString *)pattern prefix:(NSString *)prefix error:(NSError **)error {
+        return [self cachedRegex:pattern options:0 prefix:prefix error:error];
     }
 
 @end

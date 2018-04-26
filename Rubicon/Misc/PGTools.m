@@ -21,8 +21,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#import "PGTools.h"
-#import "NSObject+PGObject.h"
+#import "PGInternal.h"
 
 NSBitmapImageRep *PGCreateARGBImage(NSFloat width, NSFloat height) {
     NSInteger iWidth  = (NSInteger)ceil(width);
@@ -183,3 +182,48 @@ NSVoidPtr PGMemDup(const NSVoidPtr src, size_t size) {
     return dest;
 }
 
+NSString *_validateDateOrTimeString(NSString *str, NSString *outputFormat, NSDateFormatterStyle dateStyle, NSDateFormatterStyle timeStyle, NSStrArray testFormats) {
+    if(str.length) {
+        NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+
+        fmt.dateStyle                  = dateStyle;
+        fmt.timeStyle                  = timeStyle;
+        fmt.doesRelativeDateFormatting = YES;
+        fmt.lenient                    = YES;
+        fmt.locale                     = NSLocale.currentLocale;
+        fmt.timeZone                   = NSTimeZone.localTimeZone;
+
+        for(NSString *dfmt in testFormats) {
+            fmt.dateFormat = dfmt;
+            NSDate *dt = [fmt dateFromString:str];
+
+            if(dt) {
+                fmt.dateFormat = outputFormat;
+                return [fmt stringFromDate:dt];
+            }
+        }
+
+        NSError              *error = nil;
+        NSDataDetector       *de    = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeDate error:&error];
+        NSTextCheckingResult *res   = [de firstMatchInString:str options:0 range:str.range];
+
+        if(res.resultType == NSTextCheckingTypeDate) {
+            NSDate *dt = res.date;
+
+            if(dt) {
+                fmt.dateFormat = outputFormat;
+                return [fmt stringFromDate:dt];
+            }
+        }
+    }
+
+    return nil;
+}
+
+NSString *PGValidateDate(NSString *dateString) {
+    return _validateDateOrTimeString(dateString, @"MM/dd/yyyy", NSDateFormatterLongStyle, NSDateFormatterNoStyle, @[ @"MM/dd/yyyy", @"yyyy-MM-dd", @"MM-dd-yyyy" ]);
+}
+
+NSString *PGValidateTime(NSString *timeString) {
+    return _validateDateOrTimeString(timeString, @"HH:mm:ssZZZ", NSDateFormatterNoStyle, NSDateFormatterLongStyle, @[ @"hh:mm:ssZZZ a", @"HH:mm:ssZZZ", @"hh:mm a", @"HH:mm" ]);
+}

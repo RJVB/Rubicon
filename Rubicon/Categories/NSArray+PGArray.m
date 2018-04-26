@@ -25,6 +25,11 @@
 
 @implementation NSArray(PGArray)
 
+    -(NSRange)range {
+        NSRange r = { .location = 0, .length = self.count };
+        return r;
+    }
+
     -(BOOL)containsIdenticalObjectsOutOfOrderAsArray:(NSArray<id> *)array {
         if(array) {
             if(array == self) return YES;
@@ -91,17 +96,17 @@
         if(fromIdx > cc) @throw [self invArgExc:PGFormat(@"Invalid starting index: %lu > %lu", fromIdx, cc)];
         if(toIdx > cc) @throw [self invArgExc:PGFormat(@"Invalid ending index: %lu > %lu", toIdx, cc)];
         if(toIdx < fromIdx) @throw [self invArgExc:PGFormat(@"Invalid ending index: %lu < %lu", toIdx, fromIdx)];
-        return [self _componentsJoinedAsHarvardList:conjunction ? : @"and" fromIndex:fromIdx toIndex:toIdx];
+        return [self _componentsJoinedAsHarvardList:conjunction ?: @"and" fromIndex:fromIdx toIndex:toIdx];
     }
 
     -(NSString *)componentsJoinedAsHarvardList:(NSString *)conjunction inRange:(NSRange)range {
         if(range.location > self.count) @throw [self invArgExc:PGFormat(@"Invalid starting location: %lu > %lu", range.location, self.count)];
         if(PGRIdx(range) > self.count) @throw [self invArgExc:PGFormat(@"Invalid length: %lu > %lu", range.length, PGRLen(range))];
-        return [self _componentsJoinedAsHarvardList:conjunction ? : @"and" fromIndex:range.location toIndex:PGRIdx(range)];
+        return [self _componentsJoinedAsHarvardList:conjunction ?: @"and" fromIndex:range.location toIndex:PGRIdx(range)];
     }
 
     -(NSString *)componentsJoinedAsHarvardList:(NSString *)conjunction {
-        return [self _componentsJoinedAsHarvardList:conjunction ? : @"and" fromIndex:0 toIndex:self.count];
+        return [self _componentsJoinedAsHarvardList:conjunction ?: @"and" fromIndex:0 toIndex:self.count];
     }
 
     -(NSString *)_componentsJoinedByString:(NSString *)string fromIndex:(NSUInteger)fromIdx toIndex:(NSUInteger)toIdx {
@@ -135,13 +140,13 @@
         if(fromIdx > cc) @throw [self invArgExc:PGFormat(@"Invalid starting index: %lu > %lu", fromIdx, cc)];
         if(toIdx < fromIdx) @throw [self invArgExc:PGFormat(@"Invalid ending index: %lu < %lu", toIdx, fromIdx)];
         if(toIdx > cc) @throw [self invArgExc:PGFormat(@"Invalid ending index: %lu > %lu", toIdx, cc)];
-        return [self _componentsJoinedByString:separator ? : @"" fromIndex:fromIdx toIndex:toIdx];
+        return [self _componentsJoinedByString:separator ?: @"" fromIndex:fromIdx toIndex:toIdx];
     }
 
     -(NSString *)componentsJoinedByString:(NSString *)separator inRange:(NSRange)range {
         if(range.location > self.count) @throw [self invArgExc:PGFormat(@"Invalid starting location: %lu > %lu", range.location, self.count)];
         if(PGRIdx(range) > self.count) @throw [self invArgExc:PGFormat(@"Invalid length: %lu > %lu", range.length, PGRLen(range))];
-        return [self _componentsJoinedByString:separator ? : @"" fromIndex:range.location toIndex:PGRIdx(range)];
+        return [self _componentsJoinedByString:separator ?: @"" fromIndex:range.location toIndex:PGRIdx(range)];
     }
 
     -(NSException *)invArgExc:(NSString *)reason {

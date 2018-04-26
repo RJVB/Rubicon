@@ -53,6 +53,7 @@ FOUNDATION_EXPORT NSString *const PGErrorDomain;
 FOUNDATION_EXPORT const NSInteger PGErrorCodeExceptionAsError;
 FOUNDATION_EXPORT const NSInteger PGErrorCodeCmdLineParseError;
 FOUNDATION_EXPORT const NSInteger PGErrorCodeIOError;
+FOUNDATION_EXPORT const NSInteger PGErrorCodeRegexPatternIsNULL;
 
 FOUNDATION_EXPORT NSString *const PGUnderlyingExceptionKey;
 
@@ -62,6 +63,9 @@ FOUNDATION_EXPORT NSExceptionName const PGReadWriteLockException;
 FOUNDATION_EXPORT NSExceptionName const PGOSErrorException;
 
 FOUNDATION_EXPORT NSString *const PGDefaultSemaphoreNamePrefix;
+
+FOUNDATION_EXPORT NSString *const PGErrorMsgBadRegexPattern;
+FOUNDATION_EXPORT NSString *const PGErrorMsgRegexPatternIsNULL;
 
 #if !defined(PGAbstractClassError)
     #define PGAbstractClassError do {\

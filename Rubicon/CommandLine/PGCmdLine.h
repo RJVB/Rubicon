@@ -19,62 +19,34 @@
 #ifndef RUBICON_PGCMDLINE_H
 #define RUBICON_PGCMDLINE_H
 
-#import <Rubicon/PGTools.h>
-
-typedef NS_OPTIONS(uint8_t, PGCmdLineParseOptions) {
-    PGCmdLineParseOptionDisallowLongOptionNames            = (uint8_t)(1u << 0),  // Allow long options. Default is NO.
-    PGCmdLineParseOptionDisallowNonOptions                 = (uint8_t)(1u << 1),  // Do not allow non-options. Default is NO.
-    PGCmdLineParseOptionDisallowMixingOptionsAndNonOptions = (uint8_t)(1u << 2),  // Do not allow mixing of options and non-options. Default is NO.
-    PGCmdLineParseOptionDisallowDuplicates                 = (uint8_t)(1u << 3),  // Do not allow duplicate options. Default is NO.
-    PGCmdLineParseOptionDuplicatesKeepFirst                = (uint8_t)(1u << 4),  // In case of duplicates, keep the first one found. Default is to keep the last one found.
-    PGCmdLineParseOptionDisallowUnknownOptions             = (uint8_t)(1u << 5),  // Do not allow unknown options.  Default is NO.
-};
-
-typedef NS_OPTIONS(uint8_t, PGCmdLineItemType) {
-    PGCmdLineItemTypeError              = (uint8_t)(1u << 0), // 00000001 - Error.
-    PGCmdLineItemTypeNonOption          = (uint8_t)(1u << 1), // 00000010 - Non-option item.
-    PGCmdLineItemTypeShortOption        = (uint8_t)(1u << 2), // 00000100 - Short Option.
-    PGCmdLineItemTypeLongOption         = (uint8_t)(1u << 3), // 00001000 - Long Option.
-    PGCmdLineItemTypeEndOfOptions       = (uint8_t)(1u << 4), // 00010000 - End of options marker.
-    PGCmdLineItemTypeUnknownOption      = (uint8_t)(1u << 5), // 00100000 - Unknown option.
-    PGCmdLineItemTypeOptionalParameter  = (uint8_t)(1u << 6), // 01000000 - Option has optional parameter.
-    PGCmdLineItemTypeManditoryParameter = (uint8_t)(1u << 7), // 10000000 - Option has manditory parameter.
-};
-
-FOUNDATION_EXPORT NSString *const PGCmdLineErrorIndexKey;
-FOUNDATION_EXPORT NSString *const PGCmdLineErrorItemKey;
-
-FOUNDATION_EXPORT NSString *const PGErrorMsgCmdLineNonOptionItemsNotAllowed;
-FOUNDATION_EXPORT NSString *const PGErrorMsgCmdLineCannotMixOptionsAndNonOptions;
-FOUNDATION_EXPORT NSString *const PGErrorMsgCmdLineLongOptionsNotAllowed;
-
-FOUNDATION_EXPORT NSString *const PGCmdLineParamSeparator;
+#import <Rubicon/PGCmdLineOption.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGCmdLine : NSObject
+@interface PGCmdLine : NSObject<NSCopying>
 
-    @property(readonly, copy) NSString                     *executableName;
-    @property(readonly) /* */ NSStringEncoding             encoding;
-    @property(readonly) /* */ NSStrArray                   rawArguments;  // Raw command-line arguments as given.
-    @property(readonly) /* */ NSStrArray                   arguments;     // Non-option arguments.
-    @property(readonly) /* */ NSDictionary<NSString *, id> *options;      // Options.
-    @property(readonly) /* */ BOOL                         parseOptionDisallowLongOptionNames;
-    @property(readonly) /* */ BOOL                         parseOptionDisallowNonOptions;
-    @property(readonly) /* */ BOOL                         parseOptionDisallowMixingOptionsAndNonOptions;
-    @property(readonly) /* */ BOOL                         parseOptionDisallowDuplicates;
-    @property(readonly) /* */ BOOL                         parseOptionDuplicatesKeepFirst;
-    @property(readonly) /* */ BOOL                         parseOptionDisallowUknownOptions;
+    @property(readonly) NSString              *executableName;
+    @property(readonly) NSStringEncoding      encoding;
+    @property(readonly) NSStrArray            rawArguments;       // Raw command-line nonOptionArguments as given.
+    @property(readonly) NSStrArray            nonOptionArguments; // Non-option nonOptionArguments.
+    @property(readonly) NSStrArray            unknownOptions;     // Options not specified in the options set.
+    @property(readonly) PGCmdLineOptionSet    options;            // Options.
+    @property(readonly) PGCmdLineParseOptions parseOptions;
 
     -(instancetype)initWithArguments:(const char **)argv
                               length:(NSUInteger)argc
                             encoding:(NSStringEncoding)encoding
-                        parseOptions:(PGCmdLineParseOptions)parseOptions
+                        parseOptions:(PGCmdLineParseOptions)parseOptions options:(NSArray<PGCmdLineOption *> *)options
                                error:(NSError **)error;
 
-    -(instancetype)initWithArguments:(const char **)argv length:(NSUInteger)argc parseOptions:(PGCmdLineParseOptions)parseOptions error:(NSError **)error;
+    -(instancetype)initWithArguments:(const char **)argv
+                              length:(NSUInteger)argc
+                        parseOptions:(PGCmdLineParseOptions)parseOptions
+                             options:(NSArray<PGCmdLineOption *> *)options
+                               error:(NSError **)error;
 
-    -(PGCmdLineItemType)validateOption:(NSString *)option item:(NSString *)item index:(NSUInteger)idx error:(NSError **)error;
+    -(id)copyWithZone:(nullable NSZone *)zone;
+
 @end
 
 NS_ASSUME_NONNULL_END

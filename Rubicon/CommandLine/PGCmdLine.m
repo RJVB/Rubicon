@@ -16,29 +16,9 @@
  **********************************************************************************************************************************************************************************/
 
 #import "PGInternal.h"
+#import "PGCmdLineCommon.h"
 
-NSString *const PGCmdLineErrorIndexKey = @"PGCmdLineErrorIndexKey";
-NSString *const PGCmdLineErrorItemKey  = @"PGCmdLineErrorItemKey";
-
-NSString *const PGErrorMsgCmdLineNonOptionItemsNotAllowed      = @"Non-option items not allowed.";
-NSString *const PGErrorMsgCmdLineCannotMixOptionsAndNonOptions = @"Options and non-options cannot be mixed together.";
-NSString *const PGErrorMsgCmdLineLongOptionsNotAllowed         = @"Long options not allowed.";
-
-NSString *const PGCmdLineParamSeparator = @"=";
-
-typedef BOOL (^AlreadyExistsBlk)(NSString *);
-
-#define OptionInError(v)       (((v) & PGCmdLineItemTypeError) == PGCmdLineItemTypeError)
-#define OptionNoParam(v)       (((v) & (PGCmdLineItemTypeOptionalParameter | PGCmdLineItemTypeManditoryParameter)) == 0)
-#define OptionMustHaveParam(v) (((v) & PGCmdLineItemTypeManditoryParameter) == PGCmdLineItemTypeManditoryParameter)
-#define OptionCanHaveParam(v)  (((v) & PGCmdLineItemTypeOptionalParameter) == PGCmdLineItemTypeOptionalParameter)
-#define OptionIsUnknown(v)     (((v) & PGCmdLineItemTypeUnknownOption) == PGCmdLineItemTypeUnknownOption)
-
-@interface PGCmdLine()
-
-    @property(readonly) PGCmdLineParseOptions parseOptions;
-
-@end
+NSString *const PGCmdLineLongOptionParamMarkerPattern = @"\\s*=";
 
 @implementation PGCmdLine {
     }
@@ -46,330 +26,387 @@ typedef BOOL (^AlreadyExistsBlk)(NSString *);
     @synthesize rawArguments = _rawArguments;
     @synthesize parseOptions = _parseOptions;
     @synthesize encoding = _encoding;
-    @synthesize arguments = _arguments;
+    @synthesize nonOptionArguments = _nonOptionArguments;
     @synthesize options = _options;
     @synthesize executableName = _executableName;
+    @synthesize nonOptionCleaningRegex = _nonOptionCleaningRegex;
+    @synthesize optionCleaningRegex = _optionCleaningRegex;
+    @synthesize unknownOptions = _unknownOptions;
+
+    -(instancetype)initWithArguments:(const char **)argv
+                              length:(NSUInteger)argc
+                        parseOptions:(PGCmdLineParseOptions)parseOptions
+                             options:(NSArray<PGCmdLineOption *> *)options
+                               error:(NSError **)error {
+        return (self = [self initWithArguments:argv length:argc encoding:NSUTF8StringEncoding parseOptions:parseOptions options:options error:error]);
+    }
 
     -(instancetype)initWithArguments:(const char **)argv
                               length:(NSUInteger)argc
                             encoding:(NSStringEncoding)encoding
-                        parseOptions:(PGCmdLineParseOptions)parseOptions
+                        parseOptions:(PGCmdLineParseOptions)parseOptions options:(NSArray<PGCmdLineOption *> *)options
                                error:(NSError **)error {
         self = [super init];
 
         if(self) {
-            NSMutableArray *args = [NSMutableArray arrayWithCapacity:argc];
-
-            _parseOptions   = parseOptions;
-            _rawArguments   = args;
-            _encoding       = encoding;
-            _executableName = @"";
-
-            for(NSUInteger i = 0; i < argc; i++) {
-                const char *cstr = argv[i];
-                // check for a NULL just in case...
-                [args addObject:(cstr ? [NSString stringWithCString:cstr encoding:_encoding] : @"")];
+            if((argc == 0) || (argv == NULL) || ((*argv) == NULL)) {
+                NSDictionary *dict = @{ NSLocalizedDescriptionKey: PGErrorMsgCmdLineInvalidCommandLine };
+                PGSetReference(error, [NSError errorWithDomain:PGErrorDomain code:PGErrorCodeCmdLineParseError userInfo:dict]);
+                return nil;
             }
 
-            [self parseCommandLine:args error:error];
+            _encoding     = encoding;
+            _rawArguments = PGConvertCommandLineItems((argc - 1), (argv + 1), _encoding, error);
+
+            if(_rawArguments == nil) return nil;
+
+            _executableName     = [NSString stringWithCString:(*argv) encoding:_encoding];
+            _options            = PGCreateOptionsList(options);
+            _parseOptions       = parseOptions;
+            _nonOptionArguments = @[];
+            _unknownOptions     = @[];
+
+            if([self parseCommandLine:_rawArguments error:error]) return nil;
+
+            NSUInteger      nfc  = 0;
+            NSMutableString *nfs = [NSMutableString stringWithFormat:@"%@", @"The following options were not found: "];
+
+            for(PGCmdLineOption *opt in _options) {
+                if(opt.isRequired && !opt.wasFound) {
+                    if(nfc++) [nfs appendString:@", "];
+                    [nfs appendString:opt.nameDescription];
+                }
+            }
+
+            if(nfc) {
+                PGSetReference(error, [NSError errorWithDomain:PGErrorDomain code:PGErrorCodeCmdLineParseError userInfo:@{ NSLocalizedDescriptionKey: nfs }]);
+                return nil;
+            }
         }
 
         return self;
     }
 
-    -(instancetype)initWithArguments:(const char **)argv length:(NSUInteger)argc parseOptions:(PGCmdLineParseOptions)parseOptions error:(NSError **)error {
-        return (self = [self initWithArguments:argv length:argc encoding:NSUTF8StringEncoding parseOptions:parseOptions error:error]);
-    }
-
+    /**
+     * Parse the command-line elements for options and non-options (arguments).
+     * Generally speaking we are following the guidelines that documented here: http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html#Argument-Syntax
+     *
+     * @param error returns any error messages.
+     * @return YES if errors where encountered.
+     */
     -(BOOL)parseCommandLine:(NSStrArray)cmdLine error:(NSError **)error {
-        NSMutableStrArray                   arguments = [NSMutableArray new];
-        NSMutableDictionary<NSString *, id> *options  = [NSMutableDictionary new];
+        NSMutableStrArray nonOptionArgs  = [NSMutableArray new];
+        NSMutableStrArray unknownOptions = [NSMutableArray new];
 
         @try {
-            NSUInteger      length = cmdLine.count;
-            __block NSError *err   = nil;
+            NSError *err      = nil;
+            BOOL    softStop  = NO;
+            BOOL    noMixing  = self.parseOptionDisallowMixingOptionsAndNonOptions;
+            BOOL    noNonOpts = self.parseOptionDisallowNonOptions;
 
-            if(length) {
-                /*
-                 * This regex pattern and block will remove any whitespace around the option markers '-' and '--' but
-                 * leave any internal or trailing whitespace. It will also leave non-option arguments untouched.
-                 */
-                NSString *cleanRegex = PGFormat(@"^(?:\\s*(\\-\\-)\\s*(?:([^\\s]+)\\s*(\\%@)?)?|\\s*(\\-)\\s*)", PGCmdLineParamSeparator);
+            for(NSUInteger idx = 0, length = cmdLine.count; ((idx < length) && (!err)); idx++) {
+                NSString *item = [self cleanOption:cmdLine[idx]];
 
-                PGRegexFilterBlock cleanBlock = ^NSString *(NSString *str, NSString *sub, NSUInteger num, NSTextCheckingResult *res, NSString *last, BOOL *stop) {
-                    NSMutableString *mstr = [NSMutableString new];
-
-                    for(NSUInteger i = 1, j = res.numberOfRanges; i < j; i++) {
-                        NSRange r = [res rangeAtIndex:i];
-                        if(r.location != NSNotFound) [mstr appendString:[str substringWithRange:r]];
-                    }
-
-                    return mstr;
-                };
-
-                /*
-                 * A "soft" end-of-options occurs when parseOptionDisallowMixingOptionsAndNonOptions
-                 * returns NO and we encounter a non-option item in the command line. Any further
-                 * options encountered will result in an error.
-                 */
-                BOOL               noNonOptions     = self.parseOptionDisallowNonOptions;
-                BOOL               noMixing         = self.parseOptionDisallowMixingOptionsAndNonOptions;
-                BOOL               softEndOfOptions = NO;
-                __block NSUInteger idx              = 0;
-
-                _executableName = cmdLine[idx++];
-
-                while((idx < length) && (err == nil)) {
-                    NSString *rawItem = cmdLine[idx++];
-                    NSString *item    = [rawItem stringByFilteringWithRegexPattern:cleanRegex regexOptions:0 matchOptions:0 replacementBlock:cleanBlock error:&err];
-
-                    if(err) {
-                        /*
-                         * The regex shouldn't have an error in it but just
-                         * to be a good programmer we'll check for it. 😎
-                         */
-                        break;
-                    }
-                    else if([item isEqualToString:@"--"]) {
-                        /*
-                         * We've reached the end of options marker. So if more arguments exist
-                         * and non-options are allowed then consume the rest of the arguments
-                         * into the non-options array, otherwise indicate an error.
-                         */
-                        idx = [self handleRemainingArguments:cmdLine length:length index:idx arguments:arguments error:&err];
-                    }
-                    else if([item hasPrefix:@"--"]) {
-                        /*
-                         * Long option...
-                         */
-                        if(softEndOfOptions) err = [self createError:PGErrorMsgCmdLineCannotMixOptionsAndNonOptions index:(idx - 1) item:item];
-                        else [self handleLongOption:item index:idx options:options error:&err];
-                    }
-                    else if((item.length > 1) && [item hasPrefix:@"-"]) {
-                        /*
-                         * Short option(s)...
-                         */
-                        if(softEndOfOptions) err = [self createError:PGErrorMsgCmdLineCannotMixOptionsAndNonOptions index:(idx - 1) item:item];
-                        else idx = [self handleShortOption:item cmdLine:cmdLine length:length index:idx options:options error:&err];
-                    }
-                    else if(noNonOptions) {
-                        err = [self createError:PGErrorMsgCmdLineNonOptionItemsNotAllowed index:idx item:rawItem];
-                    }
-                    else {
-                        /*
-                         * If we are not allowing options and non-options to be mixed then
-                         * set the softEndOfOptions flag so that any further options cause
-                         * an error.
-                         */
-                        if(noMixing && !softEndOfOptions) softEndOfOptions = YES;
-                        /*
-                         * Save this item...
-                         */
-                        [arguments addObject:rawItem];
+                if([item isEqualToString:@"--"]) {
+                    idx = [self handleRemainingArguments:cmdLine index:(idx + 1) nonOptionArguments:nonOptionArgs error:&err];
+                }
+                else if([item hasPrefix:@"--"]) {
+                    if([self testForError:(softStop && noMixing) item:item index:idx reason:PGErrorMsgCmdLineCannotMixOptionsAndNonOptions error:&err]) {
+                        [self processLongOption:[item substringFromIndex:2] idx:idx unknownOptions:unknownOptions error:&err];
                     }
                 }
-            }
-            else {
-                err = [NSError errorWithDomain:PGErrorDomain code:PGErrorCodeCmdLineParseError userInfo:@{ NSLocalizedDescriptionKey: @"No command-line items." }];
+                else if((item.length > 1) && [item hasPrefix:@"-"]) {
+                    if([self testForError:(softStop && noMixing) item:item index:idx reason:PGErrorMsgCmdLineCannotMixOptionsAndNonOptions error:&err]) {
+                        idx = [self processShortOptions:[item substringFromIndex:1] cmdLine:cmdLine index:idx unknownOptions:unknownOptions error:&err];
+                    }
+                }
+                else if([self testForError:noNonOpts item:item index:idx reason:PGErrorMsgCmdLineNonOptionItemsNotAllowed error:&err]) {
+                    if(noMixing && !softStop) softStop = YES;
+                    [nonOptionArgs addObject:[self cleanNonOption:item]];
+                }
             }
 
             PGSetReference(error, err);
-            return (err == nil);
+            return (err != nil);
         }
         @catch(NSException *exception) {
             PGSetReference(error, [exception makeError]);
-            return NO;
+            return YES;
         }
         @finally {
-            _options   = options;
-            _arguments = arguments;
+            if(nonOptionArgs.count) _nonOptionArguments = nonOptionArgs;
+            if(unknownOptions.count) _unknownOptions    = unknownOptions;
         }
     }
 
-    -(NSUInteger)handleRemainingArguments:(NSStrArray)cmdLine length:(NSUInteger)len index:(NSUInteger)idx arguments:(NSMutableStrArray)arguments error:(NSError **)error {
-        if(idx < len) {
-            if(self.parseOptionDisallowNonOptions) PGSetReference(error, [self createError:PGErrorMsgCmdLineNonOptionItemsNotAllowed index:idx item:cmdLine[idx]]);
-            else do { [arguments addObject:cmdLine[idx++]]; } while(idx < len);
+    /**
+     * If non-option arguments are allowed then copy the remaining command-line items to the arguments array.
+     *
+     * @param cmdLine the command-line items.
+     * @param idx the index of the first of the remaining items in the command-line.
+     * @param nonOptionArgs the array to receive the arguments.
+     * @param error pointer to a variable of NSError that will recieve an error if non-option arguments are not allowed.
+     * @return the updated index value.
+     */
+    -(NSUInteger)handleRemainingArguments:(NSStrArray)cmdLine index:(NSUInteger)idx nonOptionArguments:(NSMutableStrArray)nonOptionArgs error:(NSError **)error {
+        NSUInteger len = cmdLine.count;
+        PGSetReference(error, nil);
+
+        if((idx < len) && [self testForError:self.parseOptionDisallowNonOptions item:cmdLine[idx] index:idx reason:PGErrorMsgCmdLineNonOptionItemsNotAllowed error:error]) {
+            do { [nonOptionArgs addObject:[self cleanNonOption:cmdLine[idx++]]]; } while(idx < len);
         }
 
-        return idx;
+        return (idx ? (idx - 1) : idx);
     }
 
-    -(void)handleLongOption:(NSString *)item index:(NSUInteger)idx options:(NSMutableDictionary *)options error:(NSError **)error {
-        NSString *option = [item substringFromIndex:2];
-        NSString *param  = nil;
-
-        /*
-         * If there is a parameter then it will be after an equal sign (=).
-         */
-        NSStrArray ar = [option componentsSeparatedByString:PGCmdLineParamSeparator limit:2];
-
-        if(ar.count > 1) {
-            option = ar[0];
-            param  = ar[1];
-        }
-
-        if(self.parseOptionDisallowLongOptionNames) {
-            PGSetReference(error, [self createError:PGErrorMsgCmdLineLongOptionsNotAllowed index:(idx - 1) item:item]);
-        }
-        else {
-            PGCmdLineItemType vald = [self validateOption:option item:item index:idx error:error];
-
-            if(OptionInError(vald)) {
-                if(error && ((*error) == nil)) *error = [self createError:@"Unknown error." index:(idx - 1) item:item];
-            }
-            else {
-                [self processOption:option parameter:param validation:vald item:item options:options index:idx error:error];
-            }
-        }
+    /**
+     * Process long options.  Long options are option that begin with two hyphen characters ("--") such as "--foo" where "foo" is the option name. Additionally long options
+     * can have parameters that are separated by a single equals sign ("=") such as "--foo=bar" where "foo" is the option name and "bar" is the parameter.
+     *
+     * @param item the command-line item.
+     * @param idx the index in the command-line where this option occurred.
+     * @param unknownOptions an array of unknown options that this option will be added to if it is not known.
+     * @param error if the option is unknown and unknown options are not allowed then this write-back parameter will be populated with an error.
+     * @return YES if an error occurred.
+     */
+    -(BOOL)processLongOption:(NSString *)item idx:(NSUInteger)idx unknownOptions:(NSMutableStrArray)unknownOptions error:(NSError **)error {
+        NSStrArray ar = [item componentsSeparatedByPattern:PGCmdLineLongOptionParamMarkerPattern limit:2];
+        return [self processOption:[self findOptionByLongName:ar[0]] param:((ar.count > 1) ? ar[1] : nil) item:item index:idx unknownOptions:unknownOptions error:error];
     }
 
-    -(NSUInteger)handleShortOption:(NSString *)item
-                           cmdLine:(NSStrArray)cmdLine
-                            length:(NSUInteger)length
-                             index:(NSUInteger)idx
-                           options:(NSMutableDictionary *)options
-                             error:(NSError **)error {
-        /*
-         * Short options may be a single character or a string of single characters each representing an option.
-         * Also, if any of the options requires a manditory parameter then any characters that come after it are
-         * considered to be a string representing the parameter.
-         *
-         * So, if you have a command-line argument like:
-         *
-         *                                         myExe -gorb123
-         *
-         * Then it would be the same as if the command-line had the following seven (7) items:
-         *
-         *                                      myExe -g -o -r -b -1 -2 -3
-         *
-         * But if the option "b" requires a manditory parameter then:
-         *
-         *                                         myExe -gorb123
-         *
-         * Then it would be the same as if the command-line had the following five (5) items:
-         *
-         *                                      myExe -g -o -r -b 123
-         *
-         * The "123" would be the parameter for the option "b". Options that only have optional parameters
-         * behave as if they require no parameters unless they are the very last option in the list in which
-         * case it would take the next command-line argument as a parameter if it is not an option (does not
-         * start with a dash (-)).  So, if you have a command-line with an option "k" that had an optional
-         * parameter like:
-         *
-         *                                          myExe -gork -q
-         *
-         * Then option "k" would have no parameter because "-q" is itself an option. But if you had a
-         * command-line like:
-         *
-         *                                          myExe -gork q
-         *
-         * Then the option for "k" would be "q" because "q" does not start with a dash so it is not
-         * another option.
-         */
-        __block NSUInteger tidx = idx;
+    /**
+     * Process sort options. Short options are options that begin with one hyphen character ("-") followed by one or more single character options. Examples are
+     * "-O" or "-abc". The latter being equivilant to "-a -b -c". If any option requires a parameter then any characters following it are considered the parameter, otherwise
+     * the next command-line item is used if it is not itself another option. Examples of this are "-ofoobar" and "-o foobar" in which case the option name is "o" and the
+     * parameter is "foobar". If an option requires a parameter and there are no more characters following it and the next command-line item is another option then an error
+     * will be generated. For example, "-o -b" will generated an error if "o" requires a parameter.
+     *
+     * @param item the command-line item.
+     * @param cmdLine the command-line.
+     * @param idx the index in the command-line where this item exists.
+     * @param unknownOptions an array of unknown options that these options will be added to if they are not known.
+     * @param error if any of these options are unknown and unknown options are not allowed then this write-back parameter will be populated with an error.
+     * @return the updated index.
+     */
+    -(NSUInteger)processShortOptions:(NSString *)item cmdLine:(NSStrArray)cmdLine index:(NSUInteger)idx unknownOptions:(NSMutableStrArray)unknownOptions error:(NSError **)error {
+        __block NSError    *err = nil;
+        __block NSUInteger i    = idx;
 
-        /*
-         * Go through the characters one at a time, validate (to find out if it takes parameters) and then send
-         * for processing.
-         */
-        PGCharEnumBlock enumBlock = ^BOOL(unichar c, unichar *dc, NSRange range, BOOL composed, NSString *before, NSString *after) {
-            NSString          *option        = [NSString stringWithCharacters:dc length:range.length];
-            NSString          *param         = nil;
-            BOOL              stop           = NO;
-            BOOL              nextMayBeParam = ((idx < length) && ![self isOptionStyle:cmdLine[idx]]);
-            PGCmdLineItemType vald           = [self validateOption:option item:item index:idx error:error];
+        PGCharEnumBlock blk = ^BOOL(unichar c, unichar *dc, NSRange range, BOOL composed, NSString *before, NSString *after) {
+            NSString        *name   = [NSString stringWithCharacters:dc length:range.length];
+            PGCmdLineOption *option = [self findOptionByShortName:name];
 
-            if(OptionInError(vald)) {
-                if((*error) == nil) (*error) = [self createError:@"Unknown error." index:(idx - 1) item:item];
-                stop = YES;
-            }
-            else if(after == nil) {
-                /*
-                 * If there are no more characters after this one (after is NULL) and
-                 * this option _might_ take a parameter then look to see if the next
-                 * command-line item is a non-option (doesn't start with '-') and then
-                 * make that the parameter.
-                 */
-                if(nextMayBeParam && !OptionNoParam(vald)) param = cmdLine[tidx++];
-            }
-            else if(OptionMustHaveParam(vald)) {
-                /*
-                 * If this options requires a parameter and there are more characters
-                 * left (after is _not_ NULL) then those characters will become the
-                 * parameter and we are done.
-                 */
-                param = after;
-                stop  = YES;
+            if(option.argumentState == PGCmdLineArgRequired) {
+                if(after.length > 0) {
+                    [self processOption:option param:[after copy] item:name index:i unknownOptions:unknownOptions error:&err];
+                    return YES;
+                }
+                else if((i + 1) < cmdLine.count) {
+                    NSString *cln = [self cleanNonOption:cmdLine[(i + 1)]];
+
+                    if(!isOption(cln)) {
+                        [self processOption:option param:cln item:name index:i++ unknownOptions:unknownOptions error:&err];
+                        return YES;
+                    }
+                }
             }
 
-            BOOL res = [self processOption:option parameter:param validation:vald item:item options:options index:idx error:error];
-            return (stop || res);
+            return [self processOption:option param:nil item:name index:idx unknownOptions:unknownOptions error:&err];
         };
 
-        NSString *q = [item substringFromIndex:1];
-        [q enumerateOverCharactersWithBlock:enumBlock range:NSMakeRange(0, q.length)];
-        return tidx;
+        [item enumerateOverCharactersWithBlock:blk];
+        PGSetReference(error, err);
+        return i;
     }
 
-    -(BOOL)processOption:(NSString *)option
-               parameter:(NSString *)param
-              validation:(PGCmdLineItemType)vld
+    /**
+     * Process the option...
+     *
+     * @param option the option
+     * @param param the parameter if any.
+     * @param item the command-line item.
+     * @param idx the index of the command-line item.
+     * @param unknownOptions the array of unknown options found so far.
+     * @param error if an error occurs it will be stored in this write-back variable.
+     * @return YES if an error occurred.
+     */
+    -(BOOL)processOption:(PGCmdLineOption *)option param:(NSString *)param
                     item:(NSString *)item
-                 options:(NSMutableDictionary *)options
-                   index:(NSUInteger)idx
+                   index:(NSUInteger)idx unknownOptions:(NSMutableStrArray)unknownOptions
                    error:(NSError **)error {
+        NSError *err = nil;
 
-        NSError *err   = nil;
-        BOOL    exists = (options[option] != nil);
+        if(option) {
+            if(param && (option.argumentState == PGCmdLineArgNone)) {
+                // If we have a parameter but this option does not take one...
+                err = [self createError:PGErrorMsgCmdLineUnexpectedParameter index:idx item:item];
+            }
+            else if(!param && (option.argumentState == PGCmdLineArgRequired)) {
+                // If the option requires a parameter but doesn't have one...
+                err = [self createError:PGErrorMsgCmdLineParameterExpected index:idx item:item];
+            }
+            else if(option.wasFound && self.parseOptionDisallowDuplicates) {
+                // If there was a duplicate option but duplicates are not allowed.
+                err = [self createError:PGErrorMsgCmdLineDuplicateFound index:idx item:item];
+            }
+            else if(!(option.wasFound && self.parseOptionDuplicatesKeepFirst)) {
+                // Normal case...
+                if(param) param = [self validateItemParameter:param option:option item:item index:idx error:&err];
 
-        if(OptionIsUnknown(vld) && self.parseOptionDisallowUknownOptions) {
-            err = [self createError:@"Unknown option." index:(idx - 1) item:item];
+                if(!err) {
+                    option.wasFound = YES;
+                    option.argument = param;
+                }
+            }
         }
-        else if(exists && self.parseOptionDisallowDuplicates) {
-            err = [self createError:@"Option already exists." index:(idx - 1) item:item];
-        }
-        else if(param && OptionNoParam(vld)) {
-            err = [self createError:@"Unexpected option parameter." index:(idx - 1) item:item];
-        }
-        else if((param == nil) && OptionMustHaveParam(vld)) {
-            err = [self createError:@"Option parameter expected." index:(idx - 1) item:item];
-        }
-        else if(!(exists && self.parseOptionDuplicatesKeepFirst)) {
-            options[option] = ((id)param ?: (id)[NSNull null]);
+        else if([self testForError:self.parseOptionDisallowUknownOptions item:item index:idx reason:PGErrorMsgCmdLineUnknownOption error:&err]) {
+            [unknownOptions addObject:item];
         }
 
         PGSetReference(error, err);
         return (err != nil);
     }
 
-    -(PGCmdLineItemType)validateOption:(NSString *)option item:(NSString *)item index:(NSUInteger)idx error:(NSError **)error {
-        if(option.length == 0) {
-            PGSetReference(error, [self createError:@"Invalid Option" index:(idx - 1) item:@""]);
-            return PGCmdLineItemTypeError;
+    /**
+     * Validate a given parameter for an option based on it's specified type.
+     *
+     * @param param the parameter.
+     * @param option the option.
+     * @param item the command-line item.
+     * @param idx the index of the command-line item.
+     * @param error write-back parameter to receive any errors.
+     * @return the parameter which may or may not have been "cleaned".
+     */
+    -(NSString *)validateItemParameter:(NSString *)param option:(PGCmdLineOption *)option item:(NSString *)item index:(NSUInteger)idx error:(NSError **)error {
+        NSError  *err    = nil;
+        NSString *errmsg = PGFormat(PGErrorMsgCmdLineParamNotValidType, otypes(option.argumentType));
+
+        switch(option.argumentType) {
+            case PGCmdLineArgTypeInteger: {
+                NSScanner *sc = [NSScanner localizedScannerWithString:param];
+                NSInteger si  = 0;
+                if([self testForError:![sc scanInteger:&si] item:item index:idx reason:errmsg error:&err]) {
+                    param = [@(si) stringValue];
+                }
+                break;
+            }
+            case PGCmdLineArgTypeFloat: {
+                NSScanner *sc = [NSScanner localizedScannerWithString:param];
+                double    sd  = 0.0;
+                if([self testForError:![sc scanDouble:&sd] item:item index:idx reason:errmsg error:&err]) {
+                    param = [@(sd) stringValue];
+                }
+                break;
+            }
+            case PGCmdLineArgTypeDate: {
+                NSString *s = PGValidateDate(param);
+                if([self testForError:(s == nil) item:item index:idx reason:errmsg error:&err]) {
+                    param = s;
+                }
+                break;
+            }
+            case PGCmdLineArgTypeTime: {
+                NSString *s = PGValidateTime(param);
+                if([self testForError:(s == nil) item:item index:idx reason:errmsg error:&err]) {
+                    param = s;
+                }
+                break;
+            }
+            case PGCmdLineArgTypeRegex: {
+                NSRegularExpression *r = option.regex;
+                if(r) {
+                    @synchronized(r) {
+                        if(![r matches:param]) err = [self createError:PGErrorMsgCmdLineParamNotValidRegex index:idx item:item];
+                    }
+                }
+                break;
+            }
+            default: break;
         }
 
-        PGSetReference(error, nil);
-        return (PGCmdLineItemTypeUnknownOption | PGCmdLineItemTypeOptionalParameter | ((option.length == 1) ? PGCmdLineItemTypeShortOption : PGCmdLineItemTypeLongOption));
+        PGSetReference(error, err);
+        return param;
     }
 
-    -(BOOL)isOptionStyle:(NSString *)item {
-        return ([item isEqualToString:@"--"] || [item hasPrefix:@"--"] || ((item.length > 1) && [item hasPrefix:@"-"]));
+    /**
+     * Simple helper method that sets the error variable if the predicate is YES.
+     *
+     * @param predicate if YES then an error occurred and the error field will be set.
+     * @param item the command-line item.
+     * @param idx the index of the command-line item the error occurred with.
+     * @param reason the description of the error.
+     * @param error a pointer to an NSError variable.
+     * @return NO if an error occurred or YES if there was no error.
+     */
+    -(BOOL)testForError:(BOOL)predicate item:(NSString *)item index:(NSUInteger)idx reason:(NSString *)reason error:(NSError **)error {
+        if(predicate) PGSetReference(error, [self createError:reason index:idx item:item]);
+        return !predicate;
     }
 
-    -(NSError *)lookForMissingOptions {
-        return nil;
+    -(PGCmdLineOption *)optionAtIndex:(NSUInteger)idx {
+        PGCmdLineOptionSet opts = self.options;
+        return (((idx == NSNotFound) || (idx >= opts.count)) ? nil : opts[idx]);
+    }
+
+    -(PGCmdLineOption *)findOptionPassingTest:(PGFindCmdLineOptionInArrayBlock)predicate {
+        return [self optionAtIndex:[self.options indexOfObjectPassingTest:predicate]];
+    }
+
+    -(PGCmdLineOption *)findOptionByShortName:(NSString *)name {
+        return [self findOptionPassingTest:^BOOL(PGCmdLineOption *option, NSUInteger i, BOOL *stop) { return PGStringsEqual(name, option.shortName); }];
+    }
+
+    -(PGCmdLineOption *)findOptionByLongName:(NSString *)name {
+        return [self findOptionPassingTest:^BOOL(PGCmdLineOption *option, NSUInteger i, BOOL *stop) { return PGStringsEqual(name, option.longName); }];
+    }
+
+    -(NSString *)cleanOption:(NSString *)option {
+        NSRegularExpression *regex = self.optionCleaningRegex;
+
+        if(regex == nil) {
+            @synchronized(self) {
+                if((regex = self.optionCleaningRegex) == nil) {
+                    NSError *error = nil;
+                    self.optionCleaningRegex = regex = [NSRegularExpression cachedRegex:PGCmdLineCleanOptionPattern prefix:PGCmdLineRegexPrefix error:&error];
+                    if(error) @throw [error makeException];
+                }
+            }
+        }
+
+        if(regex) {
+            @synchronized(regex) {
+                option = [regex stringByReplacingMatchesInString:option options:0 range:option.range withTemplate:@"$1"];
+            }
+        }
+
+        return option;
+    }
+
+    -(NSString *)cleanNonOption:(NSString *)nonOption {
+        NSRegularExpression *regex = self.nonOptionCleaningRegex;
+
+        if(regex == nil) {
+            @synchronized(self) {
+                if((regex = self.nonOptionCleaningRegex) == nil) {
+                    NSError *error = nil;
+                    self.nonOptionCleaningRegex = regex = [NSRegularExpression cachedRegex:PGCmdLineCleanNonOptionPattern prefix:PGCmdLineRegexPrefix error:&error];
+                    if(error) @throw [error makeException];
+                }
+            }
+        }
+
+        if(regex) {
+            @synchronized(regex) {
+                nonOption = [regex stringByReplacingMatchesInString:nonOption options:0 range:nonOption.range withTemplate:@"$1$2"];
+            }
+        }
+
+        return nonOption;
     }
 
     -(NSError *)createError:(NSString *)msg index:(NSUInteger)idx item:(NSString *)item {
-        NSDictionary *dict = @{
-                NSLocalizedDescriptionKey: msg, PGCmdLineErrorIndexKey: @(idx), PGCmdLineErrorItemKey: item
-        };
+        /* @f:0 */ NSDictionary *dict = @{ NSLocalizedDescriptionKey: msg, PGCmdLineErrorIndexKey: @(idx), PGCmdLineErrorItemKey: item }; /* @f:1 */
         return [NSError errorWithDomain:PGErrorDomain code:PGErrorCodeCmdLineParseError userInfo:dict];
-    }
-
-    -(BOOL)parseOptionDisallowLongOptionNames {
-        return ((self.parseOptions & PGCmdLineParseOptionDisallowLongOptionNames) == PGCmdLineParseOptionDisallowLongOptionNames);
     }
 
     -(BOOL)parseOptionDisallowNonOptions {
@@ -392,5 +429,28 @@ typedef BOOL (^AlreadyExistsBlk)(NSString *);
         return ((self.parseOptions & PGCmdLineParseOptionDisallowUnknownOptions) == PGCmdLineParseOptionDisallowUnknownOptions);
     }
 
+    -(NSString *)description {
+        NSMutableString *description = [NSMutableString stringWithFormat:@"<%@:\n", NSStringFromClass([self class])];
+        [description appendFormat:@"         executable: \"%@\"\n", self.executableName];
+        [description appendFormat:@"            options: %lu\n", self.options.count];
+        for(PGCmdLineOption *opt in self.options) {
+            [description appendFormat:@"                   : %@\n", opt.description];
+        }
+        [description appendFormat:@"    unknown options: %lu\n", self.unknownOptions.count];
+        for(NSString *str in self.unknownOptions) {
+            [description appendFormat:@"                   : %@\n", str];
+        }
+        [description appendFormat:@"          arguments: %lu\n", self.nonOptionArguments.count];
+        for(NSString *str in self.nonOptionArguments) {
+            [description appendFormat:@"                   : %@\n", str];
+        }
+        [description appendString:@">"];
+        return description;
+    }
+
+    -(id)copyWithZone:(nullable NSZone *)zone {
+        return self; // PGCmdLine is immutable...
+    }
 
 @end
+

@@ -247,7 +247,7 @@
     }
 
     -(void)queueData:(NSData *)data {
-        if(data.length) [self _queueData:data range:NSMakeRange(0, data.length)];
+        if(data.length) [self _queueData:data range:data.range];
     }
 
     -(void)queueData:(NSData *)data range:(NSRange)range {
@@ -317,7 +317,7 @@
     }
 
     -(void)requeueData:(NSData *)data {
-        if(data.length) [self _requeueData:data range:NSMakeRange(0, data.length)];
+        if(data.length) [self _requeueData:data range:data.range];
     }
 
     -(void)requeueData:(NSData *)data range:(NSRange)range {

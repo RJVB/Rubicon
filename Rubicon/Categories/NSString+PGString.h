@@ -46,6 +46,8 @@ typedef NSString *_Nullable (^PGRegexFilterBlock)(NSString *str, NSString *sub, 
                                   replacementBlock:(NS_NOESCAPE PGRegexFilterBlock)replBlock
                                              error:(NSError **)error;
 
+    -(NSRange)range;
+
     -(NSString *)stringByFrontPaddingToLength:(NSUInteger)len withString:(NSString *)str startingAtIndex:(NSUInteger)idx;
 
     -(NSString *)stringByCenteringInPaddingOfLength:(NSUInteger)len withString:(NSString *)str startingAtIndex:(NSUInteger)idx;
@@ -73,7 +75,7 @@ typedef NSString *_Nullable (^PGRegexFilterBlock)(NSString *str, NSString *sub, 
      * character sequence as a string.
      *
      * This method simply calls:
-     *     [self indexOfCharacter:c inRange:NSMakeRange(0, self.length)]
+     *     [self indexOfCharacter:c inRange:self.range]
      *
      * @param c the UTF-16 unicode code point to search for.
      * @return the index of the first instance of the character in this string or NSNotFound.
@@ -225,15 +227,17 @@ typedef NSString *_Nullable (^PGRegexFilterBlock)(NSString *str, NSString *sub, 
 
     -(NSString *)substringFrom:(NSUInteger)idx1 to:(NSUInteger)idx2;
 
+    -(BOOL)enumerateOverCharactersWithBlock:(PGCharEnumBlock)enumBlock;
+
     /**
-     * Convienience method for:
-     *           [string componentsSeparatedByPattern:pattern limit:0 options:0 keepSeparator:NO error:nil]
-     *
-     * @param pattern the regular expression pattern.
-     * @return An NSArray object containing substrings from the receiver that have been divided by
-     *         separator. If there was an error in the regular expression then a NULL value will be
-     *         returned.
-     */
+         * Convienience method for:
+         *           [string componentsSeparatedByPattern:pattern limit:0 options:0 keepSeparator:NO error:nil]
+         *
+         * @param pattern the regular expression pattern.
+         * @return An NSArray object containing substrings from the receiver that have been divided by
+         *         separator. If there was an error in the regular expression then a NULL value will be
+         *         returned.
+         */
     -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern;
 
     /**

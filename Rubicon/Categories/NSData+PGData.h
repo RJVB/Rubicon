@@ -31,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSData(PGData)
 
+    -(NSRange)range;
+
     +(NSData *)dataFromFileDescriptor:(int)fd closeOnFinish:(BOOL)willClose error:(NSError **)error;
 
 @end

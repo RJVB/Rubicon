@@ -27,6 +27,11 @@ static const NSUInteger PGDataReadBufferSize = 8196;
 
 @implementation NSData(PGData)
 
+    -(NSRange)range {
+        NSRange r = { .location = 0, .length = self.length };
+        return r;
+    }
+
     +(NSData *)dataFromFileDescriptor:(int)fd closeOnFinish:(BOOL)willClose error:(NSError **)error {
         NSData *results = nil;
 

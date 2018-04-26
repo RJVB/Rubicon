@@ -61,7 +61,7 @@
 
             if(lerror == nil) {
                 NSUInteger lastLocation = 0;
-                NSArray    *matches     = [regex matchesInString:aString options:0 range:NSMakeRange(0, aString.length)];
+                NSArray    *matches     = [regex matchesInString:aString options:0 range:aString.range];
 
                 rString = [NSMutableString string];
 
