@@ -32,6 +32,17 @@
 
 #define PGThrowOutOfMemoryException @throw [NSException exceptionWithName:NSMallocException reason:@"Out of memory" userInfo:nil]
 
+/**
+ * Given a string, this function will prefix all of the specified characters with the escapeChar.
+ *
+ * @param str the string.
+ * @param escapeChar the character that will be prefixed to each of the following characters. If the string contains more than one character then only the first one is used.
+ * @param ... a list of strings containing the characters to escape. If any of the strings contains more than one character (composed character, such as emojis,
+ *            count as one character) then each character will be broken out separately.
+ * @return a new string with the escaped sequences.
+ */
+FOUNDATION_EXPORT NSString *PGEscapeString(NSString *str, NSString *escapeChar, ...) NS_REQUIRES_NIL_TERMINATION;
+
 FOUNDATION_EXPORT NSString *_Nullable PGValidateDate(NSString *_Nonnull dateString);
 
 FOUNDATION_EXPORT NSString *_Nullable PGValidateTime(NSString *_Nonnull timeString);
@@ -76,7 +87,18 @@ NS_INLINE BOOL PGObjectsEqual(id _Nullable obj1, id _Nullable obj2) {
  * @return YES if both strings are either NULL or equal according to the isEqualToString: selector.
  */
 NS_INLINE BOOL PGStringsEqual(NSString *const _Nullable str1, NSString *const _Nullable str2) {
-    return ((str1 == nil) ? (str2 == nil) : (str2 == nil) ? NO : [str1 isEqualToString:str2]);
+    return ((str1 == nil) ? (str2 == nil) : (str2 && ((str1 == str2) || [str1 isEqualToString:str2])));
+}
+
+/**
+ * Test the equality of two arrays. Safely handles the case of either or both arrays being NULL.
+ *
+ * @param ar1 the first array.
+ * @param ar2 the second array.
+ * @return YES if both string are either NULL or equal according to the isEqualToArray: selector.
+ */
+NS_INLINE BOOL PGArraysEqual(NSArray *const _Nullable ar1, NSArray *const _Nullable ar2) {
+    return ((ar1 == nil) ? (ar2 == nil) : (ar2 && ((ar1 == ar2) || [ar1 isEqualToArray:ar2])));
 }
 
 /**
@@ -181,5 +203,9 @@ FOUNDATION_EXPORT NSURL *_Nullable PGTemporaryDirectory(NSError *_Nullable *_Nul
  * @return a URL to a temporary file or NULL if an error occurs.
  */
 FOUNDATION_EXPORT NSURL *_Nullable PGTemporaryFile(NSString *_Nonnull filenamePostfix, NSError *_Nullable *_Nullable error);
+
+NS_INLINE NSComparisonResult PGInvertComparison(NSComparisonResult cr) {
+    return ((NSComparisonResult)(((NSInteger)(cr)) * -1L));
+}
 
 #endif //__Rubicon_PGTools_H_

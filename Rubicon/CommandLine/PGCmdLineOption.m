@@ -19,9 +19,13 @@
 #import "PGCmdLineCommon.h"
 
 @implementation PGCmdLineOption {
+        NSLock              *_lock;
         NSString            *_description;
-        NSString            *_regexPattern;
         NSRegularExpression *_regex;
+        NSUInteger          _hash;
+        dispatch_once_t     _hashOnce;
+        dispatch_once_t     _lockOnce;
+        dispatch_once_t     _regexOnce;
     }
 
     @synthesize shortName = _shortName;
@@ -31,6 +35,7 @@
     @synthesize argumentType = _argumentType;
     @synthesize argumentState = _argumentState;
     @synthesize argument = _argument;
+    @synthesize regexPattern = _regexPattern;
 
     -(instancetype)initWithShortName:(NSString *)shortName
                             longName:(NSString *)longName
@@ -83,32 +88,19 @@
     }
 
     -(NSRegularExpression *)regex {
-        if(_regexPattern) {
-            if(_regex == nil) {
-                @synchronized(self) {
-                    if(_regex == nil) {
-                        NSError *err = nil;
-                        _regex = [NSRegularExpression cachedRegex:_regexPattern prefix:PGCmdLineRegexPrefix error:&err];
+        dispatch_once(&_regexOnce, ^{
+            if(self->_regexPattern) {
+                NSError *err = nil;
+                self->_regex = [NSRegularExpression cachedRegex:self->_regexPattern prefix:PGCmdLineRegexPrefix error:&err];
 #ifdef DEBUG
-                        if(!_regex) {
-                            if(!err) err = [NSError errorWithDomain:PGErrorDomain code:1 userInfo:@{ NSLocalizedDescriptionKey: @"Unknown Error." }];
-                            NSLog(@"ERROR: Invalid Regex Pattern: %@", err);
-                        }
-#endif
-                    }
+                if(!self->_regex) {
+                    if(!err) err = [NSError errorWithDomain:PGErrorDomain code:PGErrorCodeUnknownError userInfo:@{ NSLocalizedDescriptionKey: PGErrorMsgUnknowError }];
+                    NSLog(@"ERROR: Invalid Regex Pattern: %@", err);
                 }
+#endif
             }
-        }
-
+        });
         return _regex;
-    }
-
-    -(BOOL)isEqualToShortName:(NSString *)name {
-        return PGStringsEqual(name, self.shortName);
-    }
-
-    -(BOOL)isEqualToLongName:(NSString *)name {
-        return PGStringsEqual(name, self.longName);
     }
 
     -(NSComparisonResult)compare:(PGCmdLineOption *)other {
@@ -122,22 +114,33 @@
     }
 
     -(NSString *)description {
-        NSMutableString *str = [NSMutableString stringWithFormat:@"<%@:", NSStringFromClass([self class])];
+        [self.lock lock];
 
-        if(self.shortName) [str appendFormat:@" shortName: \"%@\";", self.shortName];
-        if(self.longName) [str appendFormat:@" longName: \"%@\";", self.longName];
+        @try {
+            if(_description == nil) {
+                NSMutableString *str = [NSMutableString stringWithFormat:@"<%@:", NSStringFromClass([self class])];
 
-        [str appendFormat:@" isRequired: %@; parameters: %@;", obool(self.isRequired), oargs(self.argumentState)];
+                if(self.shortName) [str appendFormat:@" shortName: \"%@\";", self.shortName];
+                if(self.longName) [str appendFormat:@" longName: \"%@\";", self.longName];
 
-        if(self.argumentState != PGCmdLineArgNone) [str appendFormat:@" parameterType: %@;", otypes(self.argumentType)];
-        if(self.regex) [str appendFormat:@" regex: \"%@\";", self.regex.pattern];
+                [str appendFormat:@" isRequired: %@; parameters: %@;", obool(self.isRequired), oargs(self.argumentState)];
 
-        [str appendFormat:@" wasFound: %@;", obool(self.wasFound)];
+                if(self.argumentState != PGCmdLineArgNone) [str appendFormat:@" parameterType: %@;", otypes(self.argumentType)];
+                if(self.regex) [str appendFormat:@" regex: \"%@\";", self.regex.pattern];
 
-        if(self.argument) [str appendFormat:@" parameter: \"%@\";", self.argument];
+                [str appendFormat:@" wasFound: %@;", obool(self.wasFound)];
 
-        [str appendString:@">"];
-        return str;
+                if(self.argument) [str appendFormat:@" parameter: \"%@\";", self.argument];
+
+                [str appendString:@">"];
+                _description = str;
+            }
+        }
+        @finally {
+            [self.lock unlock];
+        }
+
+        return _description;
     }
 
     -(NSString *)nameDescription {
@@ -160,6 +163,58 @@
         }
 
         return copy;
+    }
+
+    -(BOOL)isEqual:(id)other {
+        return (other && ((other == self) || ([other isKindOfClass:[self class]] && [self _isEqualToOption:other])));
+    }
+
+    -(BOOL)isEqualToOption:(PGCmdLineOption *)option {
+        return (option && ((option == self) || [self _isEqualToOption:option]));
+    }
+
+    -(BOOL)_isEqualToOption:(PGCmdLineOption *)option {
+        return (PGStringsEqual(_regexPattern, option->_regexPattern) &&
+                PGStringsEqual(_shortName, option.shortName) &&
+                PGStringsEqual(_longName, option.longName) &&
+                (_isRequired == option.isRequired) &&
+                (_argumentState == option.argumentState) &&
+                (_argumentType == option.argumentType));
+    }
+
+    -(NSUInteger)hash {
+        dispatch_once(&_hashOnce, ^{
+            self->_hash = (((((((((([self->_regexPattern hash] * 31u) + [self->_shortName hash]) * 31u) + [self->_longName hash]) * 31u) + self->_isRequired) * 31u) +
+                             (NSUInteger)self->_argumentType) * 31u) + (NSUInteger)self->_argumentState);
+        });
+        return _hash;
+    }
+
+    -(void)setWasFound:(BOOL)wasFound {
+        [self.lock lock];
+        @try {
+            if(_wasFound != wasFound) {
+                _description = nil;
+                _wasFound    = wasFound;
+            }
+        }
+        @finally { [self.lock unlock]; }
+    }
+
+    -(void)setArgument:(NSString *)argument {
+        [self.lock lock];
+        @try {
+            if(!PGStringsEqual(_argument, argument)) {
+                _description = nil;
+                _argument    = argument;
+            }
+        }
+        @finally { [self.lock unlock]; }
+    }
+
+    -(NSLock *)lock {
+        dispatch_once(&_lockOnce, ^{ self->_lock = [NSLock new]; });
+        return _lock;
     }
 
 @end

@@ -36,6 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(NSString *)stringByReplacingMatchesInString:(NSString *)str options:(NSMatchingOptions)options withTemplate:(NSString *)template;
 
+    -(NSString *)stringByReplacingMatchesInString:(NSString *)str withTemplate:(NSString *)template;
+
     +(NSRegularExpression *)cachedRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options prefix:(nullable NSString *)prefix error:(NSError **)error;
 
     +(NSRegularExpression *)cachedRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options error:(NSError **)error;

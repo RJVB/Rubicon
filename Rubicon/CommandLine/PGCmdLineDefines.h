@@ -31,6 +31,7 @@ typedef NS_OPTIONS(uint8_t, PGCmdLineParseOptions) {
 
 typedef NS_ENUM(uint8_t, PGCmdLineOptionArgument) {
     PGCmdLineArgNone = 0, // DEFAULT - Option takes no nonOptionArguments.
+    PGCmdLineArgOptional, // Option can take an optional argument.
     PGCmdLineArgRequired  // Option takes a mandatory argument.
 };
 
@@ -43,6 +44,15 @@ typedef NS_ENUM(uint8_t, PGCmdLineArgumentType) {
     PGCmdLineArgTypeTime,     // A valid time.
     PGCmdLineArgTypeRegex     // A string that matches a given regex pattern.
 };
+
+typedef struct _pg_cmdline_option_struct {
+    char                    *shortName;
+    char                    *longName;
+    uint8_t                 isRequired;
+    PGCmdLineOptionArgument argumentState;
+    PGCmdLineArgumentType   argumentType;
+    char                    *regexPattern;
+}                          PGCmdLineOptionStruct;
 
 FOUNDATION_EXPORT NSString *const PGCmdLineParamSeparator;
 
@@ -60,5 +70,6 @@ FOUNDATION_EXPORT NSString *const PGErrorMsgCmdLineUnexpectedParameter;
 FOUNDATION_EXPORT NSString *const PGErrorMsgCmdLineParameterExpected;
 FOUNDATION_EXPORT NSString *const PGErrorMsgCmdLineDuplicateFound;
 FOUNDATION_EXPORT NSString *const PGErrorMsgCmdLineUnknownOption;
+FOUNDATION_EXPORT NSString *const PGErrorMsgCmdLineOptionsNotFound;
 
 #endif //RUBICON_PGCMDLINEDEFINES_H

@@ -32,6 +32,7 @@ NSExceptionName const PGOSErrorException       = @"PGOSErrorException";
 
 NSString *const PGDefaultSemaphoreNamePrefix = @"/sem";
 
+const NSInteger PGErrorCodeUnknownError       = 1;
 const NSInteger PGErrorCodeExceptionAsError   = 100;
 const NSInteger PGErrorCodeCmdLineParseError  = 200;
 const NSInteger PGErrorCodeRegexPatternIsNULL = 300;
@@ -41,3 +42,5 @@ NSString *const PGUnderlyingExceptionKey = @"PGUnderlyingExceptionKey";
 
 NSString *const PGErrorMsgBadRegexPattern    = @"Invalid regular expression pattern";
 NSString *const PGErrorMsgRegexPatternIsNULL = @"Regex pattern is NULL.";
+NSString *const PGErrorMsgUnknowError        = @"Unknown Error.";
+

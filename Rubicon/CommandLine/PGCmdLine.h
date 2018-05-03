@@ -36,16 +36,35 @@ NS_ASSUME_NONNULL_BEGIN
     -(instancetype)initWithArguments:(const char **)argv
                               length:(NSUInteger)argc
                             encoding:(NSStringEncoding)encoding
-                        parseOptions:(PGCmdLineParseOptions)parseOptions options:(NSArray<PGCmdLineOption *> *)options
-                               error:(NSError **)error;
-
-    -(instancetype)initWithArguments:(const char **)argv
-                              length:(NSUInteger)argc
                         parseOptions:(PGCmdLineParseOptions)parseOptions
                              options:(NSArray<PGCmdLineOption *> *)options
                                error:(NSError **)error;
 
-    -(id)copyWithZone:(nullable NSZone *)zone;
+    +(instancetype)cmdLineWithArguments:(const char **)argv
+                                 length:(NSUInteger)argc
+                               encoding:(NSStringEncoding)encoding
+                           parseOptions:(PGCmdLineParseOptions)parseOptions
+                                options:(NSArray<PGCmdLineOption *> *)options
+                                  error:(NSError **)error;
+
+    +(instancetype)cmdLineWithArguments:(const char **)argv
+                                 length:(NSUInteger)argc
+                           parseOptions:(PGCmdLineParseOptions)parseOptions
+                                options:(NSArray<PGCmdLineOption *> *)options
+                                  error:(NSError **)error;
+
+    +(instancetype)cmdLineWithArguments:(const char **)argv
+                                 length:(NSUInteger)argc
+                               encoding:(NSStringEncoding)encoding
+                           parseOptions:(PGCmdLineParseOptions)parseOptions
+                             optionList:(const PGCmdLineOptionStruct *)options
+                                  error:(NSError **)error;
+
+    +(instancetype)cmdLineWithArguments:(const char **)argv
+                                 length:(NSUInteger)argc
+                           parseOptions:(PGCmdLineParseOptions)parseOptions
+                             optionList:(const PGCmdLineOptionStruct *)options
+                                  error:(NSError **)error;
 
 @end
 

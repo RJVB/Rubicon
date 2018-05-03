@@ -67,19 +67,54 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
         [super tearDown];
     }
 
-    -(void)test86CommandLine {
-        const char *cmdline[]   = {
-                "programName", "-foo", "--foo", "--bar=galen", "-bar", "rhodes", "--", "galen", "rhodes", "was", "here"
+    -(void)test84Regex {
+        NSString *str = @"Now \"is\" the time for some\\all good men to come to the end of their country.";
+        NSLog(@"Before: \"%@\"", str);
+        NSLog(@" After: \"%@\"", PGEscapeString(str, @"\\", @"\"\\", @".", nil));
+    }
+
+    -(void)t_est85CommandLine {
+        const char *cmdline[]    = {
+                "programName", "-R$1,234.4", "--nop=7.65E-3", "-foo", "--foo", "--bar=56789", "-bar", "012345", "--jail", "\\--jail", "\\\\--jail", "--", "galen", "rhodes",
+                "is\\was", "\"here\""
         };
-        NSError    *error       = nil;
-        NSArray    *opts        = @[
+        NSUInteger cmdLineLength = (NSUInteger)(sizeof(cmdline) / sizeof(char *));
+
+        const PGCmdLineOptionStruct opts[] = { // @f:0
+            { .shortName = "f",  .longName = "foo", .isRequired = 1, .argumentState = PGCmdLineArgNone,     .argumentType = PGCmdLineArgTypeNone    }, // 1
+            { .shortName = "o",  .longName = NULL,  .isRequired = 1, .argumentState = PGCmdLineArgRequired, .argumentType = PGCmdLineArgTypeString  }, // 2
+            { .shortName = "r",  .longName = "bar", .isRequired = 0, .argumentState = PGCmdLineArgRequired, .argumentType = PGCmdLineArgTypeInteger }, // 3
+            { .shortName = "b",  .longName = NULL,  .isRequired = 0, .argumentState = PGCmdLineArgNone,     .argumentType = PGCmdLineArgTypeNone    }, // 4
+            { .shortName = "a",  .longName = NULL,  .isRequired = 0, .argumentState = PGCmdLineArgNone,     .argumentType = PGCmdLineArgTypeNone    }, // 5
+            { .shortName = NULL, .longName = "nop", .isRequired = 0, .argumentState = PGCmdLineArgRequired, .argumentType = PGCmdLineArgTypeFloat   }, // 6
+            { .shortName = "D",  .longName = NULL,  .isRequired = 0, .argumentState = PGCmdLineArgRequired, .argumentType = PGCmdLineArgTypeDate    }, // 7
+            { .shortName = "T",  .longName = NULL,  .isRequired = 0, .argumentState = PGCmdLineArgRequired, .argumentType = PGCmdLineArgTypeTime    }, // 8
+            { .shortName = "R",  .longName = NULL,  .isRequired = 0, .argumentState = PGCmdLineArgRequired, .argumentType = PGCmdLineArgTypeRegex, .regexPattern = "\\$-?[0-9]{1,3}(?:,[0-9]{3})*(?:\\.[0-9]{2})?" }, // 9
+            { .shortName = NULL, .longName = NULL } // *END* @f:1
+        };
+        NSError                     *error = nil;
+
+        PGCmdLine *commandLine = [PGCmdLine cmdLineWithArguments:cmdline length:cmdLineLength encoding:NSUTF8StringEncoding parseOptions:0 optionList:opts error:&error];
+        NSLog(@"ERROR: %@", error);
+        NSLog(@"%@", commandLine.description);
+        NSLog(@"%@", @"Done");
+    }
+
+    -(void)t_est86CommandLine {
+        const char *cmdline[]    = {
+                "programName", "-foo", "--foo", "--bar=galen", "-bar", "rhodes", "--jail", "--", "galen", "rhodes", "is\\was", "\"here\""
+        };
+        NSUInteger cmdLineLength = (NSUInteger)(sizeof(cmdline) / sizeof(char *));
+
+        NSError   *error       = nil;
+        NSArray   *opts        = @[
                 PGMakeCmdLineOpt(@"f", @"foo", YES, PGCmdLineArgNone, PGCmdLineArgTypeNone, nil),      // 1
                 PGMakeCmdLineOpt(@"o", nil, YES, PGCmdLineArgRequired, PGCmdLineArgTypeString, nil),   // 2
                 PGMakeCmdLineOpt(@"r", @"bar", NO, PGCmdLineArgRequired, PGCmdLineArgTypeString, nil), // 3
                 PGMakeCmdLineOpt(@"b", nil, NO, PGCmdLineArgNone, PGCmdLineArgTypeNone, nil),          // 4
                 PGMakeCmdLineOpt(@"a", nil, NO, PGCmdLineArgNone, PGCmdLineArgTypeNone, nil)           // 5
         ];
-        PGCmdLine  *commandLine = [[PGCmdLine alloc] initWithArguments:cmdline length:11 encoding:NSUTF8StringEncoding parseOptions:0 options:opts error:&error];
+        PGCmdLine *commandLine = [[PGCmdLine alloc] initWithArguments:cmdline length:cmdLineLength encoding:NSUTF8StringEncoding parseOptions:0 options:opts error:&error];
 
         NSLog(@"ERROR: %@", error);
         NSLog(@"%@", commandLine.description);
@@ -88,7 +123,9 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
                 "programName", "--bar=galen", "-bar", "rhodes", "--", "galen", "rhodes", "was", "here"
         };
 
-        commandLine = [[PGCmdLine alloc] initWithArguments:cmdline2 length:9 encoding:NSUTF8StringEncoding parseOptions:0 options:opts error:&error];
+        NSUInteger cmdLine2Length = (NSUInteger)(sizeof(cmdline2) / sizeof(char *));
+
+        commandLine = [[PGCmdLine alloc] initWithArguments:cmdline2 length:cmdLine2Length encoding:NSUTF8StringEncoding parseOptions:0 options:opts error:&error];
         NSLog(@"ERROR: %@", error);
         NSLog(@"%@", commandLine.description);
 

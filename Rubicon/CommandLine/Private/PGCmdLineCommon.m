@@ -1,9 +1,14 @@
 #import "PGInternal.h"
 #import "PGCmdLineCommon.h"
 
-NSString *const PGCmdLineRegexPrefix           = @"🍸";
-NSString *const PGCmdLineCleanOptionPattern    = @"^\\s*(-{1,2})\\s*";
-NSString *const PGCmdLineCleanNonOptionPattern = @"^(\\s*)\\\\(-|\\\\)";
+NSString *const PGCmdLineRegexPrefix                  = @"🍸";
+NSString *const PGCmdLineCleanOptionPattern           = @"^\\s*(-{1,2})\\s*";
+NSString *const PGCmdLineCleanNonOptionPattern        = @"^(\\s*)\\\\(-|\\\\)";
+NSString *const PGCmdLineLongOptionParamMarkerPattern = @"\\s*=";
+NSString *const PGCmdLineLongOptionMarker             = @"--";
+NSString *const PGCmdLineShortOptionMarker            = @"-";
+NSString *const PGCmdLineCleanOptionTemplate          = @"$1";
+NSString *const PGCmdLineCleanNonOptionTemplate       = @"$1$2";
 
 NS_INLINE BOOL PGCmdLineStringsEqual(NSString *s1, NSString *s2) {
     if((s1 == nil) && (s2 == nil)) return NO;

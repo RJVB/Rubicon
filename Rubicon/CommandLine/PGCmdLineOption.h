@@ -29,18 +29,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGCmdLineOption : NSObject<NSCopying>
 
-    @property(readonly, nullable) NSString                *shortName;
-    @property(readonly, nullable) NSString                *longName;
-    @property(readonly) /*     */ BOOL                    isRequired;
-    @property(readonly) /*     */ BOOL                    wasFound;
-    @property(readonly) /*     */ PGCmdLineOptionArgument argumentState;
-    @property(readonly) /*     */ PGCmdLineArgumentType   argumentType;
-    @property(readonly, nullable) NSRegularExpression     *regex;
-    @property(readonly, nullable) NSString                *argument;
+    @property(readonly, nullable) /*            */ NSString                *shortName;
+    @property(readonly, nullable) /*            */ NSString                *longName;
+    @property(readonly) /*                      */ BOOL                    isRequired;
+    @property(readonly, nonatomic) /*           */ BOOL                    wasFound;
+    @property(readonly) /*                      */ PGCmdLineOptionArgument argumentState;
+    @property(readonly) /*                      */ PGCmdLineArgumentType   argumentType;
+    @property(readonly, nullable) /*            */ NSRegularExpression     *regex;
+    @property(readonly, nullable, copy, nonatomic) NSString                *argument;
 
     -(NSString *)nameDescription;
 
     -(id)copyWithZone:(nullable NSZone *)zone;
+
+    -(BOOL)isEqual:(id)other;
+
+    -(BOOL)isEqualToOption:(PGCmdLineOption *)other;
+
+    -(NSUInteger)hash;
+
 @end
 
 FOUNDATION_EXPORT PGCmdLineOption *PGMakeCmdLineOpt(NSString *__nullable shortName,

@@ -50,6 +50,7 @@ static const NSUInteger NSUNotFound = NSUIntegerMax;
 
 FOUNDATION_EXPORT NSString *const PGErrorDomain;
 
+FOUNDATION_EXPORT const NSInteger PGErrorCodeUnknownError;
 FOUNDATION_EXPORT const NSInteger PGErrorCodeExceptionAsError;
 FOUNDATION_EXPORT const NSInteger PGErrorCodeCmdLineParseError;
 FOUNDATION_EXPORT const NSInteger PGErrorCodeIOError;
@@ -64,8 +65,9 @@ FOUNDATION_EXPORT NSExceptionName const PGOSErrorException;
 
 FOUNDATION_EXPORT NSString *const PGDefaultSemaphoreNamePrefix;
 
-FOUNDATION_EXPORT NSString *const PGErrorMsgBadRegexPattern;
-FOUNDATION_EXPORT NSString *const PGErrorMsgRegexPatternIsNULL;
+FOUNDATION_EXPORT NSString         *const PGErrorMsgBadRegexPattern;
+FOUNDATION_EXPORT NSString         *const PGErrorMsgRegexPatternIsNULL;
+FOUNDATION_EXPORT NSString         *const PGErrorMsgUnknowError;
 
 #if !defined(PGAbstractClassError)
     #define PGAbstractClassError do {\

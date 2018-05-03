@@ -46,33 +46,33 @@
         return [self stringByReplacingMatchesInString:str options:options range:str.range withTemplate:template];
     }
 
+    -(NSString *)stringByReplacingMatchesInString:(NSString *)str withTemplate:(NSString *)template {
+        return [self stringByReplacingMatchesInString:str options:0 range:str.range withTemplate:template];
+    }
+
     +(NSRegularExpression *)cachedRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options error:(NSError **)error {
         return [self cachedRegex:pattern options:options prefix:nil error:error];
     }
 
     +(NSRegularExpression *)cachedRegex:(NSString *)pattern options:(NSRegularExpressionOptions)options prefix:(NSString *)prefix error:(NSError **)error {
+        static dispatch_once_t     predicate;
+        static NSLock              *lock;
         static NSMutableDictionary *regexCache = nil;
         NSRegularExpression        *regex      = nil;
 
         if(pattern) {
-            if(regexCache == nil) {
-                @synchronized([NSRegularExpression class]) {
-                    if(regexCache == nil) regexCache = [NSMutableDictionary new];
-                }
-            }
-
+            dispatch_once(&predicate, ^{
+                regexCache = [NSMutableDictionary new];
+                lock       = [NSLock new];
+            });
             NSString *key = PGFormat(@"%@❖%@❖%@", (prefix.length ? prefix : @"☞"), @(options), pattern);
-
+            [lock lock];
             regex = regexCache[key];
-
             if(regex == nil) {
-                @synchronized(regexCache) {
-                    if((regex = regexCache[key]) == nil) {
-                        regex = [NSRegularExpression regularExpressionWithPattern:pattern options:options error:error];
-                        if(regex) regexCache[key] = regex;
-                    }
-                }
+                regex = [NSRegularExpression regularExpressionWithPattern:pattern options:options error:error];
+                if(regex) regexCache[key] = regex;
             }
+            [lock unlock];
         }
         else if(error) {
             (*error) = [NSError errorWithDomain:PGErrorDomain code:PGErrorCodeRegexPatternIsNULL userInfo:@{ NSLocalizedDescriptionKey: PGErrorMsgRegexPatternIsNULL }];

@@ -26,6 +26,11 @@ typedef BOOL (^PGFindCmdLineOptionInArrayBlock)(PGCmdLineOption *, NSUInteger, B
 FOUNDATION_EXPORT NSString *const PGCmdLineRegexPrefix;
 FOUNDATION_EXPORT NSString *const PGCmdLineCleanOptionPattern;
 FOUNDATION_EXPORT NSString *const PGCmdLineCleanNonOptionPattern;
+FOUNDATION_EXPORT NSString *const PGCmdLineLongOptionParamMarkerPattern;
+FOUNDATION_EXPORT NSString *const PGCmdLineLongOptionMarker;
+FOUNDATION_EXPORT NSString *const PGCmdLineShortOptionMarker;
+FOUNDATION_EXPORT NSString *const PGCmdLineCleanOptionTemplate;
+FOUNDATION_EXPORT NSString *const PGCmdLineCleanNonOptionTemplate;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -35,13 +40,11 @@ FOUNDATION_EXPORT NSArray<PGCmdLineOption *> *PGCreateOptionsList(NSArray<PGCmdL
 
 @interface PGCmdLine()
 
-    @property(retain) /*  */ NSRegularExpression *nonOptionCleaningRegex;
-    @property(retain) /*  */ NSRegularExpression *optionCleaningRegex;
-    @property(readonly) /**/ BOOL                parseOptionDisallowNonOptions;
-    @property(readonly) /**/ BOOL                parseOptionDisallowMixingOptionsAndNonOptions;
-    @property(readonly) /**/ BOOL                parseOptionDisallowDuplicates;
-    @property(readonly) /**/ BOOL                parseOptionDuplicatesKeepFirst;
-    @property(readonly) /**/ BOOL                parseOptionDisallowUknownOptions;
+    @property(readonly) /**/ BOOL parseOptionDisallowNonOptions;
+    @property(readonly) /**/ BOOL parseOptionDisallowMixingOptionsAndNonOptions;
+    @property(readonly) /**/ BOOL parseOptionDisallowDuplicates;
+    @property(readonly) /**/ BOOL parseOptionDuplicatesKeepFirst;
+    @property(readonly) /**/ BOOL parseOptionDisallowUknownOptions;
 
     -(PGCmdLineOption *)optionAtIndex:(NSUInteger)idx;
 
@@ -51,13 +54,14 @@ FOUNDATION_EXPORT NSArray<PGCmdLineOption *> *PGCreateOptionsList(NSArray<PGCmdL
 
     -(PGCmdLineOption *)findOptionByLongName:(NSString *)name;
 
-    -(NSError *)createError:(NSString *)msg index:(NSUInteger)idx item:(NSString *)item;
 @end
 
 @interface PGCmdLineOption()
 
-    @property /*     */ BOOL     wasFound;
-    @property(nullable) NSString *argument;
+    @property(nonatomic) /*           */ BOOL     wasFound;
+    @property(nullable, copy, nonatomic) NSString *argument;
+    @property(nullable, readonly) /*  */ NSString *regexPattern;
+    @property(readonly, nonatomic) /* */ NSLock   *lock;
 
     -(instancetype)initWithShortName:(NSString *)shortName
                             longName:(NSString *)longName
@@ -66,16 +70,12 @@ FOUNDATION_EXPORT NSArray<PGCmdLineOption *> *PGCreateOptionsList(NSArray<PGCmdL
                         argumentType:(PGCmdLineArgumentType)argumentType
                         regexPattern:(NSString *)regexPattern;
 
-    -(BOOL)isEqualToShortName:(nullable NSString *)other;
-
-    -(BOOL)isEqualToLongName:(nullable NSString *)other;
-
     -(NSComparisonResult)compare:(nullable PGCmdLineOption *)other;
 
 @end
 
 NS_INLINE BOOL isOption(NSString *item) {
-    return ((item.length >= 2) && [item hasPrefix:@"-"]);
+    return ((item.length > PGCmdLineShortOptionMarker.length) && [item hasPrefix:PGCmdLineShortOptionMarker]);
 }
 
 NS_INLINE NSString *oquote(NSString *_Nullable string) {
@@ -102,7 +102,7 @@ NS_INLINE NSString *otypes(PGCmdLineArgumentType t) {
         case PGCmdLineArgTypeRegex: return @"regular expression";
         case PGCmdLineArgTypeString: return @"string";
         case PGCmdLineArgTypeNone:
-        default: return @"--";
+        default: return PGCmdLineLongOptionMarker;
     }
 }
 

@@ -881,6 +881,7 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = Q5XWZ7S7E9;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = RubiconTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.projectgalen.RubiconTests;
