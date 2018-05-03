@@ -44,6 +44,10 @@ NS_ASSUME_NONNULL_BEGIN
 
     +(NSRegularExpression *)cachedRegex:(NSString *)pattern prefix:(nullable NSString *)prefix error:(NSError **)error;
 
+    +(NSRegularExpression *)regularExpressionWithPattern:(NSString *)pattern error:(NSError **)error;
+
+    +(NSRegularExpression *)regularExpressionWithPattern:(NSString *)pattern;
+
     +(NSRegularExpression *)cachedRegex:(NSString *)pattern error:(NSError **)error;
 
 @end

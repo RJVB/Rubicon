@@ -382,48 +382,37 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
         [self _drawDeadCentered:clipRect fontAttribs:[self makeAlignmentCentered:attribs]];
     }
 
-    +(NSString *)stringByConcatenatingStrings:(NSString *)firstString, ... {
-        va_list         args;
-        NSMutableString *str = [NSMutableString string];
+    +(instancetype)stringWithArguments:(va_list)args {
+        NSMutableString *str = [NSMutableString new];
+        NSObject        *obj = va_arg(args, NSObject *);
+
+        while(obj) {
+            [str appendString:[obj description]];
+            obj = va_arg(args, NSObject *);
+        }
+
+        return [(NSString *)[[self class] alloc] initWithString:str];
+    }
+
+    +(instancetype)stringWithStrings:(NSString *)firstString, ... {
+        NSString *secondString = @"";
 
         if(firstString) {
-            [str appendString:firstString];
-
+            va_list args;
             va_start(args, firstString);
-            NSObject *obj = va_arg(args, NSObject *);
-
-            while(obj) {
-                [str appendString:[obj description]];
-                obj = va_arg(args, NSObject *);
-            }
-
+            secondString = [self stringWithArguments:args];
             va_end(args);
         }
 
-        return str;
+        return [(NSString *)[[self class] alloc] initWithFormat:@"%@%@", (firstString ?: @""), secondString];
     }
 
-    +(NSString *)stringWithBytes:(const NSByte *)bytes length:(NSUInteger)length {
+    +(instancetype)stringWithBytes:(const NSByte *)bytes length:(NSUInteger)length {
         return [self stringWithBytes:bytes length:length encoding:NSUTF8StringEncoding];
     }
 
-    +(NSString *)stringWithBytes:(const NSByte *)bytes length:(NSUInteger)length encoding:(NSStringEncoding)encoding {
-        if(bytes && length) {
-            return [[NSString alloc] initWithBytes:bytes length:length encoding:encoding];
-//            NSString *str  = nil;
-//            char     *cstr = (char *)malloc(length + 1);
-//
-//            if(cstr) {
-//                memcpy(cstr, bytes, length);
-//                cstr[length] = 0;
-//                str = [NSString stringWithCString:cstr encoding:encoding ?: NSUTF8StringEncoding];
-//                free(cstr);
-//            }
-//
-//            return str;
-        }
-
-        return @"";
+    +(instancetype)stringWithBytes:(const NSByte *)bytes length:(NSUInteger)length encoding:(NSStringEncoding)encoding {
+        return ((bytes && length) ? [(NSString *)[[self class] alloc] initWithBytes:bytes length:length encoding:encoding] : [(NSString *)[[self class] alloc] init]);
     }
 
     -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern {
@@ -624,6 +613,68 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
         }
 
         return nil;
+    }
+
+    -(NSStrArray)getCharactersAsArrayOfStrings {
+        if(self.length) {
+            NSMutableArray<NSString *> *array = [NSMutableArray new];
+
+            for(NSUInteger i = 0, j = self.length; i < j;) {
+                NSRange r = [self rangeOfComposedCharacterSequenceAtIndex:i];
+                [array addObject:[self substringWithRange:r]];
+                i = MAX(NSMaxRange(r), (i + 1)); // Make sure we're progressing...
+            }
+
+            return array;
+        }
+
+        return @[];
+    }
+
+    -(NSString *)stringByEscapingChars:(NSString *)characters withEscapeChar:(unichar)escChar {
+        return [self stringByEscapingChars:characters withEscape:[NSString stringWithCharacter:escChar]];
+    }
+
+    NS_INLINE NSUInteger foo(NSMutableString *pattern, NSString *characters, NSString *prefix, NSUInteger index) {
+        NSRange r = [characters rangeOfComposedCharacterSequenceAtIndex:index];
+        [pattern appendString:prefix];
+        [pattern appendString:[NSRegularExpression escapedPatternForString:[characters substringWithRange:r]]];
+        return MAX(NSMaxRange(r), (index + 1));
+    }
+
+    -(NSString *)stringByEscapingChars:(NSString *)characters withEscape:(NSString *)escChar {
+        NSUInteger cl = characters.length;
+
+        if(cl && escChar.length) {
+            NSString        *tempEscChar = [NSRegularExpression escapedTemplateForString:[escChar substringWithRange:[escChar rangeOfComposedCharacterSequenceAtIndex:0]]];
+            NSString        *template    = [NSString stringWithFormat:@"%@$1", tempEscChar];
+            NSMutableString *pattern     = [NSMutableString new];
+
+            for(NSUInteger i = 0; i < cl;) {
+                i = foo(pattern, characters, @"(", i);
+                while(i < cl) i = foo(pattern, characters, @"|", i);
+                [pattern appendString:@")"];
+            }
+#ifdef DEBUG
+            NSLog(@" Pattern: \"%@\"", pattern);
+            NSLog(@"Template: \"%@\"", template);
+#endif
+            return [[NSRegularExpression regularExpressionWithPattern:pattern] stringByReplacingMatchesInString:self withTemplate:template];
+        }
+
+        return self;
+    }
+
+    +(instancetype)stringWithCharacter:(unichar)character {
+        return [(NSString *)[[self class] alloc] initWithCharacters:&character length:1];
+    }
+
+@end
+
+@implementation NSMutableString(PGMutableString)
+
+    -(void)appendCharacter:(unichar)ch {
+        [self appendString:[NSString stringWithCharacter:ch]];
     }
 
 @end

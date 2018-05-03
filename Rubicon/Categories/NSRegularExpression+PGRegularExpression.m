@@ -89,4 +89,12 @@
         return [self cachedRegex:pattern options:0 prefix:prefix error:error];
     }
 
+    +(NSRegularExpression *)regularExpressionWithPattern:(NSString *)pattern error:(NSError **)error {
+        return [NSRegularExpression regularExpressionWithPattern:pattern options:0 error:error];
+    }
+
+    +(NSRegularExpression *)regularExpressionWithPattern:(NSString *)pattern {
+        return [NSRegularExpression regularExpressionWithPattern:pattern options:0 error:nil];
+    }
+
 @end

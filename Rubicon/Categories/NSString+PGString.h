@@ -46,6 +46,14 @@ typedef NSString *_Nullable (^PGRegexFilterBlock)(NSString *str, NSString *sub, 
                                   replacementBlock:(NS_NOESCAPE PGRegexFilterBlock)replBlock
                                              error:(NSError **)error;
 
+    -(NSStrArray)getCharactersAsArrayOfStrings;
+
+    -(NSString *)stringByEscapingChars:(NSString *)characters withEscapeChar:(unichar)escChar;
+
+    -(NSString *)stringByEscapingChars:(NSString *)characters withEscape:(NSString *)escChar;
+
+    +(instancetype)stringWithCharacter:(unichar)character;
+
     -(NSRange)range;
 
     -(NSString *)stringByFrontPaddingToLength:(NSUInteger)len withString:(NSString *)str startingAtIndex:(NSUInteger)idx;
@@ -205,20 +213,22 @@ typedef NSString *_Nullable (^PGRegexFilterBlock)(NSString *str, NSString *sub, 
 
     -(void)drawDeadCentered:(NSRect)clipRect fontAttributes:(NSDictionary *)attribs;
 
+    +(instancetype)stringWithArguments:(va_list)args;
+
     /**
-     * This method is similar in function to componentsSeparatedByString:limit:keepSeparator: except that
-     * pattern is a string that contains a Regular Expression that will be searched for instead of a
-     * simple string. NSRegularExpression is used.
-     *
-     * @param pattern the regular expression pattern.
-     * @param limit The maximum number of elements that the returned NSArray object will contain.
-     * @param options The options for the regular expression. These are the same as for NSRegularExpression.
-     * @param keepSeparator if 'YES' then the separator is preserved at the end of each substring.
-     * @param error if the regular expression contained an error then it will be returned in this field.
-     * @return An NSArray object containing substrings from the receiver that have been divided by
-     *         separator. If there was an error in the regular expression then a NULL value will be
-     *         returned.
-     */
+         * This method is similar in function to componentsSeparatedByString:limit:keepSeparator: except that
+         * pattern is a string that contains a Regular Expression that will be searched for instead of a
+         * simple string. NSRegularExpression is used.
+         *
+         * @param pattern the regular expression pattern.
+         * @param limit The maximum number of elements that the returned NSArray object will contain.
+         * @param options The options for the regular expression. These are the same as for NSRegularExpression.
+         * @param keepSeparator if 'YES' then the separator is preserved at the end of each substring.
+         * @param error if the regular expression contained an error then it will be returned in this field.
+         * @return An NSArray object containing substrings from the receiver that have been divided by
+         *         separator. If there was an error in the regular expression then a NULL value will be
+         *         returned.
+         */
     -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern
                                         limit:(NSUInteger)limit
                                       options:(NSRegularExpressionOptions)options
@@ -408,11 +418,17 @@ typedef NSString *_Nullable (^PGRegexFilterBlock)(NSString *str, NSString *sub, 
      */
     -(NSStrArray)componentsSeparatedByPattern:(NSString *)pattern limit:(NSUInteger)limit keepSeparator:(BOOL)keepSeparator error:(NSError **)error;
 
-    +(NSString *)stringByConcatenatingStrings:(NSString *)firstString, ... NS_REQUIRES_NIL_TERMINATION;
+    +(instancetype)stringWithStrings:(NSString *)firstString, ... NS_REQUIRES_NIL_TERMINATION;
 
-    +(NSString *)stringWithBytes:(const NSByte *)bytes length:(NSUInteger)length;
+    +(instancetype)stringWithBytes:(const NSByte *)bytes length:(NSUInteger)length;
 
-    +(NSString *)stringWithBytes:(const NSByte *)bytes length:(NSUInteger)length encoding:(NSStringEncoding)encoding;
+    +(instancetype)stringWithBytes:(const NSByte *)bytes length:(NSUInteger)length encoding:(NSStringEncoding)encoding;
+
+@end
+
+@interface NSMutableString(PGMutableString)
+
+    -(void)appendCharacter:(unichar)ch;
 
 @end
 

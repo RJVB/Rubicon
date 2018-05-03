@@ -228,26 +228,6 @@ NSString *PGValidateTime(NSString *timeString) {
     return _validateDateOrTimeString(timeString, @"HH:mm:ssZZZ", NSDateFormatterNoStyle, NSDateFormatterLongStyle, @[ @"hh:mm:ssZZZ a", @"HH:mm:ssZZZ", @"hh:mm a", @"HH:mm" ]);
 }
 
-NSStrArray PGSingleCharacters(NSString *str) {
-    if(str) {
-        if(str.length) {
-            NSMutableArray<NSString *> *ar = [NSMutableArray new];
-
-            for(NSUInteger i = 0; i < str.length;) {
-                NSRange r = [str rangeOfComposedCharacterSequenceAtIndex:i];
-                [ar addObject:[str substringWithRange:r]];
-                i = MAX(NSMaxRange(r), (i + 1));
-            }
-
-            if(ar.count) return ar;
-        }
-
-        return @[ str ];
-    }
-
-    return @[];
-}
-
 /**
  * Given a string, this function will prefix all of the specified characters with the escapeChar.
  *
@@ -260,35 +240,7 @@ NSStrArray PGSingleCharacters(NSString *str) {
 NSString *PGEscapeString(NSString *str, NSString *escapeChar, ...) {
     va_list args;
     va_start(args, escapeChar);
-
-    if(str.length && escapeChar.length) {
-        NSObject *obj = va_arg(args, NSObject *);
-
-        if(obj) {
-            NSStrArray      ar       = PGSingleCharacters(obj.description);
-            NSMutableString *pattern = [NSMutableString stringWithFormat:@"(%@", [NSRegularExpression escapedPatternForString:ar[0]]];
-
-            for(NSUInteger i = 1, j = ar.count; i < j; i++) {
-                [pattern appendFormat:@"|%@", [NSRegularExpression escapedPatternForString:ar[i]]];
-            }
-
-            while((obj = va_arg(args, id)) != nil) {
-                for(NSString *s in PGSingleCharacters(obj.description)) {
-                    [pattern appendFormat:@"|%@", [NSRegularExpression escapedPatternForString:s]];
-                }
-            }
-
-            [pattern appendString:@")"];
-
-            NSString *temp = [NSString stringWithFormat:@"%@$1", [NSRegularExpression escapedTemplateForString:PGSingleCharacters(escapeChar)[0]]];
-#ifdef DEBUG
-            NSLog(@" Pattern: \"%@\"", pattern);
-            NSLog(@"Template: \"%@\"", temp);
-#endif
-            str = [[NSRegularExpression regularExpressionWithPattern:pattern options:0 error:nil] stringByReplacingMatchesInString:str withTemplate:temp];
-        }
-    }
-
+    str = [str stringByEscapingChars:[NSString stringWithArguments:args] withEscape:escapeChar];
     va_end(args);
     return str;
 }

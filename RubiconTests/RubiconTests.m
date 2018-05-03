@@ -70,7 +70,8 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
     -(void)test84Regex {
         NSString *str = @"Now \"is\" the time for some\\all good men to come to the end of their country.";
         NSLog(@"Before: \"%@\"", str);
-        NSLog(@" After: \"%@\"", PGEscapeString(str, @"\\", @"\"\\", @".", nil));
+        // NSLog(@" After: \"%@\"", PGEscapeString(str, @"\\", @"\"\\", @".", nil));
+        NSLog(@" After: \"%@\"", [str stringByEscapingChars:@"\\\"." withEscape:@"\\"]);
     }
 
     -(void)t_est85CommandLine {
