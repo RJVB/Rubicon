@@ -67,7 +67,49 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
         [super tearDown];
     }
 
-    -(void)test84Regex {
+    -(void)test83SwapPointers {
+        char *a = "Galen Rhodes";
+        char *b = "Michelle Dziubinski";
+
+        NSLog(@"a = \"%s\"; b = \"%s\";", a, b);
+        PGSwapPtr((void **)&a, (void **)&b);
+        NSLog(@"a = \"%s\"; b = \"%s\";", a, b);
+    }
+
+    -(void)test83SwapObjects {
+        NSString *a = @"Galen Rhodes";
+        NSString *b = @"Michelle Dziubinski";
+
+        NSLog(@"a = \"%@\"; b = \"%@\";", a, b);
+        PGSwapObjs(&a, &b);
+        NSLog(@"a = \"%@\"; b = \"%@\";", a, b);
+    }
+
+    -(void)t_est83QueuePointerTests {
+        NSUInteger length = 30;
+        NSUInteger qsize  = 200;
+        NSUInteger qhead  = 175;
+        NSUInteger qtail  = 25;
+        NSUInteger qcnt   = (((qhead <= qtail) ? (qtail - qhead) : ((qsize - qhead) + qtail)));
+        NSUInteger c1     = MIN((qsize - qhead), length);
+
+        NSLog(@"Buffer Length: %@", @(length));
+        NSLog(@"   Queue Size: %@", @(qsize));
+        NSLog(@"   Queue Head: %@", @(qhead));
+        NSLog(@"   Queue Tail: %@", @(qtail));
+        NSLog(@"  Queue Count: %@", @(qcnt));
+        NSLog(@"           c1: %@", @(c1));
+
+        qhead = ((qhead + c1) % qsize);
+        NSUInteger c2 = MIN(qtail, (length - c1));
+        NSUInteger cc = (c1 + c2);
+
+        NSLog(@" Queue Head 2: %@", @(qhead));
+        NSLog(@"           c2: %@", @(c2));
+        NSLog(@"           cc: %@", @(cc));
+    }
+
+    -(void)t_est84Regex {
         NSString *str = @"Now \"is\" the time for some\\all good men to come to the end of their country.";
         NSLog(@"Before: \"%@\"", str);
         // NSLog(@" After: \"%@\"", PGEscapeString(str, @"\\", @"\"\\", @".", nil));
@@ -473,30 +515,6 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
             FOutput(@"%2lu [%2lu,%2lu]: '%@'; before: %@; after: %@", cnt++, range.location, range.length, [test substringWithRange:range], quote(before), quote(after));
             return NO;
         }                                range:nsRange];
-    }
-
-    -(void)t_est92DynamicByteQueue {
-        PGDynamicByteQueue *queue = [PGDynamicByteQueue queueWithInitialSize:5];
-        NSString           *test  = @"ABCD";
-        [queue queueString:test];
-        [queue queueString:@"EFGH"];
-        [queue requeueString:@"0123456789"];
-        PGPrintf(@"\n\nQUEUE: \"%@\"\n", queue.string);
-        NSInteger a = queue.pop;
-        NSInteger b = queue.pop;
-        NSInteger c = queue.dequeue;
-        NSInteger d = queue.dequeue;
-        PGPrintf(@"VALUES: a = %li ('%c'); b = %li ('%c'); c = %li ('%c'); d = %li ('%c');\n",
-                 a,
-                 (char)(a & 0x00ff),
-                 b,
-                 (char)(b & 0x00ff),
-                 c,
-                 (char)(c & 0x00ff),
-                 d,
-                 (char)(d & 0x00ff));
-
-        PGPrintf(@"QUEUE: \"%@\"\n\n\n", queue.string);
     }
 
     -(void)t_est93TemporaryDirectories {

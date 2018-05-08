@@ -32,6 +32,18 @@
 
 #define PGThrowOutOfMemoryException @throw [NSException exceptionWithName:NSMallocException reason:@"Out of memory" userInfo:nil]
 
+NS_INLINE void PGSwapPtr(void **x, void **y) {
+    void *z = *x;
+    *x = *y;
+    *y = z;
+}
+
+NS_INLINE void PGSwapObjs(id *x, id *y) {
+    id z = *x;
+    *x = *y;
+    *y = z;
+}
+
 /**
  * Given a string, this function will prefix all of the specified characters with the escapeChar.
  *

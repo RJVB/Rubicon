@@ -23,92 +23,44 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSByte, PGNormalizeType) {
-    PGNormalizeNone = 0,  // Don't move the data.
-    PGNormalizeBeginning, // Move the data to the beginning of the queue.
-    PGNormalizeEnd        // Move the data to the end of the queue.
-};
+FOUNDATION_EXPORT const NSUInteger PGDynByteQueueDefaultInitialSize;
 
-typedef BOOL (^PGDynamicBufferOpBlock)(NSBytePtr buffer, NSUInteger size, NSUInteger *pHead, NSUInteger *pTail);
+typedef NSInteger (^PGDynamicByteBufferOpBlock)(NSBytePtr buffer, NSUInteger size, NSUInteger *pHead, NSUInteger *pTail, NSError **error);
 
-@interface PGDynamicByteQueue : NSObject<NSCopying>
+@interface PGDynamicByteQueue : NSObject<NSCopying, NSLocking>
 
-    @property(nonatomic, readonly) NSUInteger count;
-    @property(nonatomic, readonly) BOOL       isEmtpy;
+    @property(readonly) NSUInteger count;
+    @property(readonly) BOOL       isEmpty;
 
-#pragma mark Initializers
+    -(instancetype)init NS_DESIGNATED_INITIALIZER;
 
     -(instancetype)initWithInitialSize:(NSUInteger)initialSize NS_DESIGNATED_INITIALIZER;
 
-    -(instancetype)initWithBytesNoCopy:(NSBytePtr)bytes count:(NSUInteger)cnt length:(NSUInteger)len freeWhenDone:(BOOL)shouldFree NS_DESIGNATED_INITIALIZER;
-
-    -(instancetype)initWithNSData:(NSData *)data NS_DESIGNATED_INITIALIZER;
-
-    +(instancetype)queueWithInitialSize:(NSUInteger)initialSize;
-
-    +(instancetype)queueWithBytesNoCopy:(NSBytePtr)bytes count:(NSUInteger)cnt length:(NSUInteger)len freeWhenDone:(BOOL)freeWhenDone;
-
-    +(instancetype)queueWithNSData:(NSData *)data;
-
-#pragma mark Getting data off the head...
-
-    -(NSInteger)dequeue;
-
-    -(NSUInteger)dequeue:(NSBytePtr)buffer maxLength:(NSUInteger)len;
-
-    -(NSString *)string;
-
-    -(NSData *)data;
-
-    -(NSMutableData *)appendToData:(NSMutableData *)mdata;
-
-#pragma mark Getting data off the tail...
-
-    -(NSInteger)pop;
-
-    -(NSUInteger)pop:(NSBytePtr)buffer maxLength:(NSUInteger)len;
-
-#pragma mark Queuing data...
+    -(BOOL)isEqualToQueue:(PGDynamicByteQueue *)other;
 
     -(void)queue:(NSByte)byte;
 
-    -(void)queue:(const NSBytePtr)buffer length:(NSUInteger)len;
+    -(void)queue:(const NSBytePtr)buffer offset:(NSUInteger)offset length:(NSUInteger)length;
 
-    -(void)queueFromQueue:(PGDynamicByteQueue *)queue length:(NSUInteger)length;
-
-    -(void)queueString:(NSString *)string;
-
-    -(void)queueString:(NSString *)string range:(NSRange)range;
-
-    -(void)queueData:(NSData *)data;
-
-    -(void)queueData:(NSData *)data range:(NSRange)range;
-
-#pragma mark Requeuing data...
+    -(void)queue:(const NSBytePtr)buffer length:(NSUInteger)length;
 
     -(void)requeue:(NSByte)byte;
 
-    -(void)requeue:(const NSBytePtr)buffer length:(NSUInteger)len;
+    -(void)requeue:(const NSBytePtr)buffer offset:(NSUInteger)offset length:(NSUInteger)length;
 
-    -(void)requeue:(const NSBytePtr)buffer range:(NSRange)range;
+    -(void)requeue:(const NSBytePtr)buffer length:(NSUInteger)length;
 
-    -(void)requeueFromQueue:(PGDynamicByteQueue *)queue length:(NSUInteger)length;
+    -(NSInteger)dequeue;
 
-    -(void)requeueString:(NSString *)string;
+    -(NSInteger)unqueue;
 
-    -(void)requeueString:(NSString *)string range:(NSRange)range;
+    -(NSInteger)dequeue:(NSBytePtr)buffer maxLength:(NSUInteger)length;
 
-    -(void)requeueData:(NSData *)data;
+    -(NSInteger)unqueue:(NSBytePtr)buffer maxLength:(NSUInteger)length;
 
-    -(void)requeueData:(NSData *)data range:(NSRange)range;
+    -(void)normalize;
 
-#pragma mark Block operations...
-
-    -(BOOL)queueOperationWithBlock:(PGDynamicBufferOpBlock)opBlock;
-
-    -(BOOL)queueOperationWithBlock:(PGDynamicBufferOpBlock)opBlock restoreOnFailure:(BOOL)restoreOnFailure;
-
-    -(BOOL)queueOperationWithBlock:(PGDynamicBufferOpBlock)opBlock normalizeBefore:(PGNormalizeType)normalizeType restoreOnFailure:(BOOL)restoreOnFailure;
+    -(NSInteger)performOperation:(PGDynamicByteBufferOpBlock)opBlock restoreOnExceptionOrError:(BOOL)restoreFlag error:(NSError **)error;
 
 @end
 
