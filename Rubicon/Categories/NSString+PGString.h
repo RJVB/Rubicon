@@ -420,9 +420,9 @@ typedef NSString *_Nullable (^PGRegexFilterBlock)(NSString *str, NSString *sub, 
 
     +(instancetype)stringWithStrings:(NSString *)firstString, ... NS_REQUIRES_NIL_TERMINATION;
 
-    +(instancetype)stringWithBytes:(const NSBytePtr)bytes length:(NSUInteger)length;
+    +(instancetype)stringWithBytes:(NSByte *)bytes length:(NSUInteger)length;
 
-    +(instancetype)stringWithBytes:(const NSBytePtr)bytes length:(NSUInteger)length encoding:(NSStringEncoding)encoding;
+    +(instancetype)stringWithBytes:(NSByte *)bytes length:(NSUInteger)length encoding:(NSStringEncoding)encoding;
 
 @end
 

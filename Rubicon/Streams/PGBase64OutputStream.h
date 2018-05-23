@@ -27,7 +27,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-char *PGEncodeBase64(const NSBytePtr input, NSUInteger inlen, NSUInteger *outlen);
+char *PGEncodeBase64(const NSByte *input, NSUInteger inlen, NSUInteger *outlen);
 
 @interface PGBase64OutputStream : PGFilterOutputStream
 

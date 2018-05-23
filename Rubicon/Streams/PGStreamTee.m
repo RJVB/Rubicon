@@ -30,7 +30,7 @@ NS_INLINE BOOL badStatus(NSStreamStatus status) {
 
     @property(readonly) BOOL closeOutputWhenClosed;
 
-    -(void)writeBytes:(const NSBytePtr)buffer length:(NSUInteger)len;
+    -(void)writeBytes:(NSByte *)buffer length:(NSUInteger)len;
 
 @end
 
@@ -61,14 +61,14 @@ NS_INLINE BOOL badStatus(NSStreamStatus status) {
         [self close];
     }
 
-    -(NSInteger)read:(NSBytePtr)buffer maxLength:(NSUInteger)len {
+    -(NSInteger)read:(NSByte *)buffer maxLength:(NSUInteger)len {
         NSInteger cc = [super read:buffer maxLength:len];
         if((len > 0) && (cc > 0)) [self writeBytes:buffer length:len];
         return cc;
     }
 
-    -(BOOL)getBuffer:(NSBytePtr *)buffer length:(NSUInteger *)len {
-        NSBytePtr  _buffer  = NULL;
+    -(BOOL)getBuffer:(NSByte **)buffer length:(NSUInteger *)len {
+        NSByte     *_buffer = NULL;
         NSUInteger _len     = 0;
         BOOL       results  = [super getBuffer:&_buffer length:&_len];
 
@@ -78,7 +78,7 @@ NS_INLINE BOOL badStatus(NSStreamStatus status) {
         return results;
     }
 
-    -(void)writeBytes:(const NSBytePtr)buffer length:(NSUInteger)len {
+    -(void)writeBytes:(NSByte *)buffer length:(NSUInteger)len {
         if(len) {
             if(self.outputStream.streamStatus == NSStreamStatusNotOpen) [self.outputStream open];
 

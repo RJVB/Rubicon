@@ -29,8 +29,6 @@
 
 typedef long long                  NSLong;
 typedef uint8_t                    NSByte;
-typedef NSByte                     *NSBytePtr;
-typedef void                       *NSVoidPtr;
 typedef NSArray<NSString *>        *NSStrArray;
 typedef NSMutableArray<NSString *> *NSMutableStrArray;
 
@@ -65,9 +63,9 @@ FOUNDATION_EXPORT NSExceptionName const PGOSErrorException;
 
 FOUNDATION_EXPORT NSString *const PGDefaultSemaphoreNamePrefix;
 
-FOUNDATION_EXPORT NSString         *const PGErrorMsgBadRegexPattern;
-FOUNDATION_EXPORT NSString         *const PGErrorMsgRegexPatternIsNULL;
-FOUNDATION_EXPORT NSString         *const PGErrorMsgUnknowError;
+FOUNDATION_EXPORT NSString *const PGErrorMsgBadRegexPattern;
+FOUNDATION_EXPORT NSString *const PGErrorMsgRegexPatternIsNULL;
+FOUNDATION_EXPORT NSString *const PGErrorMsgUnknowError;
 
 #if !defined(PGAbstractClassError)
     #define PGAbstractClassError do {\

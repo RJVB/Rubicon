@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(instancetype)initWithOutputStream:(NSOutputStream *)outputStream chunk:(NSUInteger)chunk;
 
-    -(NSInteger)writeFiltered:(const NSBytePtr)buffer maxLength:(NSUInteger)len;
+    -(NSInteger)writeFiltered:(const NSByte *)buffer maxLength:(NSUInteger)len;
 
     +(instancetype)streamWithOutputStream:(NSOutputStream *)outputStream;
 

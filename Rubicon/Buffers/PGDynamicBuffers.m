@@ -24,7 +24,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
         NSRecursiveLock *lck;
         NSUInteger      _hash;
         BOOL            _rehash;
-        PGByteQueuePtr  q;
+        PGByteQueue     *q;
     }
 
     @synthesize willShrink = _willShrink;
@@ -51,7 +51,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
         return self;
     }
 
-    -(instancetype)initWithByteQueue:(const PGByteQueuePtr)byteQueue {
+    -(instancetype)initWithByteQueue:(const PGByteQueue *)byteQueue {
         self = [super init];
 
         if(self) {
@@ -69,7 +69,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
         return self;
     }
 
-    -(instancetype)initWithBytes:(const NSBytePtr)bytes length:(NSUInteger)length {
+    -(instancetype)initWithBytes:(NSByte *)bytes length:(NSUInteger)length {
         self = [self initWithInitialSize:qNextSize(umax(length, PGDynByteQueueMinSize), 2)];
         if(self && length) {
             if(bytes) PGMemCopy(q->qbuffer, bytes, (q->qtail = length));
@@ -112,8 +112,8 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
         @try {
             [other->lck lock];
             @try {
-                PGByteQueuePtr oq = other->q;
-                NSUInteger     qc = QCOUNT(q);
+                PGByteQueue *oq = other->q;
+                NSUInteger  qc  = QCOUNT(q);
                 return (((q == NULL) && (oq == NULL)) || ((q && oq) && (qc == QCOUNT(oq)) && ((qc == 0) || qCompareQueues(q, oq))));
             }
             @finally { [other->lck unlock]; }
@@ -144,7 +144,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
         [self queue:&byte length:1];
     }
 
-    -(void)queue:(const NSBytePtr)buffer length:(NSUInteger)length {
+    -(void)queue:(NSByte *)buffer length:(NSUInteger)length {
         if(buffer && length) {
             [lck lock];
             @try {
@@ -166,7 +166,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
         [self requeue:&byte length:1];
     }
 
-    -(void)requeue:(const NSBytePtr)buffer length:(NSUInteger)length {
+    -(void)requeue:(NSByte *)buffer length:(NSUInteger)length {
         if(buffer && length) {
             [lck lock];
             @try {
@@ -189,7 +189,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
         return ([self dequeue:&b maxLength:1] ? b : EOF);
     }
 
-    -(NSUInteger)dequeue:(NSBytePtr)buffer maxLength:(NSUInteger)length {
+    -(NSUInteger)dequeue:(NSByte *)buffer maxLength:(NSUInteger)length {
         NSUInteger copied = 0;
 
         if(buffer && length) {
@@ -220,7 +220,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
         return ([self unqueue:&b maxLength:1] ? b : EOF);
     }
 
-    -(NSUInteger)unqueue:(NSBytePtr)buffer maxLength:(NSUInteger)length {
+    -(NSUInteger)unqueue:(NSByte *)buffer maxLength:(NSUInteger)length {
         NSUInteger copied = 0;
 
         if(buffer && length) {
@@ -246,13 +246,13 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
         return copied;
     }
 
-    -(NSInteger)_performOperation:(PGDynamicByteBufferOpBlock)opBlock byteQueue:(PGByteQueuePtr)queue error:(NSError **)error {
+    -(NSInteger)_performOperation:(PGDynamicByteBufferOpBlock)opBlock byteQueue:(PGByteQueue *)queue error:(NSError **)error {
         return opBlock(queue->qbuffer, queue->qsize, &queue->qhead, &queue->qtail, error);
     }
 
     -(NSInteger)_performOperation:(PGDynamicByteBufferOpBlock)opBlock error:(NSError **)error {
-        NSInteger      rslt = 0;
-        PGByteQueuePtr copy = qCreateExactCopy(q), temp = copy;
+        NSInteger   rslt  = 0;
+        PGByteQueue *copy = qCreateExactCopy(q), *temp = copy;
 
         @try {
             rslt = [self _performOperation:opBlock byteQueue:temp error:error];
@@ -290,12 +290,12 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
         @try { return [(PGDynamicByteQueue *)[[self class] allocWithZone:zone] initWithByteQueue:q]; } @finally { [lck unlock]; }
     }
 
-    -(NSBytePtr)_getBytes:(NSUInteger)len {
-        BOOL       wpd = QWRAPPED(q);
-        NSUInteger qhd = (q->qhead);
-        NSUInteger lim = ((wpd ? q->qsize : q->qtail) - q->qhead);
-        NSUInteger rem = (len - lim);
-        NSBytePtr  buf = PGMalloc(len);
+    -(NSByte *)_getBytes:(NSUInteger)len {
+        BOOL       wpd  = QWRAPPED(q);
+        NSUInteger qhd  = (q->qhead);
+        NSUInteger lim  = ((wpd ? q->qsize : q->qtail) - q->qhead);
+        NSUInteger rem  = (len - lim);
+        NSByte     *buf = PGMalloc(len);
 
         PGMemCopy(buf, QPTR(q, qPostAdd(&qhd, lim, q->qsize)), lim);
         if(rem) PGMemCopy((buf + lim), QPTR(q, qhd), rem);

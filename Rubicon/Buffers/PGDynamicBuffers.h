@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT const NSUInteger PGDynByteQueueDefaultInitialSize;
 FOUNDATION_EXPORT const NSUInteger PGDynByteQueueMinSize;
 
-typedef NSInteger (^PGDynamicByteBufferOpBlock)(NSBytePtr buffer, NSUInteger size, NSUInteger *pHead, NSUInteger *pTail, NSError **error);
+typedef NSInteger (^PGDynamicByteBufferOpBlock)(NSByte *buffer, NSUInteger size, NSUInteger *pHead, NSUInteger *pTail, NSError **error);
 
 @interface PGDynamicByteQueue : NSObject<NSCopying>
 
@@ -40,7 +40,7 @@ typedef NSInteger (^PGDynamicByteBufferOpBlock)(NSBytePtr buffer, NSUInteger siz
 
     -(instancetype)initWithNSData:(NSData *)nsData;
 
-    -(instancetype)initWithBytes:(const NSBytePtr)bytes length:(NSUInteger)length;
+    -(instancetype)initWithBytes:(NSByte *)bytes length:(NSUInteger)length;
 
     -(void)dealloc;
 
@@ -52,19 +52,19 @@ typedef NSInteger (^PGDynamicByteBufferOpBlock)(NSBytePtr buffer, NSUInteger siz
 
     -(void)queue:(NSByte)byte;
 
-    -(void)queue:(const NSBytePtr)buffer length:(NSUInteger)length;
+    -(void)queue:(NSByte *)buffer length:(NSUInteger)length;
 
     -(void)requeue:(NSByte)byte;
 
-    -(void)requeue:(const NSBytePtr)buffer length:(NSUInteger)length;
+    -(void)requeue:(NSByte *)buffer length:(NSUInteger)length;
 
     -(NSInteger)dequeue;
 
     -(NSInteger)unqueue;
 
-    -(NSUInteger)dequeue:(NSBytePtr)buffer maxLength:(NSUInteger)length;
+    -(NSUInteger)dequeue:(NSByte *)buffer maxLength:(NSUInteger)length;
 
-    -(NSUInteger)unqueue:(NSBytePtr)buffer maxLength:(NSUInteger)length;
+    -(NSUInteger)unqueue:(NSByte *)buffer maxLength:(NSUInteger)length;
 
     -(NSInteger)performOperation:(PGDynamicByteBufferOpBlock)opBlock restoreOnExceptionOrError:(BOOL)restoreFlag error:(NSError **)error;
 

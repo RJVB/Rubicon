@@ -89,7 +89,7 @@ void PGSPrintfVA(NSOutputStream *outs, NSString *fmt, va_list args) {
     size_t     buffsnt = 0;
 
     while(buffsnt < bufflen) {
-        NSInteger r = [outs write:(const NSBytePtr)(buffer + buffsnt) maxLength:(bufflen - buffsnt)];
+        NSInteger r = [outs write:(NSByte *)(buffer + buffsnt) maxLength:(bufflen - buffsnt)];
         if(r <= 0) break;
         buffsnt += r;
     }
@@ -162,9 +162,10 @@ NSURL *PGTemporaryFile(NSString *filenamePostfix, NSError **error) {
     return nil;
 }
 
-NSBytePtr PGMemoryReverse(NSBytePtr buffer, NSUInteger length) {
+NSByte *PGMemoryReverse(NSByte *buffer, NSUInteger length) {
     if(buffer && length > 1) {
-        NSBytePtr a = buffer, b = (buffer + length);
+        NSByte *a = buffer;
+        NSByte *b = (buffer + length);
 
         while((b - a) > 1) {
             NSByte t = *a;
@@ -176,7 +177,7 @@ NSBytePtr PGMemoryReverse(NSBytePtr buffer, NSUInteger length) {
     return buffer;
 }
 
-NSVoidPtr PGMemDup(const NSVoidPtr src, size_t size) {
+void *PGMemDup(const void *src, size_t size) {
     void *dest = PGMalloc(size);
     PGMemCopy(dest, src, size);
     return dest;

@@ -39,11 +39,11 @@
         return self;
     }
 
-    -(NSInteger)read:(NSBytePtr)buffer maxLength:(NSUInteger)len {
+    -(NSInteger)read:(NSByte *)buffer maxLength:(NSUInteger)len {
         return [self.inputStream read:buffer maxLength:len];
     }
 
-    -(BOOL)getBuffer:(NSBytePtr *)buffer length:(NSUInteger *)len {
+    -(BOOL)getBuffer:(NSByte **)buffer length:(NSUInteger *)len {
         return [self.inputStream getBuffer:buffer length:len];
     }
 
