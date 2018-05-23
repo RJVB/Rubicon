@@ -67,7 +67,21 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
         [super tearDown];
     }
 
-    -(void)test83SwapPointers {
+    -(void)test82XMLParseDelegate {
+        NSString            *file     = [@"~/Desktop/Test.xml" stringByExpandingTildeInPath];
+        PGXMLParserDelegate *delegate = [PGXMLParserDelegate new];
+        NSLog(@"Reading \"%@\"", file);
+        NSXMLParser *parser = [[NSXMLParser alloc] initWithStream:[NSInputStream inputStreamWithFileAtPath:file]];
+        parser.delegate                      = delegate;
+        parser.shouldProcessNamespaces       = YES;
+        parser.shouldReportNamespacePrefixes = YES;
+        NSLog(@"validationErrorOccurred: %@", (parser.shouldResolveExternalEntities ? @"YES" : @"NO"));
+        BOOL b = [parser parse];
+
+        NSLog(@"Parse Results: %@", (b ? @"GOOD" : @"BAD"));
+    }
+
+    -(void)t_est83SwapPointers {
         char *a = "Galen Rhodes";
         char *b = "Michelle Dziubinski";
 
@@ -76,7 +90,7 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
         NSLog(@"a = \"%s\"; b = \"%s\";", a, b);
     }
 
-    -(void)test83SwapObjects {
+    -(void)t_est83SwapObjects {
         NSString *a = @"Galen Rhodes";
         NSString *b = @"Michelle Dziubinski";
 

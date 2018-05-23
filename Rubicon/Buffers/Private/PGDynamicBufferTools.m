@@ -26,7 +26,7 @@ typedef union {
 
 #define HP            (31u)
 #define FOOHASH(h, v) ((h)=(((h)*(HP))+(v)))
-#define FOOCAST(t, p) (*((t *)((voidp)(p))))
+#define FOOCAST(t, p) (*((const t *)((cvoidp)(p))))
 
 NS_INLINE NSUInteger qCalculateHash3(const NSByte *b, NSUInteger *h, NSUInteger s, NSUInteger c, NSUInteger hash) {
     if(c) {

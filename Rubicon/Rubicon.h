@@ -48,6 +48,7 @@
 #import <Rubicon/PGStreamTee.h>
 #import <Rubicon/PGDynamicBuffers.h>
 #import <Rubicon/PGCmdLine.h>
+#import <Rubicon/PGXMLParserDelegate.h>
 
 FOUNDATION_EXPORT double              RubiconVersionNumber;
 FOUNDATION_EXPORT const unsigned char RubiconVersionString[];

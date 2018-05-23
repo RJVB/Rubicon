@@ -41,6 +41,7 @@
 		1117D6E85E4673C780D1C3FF /* Rubicon.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DB4FEBB7782769750FB9 /* Rubicon.m */; };
 		1117D72FD20B775B8F0898A7 /* PGSemaphore.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D4FAE743F64015E5637A /* PGSemaphore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D749C5FEC2DD2562CBC9 /* PGSemaphore.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D9DDB04FC50AB41C3219 /* PGSemaphore.m */; };
+		1117D7F712CA391E6902B76C /* PGXMLParserDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D61CE4917C58A2160795 /* PGXMLParserDelegate.m */; };
 		1117D8020CD2E2E85BC4F106 /* PGCmdLine.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DB8E835887B11294D70F /* PGCmdLine.m */; };
 		1117D80F07D735F5E5F14637 /* PGStack.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D4397E73BCFE583FF7AC /* PGStack.m */; };
 		1117D82C071E4B56245A3D39 /* PGBase64OutputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DC59A7B77EC63A993424 /* PGBase64OutputStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -50,6 +51,7 @@
 		1117D8C0D8FEA9BA9181C6E8 /* sem_timedwait.c in Sources */ = {isa = PBXBuildFile; fileRef = 1117D4804DC238152BA17B8A /* sem_timedwait.c */; };
 		1117D8D047B706C5F4AE1EF1 /* PGStack.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DA40A7107FFA3B41DC8C /* PGStack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D907273304E8BD264B9C /* PGCmdLineCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DE5F5A7DD301A911F3B2 /* PGCmdLineCommon.h */; };
+		1117D97C33BEF0151B80187D /* PGXMLParserDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D7BEC6FEFADBF2693700 /* PGXMLParserDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D9A5333A815F48ACE509 /* PGDynamicBufferTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D34948987B1192383500 /* PGDynamicBufferTools.m */; };
 		1117D9F77F007547086C011D /* PGTimedSemWait.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D72372608CDF9D460CCF /* PGTimedSemWait.h */; };
 		1117DA0BC598AF33FAA9CCD5 /* PGTimedReadLock.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D8576A8D6B3291FC3A1E /* PGTimedReadLock.h */; };
@@ -146,6 +148,7 @@
 		1117D607B5EF87616FC650DE /* sem_timedwait.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sem_timedwait.h; sourceTree = "<group>"; };
 		1117D613575E1934C599AC49 /* GNUstep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GNUstep.h; sourceTree = "<group>"; };
 		1117D61AFE6CD5656E2C1E16 /* PGFilterOutputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFilterOutputStream.m; sourceTree = "<group>"; };
+		1117D61CE4917C58A2160795 /* PGXMLParserDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGXMLParserDelegate.m; sourceTree = "<group>"; };
 		1117D63913915F49F3D8C125 /* PGCmdLineOption.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGCmdLineOption.h; sourceTree = "<group>"; };
 		1117D64853BD482690EF6B74 /* PGLinkedListNodeEnumerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGLinkedListNodeEnumerator.h; sourceTree = "<group>"; };
 		1117D64944B80E10BF29036F /* PGDynamicBuffers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDynamicBuffers.m; sourceTree = "<group>"; };
@@ -155,6 +158,7 @@
 		1117D71562821908FD8E4A08 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.info; path = Info.plist; sourceTree = "<group>"; };
 		1117D72372608CDF9D460CCF /* PGTimedSemWait.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTimedSemWait.h; sourceTree = "<group>"; };
 		1117D7789FB0B9CCBF6A9247 /* PGFilterInputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFilterInputStream.m; sourceTree = "<group>"; };
+		1117D7BEC6FEFADBF2693700 /* PGXMLParserDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGXMLParserDelegate.h; sourceTree = "<group>"; };
 		1117D7D139A66E60784824DE /* PGLinkedListNodeEnumerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGLinkedListNodeEnumerator.m; sourceTree = "<group>"; };
 		1117D815E4D43B304A71F4E6 /* PGQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGQueue.m; sourceTree = "<group>"; };
 		1117D815FD8832412F83E9E5 /* NSArray+PGArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+PGArray.m"; sourceTree = "<group>"; };
@@ -383,6 +387,15 @@
 			path = Concurrency;
 			sourceTree = "<group>";
 		};
+		1117DBA3D4F4D150CA6FFA37 /* XML */ = {
+			isa = PBXGroup;
+			children = (
+				1117D61CE4917C58A2160795 /* PGXMLParserDelegate.m */,
+				1117D7BEC6FEFADBF2693700 /* PGXMLParserDelegate.h */,
+			);
+			path = XML;
+			sourceTree = "<group>";
+		};
 		1117DBB9F745464E42D6F34E /* Private */ = {
 			isa = PBXGroup;
 			children = (
@@ -490,6 +503,7 @@
 				1117DBB9F745464E42D6F34E /* Private */,
 				1117D692E1F549C7A743FD44 /* Buffers */,
 				1117DFC37780FD559A51F998 /* CommandLine */,
+				1117DBA3D4F4D150CA6FFA37 /* XML */,
 			);
 			path = Rubicon;
 			sourceTree = "<group>";
@@ -543,6 +557,7 @@
 				1117D23456658A8B033643FC /* PGDynamicBuffers.h in Headers */,
 				1117DC3D57BC44F0976F7630 /* PGCmdLine.h in Headers */,
 				1117DBB362320F47607B2FBF /* PGTimedWait.h in Headers */,
+				1117D97C33BEF0151B80187D /* PGXMLParserDelegate.h in Headers */,
 				1117D69D5AF1A9A9A0FE03FA /* PGMutableBinaryTreeDictionary.h in Headers */,
 				1117DA8772DE599BAF065F40 /* PGFilterOutputStream.h in Headers */,
 				1117DA4BA1B8AAB1B951B8E4 /* PGNestedEnumerator.h in Headers */,
@@ -695,6 +710,7 @@
 				1117D5567CE2BE5127E3E524 /* PGCmdLineDefines.m in Sources */,
 				1117DF8322A23E1CB18128FE /* PGCmdLineCommon.m in Sources */,
 				1117D9A5333A815F48ACE509 /* PGDynamicBufferTools.m in Sources */,
+				1117D7F712CA391E6902B76C /* PGXMLParserDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
