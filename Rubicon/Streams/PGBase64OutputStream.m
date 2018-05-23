@@ -23,22 +23,22 @@
 #define INPUT_BLOCK_SIZE  ((NSUInteger)(3))
 #define OUTPUT_BLOCK_SIZE ((NSUInteger)(4))
 #define MASK(n)           ((NSByte)((n) & (0x3f)))
-#define FOO(a)            (((NSUInteger)(a) * INPUT_BLOCK_SIZE) / OUTPUT_BLOCK_SIZE)
+#define FOOMULT(a)        (((NSUInteger)(a) * INPUT_BLOCK_SIZE) / OUTPUT_BLOCK_SIZE)
 #define BAR(a)            (((NSUInteger)(a) / INPUT_BLOCK_SIZE) * OUTPUT_BLOCK_SIZE)
 #define MULT(a, m)        (((NSUInteger)(a) / (NSUInteger)(m)) * (NSUInteger)(m))
 
-const NSByte *CODES = (const NSByte *)"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const NSBytePtr CODES = (const NSBytePtr)"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-void PGEncodeBase64Final(const NSByte *input, NSByte *output, NSInteger remain);
+void PGEncodeBase64Final(const NSBytePtr input, NSBytePtr output, NSInteger remain);
 
-NS_INLINE void PGBase64EncodeBlock(const NSByte *input, NSByte *output) {
+NS_INLINE void PGBase64EncodeBlock(const NSBytePtr input, NSBytePtr output) {
     output[0] = CODES[input[0] >> 2];
     output[1] = CODES[MASK(input[0] << 4) | (input[1] >> 4)];
     output[2] = CODES[MASK(input[1] << 2) | (input[2] >> 6)];
     output[3] = CODES[MASK(input[2])];
 }
 
-NS_INLINE void PGBase64EncodeFull(const NSByte *input, NSByte *output, NSUInteger inlen, NSUInteger *inidx, NSUInteger *outidx) {
+NS_INLINE void PGBase64EncodeFull(const NSBytePtr input, NSBytePtr output, NSUInteger inlen, NSUInteger *inidx, NSUInteger *outidx) {
     while((*inidx) < inlen) {
         PGBase64EncodeBlock((input + (*inidx)), (output + (*outidx)));
         (*inidx) += INPUT_BLOCK_SIZE;
@@ -87,7 +87,7 @@ NS_INLINE void PGBase64EncodeFull(const NSByte *input, NSByte *output, NSUIntege
      * @param rlen the length of the 'remainder' buffer.
      * @return the updated pointer into the input buffer.
      */
-    NS_INLINE NSUInteger fillRemainder(PGBase64OutputStream *s, const NSByte *in, NSUInteger ilen, NSUInteger idx, NSUInteger rlen) {
+    NS_INLINE NSUInteger fillRemainder(PGBase64OutputStream *s, const NSBytePtr in, NSUInteger ilen, NSUInteger idx, NSUInteger rlen) {
         while((s->_remlen < rlen) && (idx < ilen)) {
             s->_rem[s->_remlen++] = in[idx++];
         }
@@ -106,7 +106,7 @@ NS_INLINE void PGBase64EncodeFull(const NSByte *input, NSByte *output, NSUIntege
      * @param odx the current pointer into the output buffer.
      * @return 'YES' if we didn't have enough bytes in the input buffer to finish the block.
      */
-    NS_INLINE BOOL writeRem(PGBase64OutputStream *s, const NSByte *in, NSUInteger ilen, NSByte *out, NSUInteger *idx, NSUInteger *odx) {
+    NS_INLINE BOOL writeRem(PGBase64OutputStream *s, const NSBytePtr in, NSUInteger ilen, NSBytePtr out, NSUInteger *idx, NSUInteger *odx) {
         if(s->_remlen) {
             if(s->_remlen < INPUT_BLOCK_SIZE) {
                 *idx = fillRemainder(s, in, ilen, *idx, INPUT_BLOCK_SIZE);
@@ -120,16 +120,16 @@ NS_INLINE void PGBase64EncodeFull(const NSByte *input, NSByte *output, NSUIntege
         return NO;
     }
 
-    -(NSInteger)writeFiltered:(const NSByte *)buffer maxLength:(NSUInteger)len {
+    -(NSInteger)writeFiltered:(const NSBytePtr)buffer maxLength:(NSUInteger)len {
         if(_remlen > INPUT_BLOCK_SIZE) {
             NSDictionary *dict = @{ NSLocalizedDescriptionKey: @"Internal Inconsistency Error!" };
             _error = [NSError errorWithDomain:PGErrorDomain code:PGErrorCodeIOError userInfo:dict];
             return -1;
         }
 
-        NSUInteger remlen  = _remlen;
-        NSUInteger outlen  = BAR(len + remlen);
-        NSByte     *output = PGRealloc(NULL, outlen * sizeof(NSByte));
+        NSUInteger remlen = _remlen;
+        NSUInteger outlen = BAR(len + remlen);
+        NSBytePtr  output = PGMalloc(outlen * sizeof(NSByte));
 
         @try {
             NSUInteger inidx  = 0;
@@ -144,7 +144,7 @@ NS_INLINE void PGBase64EncodeFull(const NSByte *input, NSByte *output, NSUIntege
              * We subtract the original number of remaining bytes so that we don't include
              * those in the sent totals for this invocation.
              */
-            if(count < outidx) return (FOO(count) - remlen);
+            if(count < outidx) return (FOOMULT(count) - remlen);
             return fillRemainder(self, buffer, len, inidx, (INPUT_BLOCK_SIZE - 1));
         }
         @finally { free(output); }
@@ -173,7 +173,7 @@ NS_INLINE void PGBase64EncodeFull(const NSByte *input, NSByte *output, NSUIntege
                 PGEncodeBase64Final(_rem, output, _remlen);
                 _remlen = 0;
                 NSInteger res = [super writeFiltered:output maxLength:OUTPUT_BLOCK_SIZE];
-                written = ((res > 0) ? (NSInteger)FOO(res) : res);
+                written = ((res > 0) ? (NSInteger)FOOMULT(res) : res);
             }
         }
         @finally { [self unlock]; }
@@ -183,7 +183,7 @@ NS_INLINE void PGBase64EncodeFull(const NSByte *input, NSByte *output, NSUIntege
 
 @end
 
-void PGEncodeBase64Final(const NSByte *input, NSByte *output, NSInteger remain) {
+void PGEncodeBase64Final(const NSBytePtr input, NSBytePtr output, NSInteger remain) {
     if(remain--) {
         /*
          * 'remain' is going to be equal to 0 or 1.
@@ -202,15 +202,15 @@ void PGEncodeBase64Final(const NSByte *input, NSByte *output, NSInteger remain) 
     }
 }
 
-char *PGEncodeBase64(const NSByte *input, NSUInteger inlen, NSUInteger *outlen) {
-    NSByte *output = NULL;
+char *PGEncodeBase64(const NSBytePtr input, NSUInteger inlen, NSUInteger *outlen) {
+    NSBytePtr output = NULL;
 
     if(inlen) {
         /*
          * The size of a char should always be 1 but just in case...
          */
         *outlen = BAR(inlen + (OUTPUT_BLOCK_SIZE - 1));
-        output = (NSByte *)malloc((*outlen + 1) * sizeof(NSByte));
+        output = (NSBytePtr)PGMalloc((*outlen + 1) * sizeof(NSByte));
 
         if(output) {
             NSUInteger inidx  = 0;

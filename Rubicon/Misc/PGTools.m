@@ -89,7 +89,7 @@ void PGSPrintfVA(NSOutputStream *outs, NSString *fmt, va_list args) {
     size_t     buffsnt = 0;
 
     while(buffsnt < bufflen) {
-        NSInteger r = [outs write:(const uint8_t *)(buffer + buffsnt) maxLength:(bufflen - buffsnt)];
+        NSInteger r = [outs write:(const NSBytePtr)(buffer + buffsnt) maxLength:(bufflen - buffsnt)];
         if(r <= 0) break;
         buffsnt += r;
     }
@@ -177,8 +177,8 @@ NSBytePtr PGMemoryReverse(NSBytePtr buffer, NSUInteger length) {
 }
 
 NSVoidPtr PGMemDup(const NSVoidPtr src, size_t size) {
-    void *dest = PGRealloc(NULL, size);
-    memcpy(dest, src, size);
+    void *dest = PGMalloc(size);
+    PGMemCopy(dest, src, size);
     return dest;
 }
 

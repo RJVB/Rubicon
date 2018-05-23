@@ -31,17 +31,58 @@
 #define PGFieldsPerPixel (4)
 
 #define PGThrowOutOfMemoryException @throw [NSException exceptionWithName:NSMallocException reason:@"Out of memory" userInfo:nil]
+#define PGThrowNullPointerException @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"NULL pointer." userInfo:nil]
 
-NS_INLINE void PGSwapPtr(void **x, void **y) {
+NS_INLINE NSVoidPtr _Nonnull PGTestPtr(NSVoidPtr _Nullable _ptr) {
+    if(_ptr) return (_ptr); else PGThrowOutOfMemoryException;
+}
+
+NS_INLINE void PGSwapPtr(void *_Nonnull *_Nonnull x, void *_Nonnull *_Nonnull y) {
     void *z = *x;
     *x = *y;
     *y = z;
 }
 
-NS_INLINE void PGSwapObjs(id *x, id *y) {
+NS_INLINE void PGSwapObjs(id _Nonnull *_Nonnull x, id _Nonnull *_Nonnull y) {
     id z = *x;
     *x = *y;
     *y = z;
+}
+
+NS_INLINE NSVoidPtr _Nonnull PGMalloc(size_t _sz) {
+    return PGTestPtr(malloc(_sz));
+}
+
+NS_INLINE NSVoidPtr _Nonnull PGCalloc(size_t count, size_t size) {
+    return PGTestPtr(calloc(count, size));
+}
+
+NS_INLINE NSVoidPtr _Nonnull PGRealloc(NSVoidPtr _Nullable _ptr, size_t _sz) {
+    return PGTestPtr(_ptr ? realloc(_ptr, _sz) : malloc(_sz));
+}
+
+NS_INLINE NSVoidPtr _Nonnull PGMemMove(NSVoidPtr _Nonnull dest, const NSVoidPtr _Nonnull src, size_t length) {
+    return (length ? memmove(dest, src, length) : dest);
+}
+
+NS_INLINE NSVoidPtr _Nonnull PGMemCopy(NSVoidPtr _Nonnull dest, const NSVoidPtr _Nonnull src, size_t length) {
+    return (length ? memcpy(dest, src, length) : dest);
+}
+
+NS_INLINE NSVoidPtr _Nonnull PGMemPMove(NSVoidPtr _Nonnull dest, const NSVoidPtr _Nonnull src, size_t length) {
+    return (length ? (memmove(dest, src, length) + length) : dest);
+}
+
+NS_INLINE NSVoidPtr _Nonnull PGMemPCopy(NSVoidPtr _Nonnull dest, const NSVoidPtr _Nonnull src, size_t length) {
+    return (length ? (memcpy(dest, src, length) + length) : dest);
+}
+
+NS_INLINE NSVoidPtr _Nonnull PGMemShift(NSVoidPtr _Nonnull src, NSInteger delta, NSUInteger length) {
+    return PGMemMove((src + delta), src, length);
+}
+
+NS_INLINE NSVoidPtr _Nonnull PGMemPShift(NSVoidPtr _Nonnull src, NSInteger delta, NSUInteger length) {
+    return (PGMemShift(src, delta, length) + length);
 }
 
 /**
@@ -53,7 +94,7 @@ NS_INLINE void PGSwapObjs(id *x, id *y) {
  *            count as one character) then each character will be broken out separately.
  * @return a new string with the escaped sequences.
  */
-FOUNDATION_EXPORT NSString *PGEscapeString(NSString *str, NSString *escapeChar, ...) NS_REQUIRES_NIL_TERMINATION;
+FOUNDATION_EXPORT NSString *_Nonnull PGEscapeString(NSString *_Nonnull str, NSString *_Nonnull escapeChar, ...) NS_REQUIRES_NIL_TERMINATION;
 
 FOUNDATION_EXPORT NSString *_Nullable PGValidateDate(NSString *_Nonnull dateString);
 
@@ -62,11 +103,6 @@ FOUNDATION_EXPORT NSString *_Nullable PGValidateTime(NSString *_Nonnull timeStri
 FOUNDATION_EXPORT NSBytePtr _Nonnull PGMemoryReverse(NSBytePtr _Nonnull buffer, NSUInteger length);
 
 FOUNDATION_EXPORT NSVoidPtr _Nonnull PGMemDup(const NSVoidPtr _Nonnull src, size_t size);
-
-NS_INLINE NSVoidPtr PGRealloc(NSVoidPtr _ptr, size_t _sz) {
-    NSVoidPtr nptr = (_ptr ? realloc(_ptr, _sz) : malloc(_sz));
-    if(nptr) return nptr; else PGThrowOutOfMemoryException;
-}
 
 /**
  * If the given string reference is null then return an empty string literal. (@"")

@@ -77,7 +77,7 @@
         return ((i1 < i2) ? i1 : i2);
     }
 
-    -(NSInteger)write:(const NSByte *)buffer maxLength:(NSUInteger)len {
+    -(NSInteger)write:(const NSBytePtr)buffer maxLength:(NSUInteger)len {
         [self lock];
 
         @try {
@@ -115,7 +115,7 @@
         @finally { [self unlock]; }
     }
 
-    -(NSInteger)writeFiltered:(const NSByte *)buffer maxLength:(NSUInteger)len {
+    -(NSInteger)writeFiltered:(const NSBytePtr)buffer maxLength:(NSUInteger)len {
         NSInteger written = 0;
 
         do {

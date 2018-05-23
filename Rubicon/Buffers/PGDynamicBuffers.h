@@ -24,29 +24,37 @@
 NS_ASSUME_NONNULL_BEGIN
 
 FOUNDATION_EXPORT const NSUInteger PGDynByteQueueDefaultInitialSize;
+FOUNDATION_EXPORT const NSUInteger PGDynByteQueueMinSize;
 
 typedef NSInteger (^PGDynamicByteBufferOpBlock)(NSBytePtr buffer, NSUInteger size, NSUInteger *pHead, NSUInteger *pTail, NSError **error);
 
-@interface PGDynamicByteQueue : NSObject<NSCopying, NSLocking>
+@interface PGDynamicByteQueue : NSObject<NSCopying>
 
     @property(readonly) NSUInteger count;
     @property(readonly) BOOL       isEmpty;
+    @property /*     */ BOOL       willShrink;
 
     -(instancetype)init NS_DESIGNATED_INITIALIZER;
 
     -(instancetype)initWithInitialSize:(NSUInteger)initialSize NS_DESIGNATED_INITIALIZER;
 
+    -(instancetype)initWithNSData:(NSData *)nsData;
+
+    -(instancetype)initWithBytes:(const NSBytePtr)bytes length:(NSUInteger)length;
+
+    -(void)dealloc;
+
+    -(BOOL)isEqual:(id)other;
+
     -(BOOL)isEqualToQueue:(PGDynamicByteQueue *)other;
 
-    -(void)queue:(NSByte)byte;
+    -(NSUInteger)hash;
 
-    -(void)queue:(const NSBytePtr)buffer offset:(NSUInteger)offset length:(NSUInteger)length;
+    -(void)queue:(NSByte)byte;
 
     -(void)queue:(const NSBytePtr)buffer length:(NSUInteger)length;
 
     -(void)requeue:(NSByte)byte;
-
-    -(void)requeue:(const NSBytePtr)buffer offset:(NSUInteger)offset length:(NSUInteger)length;
 
     -(void)requeue:(const NSBytePtr)buffer length:(NSUInteger)length;
 
@@ -54,13 +62,21 @@ typedef NSInteger (^PGDynamicByteBufferOpBlock)(NSBytePtr buffer, NSUInteger siz
 
     -(NSInteger)unqueue;
 
-    -(NSInteger)dequeue:(NSBytePtr)buffer maxLength:(NSUInteger)length;
+    -(NSUInteger)dequeue:(NSBytePtr)buffer maxLength:(NSUInteger)length;
 
-    -(NSInteger)unqueue:(NSBytePtr)buffer maxLength:(NSUInteger)length;
-
-    -(void)normalize;
+    -(NSUInteger)unqueue:(NSBytePtr)buffer maxLength:(NSUInteger)length;
 
     -(NSInteger)performOperation:(PGDynamicByteBufferOpBlock)opBlock restoreOnExceptionOrError:(BOOL)restoreFlag error:(NSError **)error;
+
+    -(NSData *)getNSData;
+
+    -(NSData *)getNSData:(NSUInteger)length;
+
+    -(NSString *)getNSString:(NSStringEncoding)encoding;
+
+    -(char *)getUTF8String:(NSUInteger)length;
+
+    -(NSString *)getNSString:(NSUInteger)length encoding:(NSStringEncoding)encoding;
 
 @end
 

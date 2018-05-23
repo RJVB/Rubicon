@@ -407,11 +407,11 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
         return [(NSString *)[[self class] alloc] initWithFormat:@"%@%@", (firstString ?: @""), secondString];
     }
 
-    +(instancetype)stringWithBytes:(const NSByte *)bytes length:(NSUInteger)length {
+    +(instancetype)stringWithBytes:(const NSBytePtr)bytes length:(NSUInteger)length {
         return [self stringWithBytes:bytes length:length encoding:NSUTF8StringEncoding];
     }
 
-    +(instancetype)stringWithBytes:(const NSByte *)bytes length:(NSUInteger)length encoding:(NSStringEncoding)encoding {
+    +(instancetype)stringWithBytes:(const NSBytePtr)bytes length:(NSUInteger)length encoding:(NSStringEncoding)encoding {
         return ((bytes && length) ? [(NSString *)[[self class] alloc] initWithBytes:bytes length:length encoding:encoding] : [(NSString *)[[self class] alloc] init]);
     }
 
