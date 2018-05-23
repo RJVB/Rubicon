@@ -27,7 +27,7 @@
 #define BAR(a)            (((NSUInteger)(a) / INPUT_BLOCK_SIZE) * OUTPUT_BLOCK_SIZE)
 #define MULT(a, m)        (((NSUInteger)(a) / (NSUInteger)(m)) * (NSUInteger)(m))
 
-NSByte *CODES = (NSByte *)"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const NSByte *CODES = (const NSByte *)"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 void PGEncodeBase64Final(const NSByte *input, NSByte *output, NSInteger remain);
 

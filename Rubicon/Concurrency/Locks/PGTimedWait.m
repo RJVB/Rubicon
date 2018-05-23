@@ -33,9 +33,9 @@
 
 void ignoreSignal(int _signal);
 
-void threadCleanup(void *obj);
+void threadCleanup(voidp obj);
 
-void *waitThread(void *obj);
+voidp waitThread(voidp obj);
 
 @interface PGTimedWait()
 
@@ -96,7 +96,7 @@ void *waitThread(void *obj);
 
             _thread1 = pthread_self();
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &savedState);
-            pthread_cleanup_push(threadCleanup, (__bridge void *)self);
+            pthread_cleanup_push(threadCleanup, (__bridge voidp)self);
 
                 success = [self timedAction:&actionResults savedState:savedState exception:&exception];
 
@@ -110,7 +110,7 @@ void *waitThread(void *obj);
 #pragma clang diagnostic pop
 
     -(BOOL)timedAction:(id *)results savedState:(int)savedState exception:(NSException **)exception {
-        BOOL success = (pthread_create(&_thread2, NULL, waitThread, (__bridge void *)self) == 0);
+        BOOL success = (pthread_create(&_thread2, NULL, waitThread, (__bridge voidp)self) == 0);
         pthread_setcancelstate(savedState, NULL);
 
         if(success) {
@@ -173,14 +173,14 @@ void ignoreSignal(int _signal) {
 
 #pragma clang diagnostic pop
 
-void threadCleanup(void *obj) {
+void threadCleanup(voidp obj) {
     PGTimedWait *__unsafe_unretained timedWait = ((__bridge PGTimedWait *)obj);
     [timedWait cleanup];
 }
 
-void *waitThread(void *obj) {
+voidp waitThread(voidp obj) {
     PGTimedWait *__unsafe_unretained timedWait = ((__bridge PGTimedWait *)obj);
     long errorNo = ((long)[timedWait wait]);
-    return ((void *)errorNo);
+    return ((voidp)errorNo);
 }
 

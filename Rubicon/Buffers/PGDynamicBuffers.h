@@ -40,7 +40,7 @@ typedef NSInteger (^PGDynamicByteBufferOpBlock)(NSByte *buffer, NSUInteger size,
 
     -(instancetype)initWithNSData:(NSData *)nsData;
 
-    -(instancetype)initWithBytes:(NSByte *)bytes length:(NSUInteger)length;
+    -(instancetype)initWithBytes:(const NSByte *)bytes length:(NSUInteger)length;
 
     -(void)dealloc;
 
@@ -52,11 +52,11 @@ typedef NSInteger (^PGDynamicByteBufferOpBlock)(NSByte *buffer, NSUInteger size,
 
     -(void)queue:(NSByte)byte;
 
-    -(void)queue:(NSByte *)buffer length:(NSUInteger)length;
+    -(void)queue:(const NSByte *)buffer length:(NSUInteger)length;
 
     -(void)requeue:(NSByte)byte;
 
-    -(void)requeue:(NSByte *)buffer length:(NSUInteger)length;
+    -(void)requeue:(const NSByte *)buffer length:(NSUInteger)length;
 
     -(NSInteger)dequeue;
 

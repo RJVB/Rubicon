@@ -33,12 +33,12 @@
 #define PGThrowOutOfMemoryException @throw [NSException exceptionWithName:NSMallocException reason:@"Out of memory" userInfo:nil]
 #define PGThrowNullPointerException @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"NULL pointer." userInfo:nil]
 
-NS_INLINE void *_Nonnull PGTestPtr(void *_Nullable _ptr) {
+NS_INLINE voidp _Nonnull PGTestPtr(voidp _Nullable _ptr) {
     if(_ptr) return (_ptr); else PGThrowOutOfMemoryException;
 }
 
-NS_INLINE void PGSwapPtr(void *_Nonnull *_Nonnull x, void *_Nonnull *_Nonnull y) {
-    void *z = *x;
+NS_INLINE void PGSwapPtr(voidp _Nonnull *_Nonnull x, voidp _Nonnull *_Nonnull y) {
+    voidp z = *x;
     *x = *y;
     *y = z;
 }
@@ -49,39 +49,39 @@ NS_INLINE void PGSwapObjs(id _Nonnull *_Nonnull x, id _Nonnull *_Nonnull y) {
     *y = z;
 }
 
-NS_INLINE void *_Nonnull PGMalloc(size_t _sz) {
+NS_INLINE voidp _Nonnull PGMalloc(size_t _sz) {
     return PGTestPtr(malloc(_sz));
 }
 
-NS_INLINE void *_Nonnull PGCalloc(size_t count, size_t size) {
+NS_INLINE voidp _Nonnull PGCalloc(size_t count, size_t size) {
     return PGTestPtr(calloc(count, size));
 }
 
-NS_INLINE void *_Nonnull PGRealloc(void *_Nullable _ptr, size_t _sz) {
+NS_INLINE voidp _Nonnull PGRealloc(voidp _Nullable _ptr, size_t _sz) {
     return PGTestPtr(_ptr ? realloc(_ptr, _sz) : malloc(_sz));
 }
 
-NS_INLINE void *_Nonnull PGMemMove(void *_Nonnull dest, const void *_Nonnull src, size_t length) {
+NS_INLINE voidp _Nonnull PGMemMove(voidp _Nonnull dest, cvoidp _Nonnull src, size_t length) {
     return (length ? memmove(dest, src, length) : dest);
 }
 
-NS_INLINE void *_Nonnull PGMemCopy(void *_Nonnull dest, const void *_Nonnull src, size_t length) {
+NS_INLINE voidp _Nonnull PGMemCopy(voidp _Nonnull dest, cvoidp _Nonnull src, size_t length) {
     return (length ? memcpy(dest, src, length) : dest);
 }
 
-NS_INLINE void *_Nonnull PGMemPMove(void *_Nonnull dest, const void *_Nonnull src, size_t length) {
+NS_INLINE voidp _Nonnull PGMemPMove(voidp _Nonnull dest, cvoidp _Nonnull src, size_t length) {
     return (length ? (memmove(dest, src, length) + length) : dest);
 }
 
-NS_INLINE void *_Nonnull PGMemPCopy(void *_Nonnull dest, const void *_Nonnull src, size_t length) {
+NS_INLINE voidp _Nonnull PGMemPCopy(voidp _Nonnull dest, cvoidp _Nonnull src, size_t length) {
     return (length ? (memcpy(dest, src, length) + length) : dest);
 }
 
-NS_INLINE void *_Nonnull PGMemShift(void *_Nonnull src, NSInteger delta, NSUInteger length) {
+NS_INLINE voidp _Nonnull PGMemShift(voidp _Nonnull src, NSInteger delta, NSUInteger length) {
     return PGMemMove((src + delta), src, length);
 }
 
-NS_INLINE void *_Nonnull PGMemPShift(void *_Nonnull src, NSInteger delta, NSUInteger length) {
+NS_INLINE voidp _Nonnull PGMemPShift(voidp _Nonnull src, NSInteger delta, NSUInteger length) {
     return (PGMemShift(src, delta, length) + length);
 }
 
@@ -102,7 +102,7 @@ FOUNDATION_EXPORT NSString *_Nullable PGValidateTime(NSString *_Nonnull timeStri
 
 FOUNDATION_EXPORT NSByte *_Nonnull PGMemoryReverse(NSByte *_Nonnull buffer, NSUInteger length);
 
-FOUNDATION_EXPORT void *_Nonnull PGMemDup(const void *_Nonnull src, size_t size);
+FOUNDATION_EXPORT voidp _Nonnull PGMemDup(cvoidp _Nonnull src, size_t size);
 
 /**
  * If the given string reference is null then return an empty string literal. (@"")

@@ -26,9 +26,9 @@ typedef union {
 
 #define HP            (31u)
 #define FOOHASH(h, v) ((h)=(((h)*(HP))+(v)))
-#define FOOCAST(t, p) (*((t *)((void *)(p))))
+#define FOOCAST(t, p) (*((t *)((voidp)(p))))
 
-NS_INLINE NSUInteger qCalculateHash3(NSByte *b, NSUInteger *h, NSUInteger s, NSUInteger c, NSUInteger hash) {
+NS_INLINE NSUInteger qCalculateHash3(const NSByte *b, NSUInteger *h, NSUInteger s, NSUInteger c, NSUInteger hash) {
     if(c) {
         NSHashHelper   hh = { .word = 0 };
         for(NSUInteger i  = 0; i < c; i++) hh.bytes[i] = b[qPostAdd(h, 1, s)];
@@ -38,12 +38,12 @@ NS_INLINE NSUInteger qCalculateHash3(NSByte *b, NSUInteger *h, NSUInteger s, NSU
     return hash;
 }
 
-NS_INLINE NSUInteger qCalculateHash2(NSByte *b, NSUInteger *h, NSUInteger s, NSUInteger c, NSUInteger hash) {
+NS_INLINE NSUInteger qCalculateHash2(const NSByte *b, NSUInteger *h, NSUInteger s, NSUInteger c, NSUInteger hash) {
     for(NSUInteger i = 0; i < c; i++) FOOHASH(hash, FOOCAST(NSUInteger, b + qPostAdd(h, NSUIntegerSize, s)));
     return hash;
 }
 
-NS_INLINE NSUInteger qCalculateHash1(NSByte *b, NSUInteger h, NSUInteger s, NSUInteger c) {
+NS_INLINE NSUInteger qCalculateHash1(const NSByte *b, NSUInteger h, NSUInteger s, NSUInteger c) {
     return (c ? qCalculateHash3(b, &h, s, (c % NSUIntegerSize), qCalculateHash2(b, &h, s, (c / NSUIntegerSize), (HP + c))) : HP);
 }
 
@@ -104,8 +104,9 @@ PGByteQueue *qCreateNormalizedCopy(const PGByteQueue *q) {
 
 BOOL qCompareQueues(const PGByteQueue *q1, const PGByteQueue *q2) {
     if(q1 && q2) {
-        NSUInteger h1  = q1->qhead, t1 = q1->qtail, h2 = q2->qhead, s1 = q1->qsize, s2 = q2->qsize;
-        NSByte     *b1 = q1->qbuffer, *b2 = q2->qbuffer;
+        NSUInteger   h1  = q1->qhead, t1 = q1->qtail, h2 = q2->qhead, s1 = q1->qsize, s2 = q2->qsize;
+        const NSByte *b1 = q1->qbuffer;
+        const NSByte *b2 = q2->qbuffer;
 
         while(h1 != t1) {
             if(b1[qPostAdd(&h1, 1, s1)] != b2[qPostAdd(&h2, 1, s2)]) return NO;

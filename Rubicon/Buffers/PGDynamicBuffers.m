@@ -69,7 +69,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
         return self;
     }
 
-    -(instancetype)initWithBytes:(NSByte *)bytes length:(NSUInteger)length {
+    -(instancetype)initWithBytes:(const NSByte *)bytes length:(NSUInteger)length {
         self = [self initWithInitialSize:qNextSize(umax(length, PGDynByteQueueMinSize), 2)];
         if(self && length) {
             if(bytes) PGMemCopy(q->qbuffer, bytes, (q->qtail = length));
@@ -144,7 +144,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
         [self queue:&byte length:1];
     }
 
-    -(void)queue:(NSByte *)buffer length:(NSUInteger)length {
+    -(void)queue:(const NSByte *)buffer length:(NSUInteger)length {
         if(buffer && length) {
             [lck lock];
             @try {
@@ -166,7 +166,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
         [self requeue:&byte length:1];
     }
 
-    -(void)requeue:(NSByte *)buffer length:(NSUInteger)length {
+    -(void)requeue:(const NSByte *)buffer length:(NSUInteger)length {
         if(buffer && length) {
             [lck lock];
             @try {

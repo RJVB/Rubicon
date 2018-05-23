@@ -177,8 +177,8 @@ NSByte *PGMemoryReverse(NSByte *buffer, NSUInteger length) {
     return buffer;
 }
 
-void *PGMemDup(const void *src, size_t size) {
-    void *dest = PGMalloc(size);
+voidp PGMemDup(cvoidp src, size_t size) {
+    voidp dest = PGMalloc(size);
     PGMemCopy(dest, src, size);
     return dest;
 }

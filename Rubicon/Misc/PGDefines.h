@@ -27,6 +27,8 @@
 
 #import <Rubicon/GNUstep.h>
 
+typedef const void                 *cvoidp;
+typedef void                       *voidp;
 typedef long long                  NSLong;
 typedef uint8_t                    NSByte;
 typedef NSArray<NSString *>        *NSStrArray;

@@ -321,10 +321,9 @@
                 case 0:
                     state->state        = 1;
                     state->mutationsPtr = &_modifiedCount;
-                    state->extra[0] = ((unsigned long)(__bridge void *)self.queueHead);
+                    state->extra[0] = ((unsigned long)(__bridge voidp)self.queueHead);
                     // Fall through to case 1...
-                case 1:
-                    nextNode = (__bridge PGLinkedListNode *)(void *)state->extra[0];
+                case 1:nextNode = (__bridge PGLinkedListNode *)(voidp)state->extra[0];
 
                     while((state->state == 1) && (count < len)) {
                         buffer[count++] = nextNode.data;
@@ -333,7 +332,7 @@
                     }
 
                     // Probably don't have to do this but OCD.
-                    state->extra[0] = ((state->state == 1) ? ((unsigned long)(__bridge void *)nextNode) : 0);
+                    state->extra[0] = ((state->state == 1) ? ((unsigned long)(__bridge voidp)nextNode) : 0);
                     break;
                 default:
                     break;
