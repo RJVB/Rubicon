@@ -23,6 +23,13 @@
 
 #import "PGInternal.h"
 
+const NSByte UTF8_2ByteMarker     = 0b11000000;
+const NSByte UTF8_3ByteMarker     = 0b11100000;
+const NSByte UTF8_4ByteMarker     = 0b11110000;
+const NSByte UTF8_2ByteMarkerMask = 0b11100000;
+const NSByte UTF8_3ByteMarkerMask = 0b11110000;
+const NSByte UTF8_4ByteMarkerMask = 0b11111000;
+
 NSBitmapImageRep *PGCreateARGBImage(NSFloat width, NSFloat height) {
     NSInteger iWidth  = (NSInteger)ceil(width);
     NSInteger iHeight = (NSInteger)ceil(height);
@@ -52,6 +59,15 @@ NSString *PGStrError(int osErrNo) {
 
 NSString *PGFormatVA(NSString *fmt, va_list args) {
     return [[NSString alloc] initWithFormat:fmt arguments:args];
+}
+
+void PGLog(NSString *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+#ifdef DEBUG
+    NSLog(@"%@", [[NSString alloc] initWithFormat:fmt arguments:args]);
+#endif
+    va_end(args);
 }
 
 NSString *PGFormat(NSString *fmt, ...) {
@@ -245,3 +261,39 @@ NSString *PGEscapeString(NSString *str, NSString *escapeChar, ...) {
     va_end(args);
     return str;
 }
+
+NSError *PGCreateError(NSString *domain, NSInteger code, NSString *description) {
+    return [NSError errorWithDomain:domain code:code userInfo:@{ NSLocalizedDescriptionKey: description }];
+}
+
+NSError *PGOpenInputStream(NSInputStream *input) {
+    NSError *err = nil;
+
+    switch(input.streamStatus) {
+        case NSStreamStatusError:
+            err = (input.streamError ?: PGCreateError(PGErrorDomain, PGErrorCodeUnknownInputStreamError, PGErrorMsgUnknownInputStreamError));
+            break;
+        case NSStreamStatusClosed:
+            err = PGCreateError(PGErrorDomain, PGErrorCodeInputStreamClosed, PGErrorMsgInputStreamClosed);
+            break;
+        case NSStreamStatusAtEnd:
+            err = PGCreateError(PGErrorDomain, PGErrorCodeUnexpectedEndOfInput, PGErrorMsgUnexpectedEndOfInput);
+            break;
+        case NSStreamStatusNotOpen:
+            [input open];
+        case NSStreamStatusOpening:
+            while(input.streamStatus == NSStreamStatusOpening) /* EMPTY LOOP */;
+            return PGOpenInputStream(input);
+        default:
+            break;
+    }
+
+    return err;
+}
+
+BOOL PGReadIntoBuffer(NSInputStream *input, void *buffer, NSUInteger maxLength, int *readStatus, NSError **error) {
+    int rs = (int)[input read:buffer maxLength:maxLength];
+    if((rs < 0) && (error)) *error = (input.streamError ?: PGCreateError(PGErrorDomain, PGErrorCodeUnknownInputStreamError, PGErrorMsgUnknownInputStreamError));
+    return (((*readStatus) = rs) > 0);
+}
+

@@ -68,17 +68,6 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
     }
 
     -(void)test82XMLParseDelegate {
-        NSString            *file     = [@"~/Desktop/Test.xml" stringByExpandingTildeInPath];
-        PGXMLParserDelegate *delegate = [PGXMLParserDelegate new];
-        NSLog(@"Reading \"%@\"", file);
-        NSXMLParser *parser = [[NSXMLParser alloc] initWithStream:[NSInputStream inputStreamWithFileAtPath:file]];
-        parser.delegate                      = delegate;
-        parser.shouldProcessNamespaces       = YES;
-        parser.shouldReportNamespacePrefixes = YES;
-        NSLog(@"validationErrorOccurred: %@", (parser.shouldResolveExternalEntities ? @"YES" : @"NO"));
-        BOOL b = [parser parse];
-
-        NSLog(@"Parse Results: %@", (b ? @"GOOD" : @"BAD"));
     }
 
     -(void)t_est83SwapPointers {

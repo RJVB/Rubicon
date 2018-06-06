@@ -49,12 +49,21 @@ static const NSUInteger NSUNotFound = NSUIntegerMax;
 #endif
 
 FOUNDATION_EXPORT NSString *const PGErrorDomain;
+FOUNDATION_EXPORT NSString *const PGXMLParserErrorDomain;
 
 FOUNDATION_EXPORT const NSInteger PGErrorCodeUnknownError;
 FOUNDATION_EXPORT const NSInteger PGErrorCodeExceptionAsError;
 FOUNDATION_EXPORT const NSInteger PGErrorCodeCmdLineParseError;
 FOUNDATION_EXPORT const NSInteger PGErrorCodeIOError;
 FOUNDATION_EXPORT const NSInteger PGErrorCodeRegexPatternIsNULL;
+
+FOUNDATION_EXPORT const NSInteger PGErrorCodeUnknownInputStreamError;
+FOUNDATION_EXPORT const NSInteger PGErrorCodeInputStreamClosed;
+FOUNDATION_EXPORT const NSInteger PGErrorCodeUnexpectedEndOfInput;
+FOUNDATION_EXPORT const NSInteger PGErrorCodeNoDelegate;
+FOUNDATION_EXPORT const NSInteger PGErrorCodeNoInputStream;
+
+FOUNDATION_EXPORT const NSInteger PGErrorCodeXMLParserAlreadyRun;
 
 FOUNDATION_EXPORT NSString *const PGUnderlyingExceptionKey;
 
@@ -65,9 +74,16 @@ FOUNDATION_EXPORT NSExceptionName const PGOSErrorException;
 
 FOUNDATION_EXPORT NSString *const PGDefaultSemaphoreNamePrefix;
 
-FOUNDATION_EXPORT NSString *const PGErrorMsgBadRegexPattern;
-FOUNDATION_EXPORT NSString *const PGErrorMsgRegexPatternIsNULL;
-FOUNDATION_EXPORT NSString *const PGErrorMsgUnknowError;
+FOUNDATION_EXPORT NSString         *const PGErrorMsgBadRegexPattern;
+FOUNDATION_EXPORT NSString         *const PGErrorMsgRegexPatternIsNULL;
+FOUNDATION_EXPORT NSString         *const PGErrorMsgUnknowError;
+FOUNDATION_EXPORT NSString         *const PGErrorMsgInvalidConstructor;
+FOUNDATION_EXPORT NSString         *const PGErrorMsgInputStreamClosed;
+FOUNDATION_EXPORT NSString         *const PGErrorMsgUnknownInputStreamError;
+FOUNDATION_EXPORT NSString         *const PGErrorMsgNoInputStream;
+FOUNDATION_EXPORT NSString         *const PGErrorMsgUnexpectedEndOfInput;
+FOUNDATION_EXPORT NSString         *const PGErrorMsgNoDelegate;
+FOUNDATION_EXPORT NSString         *const PGErrorMsgXMLParserAlreadyRun;
 
 #if !defined(PGAbstractClassError)
     #define PGAbstractClassError do {\

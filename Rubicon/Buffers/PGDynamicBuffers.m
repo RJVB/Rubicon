@@ -198,12 +198,11 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
                 copied = umin(length, QCOUNT(q));
 
                 if(copied) {
-                    NSUInteger lim = umin(length, ((QWRAPPED(q) ? q->qsize : q->qtail) - q->qhead));
-                    NSUInteger rem = (length - lim);
+                    NSUInteger lim = umin(copied, ((QWRAPPED(q) ? q->qsize : q->qtail) - q->qhead));
+                    NSUInteger rem = (copied - lim);
 
                     PGMemCopy(buffer, qHeadPostAddP(q, lim), lim);
                     if(rem) PGMemCopy((buffer + lim), qHeadPostAddP(q, rem), rem);
-
                     [self _tryShrink];
                     _rehash = YES;
                 }

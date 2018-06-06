@@ -21,9 +21,10 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#import "PGDefines.h"
+#import "PGXMLParser.h"
 
-NSString *const PGErrorDomain = @"com.projectgalen.Rubicon";
+NSString *const PGErrorDomain          = @"com.projectgalen.Rubicon";
+NSString *const PGXMLParserErrorDomain = @"com.projectgalen.Rubicon.PGXMLParser";
 
 NSExceptionName const PGTimedWorkerException   = @"PGTimedWorkerException";
 NSExceptionName const PGSemaphoreException     = @"PGSemaphoreException";
@@ -32,15 +33,28 @@ NSExceptionName const PGOSErrorException       = @"PGOSErrorException";
 
 NSString *const PGDefaultSemaphoreNamePrefix = @"/sem";
 
-const NSInteger PGErrorCodeUnknownError       = 1;
-const NSInteger PGErrorCodeExceptionAsError   = 100;
-const NSInteger PGErrorCodeCmdLineParseError  = 200;
-const NSInteger PGErrorCodeRegexPatternIsNULL = 300;
-const NSInteger PGErrorCodeIOError            = 1000;
+const NSInteger PGErrorCodeUnknownError        = 1;
+const NSInteger PGErrorCodeExceptionAsError    = 100;
+const NSInteger PGErrorCodeCmdLineParseError   = 101;
+const NSInteger PGErrorCodeRegexPatternIsNULL  = 102;
+const NSInteger PGErrorCodeNoDelegate          = 103;
+const NSInteger PGErrorCodeXMLParserAlreadyRun = 104;
+
+const NSInteger PGErrorCodeIOError                 = 200;
+const NSInteger PGErrorCodeNoInputStream           = 201;
+const NSInteger PGErrorCodeUnknownInputStreamError = 202;
+const NSInteger PGErrorCodeInputStreamClosed       = 203;
+const NSInteger PGErrorCodeUnexpectedEndOfInput    = 204;
 
 NSString *const PGUnderlyingExceptionKey = @"PGUnderlyingExceptionKey";
 
-NSString *const PGErrorMsgBadRegexPattern    = @"Invalid regular expression pattern";
-NSString *const PGErrorMsgRegexPatternIsNULL = @"Regex pattern is NULL.";
-NSString *const PGErrorMsgUnknowError        = @"Unknown Error.";
-
+NSString *const PGErrorMsgBadRegexPattern         = @"Invalid regular expression pattern";
+NSString *const PGErrorMsgRegexPatternIsNULL      = @"Regex pattern is NULL.";
+NSString *const PGErrorMsgUnknowError             = @"Unknown Error.";
+NSString *const PGErrorMsgInvalidConstructor      = @"Do not use this constructor.";
+NSString *const PGErrorMsgInputStreamClosed       = @"Input stream closed.";
+NSString *const PGErrorMsgUnknownInputStreamError = @"Unknown input stream error.";
+NSString *const PGErrorMsgNoInputStream           = @"No input stream.";
+NSString *const PGErrorMsgUnexpectedEndOfInput    = @"Unexpected end of input.";
+NSString *const PGErrorMsgNoDelegate              = @"No delegate set.";
+NSString *const PGErrorMsgXMLParserAlreadyRun     = @"XML Parser has already run.";

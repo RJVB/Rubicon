@@ -22,6 +22,13 @@
 
 #import <Rubicon/PGTime.h>
 
+FOUNDATION_EXPORT const NSByte UTF8_2ByteMarker;
+FOUNDATION_EXPORT const NSByte UTF8_3ByteMarker;
+FOUNDATION_EXPORT const NSByte UTF8_4ByteMarker;
+FOUNDATION_EXPORT const NSByte UTF8_2ByteMarkerMask;
+FOUNDATION_EXPORT const NSByte UTF8_3ByteMarkerMask;
+FOUNDATION_EXPORT const NSByte UTF8_4ByteMarkerMask;
+
 @class NSStream;
 
 /*
@@ -32,6 +39,8 @@
 
 #define PGThrowOutOfMemoryException @throw [NSException exceptionWithName:NSMallocException reason:@"Out of memory" userInfo:nil]
 #define PGThrowNullPointerException @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"NULL pointer." userInfo:nil]
+
+#define PG_BRDG_CAST(t)  (__bridge t *)
 
 NS_INLINE voidp _Nonnull PGTestPtr(voidp _Nullable _ptr) {
     if(_ptr) return (_ptr); else PGThrowOutOfMemoryException;
@@ -47,6 +56,10 @@ NS_INLINE void PGSwapObjs(id _Nonnull *_Nonnull x, id _Nonnull *_Nonnull y) {
     id z = *x;
     *x = *y;
     *y = z;
+}
+
+NS_INLINE char *_Nonnull PGStrdup(const char *_Nonnull str) {
+    return PGTestPtr(strdup(str));
 }
 
 NS_INLINE voidp _Nonnull PGMalloc(size_t _sz) {
@@ -235,6 +248,8 @@ FOUNDATION_EXPORT void PGFPrintfVA(NSString *filename, NSError **error, NSString
 
 FOUNDATION_EXPORT NSString *PGFormatVA(NSString *fmt, va_list args);
 
+FOUNDATION_EXPORT void PGLog(NSString *_Nonnull fmt, ...) NS_FORMAT_FUNCTION(1, 2);
+
 /**
  * Convenience function for getting the user's temporary file directory.
  *
@@ -255,5 +270,24 @@ FOUNDATION_EXPORT NSURL *_Nullable PGTemporaryFile(NSString *_Nonnull filenamePo
 NS_INLINE NSComparisonResult PGInvertComparison(NSComparisonResult cr) {
     return ((NSComparisonResult)(((NSInteger)(cr)) * -1L));
 }
+
+FOUNDATION_EXPORT NSError *PGCreateError(NSString *domain, NSInteger code, NSString *description);
+
+FOUNDATION_EXPORT NSError *PGOpenInputStream(NSInputStream *input);
+
+/**
+ * This function provides a bit of an easier way to read from an input stream into a buffer. This function returns a simple YES if data
+ * was put into the buffer or NO if it wasn't.  Then all you have to do is check the value of 'readStatus' to see if the reason for
+ * no data was because of end-of-input (0) or I/O error (< 0).  If there was data put in the buffer then 'readStatus' indicates the number
+ * of bytes read. If there was an error then the 'error' parameter will be set to the value given by the input stream.
+ *
+ * @param input the input stream to read the bytes from.
+ * @param buffer the buffer to receive the bytes.
+ * @param maxLength the maximum number of bytes that 'buffer' can hold.
+ * @param readStatus same as what's returned from NSInputStream's 'read:maxLength:' method.
+ * @param error
+ * @return YES if data was read or NO if EOF or ERROR.
+ */
+FOUNDATION_EXPORT BOOL PGReadIntoBuffer(NSInputStream *input, void *buffer, NSUInteger maxLength, int *readStatus, NSError **error);
 
 #endif //__Rubicon_PGTools_H_
