@@ -16,19 +16,13 @@
  **********************************************************************************************************************************************************************************/
 
 #import "PGInternal.h"
-#import "PGRBTNode.h"
-
-@interface PGRBTNode()
-
-    -(void)clear;
-
-@end
+#import "PGRedBlackNodePrivate.h"
 
 @interface PGKeyBinaryTreeKeyEnumerator : NSEnumerator
 
     @property(readonly, retain) id owner;
 
-    -(instancetype)initWithOwner:(id)owner rootNode:(PGRBTNode *)rootNode;
+    -(instancetype)initWithOwner:(id)owner rootNode:(PGRedBlackNode *)rootNode;
 
 @end
 
@@ -39,7 +33,7 @@
 @end
 
 @implementation PGMutableBinaryTreeDictionary {
-        PGRBTNode *_rootNode;
+        PGRedBlackNode *_rootNode;
     }
 
     -(instancetype)init {
@@ -79,7 +73,6 @@
         if(self) {
             if(aKey == nil) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Key is NULL."];
             if(anObject == nil) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Object is NULL."];
-
             [self _setObject:anObject forKey:aKey];
         }
 
@@ -131,9 +124,7 @@
 
         if(self) {
             if(objects.count == keys.count) {
-                for(NSUInteger i = 0, j = objects.count; i < j; i++) {
-                    [self _setObject:objects[i] forKey:keys[i]];
-                }
+                for(NSUInteger i = 0, j = objects.count; i < j; i++) [self _setObject:objects[i] forKey:keys[i]];
             }
             else {
                 NSString *r = PGFormat(@"objects and keys arrays do not have the same number of items: %lu != %lu", objects.count, keys.count);
@@ -170,18 +161,18 @@
 
     -(void)removeObjectForKey:(id)aKey {
         if(_rootNode) {
-            PGRBTNode *node = [_rootNode findNodeWithKey:aKey];
-            if(node) _rootNode = [node delete];
+            PGRedBlackNode *node = [_rootNode findNodeWithKey:aKey];
+            if(node) _rootNode = node.delete;
         }
     }
 
     -(void)_setObject:(id)anObject forKey:(id<NSCopying>)aKey {
         if(_rootNode) {
-            _rootNode = [[_rootNode insertValue:anObject forKey:aKey] rootNode];
+            _rootNode = [_rootNode insertValue:anObject forKey:aKey].rootNode;
         }
         else {
-            _rootNode = [[PGRBTNode alloc] initWithValue:anObject forKey:aKey];
-            [_rootNode setIsRed:NO];
+            _rootNode = [[PGRedBlackNode alloc] initWithValue:anObject forKey:aKey];
+            _rootNode.isRed = NO;
         }
     }
 
@@ -191,17 +182,17 @@
 
     -(void)removeAllObjects {
         if(_rootNode) {
-            [_rootNode clear];
+            [_rootNode clearTree];
             _rootNode = nil;
         }
     }
 
     -(NSUInteger)count {
-        return (_rootNode ? _rootNode.count : 0);
+        return _rootNode.count;
     }
 
     -(id)objectForKey:(id)aKey {
-        return [[_rootNode findNodeWithKey:aKey] value];
+        return [_rootNode findNodeWithKey:aKey].value;
     }
 
     -(NSEnumerator<id> *)keyEnumerator {
@@ -215,35 +206,31 @@
 @end
 
 @implementation PGKeyBinaryTreeKeyEnumerator {
-        NSMutableArray<PGRBTNode *> *_stack;
+        NSMutableArray<PGRedBlackNode *> *_stack;
     }
 
     @synthesize owner = _owner;
 
-    -(instancetype)initWithOwner:(id)owner rootNode:(PGRBTNode *)rootNode {
+    -(instancetype)initWithOwner:(id)owner rootNode:(PGRedBlackNode *)rootNode {
         self = [super init];
 
         if(self) {
             _owner = owner;
             _stack = [NSMutableArray arrayWithCapacity:10];
 
-            for(PGRBTNode *node = rootNode; node != nil; node = node.leftNode) {
-                [_stack addObject:rootNode];
-            }
+            for(PGRedBlackNode *node = rootNode; node != nil; node = node.leftChildNode) [_stack addObject:rootNode];
         }
 
         return self;
     }
 
     -(id)nextObject {
-        PGRBTNode *nextNode = [_stack popLastObject];
-        id        val       = nil;
+        PGRedBlackNode *nextNode = [_stack popLastObject];
+        id             val       = nil;
 
         if(nextNode) {
             val = nextNode.value;
-            for(PGRBTNode *node = nextNode.rightNode; node != nil; node = node.leftNode) {
-                [_stack addObject:node];
-            }
+            for(PGRedBlackNode *node = nextNode.rightChildNode; node != nil; node = node.leftChildNode) [_stack addObject:node];
         }
 
         return val;

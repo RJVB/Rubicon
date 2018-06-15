@@ -1,9 +1,9 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGXMLParser.h
+ *    FILENAME: PGXMLParserDelegateTest.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 5/26/18
+ *        DATE: 6/7/18
  *  VISIBILITY: Private
  *
  * Copyright © 2018 Project Galen. All rights reserved.
@@ -16,33 +16,16 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#ifndef RUBICON_PGXMLPARSER_H
-#define RUBICON_PGXMLPARSER_H
+#ifndef RUBICON_PGXMLPARSERDELEGATETEST_H
+#define RUBICON_PGXMLPARSERDELEGATETEST_H
 
-#import <Rubicon/PGTools.h>
-#import <Rubicon/PGXMLParserDelegate.h>
+#import <Rubicon/Rubicon.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGXMLParser : NSObject
-
-    @property(assign, nullable) /*   */ id<PGXMLParserDelegate> delegate;
-    @property(readonly) /*           */ NSUInteger              lineNumber;
-    @property(readonly) /*           */ NSUInteger              columnNumber;
-    @property(readonly, nullable) /* */ NSError                 *parserError;
-    @property(readonly, copy, nullable) NSString                *publicId;
-    @property(readonly, copy, nullable) NSString                *systemId;
-
-    -(instancetype)initWithInputStream:(NSInputStream *)stream NS_DESIGNATED_INITIALIZER;
-
-    -(instancetype)initWithFilePath:(NSString *)filepath;
-
-    -(instancetype)initWithURL:(NSURL *)url;
-
-    -(BOOL)parse;
-
+@interface PGXMLParserDelegateTest : NSObject<PGXMLParserDelegate>
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif //RUBICON_PGXMLPARSER_H
+#endif //RUBICON_PGXMLPARSERDELEGATETEST_H

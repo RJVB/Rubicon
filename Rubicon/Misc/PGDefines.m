@@ -33,18 +33,23 @@ NSExceptionName const PGOSErrorException       = @"PGOSErrorException";
 
 NSString *const PGDefaultSemaphoreNamePrefix = @"/sem";
 
-const NSInteger PGErrorCodeUnknownError        = 1;
-const NSInteger PGErrorCodeExceptionAsError    = 100;
-const NSInteger PGErrorCodeCmdLineParseError   = 101;
-const NSInteger PGErrorCodeRegexPatternIsNULL  = 102;
-const NSInteger PGErrorCodeNoDelegate          = 103;
-const NSInteger PGErrorCodeXMLParserAlreadyRun = 104;
+const NSInteger PGErrorCodeUnknownError       = 1;
+const NSInteger PGErrorCodeExceptionAsError   = 100;
+const NSInteger PGErrorCodeCmdLineParseError  = 101;
+const NSInteger PGErrorCodeRegexPatternIsNULL = 102;
+const NSInteger PGErrorCodeNoDelegate         = 103;
 
 const NSInteger PGErrorCodeIOError                 = 200;
 const NSInteger PGErrorCodeNoInputStream           = 201;
 const NSInteger PGErrorCodeUnknownInputStreamError = 202;
 const NSInteger PGErrorCodeInputStreamClosed       = 203;
 const NSInteger PGErrorCodeUnexpectedEndOfInput    = 204;
+
+const NSInteger PGErrorCodeXMLParserWarning     = 300;
+const NSInteger PGErrorCodeXMLParserAlreadyRun  = 301;
+const NSInteger PGErrorCodeXMLParserError       = 302;
+const NSInteger PGErrorCodeXMLParserFatalError  = 303;
+const NSInteger PGErrorCodeXMLParserStructError = 304;
 
 NSString *const PGUnderlyingExceptionKey = @"PGUnderlyingExceptionKey";
 

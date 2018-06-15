@@ -92,12 +92,11 @@
             if(self->_regexPattern) {
                 NSError *err = nil;
                 self->_regex = [NSRegularExpression cachedRegex:self->_regexPattern prefix:PGCmdLineRegexPrefix error:&err];
-#ifdef DEBUG
+
                 if(!self->_regex) {
                     if(!err) err = [NSError errorWithDomain:PGErrorDomain code:PGErrorCodeUnknownError userInfo:@{ NSLocalizedDescriptionKey: PGErrorMsgUnknowError }];
-                    NSLog(@"ERROR: Invalid Regex Pattern: %@", err);
+                    [[PGLogger sharedInstanceWithClass:self.class] debug:@"ERROR: Invalid Regex Pattern: %@", err];
                 }
-#endif
             }
         });
         return _regex;

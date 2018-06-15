@@ -285,9 +285,29 @@ FOUNDATION_EXPORT NSError *PGOpenInputStream(NSInputStream *input);
  * @param buffer the buffer to receive the bytes.
  * @param maxLength the maximum number of bytes that 'buffer' can hold.
  * @param readStatus same as what's returned from NSInputStream's 'read:maxLength:' method.
- * @param error
+ * @param error error
  * @return YES if data was read or NO if EOF or ERROR.
  */
 FOUNDATION_EXPORT BOOL PGReadIntoBuffer(NSInputStream *input, void *buffer, NSUInteger maxLength, int *readStatus, NSError **error);
+
+FOUNDATION_EXPORT char *PGCleanStrLen(const char *xstr, size_t len, char includeSpaces);
+
+NS_INLINE char *PGCleanStr(const char *xstr, char includeSpaces) {
+    return PGCleanStrLen(xstr, strlen(xstr), includeSpaces);
+}
+
+NS_INLINE NSUInteger PGRangeLength(NSUInteger startingLoc, NSUInteger endingLoc) {
+    return (MAX(startingLoc, endingLoc) - MIN(startingLoc, endingLoc));
+}
+
+NS_INLINE NSRange PGRangeFromIndexes(NSUInteger loc1, NSUInteger loc2) {
+    return NSMakeRange(MIN(loc1, loc2), PGRangeLength(loc1, loc2));
+}
+
+NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange range) {
+    if(range.location < string.length && NSMaxRange(range) < string.length) return nil;
+    NSString *r = PGFormat(@"Range {%lu, %lu} out of bounds; string length %lu", range.location, range.length, string.length);
+    return [NSException exceptionWithName:NSRangeException reason:r userInfo:nil];
+}
 
 #endif //__Rubicon_PGTools_H_

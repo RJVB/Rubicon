@@ -64,6 +64,10 @@ FOUNDATION_EXPORT const NSInteger PGErrorCodeNoDelegate;
 FOUNDATION_EXPORT const NSInteger PGErrorCodeNoInputStream;
 
 FOUNDATION_EXPORT const NSInteger PGErrorCodeXMLParserAlreadyRun;
+FOUNDATION_EXPORT const NSInteger PGErrorCodeXMLParserWarning;
+FOUNDATION_EXPORT const NSInteger PGErrorCodeXMLParserError;
+FOUNDATION_EXPORT const NSInteger PGErrorCodeXMLParserFatalError;
+FOUNDATION_EXPORT const NSInteger PGErrorCodeXMLParserStructError;
 
 FOUNDATION_EXPORT NSString *const PGUnderlyingExceptionKey;
 

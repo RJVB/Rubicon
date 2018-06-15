@@ -34,11 +34,16 @@ NS_ASSUME_NONNULL_BEGIN
     @property /*           */ xmlEntityType type;
     @property(readonly) /* */ xmlEntityPtr  xmlEntity;
 
-    -(instancetype)initWithName:(NSString *)name content:(NSString *)content publicID:(NSString *)publicID systemID:(NSString *)systemID type:(xmlEntityType)type;
+    -(instancetype)initWithName:(NSString *)name content:(NSString *)content publicID:(nullable NSString *)publicID systemID:(nullable NSString *)systemID type:(xmlEntityType)type;
 
-    +(instancetype)entityWithName:(NSString *)name content:(NSString *)content publicID:(NSString *)publicID systemID:(NSString *)systemID type:(xmlEntityType)type;
+    +(instancetype)entityWithName:(NSString *)name
+                          content:(NSString *)content
+                         publicID:(nullable NSString *)publicID
+                         systemID:(nullable NSString *)systemID
+                             type:(xmlEntityType)type;
 
     +(instancetype)entityWithName:(NSString *)name content:(NSString *)content;
+
 @end
 
 NS_ASSUME_NONNULL_END

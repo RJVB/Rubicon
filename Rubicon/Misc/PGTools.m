@@ -30,6 +30,30 @@ const NSByte UTF8_2ByteMarkerMask = 0b11100000;
 const NSByte UTF8_3ByteMarkerMask = 0b11110000;
 const NSByte UTF8_4ByteMarkerMask = 0b11111000;
 
+typedef struct _st_buffer {
+    char   *buffer;
+    size_t size;
+    size_t idx;
+}            StrBuffer;
+
+typedef NSString *(*strfmtf_t)(id, SEL, NSString *, va_list);
+
+typedef NSString *(*strallocf_t)(id, SEL);
+
+static const char *ASCII_REPL1[] = {
+        "␀", "␁", "␂", "␃", "␄", "␅", "␆", "␇", "␈", "␉", "␊", "⍗", "␌", "␍", "␎", "␏", "␐", "␑", "␒", "␓", "␔", "␕", "␖", "␗", "␘", "␙", "␚", "␛", "␜", "␝", "␞", "␟", " ", "!",
+        "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?", "@", "A", "B", "C",
+        "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "\\", "]", "^", "_", "`", "a", "b", "c", "d", "e",
+        "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~", "␡"
+};
+
+static const char *ASCII_REPL2[] = {
+        "␀", "␁", "␂", "␃", "␄", "␅", "␆", "␇", "␈", "␉", "␊", "⍗", "␌", "␍", "␎", "␏", "␐", "␑", "␒", "␓", "␔", "␕", "␖", "␗", "␘", "␙", "␚", "␛", "␜", "␝", "␞", "␟", "␠", "!",
+        "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?", "@", "A", "B", "C",
+        "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "\\", "]", "^", "_", "`", "a", "b", "c", "d", "e",
+        "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~", "␡"
+};
+
 NSBitmapImageRep *PGCreateARGBImage(NSFloat width, NSFloat height) {
     NSInteger iWidth  = (NSInteger)ceil(width);
     NSInteger iHeight = (NSInteger)ceil(height);
@@ -58,22 +82,40 @@ NSString *PGStrError(int osErrNo) {
 }
 
 NSString *PGFormatVA(NSString *fmt, va_list args) {
-    return [[NSString alloc] initWithFormat:fmt arguments:args];
+    static Class           stralloc;
+    static SEL             strfmts;
+    static SEL             strallocs;
+    static strfmtf_t       strfmtf;
+    static strallocf_t     strallocf;
+    static dispatch_once_t strfmti = 0;
+
+    dispatch_once(&strfmti, ^{
+        stralloc  = NSString.class;
+        strfmts   = @selector(initWithFormat:arguments:);
+        strallocs = @selector(alloc);
+        strallocf = (strallocf_t)[NSString methodForSelector:strallocs];
+        strfmtf   = (strfmtf_t)[[NSString alloc] methodForSelector:strfmts];
+    });
+
+    return (*strfmtf)(((*strallocf)(stralloc, strallocs)), strfmts, fmt, args);
 }
 
 void PGLog(NSString *fmt, ...) {
+    static PGLogger        *_log = nil;
+    static dispatch_once_t _logo = 0;
+
+    dispatch_once(&_logo, ^{ _log = [PGLogger sharedInstanceWithDomain:@"PGTools"]; });
+
     va_list args;
     va_start(args, fmt);
-#ifdef DEBUG
-    NSLog(@"%@", [[NSString alloc] initWithFormat:fmt arguments:args]);
-#endif
+    [_log debug:@"%@", PGFormatVA(fmt, args)];
     va_end(args);
 }
 
 NSString *PGFormat(NSString *fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    NSString *str = [[NSString alloc] initWithFormat:fmt arguments:args];
+    NSString *str = PGFormatVA(fmt, args);
     va_end(args);
     return str;
 }
@@ -81,7 +123,7 @@ NSString *PGFormat(NSString *fmt, ...) {
 void PGFPrintfVA(NSString *filename, NSError **error, NSString *fmt, va_list args) {
     NSError *err = nil;
     [PGFormatVA(fmt, args) writeToFile:filename atomically:NO encoding:NSUTF8StringEncoding error:&err];
-    if(error) *error = err;
+    PGSetReference(error, err);
 }
 
 void PGFPrintf(NSString *filename, NSError **error, NSString *fmt, ...) {
@@ -295,5 +337,62 @@ BOOL PGReadIntoBuffer(NSInputStream *input, void *buffer, NSUInteger maxLength, 
     int rs = (int)[input read:buffer maxLength:maxLength];
     if((rs < 0) && (error)) *error = (input.streamError ?: PGCreateError(PGErrorDomain, PGErrorCodeUnknownInputStreamError, PGErrorMsgUnknownInputStreamError));
     return (((*readStatus) = rs) > 0);
+}
+
+void addChar(const char ch, StrBuffer *buffer) {
+    buffer->buffer[buffer->idx++] = ch;
+
+    if(buffer->idx == buffer->size) {
+        buffer->size *= 2;
+        buffer->buffer = realloc(buffer->buffer, buffer->size);
+    }
+}
+
+NS_INLINE void addStr(const char *str, StrBuffer *buffer) {
+    while(*str) addChar(*(str++), buffer);
+}
+
+#define UNICODEMASK(c) ((uint8_t)((c)&(0xc0)))
+
+char *PGCleanStrLen(const char *xstr, size_t len, char includeSpaces) {
+    if(xstr) {
+        if(len) {
+            size_t xlen   = (size_t)strlen(xstr);
+            size_t strlen = MIN(xlen, len);
+
+            StrBuffer  buffer = { .size = strlen, .idx = 0, .buffer = malloc(strlen) };
+            uint8_t    ch     = 0;
+            size_t     i      = 0;
+            const char **repl = (includeSpaces ? ASCII_REPL2 : ASCII_REPL1);
+
+            while(i < strlen) {
+                ch = (uint8_t)xstr[i++];
+                if((ch <= 0x20) || (ch == 0x1f)) addStr(repl[ch], &buffer); else addChar(ch, &buffer);
+            }
+
+            if((UNICODEMASK(ch) == 0xc0) || (UNICODEMASK(ch) == 0x80)) {
+                /*
+                 * The last character was part of a UTF-8 unicode multi-byte
+                 * character so let's make sure we got the rest of the bytes.
+                 */
+                ch = (uint8_t)xstr[i++];
+
+                while(UNICODEMASK(ch) == 0x80) { // Only worry about trailing unicode bytes, not the starter byte.
+                    addChar(ch, &buffer);
+                    ch = (uint8_t)xstr[i++];
+                }
+            }
+
+            buffer.buffer[buffer.idx] = 0;
+
+            char *nstr = PGStrdup(buffer.buffer);
+            free(buffer.buffer);
+            return nstr;
+        }
+
+        return PGStrdup("");
+    }
+
+    return NULL;
 }
 

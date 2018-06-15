@@ -16,9 +16,9 @@
  **********************************************************************************************************************************************************************************/
 
 #import "PGXMLParserTools.h"
+#import "PGXMLParser+PGXMLParserExtensions.h"
 
 #define CASTASPARSER(p)  (PG_BRDG_CAST(PGXMLParser)(p))
-#define EXTRACTPARSER(c) CASTASPARSER(((xmlParserCtxtPtr)(c))->userData)
 
 typedef PGXMLParser *__unsafe_unretained ParserPtr;
 typedef xmlChar       *xch;
@@ -56,52 +56,52 @@ NSArray<PGXMLParsedAttribute *> *convertAttributesNS(int nb_attributes, pcxch at
 NSArray<PGXMLParsedNamespace *> *convertNamespaces(int nb_namespaces, pcxch namespaces);
 
 xmlParserInputPtr resolveEntityCallBack(void *ctx, cxch publicId, cxch systemId) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     return [parser resolveEntityCallBack:stringForXMLString(publicId) systemId:stringForXMLString(systemId)];
 }
 
 void internalSubsetCallBack(void *ctx, cxch name, cxch ExternalID, cxch SystemID) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser internalSubsetCallBack:stringForXMLString(name) ExternalID:stringForXMLString(ExternalID) SystemID:stringForXMLString(SystemID)];
 }
 
 void externalSubsetCallBack(void *ctx, cxch name, cxch ExternalID, cxch SystemID) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser externalSubsetCallBack:stringForXMLString(name) ExternalID:stringForXMLString(ExternalID) SystemID:stringForXMLString(SystemID)];
 }
 
 xmlEntityPtr getEntityCallBack(void *ctx, cxch name) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     return [parser getEntityCallBack:stringForXMLString(name)];
 }
 
 xmlEntityPtr getParameterEntityCallBack(void *ctx, cxch name) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     return [parser getParameterEntityCallBack:stringForXMLString(name)];
 }
 
 void entityDeclCallBack(void *ctx, cxch name, int type, cxch publicId, cxch systemId, xch content) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser entityDeclCallBack:stringForXMLString(name) type:type publicId:stringForXMLString(publicId) systemId:stringForXMLString(systemId) content:stringForXMLString(content)];
 }
 
 void notationDeclCallBack(void *ctx, cxch name, cxch publicId, cxch systemId) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser notationDeclCallBack:stringForXMLString(name) publicId:stringForXMLString(publicId) systemId:stringForXMLString(systemId)];
 }
 
 void attributeDeclCallBack(void *ctx, cxch elem, cxch fullname, int type, int def, cxch defaultValue, xmlEnumerationPtr tree) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser attributeDeclCallBack:stringForXMLString(elem) fullname:stringForXMLString(fullname) type:type def:def defaultValue:stringForXMLString(defaultValue) tree:tree];
 }
 
 void elementDeclCallBack(void *ctx, cxch name, int type, xmlElementContentPtr content) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser elementDeclCallBack:stringForXMLString(name) type:type content:content];
 }
 
 void unparsedEntityDeclCallBack(void *ctx, cxch name, cxch publicId, cxch systemId, cxch notationName) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser unparsedEntityDeclCallBack:stringForXMLString(name)
                               publicId:stringForXMLString(publicId)
                               systemId:stringForXMLString(systemId)
@@ -109,57 +109,57 @@ void unparsedEntityDeclCallBack(void *ctx, cxch name, cxch publicId, cxch system
 }
 
 void startDocumentCallBack(void *ctx) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser startDocumentCallBack];
 }
 
 void endDocumentCallBack(void *ctx) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser endDocumentCallBack];
 }
 
 void startElementCallBack(void *ctx, cxch name, cxch *atts) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser startElementCallBack:stringForXMLString(name) attributes:convertAttributes(atts)];
 }
 
 void endElementCallBack(void *ctx, cxch name) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser endElementCallBack:stringForXMLString(name)];
 }
 
 void referenceCallBack(void *ctx, cxch name) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser referenceCallBack:stringForXMLString(name)];
 }
 
 void charactersCallBack(void *ctx, cxch ch, int len) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser charactersCallBack:stringForXMLStringLen(ch, (size_t)len)];
 }
 
 void ignorableWhitespaceCallBack(void *ctx, cxch ch, int len) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser ignorableWhitespaceCallBack:stringForXMLStringLen(ch, (size_t)len)];
 }
 
 void processingInstructionCallBack(void *ctx, cxch target, cxch data) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser processingInstructionCallBack:stringForXMLString(target) data:stringForXMLString(data)];
 }
 
 void commentCallBack(void *ctx, cxch value) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser commentCallBack:stringForXMLString(value)];
 }
 
 void cdataBlockCallBack(void *ctx, cxch value, int len) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser cdataBlockCallBack:stringForXMLStringLen(value, (size_t)len)];
 }
 
 void warningCallBack(void *ctx, const char *msg, ...) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     va_list   args;
     va_start(args, msg);
     [parser fatalErrorCallBack:formatUTF8String(msg, args)];
@@ -167,7 +167,7 @@ void warningCallBack(void *ctx, const char *msg, ...) {
 }
 
 void errorCallBack(void *ctx, const char *msg, ...) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     va_list   args;
     va_start(args, msg);
     [parser fatalErrorCallBack:formatUTF8String(msg, args)];
@@ -175,7 +175,7 @@ void errorCallBack(void *ctx, const char *msg, ...) {
 }
 
 void fatalErrorCallBack(void *ctx, const char *msg, ...) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     va_list   args;
     va_start(args, msg);
     [parser fatalErrorCallBack:formatUTF8String(msg, args)];
@@ -193,12 +193,12 @@ void xmlStructuredErrorCallBack(void *ctx, xmlErrorPtr error) {
      *
      * ParserPtr parser = (__bridge PGXMLParser *)ctx;
      */
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser xmlStructuredErrorCallBack:error];
 }
 
 void startElementNsCallBack(void *ctx, cxch localname, cxch prefix, cxch URI, int nb_namespaces, cxch *namespaces, int nb_attributes, int nb_defaulted, cxch *attributes) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser startElementNsCallBack:stringForXMLString(localname)
                             prefix:stringForXMLString(prefix)
                                URI:stringForXMLString(URI)
@@ -207,7 +207,7 @@ void startElementNsCallBack(void *ctx, cxch localname, cxch prefix, cxch URI, in
 }
 
 void endElementNsCallBack(void *ctx, cxch localname, cxch prefix, cxch URI) {
-    ParserPtr parser = EXTRACTPARSER(ctx);
+    ParserPtr parser = CASTASPARSER(ctx);
     [parser endElementNsCallBack:stringForXMLString(localname) prefix:stringForXMLString(prefix) URI:stringForXMLString(URI)];
 }
 
@@ -254,5 +254,36 @@ NSString *stringForXMLStringLen(cxch xmlstr, size_t len) {
 
 NSError *createError(NSInteger code, NSString *description) {
     return PGCreateError(PGXMLParserErrorDomain, code, description);
+}
+
+BOOL createPushContext(PGXMLParser *parser, const void *buffer, NSInteger bytesRead, const char *filename) {
+    @try {
+        xmlParserCtxtPtr ctx = xmlCreatePushParserCtxt(parser.saxHandler, (__bridge void *)parser, buffer, (int)bytesRead, filename);
+
+        if(ctx) {
+            parser.ctx = ctx;
+            return YES;
+        }
+        else {
+            parser.parserError = createError(PGErrorCodeUnknownError, PGErrorMsgUnknowError);
+        }
+    }
+    @catch(NSException *e) {
+        parser.parserError = e.makeError;
+    }
+
+    return NO;
+}
+
+BOOL parseChunk(PGXMLParser *parser, const void *buffer, NSInteger bcount, BOOL terminate, BOOL success) {
+    @try {
+        success = (success && (xmlParseChunk(parser.ctx, buffer, (int)bcount, (terminate ? 1 : 0)) == 0));
+    }
+    @catch(NSException *e) {
+        success = NO;
+        parser.parserError = e.makeError;
+    }
+
+    return success;
 }
 

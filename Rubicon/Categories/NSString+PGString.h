@@ -56,6 +56,10 @@ typedef NSString *_Nullable (^PGRegexFilterBlock)(NSString *str, NSString *sub, 
 
     -(NSRange)range;
 
+    -(NSString *)stringByReplacingControlChars;
+
+    -(NSString *)stringByReplacingControlCharsAndSpcs;
+
     -(NSString *)stringByFrontPaddingToLength:(NSUInteger)len withString:(NSString *)str startingAtIndex:(NSUInteger)idx;
 
     -(NSString *)stringByCenteringInPaddingOfLength:(NSUInteger)len withString:(NSString *)str startingAtIndex:(NSUInteger)idx;

@@ -17,7 +17,6 @@
 
 #import "PGXMLParsedAttribute.h"
 #import "PGXMLParser+PGXMLParserExtensions.h"
-#import "PGXMLParserTools.h"
 
 static SEL PGXMLFoundNoteDeclSel;
 static SEL PGXMLFoundUnpEntDeclSel;
@@ -46,56 +45,52 @@ static SEL PGXMLReslvIntEntSel;
 #pragma mark Delegate method handling
 
     +(void)setSelectors {
-        static dispatch_once_t pgxmlparser1Once = 0;
-
-        dispatch_once(&pgxmlparser1Once, ^{
-            PGXMLFoundNoteDeclSel   = @selector(parser:foundNotationDeclarationWithName:publicID:systemID:);
-            PGXMLFoundUnpEntDeclSel = @selector(parser:foundUnparsedEntityDeclarationWithName:publicID:systemID:notationName:);
-            PGXMLFoundAttrDeclSel   = @selector(parser:foundAttributeDeclarationWithName:forElement:type:defaultValue:);
-            PGXMLFoundElemDeclSel   = @selector(parser:foundElementDeclarationWithName:model:);
-            PGXMLFoundIntEntDeclSel = @selector(parser:foundInternalEntityDeclarationWithName:value:);
-            PGXMLFoundExtEntDeclSel = @selector(parser:foundExternalEntityDeclarationWithName:publicID:systemID:);
-            PGXMLDidStartElemSel    = @selector(parser:didStartElement:namespaceURI:qualifiedName:attributes:);
-            PGXMLDidEndElemSel      = @selector(parser:didEndElement:namespaceURI:qualifiedName:);
-            PGXMLDidStartMapPfxSel  = @selector(parser:didStartMappingPrefix:toURI:);
-            PGXMLDidEndMapPfxSel    = @selector(parser:didEndMappingPrefix:);
-            PGXMLFoundCharsSel      = @selector(parser:foundCharacters:);
-            PGXMLFoundIgWhitespSel  = @selector(parser:foundIgnorableWhitespace:);
-            PGXMLFoundProcInstSel   = @selector(parser:foundProcessingInstructionWithTarget:data:);
-            PGXMLFoundCommentSel    = @selector(parser:foundComment:);
-            PGXMLFoundCDATASel      = @selector(parser:foundCDATA:);
-            PGXMLResolveExtEntSel   = @selector(parser:resolveExternalEntityName:systemID:);
-            PGXMLParseErrSel        = @selector(parser:parseErrorOccurred:);
-            PGXMLValidationErrSel   = @selector(parser:validationErrorOccurred:);
-            PGXMLDidStartDocSel     = @selector(parserDidStartDocument:);
-            PGXMLDidEndDocSel       = @selector(parserDidEndDocument:);
-            PGXMLReslvIntEntSel     = @selector(parser:resolveInternalEntityForName:);
-        });
+        PGXMLFoundNoteDeclSel   = @selector(parser:foundNotationDeclarationWithName:publicID:systemID:);
+        PGXMLFoundUnpEntDeclSel = @selector(parser:foundUnparsedEntityDeclarationWithName:publicID:systemID:notationName:);
+        PGXMLFoundAttrDeclSel   = @selector(parser:foundAttributeDeclarationWithName:forElement:type:defaultValue:);
+        PGXMLFoundElemDeclSel   = @selector(parser:foundElementDeclarationWithName:model:);
+        PGXMLFoundIntEntDeclSel = @selector(parser:foundInternalEntityDeclarationWithName:value:);
+        PGXMLFoundExtEntDeclSel = @selector(parser:foundExternalEntityDeclarationWithName:publicID:systemID:);
+        PGXMLDidStartElemSel    = @selector(parser:didStartElement:namespaceURI:qualifiedName:attributes:);
+        PGXMLDidEndElemSel      = @selector(parser:didEndElement:namespaceURI:qualifiedName:);
+        PGXMLDidStartMapPfxSel  = @selector(parser:didStartMappingPrefix:toURI:);
+        PGXMLDidEndMapPfxSel    = @selector(parser:didEndMappingPrefix:);
+        PGXMLFoundCharsSel      = @selector(parser:foundCharacters:);
+        PGXMLFoundIgWhitespSel  = @selector(parser:foundIgnorableWhitespace:);
+        PGXMLFoundProcInstSel   = @selector(parser:foundProcessingInstructionWithTarget:data:);
+        PGXMLFoundCommentSel    = @selector(parser:foundComment:);
+        PGXMLFoundCDATASel      = @selector(parser:foundCDATA:);
+        PGXMLResolveExtEntSel   = @selector(parser:resolveExternalEntityName:systemID:);
+        PGXMLParseErrSel        = @selector(parser:parseErrorOccurred:);
+        PGXMLValidationErrSel   = @selector(parser:validationErrorOccurred:);
+        PGXMLDidStartDocSel     = @selector(parserDidStartDocument:);
+        PGXMLDidEndDocSel       = @selector(parserDidEndDocument:);
+        PGXMLReslvIntEntSel     = @selector(parser:resolveInternalEntityForName:);
     }
 
-    -(void)updateDelegateFunctions:(id<PGXMLParserDelegate>)d {
+    -(void)updateDelegateFunctions:(NSObject<PGXMLParserDelegate> *)d {
         // @f:0
-        self.foundNoteDeclFunc   = ([d respondsToSelector:PGXMLFoundNoteDeclSel]   ? [d methodForSelector:PGXMLFoundNoteDeclSel]   : nil);
-        self.foundUnpEntDeclFunc = ([d respondsToSelector:PGXMLFoundUnpEntDeclSel] ? [d methodForSelector:PGXMLFoundUnpEntDeclSel] : nil);
-        self.foundAttrDeclFunc   = ([d respondsToSelector:PGXMLFoundAttrDeclSel]   ? [d methodForSelector:PGXMLFoundAttrDeclSel]   : nil);
-        self.foundElemDeclFunc   = ([d respondsToSelector:PGXMLFoundElemDeclSel]   ? [d methodForSelector:PGXMLFoundElemDeclSel]   : nil);
-        self.foundIntEntDeclFunc = ([d respondsToSelector:PGXMLFoundIntEntDeclSel] ? [d methodForSelector:PGXMLFoundIntEntDeclSel] : nil);
-        self.foundExtEntDeclFunc = ([d respondsToSelector:PGXMLFoundExtEntDeclSel] ? [d methodForSelector:PGXMLFoundExtEntDeclSel] : nil);
-        self.didStartDocFunc     = ([d respondsToSelector:PGXMLDidStartDocSel]     ? [d methodForSelector:PGXMLDidStartDocSel]     : nil);
-        self.didEndDocFunc       = ([d respondsToSelector:PGXMLDidEndDocSel]       ? [d methodForSelector:PGXMLDidEndDocSel]       : nil);
-        self.didStartElemFunc    = ([d respondsToSelector:PGXMLDidStartElemSel]    ? [d methodForSelector:PGXMLDidStartElemSel]    : nil);
-        self.didEndElemFunc      = ([d respondsToSelector:PGXMLDidEndElemSel]      ? [d methodForSelector:PGXMLDidEndElemSel]      : nil);
-        self.didStartMapPfxFunc  = ([d respondsToSelector:PGXMLDidStartMapPfxSel]  ? [d methodForSelector:PGXMLDidStartMapPfxSel]  : nil);
-        self.didEndMapPfxFunc    = ([d respondsToSelector:PGXMLDidEndMapPfxSel]    ? [d methodForSelector:PGXMLDidEndMapPfxSel]    : nil);
-        self.foundCharsFunc      = ([d respondsToSelector:PGXMLFoundCharsSel]      ? [d methodForSelector:PGXMLFoundCharsSel]      : nil);
-        self.foundIgnWhitespFunc = ([d respondsToSelector:PGXMLFoundIgWhitespSel]  ? [d methodForSelector:PGXMLFoundIgWhitespSel]  : nil);
-        self.foundProcInstFunc   = ([d respondsToSelector:PGXMLFoundProcInstSel]   ? [d methodForSelector:PGXMLFoundProcInstSel]   : nil);
-        self.foundCommentFunc    = ([d respondsToSelector:PGXMLFoundCommentSel]    ? [d methodForSelector:PGXMLFoundCommentSel]    : nil);
-        self.foundCDATAFunc      = ([d respondsToSelector:PGXMLFoundCDATASel]      ? [d methodForSelector:PGXMLFoundCDATASel]      : nil);
-        self.resolveExtEntFunc   = ([d respondsToSelector:PGXMLResolveExtEntSel]   ? [d methodForSelector:PGXMLResolveExtEntSel]   : nil);
-        self.parseErrFunc        = ([d respondsToSelector:PGXMLParseErrSel]        ? [d methodForSelector:PGXMLParseErrSel]        : nil);
-        self.validationErrFunc   = ([d respondsToSelector:PGXMLValidationErrSel]   ? [d methodForSelector:PGXMLValidationErrSel]   : nil);
-        self.reslvIntEntFunc     = ([d respondsToSelector:PGXMLReslvIntEntSel]     ? [d methodForSelector:PGXMLReslvIntEntSel]     : nil);
+        self.foundNoteDeclFunc   =   (PGXMLFoundNoteDeclFunc_t)([d respondsToSelector:PGXMLFoundNoteDeclSel]   ? [d methodForSelector:PGXMLFoundNoteDeclSel]   : nil);
+        self.foundUnpEntDeclFunc = (PGXMLFoundUnpEntDeclFunc_t)([d respondsToSelector:PGXMLFoundUnpEntDeclSel] ? [d methodForSelector:PGXMLFoundUnpEntDeclSel] : nil);
+        self.foundAttrDeclFunc   =   (PGXMLFoundAttrDeclFunc_t)([d respondsToSelector:PGXMLFoundAttrDeclSel]   ? [d methodForSelector:PGXMLFoundAttrDeclSel]   : nil);
+        self.foundElemDeclFunc   =   (PGXMLFoundElemDeclFunc_t)([d respondsToSelector:PGXMLFoundElemDeclSel]   ? [d methodForSelector:PGXMLFoundElemDeclSel]   : nil);
+        self.foundIntEntDeclFunc = (PGXMLFoundIntEntDeclFunc_t)([d respondsToSelector:PGXMLFoundIntEntDeclSel] ? [d methodForSelector:PGXMLFoundIntEntDeclSel] : nil);
+        self.foundExtEntDeclFunc = (PGXMLFoundExtEntDeclFunc_t)([d respondsToSelector:PGXMLFoundExtEntDeclSel] ? [d methodForSelector:PGXMLFoundExtEntDeclSel] : nil);
+        self.didStartDocFunc     =     (PGXMLDidStartDocFunc_t)([d respondsToSelector:PGXMLDidStartDocSel]     ? [d methodForSelector:PGXMLDidStartDocSel]     : nil);
+        self.didEndDocFunc       =       (PGXMLDidEndDocFunc_t)([d respondsToSelector:PGXMLDidEndDocSel]       ? [d methodForSelector:PGXMLDidEndDocSel]       : nil);
+        self.didStartElemFunc    =    (PGXMLDidStartElemFunc_t)([d respondsToSelector:PGXMLDidStartElemSel]    ? [d methodForSelector:PGXMLDidStartElemSel]    : nil);
+        self.didEndElemFunc      =      (PGXMLDidEndElemFunc_t)([d respondsToSelector:PGXMLDidEndElemSel]      ? [d methodForSelector:PGXMLDidEndElemSel]      : nil);
+        self.didStartMapPfxFunc  =  (PGXMLDidStartMapPfxFunc_t)([d respondsToSelector:PGXMLDidStartMapPfxSel]  ? [d methodForSelector:PGXMLDidStartMapPfxSel]  : nil);
+        self.didEndMapPfxFunc    =    (PGXMLDidEndMapPfxFunc_t)([d respondsToSelector:PGXMLDidEndMapPfxSel]    ? [d methodForSelector:PGXMLDidEndMapPfxSel]    : nil);
+        self.foundCharsFunc      =      (PGXMLFoundCharsFunc_t)([d respondsToSelector:PGXMLFoundCharsSel]      ? [d methodForSelector:PGXMLFoundCharsSel]      : nil);
+        self.foundIgnWhitespFunc =  (PGXMLFoundIgWhitespFunc_t)([d respondsToSelector:PGXMLFoundIgWhitespSel]  ? [d methodForSelector:PGXMLFoundIgWhitespSel]  : nil);
+        self.foundProcInstFunc   =   (PGXMLFoundProcInstFunc_t)([d respondsToSelector:PGXMLFoundProcInstSel]   ? [d methodForSelector:PGXMLFoundProcInstSel]   : nil);
+        self.foundCommentFunc    =    (PGXMLFoundCommentFunc_t)([d respondsToSelector:PGXMLFoundCommentSel]    ? [d methodForSelector:PGXMLFoundCommentSel]    : nil);
+        self.foundCDATAFunc      =      (PGXMLFoundCDATAFunc_t)([d respondsToSelector:PGXMLFoundCDATASel]      ? [d methodForSelector:PGXMLFoundCDATASel]      : nil);
+        self.resolveExtEntFunc   =   (PGXMLResolveExtEntFunc_t)([d respondsToSelector:PGXMLResolveExtEntSel]   ? [d methodForSelector:PGXMLResolveExtEntSel]   : nil);
+        self.parseErrFunc        =        (PGXMLParseErrFunc_t)([d respondsToSelector:PGXMLParseErrSel]        ? [d methodForSelector:PGXMLParseErrSel]        : nil);
+        self.validationErrFunc   =   (PGXMLValidationErrFunc_t)([d respondsToSelector:PGXMLValidationErrSel]   ? [d methodForSelector:PGXMLValidationErrSel]   : nil);
+        self.reslvIntEntFunc     =     (PGXMLReslvIntEntFunc_t)([d respondsToSelector:PGXMLReslvIntEntSel]     ? [d methodForSelector:PGXMLReslvIntEntSel]     : nil);
         // @f:1
     }
 

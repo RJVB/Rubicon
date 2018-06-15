@@ -38,20 +38,6 @@ typedef union {
     unichar  ch[UNICHAR_CHLEN];
 }            UNICHAR_UNION;
 
-NS_INLINE NSUInteger PGRangeLength(NSUInteger startingLoc, NSUInteger endingLoc) {
-    return (MAX(startingLoc, endingLoc) - MIN(startingLoc, endingLoc));
-}
-
-NS_INLINE NSRange PGRangeFromIndexes(NSUInteger loc1, NSUInteger loc2) {
-    return NSMakeRange(MIN(loc1, loc2), PGRangeLength(loc1, loc2));
-}
-
-NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange range) {
-    if(range.location < string.length && NSMaxRange(range) < string.length) return nil;
-    NSString *r = PGFormat(@"Range {%lu, %lu} out of bounds; string length %lu", range.location, range.length, string.length);
-    return [NSException exceptionWithName:NSRangeException reason:r];
-}
-
 NS_INLINE void fillCharBuffer(UNICHAR_UNION *buffer, NSString *string, NSRange range) {
     buffer->foo      = 0;
     for(NSUInteger k = 0, l = MIN(range.length, UNICHAR_CHLEN); k < l; k++) {
@@ -68,6 +54,23 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
     -(NSRange)range {
         NSRange r = { .location = 0, .length = self.length };
         return r;
+    }
+
+    -(NSString *)_stringByReplacingControlChars:(BOOL)includeSpaces {
+        if(self.length) {
+            char *xstr = PGCleanStr(self.UTF8String ?: "", includeSpaces);
+            if(xstr) return [[NSString alloc] initWithBytesNoCopy:xstr length:strlen(xstr) encoding:NSUTF8StringEncoding freeWhenDone:YES];
+        }
+
+        return @"";
+    }
+
+    -(NSString *)stringByReplacingControlChars {
+        return [self _stringByReplacingControlChars:NO];
+    }
+
+    -(NSString *)stringByReplacingControlCharsAndSpcs {
+        return [self _stringByReplacingControlChars:YES];
     }
 
     -(NSString *)stringByFrontPaddingToLength:(NSUInteger)len withString:(NSString *)str startingAtIndex:(NSUInteger)idx {
@@ -655,10 +658,9 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
                 while(i < cl) i = foo(pattern, characters, @"|", i);
                 [pattern appendString:@")"];
             }
-#ifdef DEBUG
-            NSLog(@" Pattern: \"%@\"", pattern);
-            NSLog(@"Template: \"%@\"", template);
-#endif
+
+            [[PGLogger sharedInstanceWithClass:self.class] debug:@" Pattern: \"%@\"", pattern];
+            [[PGLogger sharedInstanceWithClass:self.class] debug:@"Template: \"%@\"", template];
             return [[NSRegularExpression regularExpressionWithPattern:pattern] stringByReplacingMatchesInString:self withTemplate:template];
         }
 

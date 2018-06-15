@@ -8,6 +8,7 @@
 
 #import <XCTest/XCTest.h>
 #import <Rubicon/Rubicon.h>
+#import "PGXMLParserDelegateTest.h"
 #import "CommonBaseClass.h"
 
 #define INDICATOR(x) ((x) ? @"✅" : @"⛔️")
@@ -47,18 +48,24 @@ NS_INLINE NSString *oquote(NSString *string) {
 
 NS_INLINE NSString *compareDescription(NSComparisonResult cr) {
     switch(cr) {
-        case NSOrderedAscending: return @"NSOrderedAscending";
-        case NSOrderedDescending: return @"NSOrderedDescending";
-        default: return @"NSOrderedSame";
+        case NSOrderedAscending:
+            return @"NSOrderedAscending";
+        case NSOrderedDescending:
+            return @"NSOrderedDescending";
+        default:
+            return @"NSOrderedSame";
     }
 }
 
 void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
 
-@implementation RubiconTests
+@implementation RubiconTests {
+        PGLogger *log;
+    }
 
     -(void)setUp {
         [super setUp];
+        log = [PGLogger sharedInstanceWithClass:self.class];
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
 
@@ -67,25 +74,63 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
         [super tearDown];
     }
 
+    -(void)t_est81Logger {
+        [log debug:@"This is a test: %@", @"Test"];
+        [log error:@"This is an error: %@", @"ERROR"];
+    }
+
+    typedef void (*LOGF)(id, SEL, NSString *, ...);
+
     -(void)test82XMLParseDelegate {
+        NSLog(@"%@", @"Logging Test");
+        SEL  logsel = @selector(debug:);
+        LOGF logf   = (LOGF)[log methodForSelector:logsel];
+        (*logf)(log, logsel, @"%@", @"Logging Test");
+
+        PGXMLParserDelegateTest *delegate  = [PGXMLParserDelegateTest new];
+        // NSString *oFilename = @"~/Desktop/XML/Test.xml".stringByExpandingTildeInPath;
+        NSString                *oFilename = @"~/Desktop/XML/Test2.xml".stringByExpandingTildeInPath;
+        NSURL                   *oURL      = [NSURL fileURLWithPath:oFilename];
+        NSString                *urlstr    = oURL.absoluteString;
+
+        (*logf)(log, logsel, @"   Parsing file: %@", oFilename);
+        (*logf)(log, logsel, @"    Parsing URL: %@", urlstr);
+
+        PGXMLParser *parser = [[PGXMLParser alloc] initWithURL:oURL];
+        parser.delegate = delegate;
+        BOOL success = parser.parse;
+
+        (*logf)(log, logsel, @"Parsing Results: %@", (success ? @"Success" : @"Failure"));
+    }
+
+    -(NSInteger)callingByIMPTest:(NSInteger)i {
+        return (i * 10);
+    }
+
+    -(void)t_est82CallingByIMPTest {
+        SEL       theSel = @selector(callingByIMPTest:);
+        IMP       theImp = [self methodForSelector:theSel];
+        NSInteger theRes = ((NSInteger(*)(id, SEL, NSInteger))(*theImp))(self, theSel, 7);
+
+        [log debug:@"Results: %li", ((NSInteger)theRes)];
     }
 
     -(void)t_est83SwapPointers {
         char *a = "Galen Rhodes";
         char *b = "Michelle Dziubinski";
 
-        NSLog(@"a = \"%s\"; b = \"%s\";", a, b);
+        [log debug:@"a = \"%s\"; b = \"%s\";", a, b];
         PGSwapPtr((void **)&a, (void **)&b);
-        NSLog(@"a = \"%s\"; b = \"%s\";", a, b);
+        [log debug:@"a = \"%s\"; b = \"%s\";", a, b];
     }
 
     -(void)t_est83SwapObjects {
         NSString *a = @"Galen Rhodes";
         NSString *b = @"Michelle Dziubinski";
 
-        NSLog(@"a = \"%@\"; b = \"%@\";", a, b);
+        [log debug:@"a = \"%@\"; b = \"%@\";", a, b];
         PGSwapObjs(&a, &b);
-        NSLog(@"a = \"%@\"; b = \"%@\";", a, b);
+        [log debug:@"a = \"%@\"; b = \"%@\";", a, b];
     }
 
     -(void)t_est83QueuePointerTests {
@@ -96,27 +141,27 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
         NSUInteger qcnt   = (((qhead <= qtail) ? (qtail - qhead) : ((qsize - qhead) + qtail)));
         NSUInteger c1     = MIN((qsize - qhead), length);
 
-        NSLog(@"Buffer Length: %@", @(length));
-        NSLog(@"   Queue Size: %@", @(qsize));
-        NSLog(@"   Queue Head: %@", @(qhead));
-        NSLog(@"   Queue Tail: %@", @(qtail));
-        NSLog(@"  Queue Count: %@", @(qcnt));
-        NSLog(@"           c1: %@", @(c1));
+        [log debug:@"Buffer Length: %@", @(length)];
+        [log debug:@"   Queue Size: %@", @(qsize)];
+        [log debug:@"   Queue Head: %@", @(qhead)];
+        [log debug:@"   Queue Tail: %@", @(qtail)];
+        [log debug:@"  Queue Count: %@", @(qcnt)];
+        [log debug:@"           c1: %@", @(c1)];
 
         qhead = ((qhead + c1) % qsize);
         NSUInteger c2 = MIN(qtail, (length - c1));
         NSUInteger cc = (c1 + c2);
 
-        NSLog(@" Queue Head 2: %@", @(qhead));
-        NSLog(@"           c2: %@", @(c2));
-        NSLog(@"           cc: %@", @(cc));
+        [log debug:@" Queue Head 2: %@", @(qhead)];
+        [log debug:@"           c2: %@", @(c2)];
+        [log debug:@"           cc: %@", @(cc)];
     }
 
     -(void)t_est84Regex {
         NSString *str = @"Now \"is\" the time for some\\all good men to come to the end of their country.";
-        NSLog(@"Before: \"%@\"", str);
-        // NSLog(@" After: \"%@\"", PGEscapeString(str, @"\\", @"\"\\", @".", nil));
-        NSLog(@" After: \"%@\"", [str stringByEscapingChars:@"\\\"." withEscape:@"\\"]);
+        [log debug:@"Before: \"%@\"", str];
+        // [log debug:@" After: \"%@\"", PGEscapeString(str, @"\\", @"\"\\", @".", nil)];
+        [log debug:@" After: \"%@\"", [str stringByEscapingChars:@"\\\"." withEscape:@"\\"]];
     }
 
     -(void)t_est85CommandLine {
@@ -141,9 +186,9 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
         NSError                     *error = nil;
 
         PGCmdLine *commandLine = [PGCmdLine cmdLineWithArguments:cmdline length:cmdLineLength encoding:NSUTF8StringEncoding parseOptions:0 optionList:opts error:&error];
-        NSLog(@"ERROR: %@", error);
-        NSLog(@"%@", commandLine.description);
-        NSLog(@"%@", @"Done");
+        [log debug:@"ERROR: %@", error];
+        [log debug:@"%@", commandLine.description];
+        [log debug:@"%@", @"Done"];
     }
 
     -(void)t_est86CommandLine {
@@ -162,8 +207,8 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
         ];
         PGCmdLine *commandLine = [[PGCmdLine alloc] initWithArguments:cmdline length:cmdLineLength encoding:NSUTF8StringEncoding parseOptions:0 options:opts error:&error];
 
-        NSLog(@"ERROR: %@", error);
-        NSLog(@"%@", commandLine.description);
+        [log debug:@"ERROR: %@", error];
+        [log debug:@"%@", commandLine.description];
 
         const char *cmdline2[] = {
                 "programName", "--bar=galen", "-bar", "rhodes", "--", "galen", "rhodes", "was", "here"
@@ -172,10 +217,10 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
         NSUInteger cmdLine2Length = (NSUInteger)(sizeof(cmdline2) / sizeof(char *));
 
         commandLine = [[PGCmdLine alloc] initWithArguments:cmdline2 length:cmdLine2Length encoding:NSUTF8StringEncoding parseOptions:0 options:opts error:&error];
-        NSLog(@"ERROR: %@", error);
-        NSLog(@"%@", commandLine.description);
+        [log debug:@"ERROR: %@", error];
+        [log debug:@"%@", commandLine.description];
 
-        NSLog(@"%@", @"Done");
+        [log debug:@"%@", @"Done"];
     }
 
     -(void)t_est87TimeFormatter {
@@ -209,12 +254,12 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
             }
 
             fmt.dateFormat = @"HH:mm:ss.SSSZZZ (zzzz)";
-            NSLog(@"Time: \"%@\" = %@", dstr, dt ? quote([fmt stringFromDate:dt]) : @"<NULL>");
+            [log debug:@"Time: \"%@\" = %@", dstr, dt ? quote([fmt stringFromDate:dt]) : @"<NULL>"];
         }
 
         NSDate *dt = [NSDate date];
         fmt.dateFormat = @"HH:mm:ss.SSSZZZ (zzzz)";
-        NSLog(@"Time: %@ = %@", dt, [fmt stringFromDate:dt]);
+        [log debug:@"Time: %@ = %@", dt, [fmt stringFromDate:dt]];
     }
 
     -(void)t_est87DateFormatter {
@@ -247,39 +292,39 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
                 }
             }
 
-            NSLog(@"Date: \"%@\" = %@", dstr, quote(dt.description));
+            [log debug:@"Date: \"%@\" = %@", dstr, quote(dt.description)];
         }
 
         NSDate *dt = [NSDate date];
-        NSLog(@"Date: %@ = %@", dt, [fmt stringFromDate:dt]);
+        [log debug:@"Date: %@ = %@", dt, [fmt stringFromDate:dt]];
     }
 
     -(void)t_est87ArrayBlock {
         NSStrArray array = @[ @"Galen", @"Sherard", @"Rhodes" ];
         NSUInteger idx   = [array indexOfObjectPassingTest:^BOOL(NSString *obj, NSUInteger i, BOOL *stop) {
-            NSLog(@"Object(%lu): %@", i, oquote(obj));
+            [log debug:@"Object(%lu): %@", i, oquote(obj)];
             return [obj isEqualToString:@"is"];
         }];
 
-        NSLog(@"Results: %lu", idx);
+        [log debug:@"Results: %lu", idx];
     }
 
     -(void)t_est87Cleans {
         NSRegularExpression *rx1 = [NSRegularExpression regularExpressionWithPattern:@"^\\s*(-{1,2})\\s*" options:0 error:nil];
         NSRegularExpression *rx2 = [NSRegularExpression regularExpressionWithPattern:@"^(\\s*)\\\\(-|\\\\)" options:0 error:nil];
 
-        NSLog(@"Result: %@", quote([rx2 stringByReplacingMatchesInString:@"     \\-Galen" options:0 withTemplate:@"$1$2"]));
-        NSLog(@"Result: %@", quote([rx2 stringByReplacingMatchesInString:@"\\-Galen" options:0 withTemplate:@"$1$2"]));
-        NSLog(@"Result: %@", quote([rx2 stringByReplacingMatchesInString:@"     \\\\Galen" options:0 withTemplate:@"$1$2"]));
-        NSLog(@"Result: %@", quote([rx2 stringByReplacingMatchesInString:@"\\\\Galen" options:0 withTemplate:@"$1$2"]));
-        NSLog(@"Result: %@", quote([rx1 stringByReplacingMatchesInString:@"-foo" options:0 withTemplate:@"$1"]));
-        NSLog(@"Result: %@", quote([rx1 stringByReplacingMatchesInString:@"-  foo" options:0 withTemplate:@"$1"]));
-        NSLog(@"Result: %@", quote([rx1 stringByReplacingMatchesInString:@"   -foo" options:0 withTemplate:@"$1"]));
-        NSLog(@"Result: %@", quote([rx1 stringByReplacingMatchesInString:@"   -  foo" options:0 withTemplate:@"$1"]));
-        NSLog(@"Result: %@", quote([rx1 stringByReplacingMatchesInString:@"--foo" options:0 withTemplate:@"$1"]));
-        NSLog(@"Result: %@", quote([rx1 stringByReplacingMatchesInString:@"--  foo" options:0 withTemplate:@"$1"]));
-        NSLog(@"Result: %@", quote([rx1 stringByReplacingMatchesInString:@"   --foo" options:0 withTemplate:@"$1"]));
-        NSLog(@"Result: %@", quote([rx1 stringByReplacingMatchesInString:@"   --  foo" options:0 withTemplate:@"$1"]));
+        [log debug:@"Result: %@", quote([rx2 stringByReplacingMatchesInString:@"     \\-Galen" options:0 withTemplate:@"$1$2"])];
+        [log debug:@"Result: %@", quote([rx2 stringByReplacingMatchesInString:@"\\-Galen" options:0 withTemplate:@"$1$2"])];
+        [log debug:@"Result: %@", quote([rx2 stringByReplacingMatchesInString:@"     \\\\Galen" options:0 withTemplate:@"$1$2"])];
+        [log debug:@"Result: %@", quote([rx2 stringByReplacingMatchesInString:@"\\\\Galen" options:0 withTemplate:@"$1$2"])];
+        [log debug:@"Result: %@", quote([rx1 stringByReplacingMatchesInString:@"-foo" options:0 withTemplate:@"$1"])];
+        [log debug:@"Result: %@", quote([rx1 stringByReplacingMatchesInString:@"-  foo" options:0 withTemplate:@"$1"])];
+        [log debug:@"Result: %@", quote([rx1 stringByReplacingMatchesInString:@"   -foo" options:0 withTemplate:@"$1"])];
+        [log debug:@"Result: %@", quote([rx1 stringByReplacingMatchesInString:@"   -  foo" options:0 withTemplate:@"$1"])];
+        [log debug:@"Result: %@", quote([rx1 stringByReplacingMatchesInString:@"--foo" options:0 withTemplate:@"$1"])];
+        [log debug:@"Result: %@", quote([rx1 stringByReplacingMatchesInString:@"--  foo" options:0 withTemplate:@"$1"])];
+        [log debug:@"Result: %@", quote([rx1 stringByReplacingMatchesInString:@"   --foo" options:0 withTemplate:@"$1"])];
+        [log debug:@"Result: %@", quote([rx1 stringByReplacingMatchesInString:@"   --  foo" options:0 withTemplate:@"$1"])];
     }
 
     -(void)t_est87Set {
@@ -294,10 +339,10 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
 
         NSUInteger          i = 0;
         for(PGCmdLineOption *opt in set) {
-            NSLog(@"Option %lu> %@", ++i, opt.description);
+            [log debug:@"Option %lu> %@", ++i, opt.description];
         }
 
-        NSLog(@"%@", BAR);
+        [log debug:@"%@", BAR];
 
         NSUInteger j = 0;
 
@@ -310,7 +355,7 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
                 k++;
 
                 if(opt1 != opt2 && eq) {
-                    NSLog(@"%lu == %lu; %@ == %@", j, k, opt1, opt2);
+                    [log debug:@"%lu == %lu; %@ == %@", j, k, opt1, opt2];
                 }
             }
         }
@@ -323,17 +368,17 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
-        NSLog(@"[%@ compare:%@] == %@", oquote(s1), oquote(s2), compareDescription([s1 compare:s2]));
-        NSLog(@"[%@ compare:%@] == %@", oquote(s2), oquote(s1), compareDescription([s2 compare:s1]));
-        NSLog(@"[%@ compare:%@] == %@", oquote(s3), oquote(s1), compareDescription([s3 compare:s1]));
-        NSLog(@"[%@ compare:%@] == %@", oquote(s1), oquote(s3), compareDescription([s1 compare:s3]));
+        [log debug:@"[%@ compare:%@] == %@", oquote(s1), oquote(s2), compareDescription([s1 compare:s2])];
+        [log debug:@"[%@ compare:%@] == %@", oquote(s2), oquote(s1), compareDescription([s2 compare:s1])];
+        [log debug:@"[%@ compare:%@] == %@", oquote(s3), oquote(s1), compareDescription([s3 compare:s1])];
+        [log debug:@"[%@ compare:%@] == %@", oquote(s1), oquote(s3), compareDescription([s1 compare:s3])];
 
-        NSLog(@"%@", BAR);
+        [log debug:@"%@", BAR];
 
-        NSLog(@"PGStrCompare(%@, %@) == %@", oquote(s1), oquote(s2), compareDescription(PGStrCompare(s1, s2)));
-        NSLog(@"PGStrCompare(%@, %@) == %@", oquote(s2), oquote(s1), compareDescription(PGStrCompare(s2, s1)));
-        NSLog(@"PGStrCompare(%@, %@) == %@", oquote(s3), oquote(s1), compareDescription(PGStrCompare(s3, s1)));
-        NSLog(@"PGStrCompare(%@, %@) == %@", oquote(s1), oquote(s3), compareDescription(PGStrCompare(s1, s3)));
+        [log debug:@"PGStrCompare(%@, %@) == %@", oquote(s1), oquote(s2), compareDescription(PGStrCompare(s1, s2))];
+        [log debug:@"PGStrCompare(%@, %@) == %@", oquote(s2), oquote(s1), compareDescription(PGStrCompare(s2, s1))];
+        [log debug:@"PGStrCompare(%@, %@) == %@", oquote(s3), oquote(s1), compareDescription(PGStrCompare(s3, s1))];
+        [log debug:@"PGStrCompare(%@, %@) == %@", oquote(s1), oquote(s3), compareDescription(PGStrCompare(s1, s3))];
 #pragma clang diagnostic pop
     }
 
@@ -358,21 +403,21 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
             if(r) [regex addObject:r];
             else {
                 hadOutput = YES;
-                NSLog(@"%@", BAR);
-                NSLog(@"Error in regex pattern: %@", pattern);
-                NSLog(@"      --------------->: %@", (error ? error.description : @"<Unknown>"));
+                [log debug:@"%@", BAR];
+                [log debug:@"Error in regex pattern: %@", pattern];
+                [log debug:@"      --------------->: %@", (error ? error.description : @"<Unknown>")];
             }
         }
         if(hadOutput) {
             hadOutput = NO;
-            NSLog(@"%@", BAR);
+            [log debug:@"%@", BAR];
         }
 
         NSUInteger si = 0;
 
         for(NSString *str in samples) {
-            NSLog(@"%@", BAR);
-            NSLog(@"Sample %2lu: \"%@\"", ++si, str);
+            [log debug:@"%@", BAR];
+            [log debug:@"Sample %2lu: \"%@\"", ++si, str];
 
             for(NSUInteger i = 0, j = regex.count; i < j; i++) {
                 NSRegularExpression             *r       = regex[i];
@@ -385,37 +430,37 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
                 NSString *f3 = @"        %@ %2lu: Location = %2lu; Length = %2lu; \"%@\"";
                 NSString *f4 = @"        %@ %2lu: Location = --; Length = --;";
 
-                NSLog(f1, (i + 1), r.pattern);
+                [log debug:f1, (i + 1), r.pattern];
 
                 if(mc == 1) {
                     NSTextCheckingResult *tcr = matches[0];
                     NSUInteger           gc   = tcr.numberOfRanges;
 
-                    NSLog(f2, PGFormat(@"OPTION - Capture Groups = %lu", gc));
+                    [log debug:f2, PGFormat(@"OPTION - Capture Groups = %lu", gc)];
 
                     for(NSUInteger k = 0, l = gc; k < l; k++) {
                         NSRange group = [tcr rangeAtIndex:k];
 
-                        if(group.location == NSNotFound) NSLog(f4, @"Group", k);
-                        else NSLog(f3, @"Group", k, group.location, group.length, [str substringWithRange:group]);
+                        if(group.location == NSNotFound) [log debug:f4, @"Group", k];
+                        else [log debug:f3, @"Group", k, group.location, group.length, [str substringWithRange:group]];
                     }
                 }
                 else {
-                    NSLog(f2, PGFormat(@"Not An Option - matches = %lu", mc));
+                    [log debug:f2, PGFormat(@"Not An Option - matches = %lu", mc)];
 
                     for(NSUInteger k = 0; k < mc; k++) {
                         NSRange match = matches[k].range;
 
-                        if(match.location == NSNotFound) NSLog(f4, @"Range", k);
-                        else NSLog(f3, @"Range", k, match.location, match.length, [str substringWithRange:match]);
+                        if(match.location == NSNotFound) [log debug:f4, @"Range", k];
+                        else [log debug:f3, @"Range", k, match.location, match.length, [str substringWithRange:match]];
                     }
                 }
 
-                NSLog(@"%@", @"   ");
+                [log debug:@"%@", @"   "];
             }
         }
 
-        NSLog(@"%@", BAR);
+        [log debug:@"%@", BAR];
     }
 
     -(void)t_est90OptionCleanup {
@@ -473,24 +518,24 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
 
         for(NSString *str in samples) maxWidth = MAX(maxWidth, str.length + 2);
 
-        NSLog(@"%@", BAR);
-        NSLog(@"%@", @"");
+        [log debug:@"%@", BAR];
+        [log debug:@"%@", @""];
 
         for(NSString *str in samples) {
             NSString *fstr = [str stringByFilteringWithRegexPattern:pattern regexOptions:0 matchOptions:0 replacementBlock:blk error:&err];
 
-            if(fstr) NSLog(@"Input: %@; Output:%@", [quote(str) stringByFrontPaddingToLength:maxWidth withString:@" " startingAtIndex:0], quote(fstr));
-            else if(err) NSLog(@"Error: %@", err);
-            else NSLog(@"%@", @"Unknown Error.");
+            if(fstr) [log debug:@"Input: %@; Output:%@", [quote(str) stringByFrontPaddingToLength:maxWidth withString:@" " startingAtIndex:0], quote(fstr)];
+            else if(err) [log debug:@"Error: %@", err];
+            else [log debug:@"%@", @"Unknown Error."];
         }
 
-        NSLog(@"%@", @"");
-        NSLog(@"%@", @"");
-        NSLog(@"%@", BAR);
+        [log debug:@"%@", @""];
+        [log debug:@"%@", @""];
+        [log debug:@"%@", BAR];
     }
 
     -(void)t_est90StringByFilteringWithRegexPattern {
-        NSLog(@"%@", @"Beginning: test90StringByFilteringWithRegexPattern");
+        [log debug:@"%@", @"Beginning: test90StringByFilteringWithRegexPattern"];
 
         PGRegexFilterBlock blk = ^NSString *(NSString *str, NSString *sub, NSUInteger num, NSTextCheckingResult *res, NSString *last, BOOL *stop) {
             return ([sub isEqualToString:@"men"] ? @"programmers" : @"users");
@@ -504,7 +549,7 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
         FOutput(@"Unfiltered String: %@", TestString);
         FOutput(@"  Filtered String: %@", str);
 
-        NSLog(@"%@", @"Finished: test90StringByFilteringWithRegexPattern");
+        [log debug:@"%@", @"Finished: test90StringByFilteringWithRegexPattern"];
     }
 
     -(void)t_est91EnumerateOverCharactersWithBlock {
@@ -522,7 +567,7 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
 
     -(void)t_est93TemporaryDirectories {
         NSError *error = nil;
-        NSLog(@"Temporary Directory: \"%@\"", PGTemporaryDirectory(&error).absoluteString);
+        [log debug:@"Temporary Directory: \"%@\"", PGTemporaryDirectory(&error).absoluteString];
         if(error) {
             XCTFail(@"Error: %@", error.description);
         }
@@ -530,7 +575,7 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
 
     -(void)t_est93TemporaryFiles {
         NSError *error = nil;
-        NSLog(@"Temporary File: \"%@\"", PGTemporaryFile(@"Test.txt", &error).absoluteString);
+        [log debug:@"Temporary File: \"%@\"", PGTemporaryFile(@"Test.txt", &error).absoluteString];
         if(error) {
             XCTFail(@"Error: %@", error.description);
         }
@@ -541,7 +586,7 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
         NSStrArray results = @[ @"=+Galen+=+", @"alen Rhode", @"GalenGlenn", @"=+-+=+-+=+" ];
         BOOL       overall = YES;
 
-        NSLog(@"%@", BAR);
+        [log debug:@"%@", BAR];
         for(int i = 0; i < strings.count;) {
             NSString   *s   = strings[(NSUInteger)i];
             NSString   *t   = [PGFormat(@"\"%@\"", s) stringByFrontPaddingToLength:15 withString:@"                                 " startingAtIndex:0];
@@ -550,9 +595,9 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
             BOOL       x    = ([u isEqualToString:results[(NSUInteger)i++]]);
 
             overall = (overall && x);
-            NSLog(@"%2d %@> (%2lu) %@ <=> \"%@\"", i, INDICATOR(x), slen, t, u);
+            [log debug:@"%2d %@> (%2lu) %@ <=> \"%@\"", i, INDICATOR(x), slen, t, u];
         }
-        NSLog(@"%@", BAR);
+        [log debug:@"%@", BAR];
         XCTAssertTrue(overall, @"%@: Overall - %@", @"One or more of the test cases failed", INDICATOR(overall));
     }
 
@@ -561,7 +606,7 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
         NSStrArray results = @[ @"=+-+=Galen", @"len Rhodes", @"GalenGlenn", @"=+-+=+-+=+" ];
         BOOL       overall = YES;
 
-        NSLog(@"%@", BAR);
+        [log debug:@"%@", BAR];
         for(int i = 0; i < strings.count;) {
             NSString   *s   = strings[(NSUInteger)i];
             NSString   *t   = [PGFormat(@"\"%@\"", s) stringByFrontPaddingToLength:15 withString:@"                                 " startingAtIndex:0];
@@ -570,9 +615,9 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
             BOOL       x    = ([u isEqualToString:results[(NSUInteger)i++]]);
 
             overall = (overall && x);
-            NSLog(@"%2d %@> (%2lu) %@ <=> \"%@\"", i, INDICATOR(x), slen, t, u);
+            [log debug:@"%2d %@> (%2lu) %@ <=> \"%@\"", i, INDICATOR(x), slen, t, u];
         }
-        NSLog(@"%@", BAR);
+        [log debug:@"%@", BAR];
         XCTAssertTrue(overall, @"%@: Overall - %@", @"One or more of the test cases failed", INDICATOR(overall));
     }
 
@@ -585,10 +630,10 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
         NSInteger written = [output write:(const uint8_t *)cInput maxLength:cInputLen];
         [output close];
 
-        NSLog(@"%@", BAR);
-        NSLog(@"        Bytes Provided: %zu", cInputLen);
-        NSLog(@"         Bytes Written: %@:%@", @(written), INDICATOR(cInputLen == written));
-        NSLog(@"%@", BAR);
+        [log debug:@"%@", BAR];
+        [log debug:@"        Bytes Provided: %zu", cInputLen];
+        [log debug:@"         Bytes Written: %@:%@", @(written), INDICATOR(cInputLen == written)];
+        [log debug:@"%@", BAR];
         XCTAssertTrue((cInputLen == written), @"%@: cInputLen = %zu; written = %li", @"Test cases failed", cInputLen, written);
     }
 
@@ -605,12 +650,12 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
         Output(Base64Input);
         Output(BAR);
 
-        NSLog(BAR);
-        NSLog(@"   String Input: %@ (%zu, %lu)", Base64Input, inputLen, zz);
-        NSLog(@"  Base64 Output: %@ (%zu)", base64Output, strlen(output));
-        NSLog(@"Expected Output: %@", Base64Output);
-        NSLog(@"        Correct: %@", INDICATOR(x));
-        NSLog(BAR);
+        [log debug:BAR];
+        [log debug:@"   String Input: %@ (%zu, %lu)", Base64Input, inputLen, zz];
+        [log debug:@"  Base64 Output: %@ (%zu)", base64Output, strlen(output)];
+        [log debug:@"Expected Output: %@", Base64Output];
+        [log debug:@"        Correct: %@", INDICATOR(x)];
+        [log debug:BAR];
         free(output);
         XCTAssertTrue(x, @"Test Case Failed!");
     }
@@ -629,14 +674,14 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
 
         BOOL x = [[NSString stringWithUTF8String:(const char *)bytes] isEqualToString:Base64Output];
 
-        NSLog(@"%@", BAR);
-        NSLog(@"         Bytes Written: %@", @(written));
-        NSLog(@"Bytes Written by Flush: %@", @(fwritten));
-        NSLog(@"         Output Length: %zu", strlen((const char *)bytes));
-        NSLog(@"                Output: \"%s\"", (const char *)bytes);
-        NSLog(@"       Expected Output: \"%@\"", Base64Output);
-        NSLog(@"        Correct: %@", INDICATOR(x));
-        NSLog(@"%@", BAR);
+        [log debug:@"%@", BAR];
+        [log debug:@"         Bytes Written: %@", @(written)];
+        [log debug:@"Bytes Written by Flush: %@", @(fwritten)];
+        [log debug:@"         Output Length: %zu", strlen((const char *)bytes)];
+        [log debug:@"                Output: \"%s\"", (const char *)bytes];
+        [log debug:@"       Expected Output: \"%@\"", Base64Output];
+        [log debug:@"        Correct: %@", INDICATOR(x)];
+        [log debug:@"%@", BAR];
 
         [b64 close];
         b64 = nil;
@@ -733,7 +778,7 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
                         BOOL     y    = [str isEqualToString:res];
 
                         x = (x && y);
-                        if(!y) NSLog(@"\"%@\" == \"%@\" %@", str, res, INDICATOR(y));
+                        if(!y) [log debug:@"\"%@\" == \"%@\" %@", str, res, INDICATOR(y)];
                     }
                 }
             }
@@ -757,16 +802,16 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
                     NSStrArray array = [TestString2 componentsSeparatedByPattern:pattern limit:limit.unsignedLongValue options:0 keepSeparator:keep error:&error];
                     XCTAssertNil(error, @"REGEX ERROR: %@", error.description);
 
-                    NSLog(@"%@", BAR);
-                    NSLog(@"         Splitting: \"%@\"", TestString2);
-                    NSLog(@"      With Pattern: \"%@\"", pattern);
-                    NSLog(@"             Limit: %@", limit);
-                    NSLog(@"Keeping Separators: %@", (keep ? @"YES" : @"NO"));
-                    NSLog(@"%@", BAR);
+                    [log debug:@"%@", BAR];
+                    [log debug:@"         Splitting: \"%@\"", TestString2];
+                    [log debug:@"      With Pattern: \"%@\"", pattern];
+                    [log debug:@"             Limit: %@", limit];
+                    [log debug:@"Keeping Separators: %@", (keep ? @"YES" : @"NO")];
+                    [log debug:@"%@", BAR];
 
                     for(NSUInteger i = 0, j = array.count; i < j;) {
                         NSString *str = array[i];
-                        NSLog(@"%3lu> \"%@\"", ++i, str);
+                        [log debug:@"%3lu> \"%@\"", ++i, str];
                     }
                 }
             }
@@ -774,11 +819,11 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
     }
 
     -(void)t_est96PGFormat {
-        NSLog(@"New String = \"%@\"", PGFormat(@"Galen %@", TestString));
+        [log debug:@"New String = \"%@\"", PGFormat(@"Galen %@", TestString)];
     }
 
     -(void)_testCompareWithClass:(id)obj {
-        NSLog(@"Class %@ responds to \"compare:\": %@", NSStringFromClass([obj class]), [obj respondsToSelector:@selector(compare:)] ? @"YES" : @"NO");
+        [log debug:@"Class %@ responds to \"compare:\": %@", NSStringFromClass([obj class]), [obj respondsToSelector:@selector(compare:)] ? @"YES" : @"NO"];
     }
 
     -(void)t_est97Compare {
@@ -810,9 +855,9 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
 
         if(cClass1) {
             NSString *fmt = @"Class %@ and class %@ share a common base class: %@";
-            NSLog(fmt, c1Name, c2Name, NSStringFromClass(cClass1));
-            NSLog(fmt, s1Name, s2Name, NSStringFromClass(cClass2));
-            NSLog(fmt, s1Name, c1Name, NSStringFromClass(cClass3));
+            [log debug:fmt, c1Name, c2Name, NSStringFromClass(cClass1)];
+            [log debug:fmt, s1Name, s2Name, NSStringFromClass(cClass2)];
+            [log debug:fmt, s1Name, c1Name, NSStringFromClass(cClass3)];
         }
         else {
             XCTFail(@"Class %@ and class %@ do not have a common base class.", c1Name, c2Name);

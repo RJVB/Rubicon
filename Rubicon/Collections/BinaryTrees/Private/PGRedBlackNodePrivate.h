@@ -1,9 +1,9 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGXMLParser.h
+ *    FILENAME: PGRedBlackNodePrivate.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 5/26/18
+ *        DATE: 6/13/18
  *  VISIBILITY: Private
  *
  * Copyright © 2018 Project Galen. All rights reserved.
@@ -16,33 +16,35 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#ifndef RUBICON_PGXMLPARSER_H
-#define RUBICON_PGXMLPARSER_H
+#ifndef __PGREDBLACKNODEPRIVATE_H__
+#define __PGREDBLACKNODEPRIVATE_H__
 
-#import <Rubicon/PGTools.h>
-#import <Rubicon/PGXMLParserDelegate.h>
+#import "PGInternal.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGXMLParser : NSObject
+@interface PGRedBlackNode<K, V>()
 
-    @property(assign, nullable) /*   */ id<PGXMLParserDelegate> delegate;
-    @property(readonly) /*           */ NSUInteger              lineNumber;
-    @property(readonly) /*           */ NSUInteger              columnNumber;
-    @property(readonly, nullable) /* */ NSError                 *parserError;
-    @property(readonly, copy, nullable) NSString                *publicId;
-    @property(readonly, copy, nullable) NSString                *systemId;
+    @property(nonatomic, copy) /*    */ K                    key;
+    @property(nonatomic) /*          */ BOOL                 isRed;
+    @property(nonatomic) /*          */ PGRedBlackNode<K, V> *parentNode;
+    @property(nonatomic) /*          */ PGRedBlackNode<K, V> *rightChildNode;
+    @property(nonatomic) /*          */ PGRedBlackNode<K, V> *leftChildNode;
 
-    -(instancetype)initWithInputStream:(NSInputStream *)stream NS_DESIGNATED_INITIALIZER;
+    -(instancetype)initWithValue:(V)value forKey:(K<NSCopying>)key isRed:(BOOL)isRed;
 
-    -(instancetype)initWithFilePath:(NSString *)filepath;
+    -(void)recount;
 
-    -(instancetype)initWithURL:(NSURL *)url;
+    -(void)setIsBlack:(BOOL)isBlack;
 
-    -(BOOL)parse;
+    -(void)insertRebalance;
+
+    -(void)deleteRebalance;
+
+    +(instancetype)nodeWithValue:(V)value forKey:(K<NSCopying>)key isRed:(BOOL)isRed;
 
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif //RUBICON_PGXMLPARSER_H
+#endif //__PGREDBLACKNODEPRIVATE_H__
