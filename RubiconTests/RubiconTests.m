@@ -302,7 +302,7 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
     -(void)t_est87ArrayBlock {
         NSStrArray array = @[ @"Galen", @"Sherard", @"Rhodes" ];
         NSUInteger idx   = [array indexOfObjectPassingTest:^BOOL(NSString *obj, NSUInteger i, BOOL *stop) {
-            [log debug:@"Object(%lu): %@", i, oquote(obj)];
+            [self->log debug:@"Object(%lu): %@", i, oquote(obj)];
             return [obj isEqualToString:@"is"];
         }];
 

@@ -17,19 +17,15 @@
 
 #import "PGRedBlackNodePrivate.h"
 
-#define orphan(n)        swpnode(n, nil)
-#define CN(n, q)         (n).q##ChildNode
-#define PN(n)            (n).parentNode
+typedef PGRedBlackNode *RBNp;
 
-PGRedBlackNode *setchldfld(PGRedBlackNode *s, PGRedBlackNode *f, PGRedBlackNode *n);
+RBNp rotate(RBNp n, BOOL l);
 
-PGRedBlackNode *getchld(PGRedBlackNode *p, BOOL r);
-
-void setchld(PGRedBlackNode *p, PGRedBlackNode *n, BOOL r);
-
-void swpnode(PGRedBlackNode *o, PGRedBlackNode *n);
-
-void rotate(PGRedBlackNode *n, BOOL l);
+// @f:0
+NS_INLINE void SC(RBNp a, RBNp b)                 { BOOL c = a.isRed; a.isRed = b.isRed; b.isRed = c; }
+NS_INLINE void SWP(RBNp a, RBNp b)                { RBNp p = a.parentNode; if(p) { if(a == p.leftChildNode) p.leftChildNode = b; else p.rightChildNode = b; }}
+NS_INLINE RBNp setchldfld(RBNp s, RBNp f, RBNp n) { if(f == n) return f; SWP(n, nil); f.parentNode = nil; n.parentNode = s; return n; }
+// @f:1
 
 @implementation PGRedBlackNode {
     }
@@ -59,18 +55,31 @@ void rotate(PGRedBlackNode *n, BOOL l);
         return (self = [self initWithValue:value forKey:key isRed:NO]);
     }
 
-    -(PGRedBlackNode *)rootNode {
-        PGRedBlackNode *p = PN(self);
+    -(RBNp)grandParentNode {
+        return self.parentNode.parentNode;
+    }
+
+    -(RBNp)siblingNode {
+        RBNp p = self.parentNode;
+        return (p ? ((self == p.leftChildNode) ? p.rightChildNode : p.leftChildNode) : nil);
+    }
+
+    -(RBNp)uncleNode {
+        return self.parentNode.siblingNode;
+    }
+
+    -(RBNp)rootNode {
+        RBNp p = self.parentNode;
         return (p ? p.rootNode : self);
     }
 
-    -(void)setRightChildNode:(PGRedBlackNode *)node {
-        _rightChildNode = setchldfld(self, _rightChildNode, node);
+    -(void)setRightChildNode:(RBNp)node {
+        _rightChildNode = setchldfld(self, self.rightChildNode, node);
         [self recount];
     }
 
-    -(void)setLeftChildNode:(PGRedBlackNode *)node {
-        _leftChildNode = setchldfld(self, _leftChildNode, node);
+    -(void)setLeftChildNode:(RBNp)node {
+        _leftChildNode = setchldfld(self, self.leftChildNode, node);
         [self recount];
     }
 
@@ -79,9 +88,9 @@ void rotate(PGRedBlackNode *n, BOOL l);
             if([self.key isEqual:key]) {
                 switch(PGCompare(self.key, key)) {
                     case NSOrderedAscending:
-                        return [CN(self, right) findNodeWithKey:key];
+                        return [self.rightChildNode findNodeWithKey:key];
                     case NSOrderedDescending:
-                        return [CN(self, left) findNodeWithKey:key];
+                        return [self.leftChildNode findNodeWithKey:key];
                     default:
                         break;
                 }
@@ -96,16 +105,16 @@ void rotate(PGRedBlackNode *n, BOOL l);
             if(![self.key isEqual:key]) {
                 switch(PGCompare(self.key, key)) {
                     case NSOrderedAscending:
-                        if(CN(self, right)) return [CN(self, right) insertValue:value forKey:key];
+                        if(self.rightChildNode) return [self.rightChildNode insertValue:value forKey:key];
                         else {
-                            PGRedBlackNode *node = CN(self, right) = [PGRedBlackNode nodeWithValue:value forKey:key isRed:YES];
+                            RBNp node = self.rightChildNode = [PGRedBlackNode nodeWithValue:value forKey:key isRed:YES];
                             [node insertRebalance];
                             return node;
                         }
                     case NSOrderedDescending:
-                        if(CN(self, left)) return [CN(self, left) insertValue:value forKey:key];
+                        if(self.leftChildNode) return [self.leftChildNode insertValue:value forKey:key];
                         else {
-                            PGRedBlackNode *node = CN(self, left) = [PGRedBlackNode nodeWithValue:value forKey:key isRed:YES];
+                            RBNp node = self.leftChildNode = [PGRedBlackNode nodeWithValue:value forKey:key isRed:YES];
                             [node insertRebalance];
                             return node;
                         }
@@ -122,30 +131,33 @@ void rotate(PGRedBlackNode *n, BOOL l);
     }
 
     -(instancetype)delete {
-        PGRedBlackNode *lc = CN(self, left);
-        PGRedBlackNode *rc = CN(self, right);
+        RBNp lc = self.leftChildNode;
+        RBNp rc = self.rightChildNode;
 
         if(lc && rc) {
-            while(CN(rc, left)) rc = CN(rc, left);
+            while(rc.leftChildNode) rc = rc.leftChildNode;
             self.key   = rc.key;
             self.value = rc.value;
             return [rc delete];
         }
         else {
-            PGRedBlackNode *c = (lc ?: rc);
-            PGRedBlackNode *p = PN(self);
+            RBNp c = (lc ?: rc);
+            RBNp p = self.parentNode;
 
             if(c) c.isRed = NO; else if(!self.isRed) [self deleteRebalance];
-            swpnode(self, c);
-            self.key   = nil;
-            self.value = nil;
+            SWP(self, c);
+            _isRed          = NO;
+            _count          = 0;
+            _parentNode     = nil;
+            _leftChildNode  = nil;
+            _rightChildNode = nil;
             return (p ?: c).rootNode;
         }
     }
 
     -(void)recount {
-        _count = (1 + CN(self, left).count + CN(self, right).count);
-        [PN(self) recount];
+        _count = (1 + self.leftChildNode.count + self.rightChildNode.count);
+        [self.parentNode recount];
     }
 
     -(void)setIsBlack:(BOOL)isBlack {
@@ -153,17 +165,20 @@ void rotate(PGRedBlackNode *n, BOOL l);
     }
 
     -(void)insertRebalance {
-        PGRedBlackNode *g, *u, *p = PN(self);
-        BOOL           pl;
+        RBNp p = self.parentNode;
 
         if(p) {
             if(p.isRed) {
-                if((u = getchld(p, (pl = (p == ((g = PN(p)).leftChildNode))))).isRed) {
+                RBNp u  = self.uncleNode;
+                RBNp g  = self.grandParentNode;
+                BOOL pl = (p == (g.leftChildNode));
+
+                if(self.uncleNode.isRed) {
                     g.isRed = (p.isBlack = (u.isBlack = YES));
                     [g insertRebalance];
                 }
                 else {
-                    if((self == CN(p, left)) != pl) rotate(p, pl);
+                    if((self == p.leftChildNode) != pl) rotate(p, pl);
                     rotate(g, !pl);
                 }
             }
@@ -172,19 +187,19 @@ void rotate(PGRedBlackNode *n, BOOL l);
     }
 
     -(void)deleteRebalance {
-        PGRedBlackNode *p = PN(self);
+        RBNp p = self.parentNode;
 
         if(p) {
-            BOOL           nl = (self == CN(p, left));
-            PGRedBlackNode *s = getchld(p, nl);
+            BOOL nl = (self == p.leftChildNode);
+            RBNp s  = ((nl) ? p.rightChildNode : p.leftChildNode);
 
-            /* @f:0 */ if(s.isRed) { rotate(p, nl); s = getchld(p, nl); } /* @f:1 */
-            BOOL a = CN(s, right).isRed, b = CN(s, left).isRed;
+            /* @f:0 */ if(s.isRed) { rotate(p, nl); s = ((nl) ? p.rightChildNode : p.leftChildNode); } /* @f:1 */
+            BOOL a = s.rightChildNode.isRed, b = s.leftChildNode.isRed;
 
             if(a || b) {
-                /* @f:0 */ if((a != b) && (nl == b)) { rotate(s, a); s = PN(s); } /* @f:1 */
+                /* @f:0 */ if((a != b) && (nl == b)) { rotate(s, a); s = s.parentNode; } /* @f:1 */
                 rotate(p, nl);
-                getchld(s, nl).isBlack = YES;
+                ((nl) ? s.rightChildNode : s.leftChildNode).isBlack = YES;
             }
             else {
                 s.isRed = YES;
@@ -200,11 +215,9 @@ void rotate(PGRedBlackNode *n, BOOL l);
          * In other words we don't need to be worrying about recounting or rebalancing the
          * tree since everything is simply going to be wiped out.
          */
-        _key        = nil;
-        _value      = nil;
-        _parentNode = nil;
         _count      = 0;
         _isRed      = NO;
+        _parentNode = nil;
 
         if(_leftChildNode) {
             [_leftChildNode _clear];
@@ -225,7 +238,7 @@ void rotate(PGRedBlackNode *n, BOOL l);
         [self.rootNode _clear];
     }
 
-    -(PGRedBlackNode *)clearSubTree {
+    -(RBNp)clearSubTree {
         [self.leftChildNode clearSubTree];
         [self.rightChildNode clearSubTree];
         return [self delete];
@@ -241,39 +254,27 @@ void rotate(PGRedBlackNode *n, BOOL l);
 
 @end
 
-void setchld(PGRedBlackNode *p, PGRedBlackNode *n, BOOL r) {
-    if(r) CN(p, right) = n; else CN(p, left) = n;
-}
+#define LR(l) ((l)?@"left":@"right")
 
-void swpnode(PGRedBlackNode *o, PGRedBlackNode *n) {
-    PGRedBlackNode *p = PN(o);
-    if(p) setchld(p, n, (o == CN(p, right)));
-}
-
-NS_INLINE void swpclr(PGRedBlackNode *a, PGRedBlackNode *b) {
-    BOOL c = a.isRed;
-    a.isRed = b.isRed;
-    b.isRed = c;
-}
-
-void rotate(PGRedBlackNode *n, BOOL l) {
-    PGRedBlackNode *o = getchld(n, l);
-    if(o) {
-        swpnode(n, o);
-        setchld(n, getchld(o, !l), l);
-        setchld(o, n, !l);
-        swpclr(n, o);
+RBNp rotate(RBNp n, BOOL l) {
+    RBNp o = nil;
+    if(l) {
+        if((o = n.rightChildNode)) {
+            SWP(n, o);
+            n.rightChildNode = o.leftChildNode;
+            o.leftChildNode  = n;
+            SC(n, o);
+            return o;
+        }
     }
+    else if((o = n.leftChildNode)) {
+        SWP(n, o);
+        n.leftChildNode  = o.rightChildNode;
+        o.rightChildNode = n;
+        SC(n, o);
+        return o;
+    }
+
+    @throw [NSException exceptionWithName:NSInvalidArgumentException reason:PGFormat(PGErrorMsgCannotRotateNode, LR(l), LR(!l))];
 }
 
-PGRedBlackNode *getchld(PGRedBlackNode *p, BOOL r) {
-    return ((r) ? CN(p, right) : CN(p, left));
-}
-
-PGRedBlackNode *setchldfld(PGRedBlackNode *s, PGRedBlackNode *f, PGRedBlackNode *n) {
-    if(f == n) return f;
-    orphan(n);
-    PN(f) = nil;
-    PN(n) = s;
-    return n;
-}

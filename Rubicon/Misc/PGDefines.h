@@ -78,16 +78,17 @@ FOUNDATION_EXPORT NSExceptionName const PGOSErrorException;
 
 FOUNDATION_EXPORT NSString *const PGDefaultSemaphoreNamePrefix;
 
-FOUNDATION_EXPORT NSString         *const PGErrorMsgBadRegexPattern;
-FOUNDATION_EXPORT NSString         *const PGErrorMsgRegexPatternIsNULL;
-FOUNDATION_EXPORT NSString         *const PGErrorMsgUnknowError;
-FOUNDATION_EXPORT NSString         *const PGErrorMsgInvalidConstructor;
-FOUNDATION_EXPORT NSString         *const PGErrorMsgInputStreamClosed;
-FOUNDATION_EXPORT NSString         *const PGErrorMsgUnknownInputStreamError;
-FOUNDATION_EXPORT NSString         *const PGErrorMsgNoInputStream;
-FOUNDATION_EXPORT NSString         *const PGErrorMsgUnexpectedEndOfInput;
-FOUNDATION_EXPORT NSString         *const PGErrorMsgNoDelegate;
-FOUNDATION_EXPORT NSString         *const PGErrorMsgXMLParserAlreadyRun;
+FOUNDATION_EXPORT NSString *const PGErrorMsgBadRegexPattern;
+FOUNDATION_EXPORT NSString *const PGErrorMsgRegexPatternIsNULL;
+FOUNDATION_EXPORT NSString *const PGErrorMsgUnknowError;
+FOUNDATION_EXPORT NSString *const PGErrorMsgInvalidConstructor;
+FOUNDATION_EXPORT NSString *const PGErrorMsgInputStreamClosed;
+FOUNDATION_EXPORT NSString *const PGErrorMsgUnknownInputStreamError;
+FOUNDATION_EXPORT NSString *const PGErrorMsgNoInputStream;
+FOUNDATION_EXPORT NSString *const PGErrorMsgUnexpectedEndOfInput;
+FOUNDATION_EXPORT NSString *const PGErrorMsgNoDelegate;
+FOUNDATION_EXPORT NSString *const PGErrorMsgXMLParserAlreadyRun;
+FOUNDATION_EXPORT NSString *const PGErrorMsgCannotRotateNode;
 
 #if !defined(PGAbstractClassError)
     #define PGAbstractClassError do {\

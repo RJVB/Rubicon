@@ -25,14 +25,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGRedBlackNode<K, V> : NSObject
 
-    @property(nonatomic, readonly, copy) K                    key;
-    @property(nonatomic) /*           */ V                    value;
-    @property(nonatomic, readonly) /* */ BOOL                 isRed;
-    @property(nonatomic, readonly) /* */ NSUInteger           count;
-    @property(nonatomic, readonly) /* */ PGRedBlackNode<K, V> *parentNode;
-    @property(nonatomic, readonly) /* */ PGRedBlackNode<K, V> *rightChildNode;
-    @property(nonatomic, readonly) /* */ PGRedBlackNode<K, V> *leftChildNode;
-    @property(nonatomic, readonly) /* */ PGRedBlackNode<K, V> *rootNode;
+    @property(nonatomic, readonly, copy)/**/ K                    key;
+    @property(nonatomic) /*               */ V                    value;
+    @property(nonatomic, readonly) /*     */ BOOL                 isRed;
+    @property(nonatomic, readonly) /*     */ NSUInteger           count;
+    @property(nonatomic, readonly, nullable) PGRedBlackNode<K, V> *parentNode;
+    @property(nonatomic, readonly, nullable) PGRedBlackNode<K, V> *rightChildNode;
+    @property(nonatomic, readonly, nullable) PGRedBlackNode<K, V> *leftChildNode;
+    @property(nonatomic, readonly) /*     */ PGRedBlackNode<K, V> *rootNode;
+    @property(nonatomic, readonly, nullable) PGRedBlackNode<K, V> *grandParentNode;
+    @property(nonatomic, readonly, nullable) PGRedBlackNode<K, V> *siblingNode;
+    @property(nonatomic, readonly, nullable) PGRedBlackNode<K, V> *uncleNode;
 
     -(instancetype)initWithValue:(V)value forKey:(K<NSCopying>)key;
 

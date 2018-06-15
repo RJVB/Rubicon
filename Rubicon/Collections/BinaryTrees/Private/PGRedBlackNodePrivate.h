@@ -25,11 +25,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGRedBlackNode<K, V>()
 
-    @property(nonatomic, copy) /*    */ K                    key;
-    @property(nonatomic) /*          */ BOOL                 isRed;
-    @property(nonatomic) /*          */ PGRedBlackNode<K, V> *parentNode;
-    @property(nonatomic) /*          */ PGRedBlackNode<K, V> *rightChildNode;
-    @property(nonatomic) /*          */ PGRedBlackNode<K, V> *leftChildNode;
+    @property(nonatomic, copy)/**/ K                    key;
+    @property(nonatomic) /*     */ BOOL                 isRed;
+    @property(nonatomic, nullable) PGRedBlackNode<K, V> *parentNode;
+    @property(nonatomic, nullable) PGRedBlackNode<K, V> *rightChildNode;
+    @property(nonatomic, nullable) PGRedBlackNode<K, V> *leftChildNode;
 
     -(instancetype)initWithValue:(V)value forKey:(K<NSCopying>)key isRed:(BOOL)isRed;
 
