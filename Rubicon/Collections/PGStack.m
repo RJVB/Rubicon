@@ -271,7 +271,11 @@
 
     -(NSEnumerator *)objectEnumerator {
         [self lock];
-        @try { return (self.stackTop ? [PGNestedEnumerator enumeratorWithOwner:self andEnumerator:self.stackTop.objectEnumerator] : [PGEmptyEnumerator emptyEnumerator]); }
+        @try {
+            return (self.stackTop ?
+                    (NSEnumerator *)[PGNestedEnumerator enumeratorWithOwner:self andEnumerator:self.stackTop.objectEnumerator] :
+                    (NSEnumerator *)[PGEmptyEnumerator emptyEnumerator]);
+        }
         @finally { [self unlock]; }
     }
 
@@ -279,8 +283,8 @@
         [self lock];
         @try {
             return (self.stackTop ?
-                    [PGNestedEnumerator enumeratorWithOwner:self andEnumerator:self.stackTop.previousNode.reverseObjectEnumerator] :
-                    [PGEmptyEnumerator emptyEnumerator]);
+                    (NSEnumerator *)[PGNestedEnumerator enumeratorWithOwner:self andEnumerator:self.stackTop.previousNode.reverseObjectEnumerator] :
+                    (NSEnumerator *)[PGEmptyEnumerator emptyEnumerator]);
         }
         @finally { [self unlock]; }
     }
@@ -302,7 +306,8 @@
                     state->mutationsPtr = &_modifiedCount;
                     state->extra[0] = ((unsigned long)(__bridge voidp)self.stackTop);
                     // Fall through to the case 1....
-                case 1:nextNode = (__bridge PGLinkedListNode *)(voidp)state->extra[0];
+                case 1:
+                    nextNode = (__bridge PGLinkedListNode *)(voidp)state->extra[0];
 
                     while((state->state == 1) && (count < len)) {
                         buffer[count++] = nextNode.data;

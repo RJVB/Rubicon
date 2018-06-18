@@ -22,14 +22,15 @@
 
 #define PG_DEF_BUF_SZ ((size_t)(128))
 
+NSString *const PGXMLMsg01 = @"%@ Subset Call Back; Name: \"%@\"; External ID: \"%@\"; System ID: \"%@\"";
+
 static SEL NSInputStreamReadSel;
 
 @implementation PGXMLParser {
-        NSRecursiveLock     *_lck;
-        NSMutableDictionary *_entities;
-        NSMutableArray      *_namespaceStack;
-
-        id<PGXMLParserDelegate> __unsafe_unretained _delegate;
+        NSRecursiveLock                                      *_lck;
+        NSMutableDictionary<NSString *, PGXMLParsedEntity *> *_entities;
+        PGStack<NSArray<PGXMLParsedNamespace *> *>           *_namespaceStack;
+        id<PGXMLParserDelegate> __unsafe_unretained          _delegate;
     }
 
 #pragma mark Constructors and Destructors
@@ -70,17 +71,17 @@ static SEL NSInputStreamReadSel;
 #pragma mark Getters and Setters
 
     -(NSMutableDictionary<NSString *, PGXMLParsedEntity *> *)entities {
-        if(!_entities) { @synchronized(self) { if(!_entities) _entities = [NSMutableDictionary new]; }}
+        PGSETIFNIL(self, _entities, [NSMutableDictionary new]);
         return _entities;
     }
 
-    -(NSMutableArray<NSArray<PGXMLParsedNamespace *> *> *)namespaceStack {
-        if(!_namespaceStack) { @synchronized(self) { if(!_namespaceStack) _namespaceStack = [NSMutableArray new]; }}
+    -(PGStack<NSArray<PGXMLParsedNamespace *> *> *)namespaceStack {
+        PGSETIFNIL(self, _namespaceStack, [PGStack new]);
         return _namespaceStack;
     }
 
     -(NSRecursiveLock *)lck {
-        if(!_lck) { @synchronized(self) { if(!_lck) _lck = [NSRecursiveLock new]; }}
+        PGSETIFNIL(self, _lck, [NSRecursiveLock new]);
         return _lck;
     }
 
@@ -208,11 +209,11 @@ static SEL NSInputStreamReadSel;
     }
 
     -(void)internalSubsetCallBack:(NSString *)name ExternalID:(NSString *)ExternalID SystemID:(NSString *)SystemID {
-        [[PGLogger sharedInstanceWithClass:self.class] debug:@"Internal Subset Call Back; Name: \"%@\"; External ID: \"%@\"; System ID: \"%@\"", name, ExternalID, SystemID];
+        [[PGLogger sharedInstanceWithClass:self.class] debug:PGXMLMsg01, @"Internal", name, ExternalID, SystemID];
     }
 
     -(void)externalSubsetCallBack:(NSString *)name ExternalID:(NSString *)ExternalID SystemID:(NSString *)SystemID {
-        [[PGLogger sharedInstanceWithClass:self.class] debug:@"External Subset Call Back; Name: \"%@\"; External ID: \"%@\"; System ID: \"%@\"", name, ExternalID, SystemID];
+        [[PGLogger sharedInstanceWithClass:self.class] debug:PGXMLMsg01, @"External", name, ExternalID, SystemID];
     }
 
     -(xmlEntityPtr)getEntityCallBack:(NSString *)name {
@@ -291,7 +292,7 @@ static SEL NSInputStreamReadSel;
                        namespaces:(NSArray<PGXMLParsedNamespace *> *)namespaces
                        attributes:(NSArray<PGXMLParsedAttribute *> *)attributes {
         BOOL hasImpl = NO;
-        [self.namespaceStack addObject:(namespaces.count ? namespaces : @[])];
+        [self.namespaceStack push:(namespaces.count ? namespaces : @[])];
         [self startMappingPrefixes:namespaces hasImpl:&hasImpl];
         [self _didStartElement:localname namespaceURI:URI qualifiedName:createQName(localname, prefix) attributes:attributes hasImpl:&hasImpl];
     }
@@ -299,7 +300,7 @@ static SEL NSInputStreamReadSel;
     -(void)endElementNsCallBack:(NSString *)localname prefix:(NSString *)prefix URI:(NSString *)URI {
         BOOL hasImpl = NO;
         [self _didEndElement:localname namespaceURI:URI qualifiedName:createQName(localname, prefix) hasImpl:&hasImpl];
-        [self endMappingPrefixes:self.namespaceStack.popLastObject hasImpl:&hasImpl];
+        [self endMappingPrefixes:self.namespaceStack.pop hasImpl:&hasImpl];
     }
 
     -(void)startMappingPrefixes:(NSArray<PGXMLParsedNamespace *> *)namespaces hasImpl:(BOOL *)hasImpl {
