@@ -79,7 +79,7 @@ typedef NSInteger        (*NSInputStreamReadFunc)(id, SEL, uint8_t *, NSUInteger
     @property(readonly) /* */ NSRecursiveLock                                      *lck;
     @property /*           */ NSInputStream                                        *input;
     @property /*           */ NSInputStreamReadFunc                                readFunc;
-    @property(copy, nullable) NSString                                             *filename;
+    @property(copy, nullable) NSURL                                                *url;
     @property(copy, nullable) NSString                                             *publicId;
     @property(copy, nullable) NSString                                             *systemId;
     @property(readonly) /* */ NSMutableDictionary<NSString *, PGXMLParsedEntity *> *entities;

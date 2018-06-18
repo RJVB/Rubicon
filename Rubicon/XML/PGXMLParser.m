@@ -26,11 +26,14 @@ NSString *const PGXMLMsg01 = @"%@ Subset Call Back; Name: \"%@\"; External ID: \
 
 static SEL NSInputStreamReadSel;
 
+void entityHashScanner(void *payload, void *data, xmlChar *name);
+
 @implementation PGXMLParser {
         NSRecursiveLock                                      *_lck;
         NSMutableDictionary<NSString *, PGXMLParsedEntity *> *_entities;
         PGStack<NSArray<PGXMLParsedNamespace *> *>           *_namespaceStack;
         id<PGXMLParserDelegate> __unsafe_unretained          _delegate;
+        PGLogger                                             *_logger;
     }
 
 #pragma mark Constructors and Destructors
@@ -45,6 +48,7 @@ static SEL NSInputStreamReadSel;
         self = [super init];
 
         if(self) {
+            _logger = [PGLogger sharedInstanceWithClass:self.class];
             self.input    = stream;
             self.readFunc = (NSInputStreamReadFunc)[self.input methodForSelector:NSInputStreamReadSel];
         }
@@ -54,13 +58,13 @@ static SEL NSInputStreamReadSel;
 
     -(instancetype)initWithFilePath:(NSString *)filepath {
         self = [self initWithInputStream:[NSInputStream inputStreamWithFileAtPath:filepath]];
-        if(self) self.filename = [filepath copy];
+        if(self) self.url = [NSURL fileURLWithPath:filepath];
         return self;
     }
 
     -(instancetype)initWithURL:(NSURL *)url {
         self = [self initWithInputStream:[NSInputStream inputStreamWithURL:url]];
-        if(self) self.filename = [[url description] copy];
+        if(self) self.url = url;
         return self;
     }
 
@@ -104,27 +108,19 @@ static SEL NSInputStreamReadSel;
         NSInteger     rcount  = (*self.readFunc)(input, NSInputStreamReadSel, buffer, length);
         BOOL          success = YES;
 
-        while(success && (rcount > 0)) {
-            if((success = parseChunk(self, buffer, rcount, NO, success))) rcount = (*self.readFunc)(input, NSInputStreamReadSel, buffer, length);
-        }
-
+        while(success && (rcount > 0)) { if((success = parseChunk(self, buffer, rcount, NO, success))) rcount = (*self.readFunc)(input, NSInputStreamReadSel, buffer, length); }
         success = parseChunk(self, buffer, 0, YES, success);
         self.parserError = (((rcount >= 0) || success || self.parserError) ? self.parserError : self.getInputStreamError);
         return success;
     }
 
     -(BOOL)parseWithBuffer:(void *)buffer maxLength:(NSUInteger)length bytesRead:(NSInteger)bytesRead filename:(const char *)filename {
-        if(createPushContext(self, buffer, bytesRead, filename)) {
-            @try {
-                return [self parseChunkWithBuffer:buffer maxLength:length];
-            }
-            @finally { [self destroyParserContext]; }
-        }
+        if(createPushContext(self, buffer, bytesRead, filename)) { @try { return [self parseChunkWithBuffer:buffer maxLength:length]; } @finally { [self destroyParserContext]; }}
         return NO;
     }
 
     -(BOOL)parseWithBuffer:(void *)buffer maxLength:(NSUInteger)length bytesRead:(NSInteger)bytesRead {
-        char *filename = PGStrdup(self.filename ? self.filename.UTF8String : "");
+        char *filename = PGStrdup(self.url ? self.url.absoluteString.UTF8String : "");
         @try { return [self parseWithBuffer:buffer maxLength:length bytesRead:bytesRead filename:filename]; } @finally { free(filename); }
     }
 
@@ -194,7 +190,7 @@ static SEL NSInputStreamReadSel;
         NSData *data   = [self _resolveExternalEntityForName:publicId systemID:systemId hasImpl:&hasImpl];
         int    blen    = (int)data.length;
 
-        if(blen) {
+        if(hasImpl && blen) {
             char *buf = PGMalloc((size_t)blen);
 
             @try {
@@ -205,24 +201,39 @@ static SEL NSInputStreamReadSel;
             @finally { free(buf); }
         }
 
+        [_logger debug:@"!!!!!!!!!!!!!! %@; %@", publicId, systemId];
         return xmlLoadExternalEntity(publicId.UTF8String, systemId.UTF8String, self.ctx);
     }
 
     -(void)internalSubsetCallBack:(NSString *)name ExternalID:(NSString *)ExternalID SystemID:(NSString *)SystemID {
-        [[PGLogger sharedInstanceWithClass:self.class] debug:PGXMLMsg01, @"Internal", name, ExternalID, SystemID];
+        [_logger debug:PGXMLMsg01, @"Internal", name, ExternalID, SystemID];
     }
 
     -(void)externalSubsetCallBack:(NSString *)name ExternalID:(NSString *)ExternalID SystemID:(NSString *)SystemID {
-        [[PGLogger sharedInstanceWithClass:self.class] debug:PGXMLMsg01, @"External", name, ExternalID, SystemID];
+        if(SystemID.length) {
+            NSURL *exURL = (self.url ? [NSURL URLWithString:SystemID relativeToURL:self.url] : [NSURL URLWithString:SystemID]);
+
+            if(exURL) {
+                xmlDtdPtr dtd = xmlParseDTD((const xmlChar *)ExternalID.UTF8String, (const xmlChar *)exURL.absoluteString.UTF8String);
+                if(dtd && dtd->entities) xmlHashScan((xmlHashTablePtr)dtd->entities, entityHashScanner, (__bridge void *)self);
+            }
+        }
+    }
+
+    -(xmlEntityPtr)updateEntityForName:(NSString *)name content:(NSString *)content {
+        PGXMLParsedEntity *ent = self.entities[name];
+
+        if(ent) ent.content = content;
+        else self.entities[name] = ent = [PGXMLParsedEntity entityWithName:name content:content];
+
+        return ent.xmlEntity;
     }
 
     -(xmlEntityPtr)getEntityCallBack:(NSString *)name {
-        BOOL              hasImpl  = NO;
-        PGXMLParsedEntity *ent     = self.entities[name];
-        NSString          *content = [self _resolveInternalEntityForName:name hasImpl:&hasImpl];
+        BOOL     hasImpl  = NO;
+        NSString *content = [self _resolveInternalEntityForName:name hasImpl:&hasImpl];
 
-        if(ent && content) ent.content = content; else if(content) self.entities[name] = ent = [PGXMLParsedEntity entityWithName:name content:content];
-        return ent.xmlEntity;
+        return ((hasImpl && content) ? [self updateEntityForName:name content:content] : self.entities[name].xmlEntity);
     }
 
     -(xmlEntityPtr)getParameterEntityCallBack:(NSString *)name {
@@ -459,4 +470,17 @@ static SEL NSInputStreamReadSel;
     }
 
 @end
+
+void entityHashScanner(void *payload, void *data, xmlChar *name) {
+    __unsafe_unretained PGXMLParser *parser = (__bridge PGXMLParser *)data;
+    xmlEntityPtr                    entity  = (xmlEntityPtr)payload;
+
+    if(name && entity && parser) {
+        [parser entityDeclCallBack:stringForXMLString(name)
+                              type:entity->etype
+                          publicId:stringForXMLString(entity->ExternalID)
+                          systemId:stringForXMLString(entity->SystemID)
+                           content:stringForXMLString(entity->content)];
+    }
+}
 
