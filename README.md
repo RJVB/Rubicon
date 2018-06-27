@@ -18,7 +18,7 @@ protocols,and categories) to make development easier in general even if it's not
 cross-platform. For example, Rubicon includes an implementation of a full
 red-black binary tree that is independent of the NSDictionary and NSSet classes.
 This allows you to use a super fast binary tree in your own classes without the
-overhead of the NSDictionary and NSSetcollection classes.
+overhead of the NSDictionary and NSSet collection classes.
 
 ## PGSimpleBuffer and PGCString
 
@@ -26,7 +26,7 @@ Many times in writing Objective-C programs that call C libraries there is a need
 allocate memory buffers and C style strings. This is not really a problem except for
 the often ugly code involved in making sure any temporary buffers or C strings get
 deallocated when their time is done. ARC only covers Objective-C objects and not memory
-allocated for non-object memory such as byte buffer and C strings. So, I created two
+allocated for non-object memory such as byte buffers and C strings. So, I created two
 helper classes for this.
 
 **PGSimpleBuffer** is an Objective-C wrapper around a buffer created with the standard
