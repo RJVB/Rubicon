@@ -25,9 +25,10 @@ overhead of the NSDictionary and NSSet collection classes.
 Many times in writing Objective-C programs that call C libraries there is a need to
 allocate memory buffers and C style strings. This is not really a problem except for
 the often ugly code involved in making sure any temporary buffers or C strings get
-deallocated when their time is done. ARC only covers Objective-C objects and not memory
-allocated for non-object memory such as byte buffers and C strings. So, I created two
-helper classes for this.
+deallocated when their time is done.
+[ARC only covers Objective-C objects](https://developer.apple.com/library/archive/releasenotes/ObjectiveC/RN-TransitioningToARC/Introduction/Introduction.html)
+and not memory allocated for non-object memory such as byte buffers and C strings.
+So, I created two helper classes for this.
 
 **PGSimpleBuffer** is an Objective-C wrapper around a buffer created with the standard
 [void *malloc(size_t)](http://www.manpagez.com/man/3/malloc/) function. You simply specify
