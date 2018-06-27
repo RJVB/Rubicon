@@ -79,7 +79,6 @@ typedef NSInteger           (*NSInputStreamReadFunc)(id, SEL, uint8_t *, NSUInte
     @property(nullable) /* */ xmlParserCtxtPtr      ctx;
     @property(nullable) /* */ xmlSAXHandlerPtr      saxHandler;
     @property(nullable) /* */ NSError               *parserError;
-    @property(readonly) /* */ NSRecursiveLock       *lck;
     @property(readonly) /* */ NSInputStream         *input;
     @property(readonly) /* */ NSInputStreamReadFunc readFunc;
     @property(copy, nullable) NSURL                 *url;

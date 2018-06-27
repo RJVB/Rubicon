@@ -27,15 +27,15 @@ NS_ASSUME_NONNULL_BEGIN
 @interface PGXMLParser : NSObject
 
     @property(assign, nullable) /*   */ id<PGXMLParserDelegate> delegate;
-    @property(readonly) /*           */ NSUInteger              lineNumber;
-    @property(readonly) /*           */ NSUInteger              columnNumber;
-    @property(readonly) /*           */ BOOL                    isStandalone;
-    @property(readonly, nullable) /* */ NSError                 *parserError;
-    @property(readonly, copy, nullable) NSString                *publicId;
-    @property(readonly, copy, nullable) NSString                *systemId;
-    @property(readonly, copy, nullable) NSString                *version;
-    @property(readonly, copy, nullable) NSString                *encoding;
-    @property(readonly, nullable) /* */ NSError                 *inputStreamError;
+    @property(readonly) /*           */ NSUInteger lineNumber;
+    @property(readonly) /*           */ NSUInteger columnNumber;
+    @property(readonly) /*           */ BOOL       isStandalone;
+    @property(readonly, copy, nullable) NSString   *publicId;
+    @property(readonly, copy, nullable) NSString   *systemId;
+    @property(readonly, copy, nullable) NSString   *version;
+    @property(readonly, copy, nullable) NSString   *encoding;
+    @property(readonly, nullable) /* */ NSError    *parserError;
+    @property(readonly, nullable) /* */ NSError    *inputStreamError;
 
     -(instancetype)initWithInputStream:(NSInputStream *)stream NS_DESIGNATED_INITIALIZER;
 

@@ -25,6 +25,7 @@ static SEL NSInputStreamReadSel;
 
 @implementation PGXMLParser {
         id<PGXMLParserDelegate> __unsafe_unretained _delegate;
+        NSRecursiveLock                             *_lck;
     }
 
 #pragma mark Constructors and Destructors
@@ -55,7 +56,6 @@ static SEL NSInputStreamReadSel;
     @synthesize hasRun = _hasRun;
     @synthesize ctx = _ctx;
     @synthesize saxHandler = _saxHandler;
-    @synthesize lck = _lck;
     @synthesize input = _input;
     @synthesize readFunc = _readFunc;
     @synthesize url = _url;
@@ -118,23 +118,21 @@ static SEL NSInputStreamReadSel;
     }
 
     -(id<PGXMLParserDelegate>)delegate {
-        [self.lck lock];
-        id<PGXMLParserDelegate> d = _delegate;
-        [self.lck unlock];
+        id<PGXMLParserDelegate> d = nil;
+        [_lck lock];
+        @try { d = _delegate; } @finally { [_lck unlock]; }
         return d;
     }
 
     -(void)setDelegate:(id<PGXMLParserDelegate>)delegate {
-        [self.lck lock];
+        [_lck lock];
         @try {
             if(_delegate != delegate) {
                 _delegate = delegate;
                 [self updateDelegateFunctions:_delegate];
             }
         }
-        @finally {
-            [self.lck unlock];
-        }
+        @finally { [_lck unlock]; }
     }
 
     -(NSError *)inputStreamError {
@@ -188,35 +186,37 @@ static SEL NSInputStreamReadSel;
     }
 
     -(BOOL)parse {
-        [self.lck lock];
+        [_lck lock];
         @try {
-            if(self.hasRun) self.parserError = createError(PGErrorCodeXMLParserAlreadyRun, PGErrorMsgXMLParserAlreadyRun);
-            else if(!self.input) self.parserError = createError(PGErrorCodeNoInputStream, PGErrorMsgNoInputStream);
-            else if(!self.delegate) self.parserError = createError(PGErrorCodeNoDelegate, PGErrorMsgNoDelegate);
-            else if((self.parserError = PGOpenInputStream(self.input)) == nil) {
-                @try {
-                    _version = _encoding = _publicId = _systemId = nil;
-                    PGSimpleBuffer *b = [PGSimpleBuffer bufferWithLength:PG_DEF_BUF_SZ];
-                    return [self tryParse:b bytesRead:(*self.readFunc)(self.input, NSInputStreamReadSel, b.buffer, b.length)];
-                }
-                @catch(NSException *e) {
-                    self.parserError = e.makeError;
-                }
-                @finally {
-                    self.hasRun = YES;
-                    [self.input close];
+            @try {
+                if(self.hasRun) self.parserError = createError(PGErrorCodeXMLParserAlreadyRun, PGErrorMsgXMLParserAlreadyRun);
+                else if(!self.input) self.parserError = createError(PGErrorCodeNoInputStream, PGErrorMsgNoInputStream);
+                else if(!self.delegate) self.parserError = createError(PGErrorCodeNoDelegate, PGErrorMsgNoDelegate);
+                else if((self.parserError = PGOpenInputStream(self.input)) == nil) {
+                    @try {
+                        _version = _encoding = _publicId = _systemId = nil;
+                        PGSimpleBuffer *b = [PGSimpleBuffer bufferWithLength:PG_DEF_BUF_SZ];
+                        return [self tryParse:b bytesRead:(*self.readFunc)(self.input, NSInputStreamReadSel, b.buffer, b.length)];
+                    }
+                    @catch(NSException *e) {
+                        self.parserError = e.makeError;
+                    }
+                    @finally {
+                        self.hasRun = YES;
+                        [self.input close];
+                    }
                 }
             }
-        }
-        @finally {
-            [self.inputs removeAllObjects];
-            [self.entities removeAllObjects];
-            [self.paramEntities removeAllObjects];
-            [self.namespaceStack removeAllObjects];
-            [self.lck unlock];
-        }
+            @finally {
+                [self.inputs removeAllObjects];
+                [self.entities removeAllObjects];
+                [self.paramEntities removeAllObjects];
+                [self.namespaceStack removeAllObjects];
+            }
 
-        return NO;
+            return NO;
+        }
+        @finally { [_lck unlock]; }
     }
 
 #pragma mark Helper Methods
@@ -576,21 +576,21 @@ static SEL NSInputStreamReadSel;
         LIBXML_TEST_VERSION
         self.saxHandler = PGCalloc(1, sizeof(xmlSAXHandler));
 
-        self.saxHandler->initialized        = XML_SAX2_MAGIC;
-        self.saxHandler->internalSubset     = internalSubsetCallBack;
-        self.saxHandler->externalSubset     = externalSubsetCallBack;
-        self.saxHandler->resolveEntity      = resolveEntityCallBack;
-        self.saxHandler->getEntity          = getEntityCallBack;
-        self.saxHandler->getParameterEntity = getParameterEntityCallBack;
-        self.saxHandler->entityDecl         = entityDeclCallBack;
-        self.saxHandler->unparsedEntityDecl = unparsedEntityDeclCallBack;
-        self.saxHandler->notationDecl       = notationDeclCallBack;
-        self.saxHandler->attributeDecl      = attributeDeclCallBack;
-        self.saxHandler->elementDecl        = elementDeclCallBack;
-        self.saxHandler->startDocument      = startDocumentCallBack;
-        self.saxHandler->endDocument        = endDocumentCallBack;
-        self.saxHandler->startElement       = startElementCallBack;
-        self.saxHandler->endElement         = endElementCallBack;
+        self.saxHandler->initialized           = XML_SAX2_MAGIC;
+        self.saxHandler->internalSubset        = internalSubsetCallBack;
+        self.saxHandler->externalSubset        = externalSubsetCallBack;
+        self.saxHandler->resolveEntity         = resolveEntityCallBack;
+        self.saxHandler->getEntity             = getEntityCallBack;
+        self.saxHandler->getParameterEntity    = getParameterEntityCallBack;
+        self.saxHandler->entityDecl            = entityDeclCallBack;
+        self.saxHandler->unparsedEntityDecl    = unparsedEntityDeclCallBack;
+        self.saxHandler->notationDecl          = notationDeclCallBack;
+        self.saxHandler->attributeDecl         = attributeDeclCallBack;
+        self.saxHandler->elementDecl           = elementDeclCallBack;
+        self.saxHandler->startDocument         = startDocumentCallBack;
+        self.saxHandler->endDocument           = endDocumentCallBack;
+        self.saxHandler->startElement          = startElementCallBack;
+        self.saxHandler->endElement            = endElementCallBack;
         self.saxHandler->reference             = referenceCallBack;
         self.saxHandler->characters            = charactersCallBack;
         self.saxHandler->ignorableWhitespace   = ignorableWhitespaceCallBack;
