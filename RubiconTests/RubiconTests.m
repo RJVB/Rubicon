@@ -10,6 +10,7 @@
 #import <Rubicon/Rubicon.h>
 #import "PGXMLParserDelegateTest.h"
 #import "CommonBaseClass.h"
+#import "PGNSXMLParserDelegateTest.h"
 
 #define INDICATOR(x) ((x) ? @"✅" : @"⛔️")
 
@@ -81,24 +82,40 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
 
     typedef void (*LOGF)(id, SEL, NSString *, ...);
 
+    -(BOOL)_test82NSXMLParseDelegate:(NSURL *)oURL {
+        NSXMLParser               *parser   = [[NSXMLParser alloc] initWithContentsOfURL:oURL];
+        PGNSXMLParserDelegateTest *delegate = [PGNSXMLParserDelegateTest new];
+        parser.delegate                      = delegate;
+        parser.shouldProcessNamespaces       = YES;
+        parser.shouldReportNamespacePrefixes = YES;
+        parser.shouldResolveExternalEntities = YES;
+        return parser.parse;
+    }
+
+    -(BOOL)_test82PGXMLParseDelegate:(NSURL *)oURL {
+        PGXMLParserDelegateTest *delegate = [PGXMLParserDelegateTest new];
+        PGXMLParser             *parser   = [[PGXMLParser alloc] initWithURL:oURL];
+        parser.delegate = delegate;
+        return parser.parse;
+    }
+
     -(void)test82XMLParseDelegate {
         NSLog(@"%@", @"Logging Test");
         SEL  logsel = @selector(debug:);
         LOGF logf   = (LOGF)[log methodForSelector:logsel];
         (*logf)(log, logsel, @"%@", @"Logging Test");
 
-        PGXMLParserDelegateTest *delegate  = [PGXMLParserDelegateTest new];
-        // NSString *oFilename = @"~/Desktop/XML/Test.xml".stringByExpandingTildeInPath;
-        NSString                *oFilename = @"~/Desktop/XML/Test2.xml".stringByExpandingTildeInPath;
-        NSURL                   *oURL      = [NSURL fileURLWithPath:oFilename];
-        NSString                *urlstr    = oURL.absoluteString;
+        NSString *oFilename = @"~/Desktop/XML/Test.xml".stringByExpandingTildeInPath;
+        // NSString                *oFilename = @"~/Desktop/XML/Test2.xml".stringByExpandingTildeInPath;
+        // NSString                *oFilename = @"~/Desktop/XML/XMLSchema.xsd.xml".stringByExpandingTildeInPath;
+        NSURL    *oURL      = [NSURL fileURLWithPath:oFilename];
+        NSString *urlstr    = oURL.absoluteString;
 
         (*logf)(log, logsel, @"   Parsing file: %@", oFilename);
         (*logf)(log, logsel, @"    Parsing URL: %@", urlstr);
 
-        PGXMLParser *parser = [[PGXMLParser alloc] initWithURL:oURL];
-        parser.delegate = delegate;
-        BOOL success = parser.parse;
+        BOOL success = [self _test82PGXMLParseDelegate:oURL];
+        // BOOL success = [self _test82NSXMLParseDelegate:oURL];
 
         (*logf)(log, logsel, @"Parsing Results: %@", (success ? @"Success" : @"Failure"));
     }

@@ -19,24 +19,56 @@
 #import "PGXMLParserTools.h"
 #import "PGXMLParser+PGXMLParserExtensions.h"
 #import "PGXMLParsedEntity.h"
-
-#define PG_DEF_BUF_SZ ((size_t)(128))
-
-NSString *const PGXMLMsg01 = @"%@ Subset Call Back; Name: \"%@\"; External ID: \"%@\"; System ID: \"%@\"";
+#import "PGXMLParserInput.h"
 
 static SEL NSInputStreamReadSel;
 
-void entityHashScanner(void *payload, void *data, xmlChar *name);
-
 @implementation PGXMLParser {
-        NSRecursiveLock                                      *_lck;
-        NSMutableDictionary<NSString *, PGXMLParsedEntity *> *_entities;
-        PGStack<NSArray<PGXMLParsedNamespace *> *>           *_namespaceStack;
-        id<PGXMLParserDelegate> __unsafe_unretained          _delegate;
-        PGLogger                                             *_logger;
+        id<PGXMLParserDelegate> __unsafe_unretained _delegate;
     }
 
 #pragma mark Constructors and Destructors
+
+    @synthesize parserError = _parserError;
+    @synthesize foundNoteDeclFunc = _foundNoteDeclFunc;
+    @synthesize foundUnpEntDeclFunc = _foundUnpEntDeclFunc;
+    @synthesize foundAttrDeclFunc = _foundAttrDeclFunc;
+    @synthesize foundElemDeclFunc = _foundElemDeclFunc;
+    @synthesize foundIntEntDeclFunc = _foundIntEntDeclFunc;
+    @synthesize foundExtEntDeclFunc = _foundExtEntDeclFunc;
+    @synthesize didStartDocFunc = _didStartDocFunc;
+    @synthesize didEndDocFunc = _didEndDocFunc;
+    @synthesize didStartElemFunc = _didStartElemFunc;
+    @synthesize didEndElemFunc = _didEndElemFunc;
+    @synthesize didStartMapPfxFunc = _didStartMapPfxFunc;
+    @synthesize didEndMapPfxFunc = _didEndMapPfxFunc;
+    @synthesize foundCharsFunc = _foundCharsFunc;
+    @synthesize foundIgnWhitespFunc = _foundIgnWhitespFunc;
+    @synthesize foundProcInstFunc = _foundProcInstFunc;
+    @synthesize foundCommentFunc = _foundCommentFunc;
+    @synthesize foundCDATAFunc = _foundCDATAFunc;
+    @synthesize parseErrFunc = _parseErrFunc;
+    @synthesize validationErrFunc = _validationErrFunc;
+    @synthesize reslvExtEntFunc = _reslvExtEntFunc;
+    @synthesize reslvIntEntFunc = _reslvIntEntFunc;
+    @synthesize reslvIntPEntFunc = _reslvIntPEntFunc;
+    @synthesize hasRun = _hasRun;
+    @synthesize ctx = _ctx;
+    @synthesize saxHandler = _saxHandler;
+    @synthesize lck = _lck;
+    @synthesize input = _input;
+    @synthesize readFunc = _readFunc;
+    @synthesize url = _url;
+    @synthesize entities = _entities;
+    @synthesize paramEntities = _paramEntities;
+    @synthesize namespaceStack = _namespaceStack;
+    @synthesize inputs = _inputs;
+    @synthesize logger = _logger;
+    @synthesize isStandalone = _isStandalone;
+    @synthesize publicId = _publicId;
+    @synthesize systemId = _systemId;
+    @synthesize version = _version;
+    @synthesize encoding = _encoding;
 
     -(instancetype)init {
         self = [super init];
@@ -48,9 +80,14 @@ void entityHashScanner(void *payload, void *data, xmlChar *name);
         self = [super init];
 
         if(self) {
-            _logger = [PGLogger sharedInstanceWithClass:self.class];
-            self.input    = stream;
-            self.readFunc = (NSInputStreamReadFunc)[self.input methodForSelector:NSInputStreamReadSel];
+            _lck            = [NSRecursiveLock new];
+            _logger         = [PGLogger sharedInstanceWithClass:self.class];
+            _inputs         = [NSMutableArray new];
+            _entities       = [NSMutableDictionary new];
+            _paramEntities  = [NSMutableDictionary new];
+            _namespaceStack = [PGStack new];
+            _input          = stream;
+            _readFunc       = (NSInputStreamReadFunc)[_input methodForSelector:NSInputStreamReadSel];
         }
 
         return self;
@@ -74,19 +111,10 @@ void entityHashScanner(void *payload, void *data, xmlChar *name);
 
 #pragma mark Getters and Setters
 
-    -(NSMutableDictionary<NSString *, PGXMLParsedEntity *> *)entities {
-        PGSETIFNIL(self, _entities, [NSMutableDictionary new]);
-        return _entities;
-    }
-
-    -(PGStack<NSArray<PGXMLParsedNamespace *> *> *)namespaceStack {
-        PGSETIFNIL(self, _namespaceStack, [PGStack new]);
-        return _namespaceStack;
-    }
-
-    -(NSRecursiveLock *)lck {
-        PGSETIFNIL(self, _lck, [NSRecursiveLock new]);
-        return _lck;
+    -(NSArray<NSString *> *)typeNames {
+        static NSArray<NSString *> *__typeNames = nil;
+        PGSETIFNIL([PGXMLParser class], __typeNames, (@[ @"general", @"parameter", @"predefined", @"other" ]));
+        return __typeNames;
     }
 
     -(id<PGXMLParserDelegate>)delegate {
@@ -98,127 +126,100 @@ void entityHashScanner(void *payload, void *data, xmlChar *name);
 
     -(void)setDelegate:(id<PGXMLParserDelegate>)delegate {
         [self.lck lock];
-        @try { if(_delegate != delegate) [self updateDelegateFunctions:(_delegate = delegate)]; } @finally { [self.lck unlock]; }
+        @try {
+            if(_delegate != delegate) {
+                _delegate = delegate;
+                [self updateDelegateFunctions:_delegate];
+            }
+        }
+        @finally {
+            [self.lck unlock];
+        }
+    }
+
+    -(NSError *)inputStreamError {
+        return (self.input.streamError ?: createError(PGErrorCodeUnknownInputStreamError, PGErrorMsgUnknownInputStreamError));
     }
 
 #pragma mark Parsing
 
-    -(BOOL)parseChunkWithBuffer:(void *)buffer maxLength:(NSUInteger)length {
-        NSInputStream *input  = self.input;
-        NSInteger     rcount  = (*self.readFunc)(input, NSInputStreamReadSel, buffer, length);
-        BOOL          success = YES;
+    -(BOOL)parseBuffer:(PGSimpleBuffer *)buffer bytesRead:(NSInteger)bytesRead {
+        PGCString  *filename = [PGCString stringWithNSString:self.url.absoluteString];
+        BOOL       nsuccess  = NO, eof;
+        voidp      buf       = buffer.buffer;
+        NSUInteger len       = buffer.length;
 
-        while(success && (rcount > 0)) { if((success = parseChunk(self, buffer, rcount, NO, success))) rcount = (*self.readFunc)(input, NSInputStreamReadSel, buffer, length); }
-        success = parseChunk(self, buffer, 0, YES, success);
-        self.parserError = (((rcount >= 0) || success || self.parserError) ? self.parserError : self.getInputStreamError);
-        return success;
+        if(createPushContext(self, buf, bytesRead, filename.cString)) {
+            @try {
+                xmlParserCtxtPtr      ctx    = self.ctx;
+                NSInputStream         *input = self.input;
+                NSInputStreamReadFunc rfunc  = self.readFunc;
+
+                /*
+                 * Nice tight fast loop!
+                 */
+                do {
+                    bytesRead = (*rfunc)(input, NSInputStreamReadSel, buf, len);
+                    eof       = (bytesRead <= 0);
+                    nsuccess  = !xmlParseChunk(ctx, buf, (int)(eof ? 0 : bytesRead), eof);
+                }
+                while(nsuccess && !eof);
+
+                if((bytesRead < 0) && (self.parserError == nil)) self.parserError = self.inputStreamError;
+                nsuccess = (nsuccess && (bytesRead == 0));
+            }
+            @finally {
+                [self destroyParserContext];
+            }
+        }
+
+        return nsuccess;
     }
 
-    -(BOOL)parseWithBuffer:(void *)buffer maxLength:(NSUInteger)length bytesRead:(NSInteger)bytesRead filename:(const char *)filename {
-        if(createPushContext(self, buffer, bytesRead, filename)) { @try { return [self parseChunkWithBuffer:buffer maxLength:length]; } @finally { [self destroyParserContext]; }}
-        return NO;
-    }
-
-    -(BOOL)parseWithBuffer:(void *)buffer maxLength:(NSUInteger)length bytesRead:(NSInteger)bytesRead {
-        char *filename = PGStrdup(self.url ? self.url.absoluteString.UTF8String : "");
-        @try { return [self parseWithBuffer:buffer maxLength:length bytesRead:bytesRead filename:filename]; } @finally { free(filename); }
-    }
-
-    -(BOOL)parseWithBuffer:(void *)buffer maxLength:(NSUInteger)length {
-        BOOL      success    = NO;
-        NSInteger readStatus = (*self.readFunc)(self.input, NSInputStreamReadSel, buffer, length);
-
-        if(readStatus > 0) {
-            self.parserError = nil;
+    -(BOOL)tryParse:(PGSimpleBuffer *)buffer bytesRead:(NSInteger)bytesRead {
+        if(bytesRead > 0) {
             [self setupSAXHandlerStructure];
-            @try { success = [self parseWithBuffer:buffer maxLength:length bytesRead:readStatus]; } @finally { [self destroySAXHandlerStructure]; }
+            @try { return [self parseBuffer:buffer bytesRead:bytesRead]; } @finally { [self destroySAXHandlerStructure]; }
         }
-        else if(readStatus == 0) self.parserError = createError(PGErrorCodeUnexpectedEndOfInput, PGErrorMsgUnexpectedEndOfInput);
-        else self.parserError = self.getInputStreamError;
-
-        return success;
-    }
-
-    -(BOOL)parse04 {
-        uint8_t *buffer = PGMalloc(PG_DEF_BUF_SZ);
-        @try { return [self parseWithBuffer:buffer maxLength:PG_DEF_BUF_SZ]; } @finally { free(buffer); }
-    }
-
-    -(BOOL)parse03 {
-        @try { return self.parse04; } @finally { [self.input close]; }
-    }
-
-    -(BOOL)parse02 {
-        @try {
-            return (self.openInputStream && self.parse03);
+        else {
+            self.parserError = (bytesRead ? self.inputStreamError : createError(PGErrorCodeUnexpectedEndOfInput, PGErrorMsgUnexpectedEndOfInput));
+            return NO;
         }
-        @finally {
-            self.hasRun = YES;
-        }
-    }
-
-    -(BOOL)parse01 {
-        @try {
-            if(self.hasRun) self.parserError = createError(PGErrorCodeXMLParserAlreadyRun, PGErrorMsgXMLParserAlreadyRun);
-            else if(!self.input) self.parserError = createError(PGErrorCodeNoInputStream, PGErrorMsgNoInputStream);
-            else if(!self.delegate) self.parserError = createError(PGErrorCodeNoDelegate, PGErrorMsgNoDelegate);
-            else return self.parse02;
-        }
-        @catch(NSException *e) {
-            if(!self.parserError) self.parserError = e.makeError;
-        }
-        return NO;
     }
 
     -(BOOL)parse {
         [self.lck lock];
-        @try { return self.parse01; } @finally { [self.lck unlock]; }
-    }
-
-    -(BOOL)openInputStream {
-        return ((self.parserError = PGOpenInputStream(self.input)) == nil);
-    }
-
-    -(NSError *)getInputStreamError {
-        return (self.input.streamError ?: createError(PGErrorCodeUnknownInputStreamError, PGErrorMsgUnknownInputStreamError));
-    }
-
-#pragma mark libxml2 Callback Handlers
-
-    -(xmlParserInputPtr)resolveEntityCallBack:(NSString *)publicId systemId:(NSString *)systemId {
-        BOOL   hasImpl = NO;
-        NSData *data   = [self _resolveExternalEntityForName:publicId systemID:systemId hasImpl:&hasImpl];
-        int    blen    = (int)data.length;
-
-        if(hasImpl && blen) {
-            char *buf = PGMalloc((size_t)blen);
-
-            @try {
-                [data getBytes:buf length:(NSUInteger)blen];
-                xmlParserInputBufferPtr pib = xmlParserInputBufferCreateMem(buf, blen, XML_CHAR_ENCODING_UTF8);
-                return xmlNewIOInputStream(self.ctx, pib, XML_CHAR_ENCODING_UTF8);
-            }
-            @finally { free(buf); }
-        }
-
-        [_logger debug:@"!!!!!!!!!!!!!! %@; %@", publicId, systemId];
-        return xmlLoadExternalEntity(publicId.UTF8String, systemId.UTF8String, self.ctx);
-    }
-
-    -(void)internalSubsetCallBack:(NSString *)name ExternalID:(NSString *)ExternalID SystemID:(NSString *)SystemID {
-        [_logger debug:PGXMLMsg01, @"Internal", name, ExternalID, SystemID];
-    }
-
-    -(void)externalSubsetCallBack:(NSString *)name ExternalID:(NSString *)ExternalID SystemID:(NSString *)SystemID {
-        if(SystemID.length) {
-            NSURL *exURL = (self.url ? [NSURL URLWithString:SystemID relativeToURL:self.url] : [NSURL URLWithString:SystemID]);
-
-            if(exURL) {
-                xmlDtdPtr dtd = xmlParseDTD((const xmlChar *)ExternalID.UTF8String, (const xmlChar *)exURL.absoluteString.UTF8String);
-                if(dtd && dtd->entities) xmlHashScan((xmlHashTablePtr)dtd->entities, entityHashScanner, (__bridge void *)self);
+        @try {
+            if(self.hasRun) self.parserError = createError(PGErrorCodeXMLParserAlreadyRun, PGErrorMsgXMLParserAlreadyRun);
+            else if(!self.input) self.parserError = createError(PGErrorCodeNoInputStream, PGErrorMsgNoInputStream);
+            else if(!self.delegate) self.parserError = createError(PGErrorCodeNoDelegate, PGErrorMsgNoDelegate);
+            else if((self.parserError = PGOpenInputStream(self.input)) == nil) {
+                @try {
+                    _version = _encoding = _publicId = _systemId = nil;
+                    PGSimpleBuffer *b = [PGSimpleBuffer bufferWithLength:PG_DEF_BUF_SZ];
+                    return [self tryParse:b bytesRead:(*self.readFunc)(self.input, NSInputStreamReadSel, b.buffer, b.length)];
+                }
+                @catch(NSException *e) {
+                    self.parserError = e.makeError;
+                }
+                @finally {
+                    self.hasRun = YES;
+                    [self.input close];
+                }
             }
         }
+        @finally {
+            [self.inputs removeAllObjects];
+            [self.entities removeAllObjects];
+            [self.paramEntities removeAllObjects];
+            [self.namespaceStack removeAllObjects];
+            [self.lck unlock];
+        }
+
+        return NO;
     }
+
+#pragma mark Helper Methods
 
     -(xmlEntityPtr)updateEntityForName:(NSString *)name content:(NSString *)content {
         PGXMLParsedEntity *ent = self.entities[name];
@@ -227,91 +228,6 @@ void entityHashScanner(void *payload, void *data, xmlChar *name);
         else self.entities[name] = ent = [PGXMLParsedEntity entityWithName:name content:content];
 
         return ent.xmlEntity;
-    }
-
-    -(xmlEntityPtr)getEntityCallBack:(NSString *)name {
-        BOOL     hasImpl  = NO;
-        NSString *content = [self _resolveInternalEntityForName:name hasImpl:&hasImpl];
-
-        return ((hasImpl && content) ? [self updateEntityForName:name content:content] : self.entities[name].xmlEntity);
-    }
-
-    -(xmlEntityPtr)getParameterEntityCallBack:(NSString *)name {
-        return [self getEntityCallBack:name];
-    }
-
-    -(void)entityDeclCallBack:(NSString *)name type:(int)type publicId:(NSString *)publicId systemId:(NSString *)systemId content:(NSString *)content {
-        PGXMLParsedEntity *ent = self.entities[name];
-
-        if(ent) {
-            ent.content  = content;
-            ent.publicID = publicId;
-            ent.systemID = systemId;
-            ent.type     = (xmlEntityType)type;
-        }
-        else {
-            self.entities[name] = [PGXMLParsedEntity entityWithName:name content:content publicID:publicId systemID:systemId type:(xmlEntityType)type];
-        }
-        BOOL hasImpl = NO;
-
-        [self _foundInternalEntityDeclarationWithName:name value:content hasImpl:&hasImpl];
-    }
-
-    -(void)notationDeclCallBack:(NSString *)name publicId:(NSString *)publicId systemId:(NSString *)systemId {
-        BOOL hasImpl = NO;
-        [self _foundNotationDeclarationWithName:name publicID:publicId systemID:systemId hasImpl:&hasImpl];
-    }
-
-    -(void)attributeDeclCallBack:(NSString *)elem fullname:(NSString *)fullname type:(int)type def:(int)def defaultValue:(NSString *)defaultValue tree:(xmlEnumerationPtr)tree {
-        BOOL hasImpl = NO;
-        [self _foundAttributeDeclarationWithName:fullname forElement:elem type:[@(type) stringValue] defaultValue:defaultValue hasImpl:&hasImpl];
-    }
-
-    -(void)elementDeclCallBack:(NSString *)name type:(int)type content:(xmlElementContentPtr)content {
-        BOOL hasImpl = NO;
-        [self _foundElementDeclarationWithName:name model:nil hasImpl:&hasImpl];
-    }
-
-    -(void)unparsedEntityDeclCallBack:(NSString *)name publicId:(NSString *)publicId systemId:(NSString *)systemId notationName:(NSString *)notationName {
-        BOOL hasImpl = NO;
-        [self _foundUnparsedEntityDeclarationWithName:name publicID:publicId systemID:systemId notationName:notationName hasImpl:&hasImpl];
-    }
-
-    -(void)startDocumentCallBack {
-        BOOL hasImpl = NO;
-        [self _didStartDocument:&hasImpl];
-    }
-
-    -(void)endDocumentCallBack {
-        BOOL hasImpl = NO;
-        [self _didEndDocument:&hasImpl];
-    }
-
-    -(void)startElementCallBack:(NSString *)name attributes:(NSArray<PGXMLParsedAttribute *> *)attributes {
-        BOOL hasImpl = NO;
-        [self _didStartElement:name namespaceURI:nil qualifiedName:nil attributes:attributes hasImpl:&hasImpl];
-    }
-
-    -(void)endElementCallBack:(NSString *)name {
-        BOOL hasImpl = NO;
-        [self _didEndElement:name namespaceURI:nil qualifiedName:nil hasImpl:&hasImpl];
-    }
-
-    -(void)startElementNsCallBack:(NSString *)localname
-                           prefix:(NSString *)prefix
-                              URI:(NSString *)URI
-                       namespaces:(NSArray<PGXMLParsedNamespace *> *)namespaces
-                       attributes:(NSArray<PGXMLParsedAttribute *> *)attributes {
-        BOOL hasImpl = NO;
-        [self.namespaceStack push:(namespaces.count ? namespaces : @[])];
-        [self startMappingPrefixes:namespaces hasImpl:&hasImpl];
-        [self _didStartElement:localname namespaceURI:URI qualifiedName:createQName(localname, prefix) attributes:attributes hasImpl:&hasImpl];
-    }
-
-    -(void)endElementNsCallBack:(NSString *)localname prefix:(NSString *)prefix URI:(NSString *)URI {
-        BOOL hasImpl = NO;
-        [self _didEndElement:localname namespaceURI:URI qualifiedName:createQName(localname, prefix) hasImpl:&hasImpl];
-        [self endMappingPrefixes:self.namespaceStack.pop hasImpl:&hasImpl];
     }
 
     -(void)startMappingPrefixes:(NSArray<PGXMLParsedNamespace *> *)namespaces hasImpl:(BOOL *)hasImpl {
@@ -334,54 +250,304 @@ void entityHashScanner(void *payload, void *data, xmlChar *name);
         }
     }
 
-    -(void)referenceCallBack:(NSString *)name {
-        BOOL     hasImpl  = NO;
-        NSString *content = [self _resolveInternalEntityForName:name hasImpl:&hasImpl];
-
-        if(hasImpl && content) {
-            hasImpl = NO;
-            [self _foundCharacters:content hasImpl:&hasImpl];
+    -(NSString *)getKeyForName:(NSString *)name andType:(int)type {
+        switch(type) {
+            case XML_INTERNAL_GENERAL_ENTITY:
+            case XML_EXTERNAL_GENERAL_PARSED_ENTITY:
+            case XML_EXTERNAL_GENERAL_UNPARSED_ENTITY:
+                return PGFormat(PGXMLKeyFormat, name, self.typeNames[0]);
+            case XML_INTERNAL_PARAMETER_ENTITY:
+            case XML_EXTERNAL_PARAMETER_ENTITY:
+                return PGFormat(PGXMLKeyFormat, name, self.typeNames[1]);
+            case XML_INTERNAL_PREDEFINED_ENTITY:
+                return PGFormat(PGXMLKeyFormat, name, self.typeNames[2]);
+            default:
+                return PGFormat(PGXMLKeyFormat, name, self.typeNames[3]);
         }
     }
 
+    -(NSURL *)urlForPublicID:(NSString *)publicID systemID:(NSString *)systemID {
+        NSURL *url = self.url;
+        return (url ? [NSURL URLWithString:systemID relativeToURL:url] : [NSURL URLWithString:systemID]);
+    }
+
+    -(PGXMLParsedEntity *)getExistingEntityForName:(NSString *)name {
+        NSUInteger idxs[] = { 0, 2, 3 };
+
+        for(int i = 0; i < 3; i++) {
+            PGXMLParsedEntity *e = self.entities[PGFormat(PGXMLKeyFormat, name, self.typeNames[idxs[i]])];
+            if(e) return e;
+        }
+
+        return nil;
+    }
+
+    -(xmlParserInputPtr)localResolveEntityForPublicID:(NSString *)publicID systemID:(NSString *)systemID {
+        if(systemID.length) {
+            NSURL *url = [self urlForPublicID:publicID systemID:systemID];
+            if(url) return [self xmlParserInputPtrFromData:[NSData dataWithContentsOfURL:url]];
+        }
+        return NULL;
+    }
+
+    -(PGXMLParserInput *)getNewParserInputForData:(NSData *)data {
+        PGXMLParserInput *input = [PGXMLParserInput inputWithData:data];
+        [self.inputs addObject:input];
+        return input;
+    }
+
+    -(xmlParserInputPtr)xmlParserInputPtrFromData:(NSData *)data {
+        return (self.ctx ? [[self getNewParserInputForData:data] getNewParserInputForContext:self.ctx] : NULL);
+    }
+
+    -(void)extractEntitiesFromDTDAtURL:(NSURL *)url externalID:(NSString *)externalID {
+        if(url) {
+            xmlDtdPtr dtd = xmlParseDTD((const xmlChar *)externalID.UTF8String, (const xmlChar *)url.absoluteString.UTF8String);
+            if(dtd && dtd->entities) xmlHashScan((xmlHashTablePtr)dtd->entities, entityHashScanner, (__bridge void *)self);
+        }
+    }
+
+    -(void)handleSubset:(NSString *)desc name:(NSString *)name externalID:(NSString *)externalID systemID:(NSString *)systemID {
+        [self.logger debug:PGXMLMsg01, desc, name, externalID, systemID];
+        if(systemID.length) [self extractEntitiesFromDTDAtURL:[self urlForPublicID:externalID systemID:systemID] externalID:externalID];
+    }
+
+#pragma mark libxml2 Callback Handlers
+
+    -(void)internalSubsetCallBack:(NSString *)name externalID:(NSString *)externalID systemID:(NSString *)systemID {
+        [self handleSubset:@"Internal" name:name externalID:externalID systemID:systemID];
+    }
+
+    -(void)externalSubsetCallBack:(NSString *)name externalID:(NSString *)externalID systemID:(NSString *)systemID {
+        [self handleSubset:@"External" name:name externalID:externalID systemID:systemID];
+    }
+
+    -(xmlParserInputPtr)resolveEntityCallBack:(NSString *)publicID systemID:(NSString *)systemID {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
+        BOOL   hasImpl = NO;
+        NSData *data   = [self _resolveExternalEntityForName:publicID systemID:systemID hasImpl:&hasImpl];
+        return (data.length ? [self xmlParserInputPtrFromData:data] : [self localResolveEntityForPublicID:publicID systemID:systemID]);
+    }
+
+    -(xmlEntityPtr)getEntityCallBack:(NSString *)name {
+        [self.logger debug:@"%@; name: \"%@\"", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd)), name];
+        BOOL              hasImpl  = NO;
+        NSString          *content = [self _resolveInternalEntityForName:name hasImpl:&hasImpl];
+        PGXMLParsedEntity *e       = [self getExistingEntityForName:name];
+
+        if(content) {
+            if(e) e.content = content;
+            else e = [PGXMLParsedEntity entityWithName:name content:content];
+        }
+
+        return e.xmlEntity;
+    }
+
+    -(xmlEntityPtr)getParameterEntityCallBack:(NSString *)name {
+        [self.logger debug:@"%@; name: \"%@\"", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd)), name];
+        BOOL              hasImpl  = NO;
+        NSString          *content = [self _resolveInternalParameterEntityForName:name hasImpl:&hasImpl];
+        PGXMLParsedEntity *e       = self.paramEntities[PGFormat(PGXMLKeyFormat, name, self.typeNames[1])];
+
+        if(content) {
+            if(e) e.content = content;
+            else e = [PGXMLParsedEntity entityWithName:name content:content];
+        }
+
+        return e.xmlEntity;
+    }
+
+    -(void)entityDeclCallBack:(NSString *)name type:(int)type publicID:(NSString *)publicID systemID:(NSString *)systemID content:(NSString *)content {
+        NSString *s = PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd));
+        [self.logger debug:@"%@; %@: \"%@\"; %@: \"%@\"; %@: \"%@\"; %@: \"%@\"; %@: \"%@\"",
+                           s,
+                           @"name",
+                           name,
+                           @"type",
+                           @(type),
+                           @"public ID",
+                           publicID,
+                           @"system ID",
+                           systemID,
+                           @"content",
+                           content];
+
+        NSString          *key    = [self getKeyForName:name andType:type];
+        PGXMLParsedEntity *ent    = self.entities[key];
+        BOOL              hasImpl = NO;
+
+        if(ent) {
+            ent.content  = content;
+            ent.publicID = publicID;
+            ent.systemID = systemID;
+            ent.type     = (xmlEntityType)type;
+        }
+        else {
+            ent = [PGXMLParsedEntity entityWithName:name content:content publicID:publicID systemID:systemID type:(xmlEntityType)type];
+            self.entities[key] = ent;
+        }
+
+        [self _foundInternalEntityDeclarationWithName:name value:content hasImpl:&hasImpl];
+    }
+
+    -(void)notationDeclCallBack:(NSString *)name publicID:(NSString *)publicID systemID:(NSString *)systemID {
+        NSString *s = PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd));
+        [self.logger debug:@"%@; %@: \"%@\"; %@: \"%@\"; %@: \"%@\"", s, @"name", name, @"publicID", publicID, @"systemID", systemID];
+        BOOL hasImpl = NO;
+        [self _foundNotationDeclarationWithName:name publicID:publicID systemID:systemID hasImpl:&hasImpl];
+    }
+
+    -(void)attributeDeclCallBack:(NSString *)elem fullname:(NSString *)fullname type:(int)type def:(int)def defaultValue:(NSString *)defaultValue tree:(xmlEnumerationPtr)tree {
+        NSString *s = PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd));
+        [self.logger debug:@"%@; %@: \"%@\"; %@: \"%@\"; %@: \"%@\"; %@: \"%@\"; %@: \"%@\"",
+                           s,
+                           @"elem",
+                           elem,
+                           @"fullname",
+                           fullname,
+                           @"type",
+                           @(type),
+                           @"def",
+                           @(def),
+                           @"defaultValue",
+                           defaultValue];
+        BOOL hasImpl = NO;
+        [self _foundAttributeDeclarationWithName:fullname forElement:elem type:[@(type) stringValue] defaultValue:defaultValue hasImpl:&hasImpl];
+    }
+
+    -(void)elementDeclCallBack:(NSString *)name type:(int)type content:(xmlElementContentPtr)content {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
+        BOOL hasImpl = NO;
+        [self _foundElementDeclarationWithName:name model:nil hasImpl:&hasImpl];
+    }
+
+    -(void)unparsedEntityDeclCallBack:(NSString *)name publicID:(NSString *)publicID systemID:(NSString *)systemID notationName:(NSString *)notationName {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
+        BOOL hasImpl = NO;
+        [self _foundUnparsedEntityDeclarationWithName:name publicID:publicID systemID:systemID notationName:notationName hasImpl:&hasImpl];
+    }
+
+    -(void)startDocumentCallBack {
+        xmlParserCtxtPtr ctx = self.ctx;
+
+        if(ctx) {
+            _isStandalone = ((ctx->standalone) != 0);
+            _version      = stringForXMLString(ctx->version);
+            _encoding     = stringForXMLString(ctx->encoding);
+
+            NSString *fmt = @"%@; line: %@; column: %@; encoding: \"%@\"; version: \"%@\"; standalone: %@";
+            NSString *loc = PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd));
+            [self.logger debug:fmt, loc, @(self.lineNumber), @(self.columnNumber), self.encoding, self.version, (self.isStandalone ? @"YES" : @"NO")];
+        }
+        else {
+            _isStandalone = NO;
+            _version      = nil;
+            _encoding     = nil;
+
+            [self.logger debug:@"%@; *** NO CONTEXT ***", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
+        }
+
+        BOOL hasImpl = NO;
+        [self _didStartDocument:&hasImpl];
+    }
+
+    -(NSUInteger)lineNumber {
+        xmlParserCtxtPtr ctx = self.ctx;
+        return (NSUInteger)MAX((ctx ? ctx->input->line : 0), 0);
+    }
+
+    -(NSUInteger)columnNumber {
+        xmlParserCtxtPtr ctx = self.ctx;
+        return (NSUInteger)MAX((ctx ? ctx->input->col : 0), 0);
+    }
+
+    -(void)endDocumentCallBack {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
+        BOOL hasImpl = NO;
+        [self _didEndDocument:&hasImpl];
+    }
+
+    -(void)startElementCallBack:(NSString *)name attributes:(NSArray<PGXMLParsedAttribute *> *)attributes {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
+        BOOL hasImpl = NO;
+        [self _didStartElement:name namespaceURI:nil qualifiedName:nil attributes:attributes hasImpl:&hasImpl];
+    }
+
+    -(void)endElementCallBack:(NSString *)name {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
+        BOOL hasImpl = NO;
+        [self _didEndElement:name namespaceURI:nil qualifiedName:nil hasImpl:&hasImpl];
+    }
+
+    -(void)startElementNsCallBack:(NSString *)localname
+                           prefix:(NSString *)prefix
+                              URI:(NSString *)URI
+                       namespaces:(NSArray<PGXMLParsedNamespace *> *)namespaces
+                       attributes:(NSArray<PGXMLParsedAttribute *> *)attributes {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
+        BOOL hasImpl = NO;
+        [self.namespaceStack push:(namespaces.count ? namespaces : @[])];
+        [self startMappingPrefixes:namespaces hasImpl:&hasImpl];
+        [self _didStartElement:localname namespaceURI:URI qualifiedName:createQName(localname, prefix) attributes:attributes hasImpl:&hasImpl];
+    }
+
+    -(void)endElementNsCallBack:(NSString *)localname prefix:(NSString *)prefix namespaceURI:(NSString *)namespaceURI {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
+        BOOL hasImpl = NO;
+        [self _didEndElement:localname namespaceURI:namespaceURI qualifiedName:createQName(localname, prefix) hasImpl:&hasImpl];
+        [self endMappingPrefixes:self.namespaceStack.pop hasImpl:&hasImpl];
+    }
+
+    -(void)referenceCallBack:(NSString *)name {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
+        xmlEntityPtr ent = [self getEntityCallBack:name];
+        if(ent && ent->content) [self charactersCallBack:stringForXMLString(ent->content)];
+    }
+
     -(void)charactersCallBack:(NSString *)ch {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
         BOOL hasImpl = NO;
         [self _foundCharacters:ch hasImpl:&hasImpl];
     }
 
     -(void)ignorableWhitespaceCallBack:(NSString *)ch {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
         BOOL hasImpl = NO;
         [self _foundIgnorableWhitespace:ch hasImpl:&hasImpl];
     }
 
     -(void)processingInstructionCallBack:(NSString *)target data:(NSString *)data {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
         BOOL hasImpl = NO;
         [self _foundProcessingInstructionWithTarget:target data:data hasImpl:&hasImpl];
     }
 
     -(void)commentCallBack:(NSString *)value {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
         BOOL hasImpl = NO;
         [self _foundComment:value hasImpl:&hasImpl];
     }
 
     -(void)cdataBlockCallBack:(NSString *)value {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
         BOOL hasImpl = NO;
 
         if(value) {
-            char   *str  = strdup(value.UTF8String);
-            NSData *data = [NSData dataWithBytesNoCopy:str length:strlen(str) freeWhenDone:YES];
-            [self _foundCDATA:data hasImpl:&hasImpl];
+            char *str = strdup(value.UTF8String);
+            [self _foundCDATA:[NSData dataWithBytesNoCopy:str length:strlen(str) freeWhenDone:YES] hasImpl:&hasImpl];
         }
         else [self _foundCDATA:[NSData new] hasImpl:&hasImpl];
     }
 
     -(void)warningCallBack:(NSString *)msg {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
         BOOL hasImpl = NO;
         self.parserError = createError(PGErrorCodeXMLParserWarning, msg);
         [self _parseErrorOccurred:self.parserError hasImpl:&hasImpl];
     }
 
     -(void)errorCallBack:(NSString *)msg {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
         BOOL hasImpl = NO;
         // int  col     = self.ctx->input->col;
         // int  lin     = self.ctx->input->line;
@@ -390,12 +556,14 @@ void entityHashScanner(void *payload, void *data, xmlChar *name);
     }
 
     -(void)fatalErrorCallBack:(NSString *)msg {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
         BOOL hasImpl = NO;
         self.parserError = createError(PGErrorCodeXMLParserFatalError, msg);
         [self _parseErrorOccurred:self.parserError hasImpl:&hasImpl];
     }
 
     -(void)xmlStructuredErrorCallBack:(xmlErrorPtr)error {
+        [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
         BOOL     hasImpl = NO;
         NSString *msg    = [NSString stringWithFormat:@"(%d:%d) %@", error->domain, error->code, [NSString stringWithUTF8String:error->message]];
         self.parserError = createError(PGErrorCodeXMLParserStructError, msg);
@@ -408,19 +576,21 @@ void entityHashScanner(void *payload, void *data, xmlChar *name);
         LIBXML_TEST_VERSION
         self.saxHandler = PGCalloc(1, sizeof(xmlSAXHandler));
 
-        self.saxHandler->initialized           = XML_SAX2_MAGIC;
-        self.saxHandler->internalSubset        = internalSubsetCallBack;
-        self.saxHandler->resolveEntity         = resolveEntityCallBack;
-        self.saxHandler->getEntity             = getEntityCallBack;
-        self.saxHandler->entityDecl            = entityDeclCallBack;
-        self.saxHandler->notationDecl          = notationDeclCallBack;
-        self.saxHandler->attributeDecl         = attributeDeclCallBack;
-        self.saxHandler->elementDecl           = elementDeclCallBack;
-        self.saxHandler->unparsedEntityDecl    = unparsedEntityDeclCallBack;
-        self.saxHandler->startDocument         = startDocumentCallBack;
-        self.saxHandler->endDocument           = endDocumentCallBack;
-        self.saxHandler->startElement          = startElementCallBack;
-        self.saxHandler->endElement            = endElementCallBack;
+        self.saxHandler->initialized        = XML_SAX2_MAGIC;
+        self.saxHandler->internalSubset     = internalSubsetCallBack;
+        self.saxHandler->externalSubset     = externalSubsetCallBack;
+        self.saxHandler->resolveEntity      = resolveEntityCallBack;
+        self.saxHandler->getEntity          = getEntityCallBack;
+        self.saxHandler->getParameterEntity = getParameterEntityCallBack;
+        self.saxHandler->entityDecl         = entityDeclCallBack;
+        self.saxHandler->unparsedEntityDecl = unparsedEntityDeclCallBack;
+        self.saxHandler->notationDecl       = notationDeclCallBack;
+        self.saxHandler->attributeDecl      = attributeDeclCallBack;
+        self.saxHandler->elementDecl        = elementDeclCallBack;
+        self.saxHandler->startDocument      = startDocumentCallBack;
+        self.saxHandler->endDocument        = endDocumentCallBack;
+        self.saxHandler->startElement       = startElementCallBack;
+        self.saxHandler->endElement         = endElementCallBack;
         self.saxHandler->reference             = referenceCallBack;
         self.saxHandler->characters            = charactersCallBack;
         self.saxHandler->ignorableWhitespace   = ignorableWhitespaceCallBack;
@@ -429,9 +599,7 @@ void entityHashScanner(void *payload, void *data, xmlChar *name);
         self.saxHandler->warning               = warningCallBack;
         self.saxHandler->error                 = errorCallBack;
         self.saxHandler->fatalError            = fatalErrorCallBack;
-        self.saxHandler->getParameterEntity    = getParameterEntityCallBack;
         self.saxHandler->cdataBlock            = cdataBlockCallBack;
-        self.saxHandler->externalSubset        = externalSubsetCallBack;
         self.saxHandler->startElementNs        = startElementNsCallBack;
         self.saxHandler->endElementNs          = endElementNsCallBack;
         self.saxHandler->serror                = xmlStructuredErrorCallBack;
@@ -470,17 +638,3 @@ void entityHashScanner(void *payload, void *data, xmlChar *name);
     }
 
 @end
-
-void entityHashScanner(void *payload, void *data, xmlChar *name) {
-    __unsafe_unretained PGXMLParser *parser = (__bridge PGXMLParser *)data;
-    xmlEntityPtr                    entity  = (xmlEntityPtr)payload;
-
-    if(name && entity && parser) {
-        [parser entityDeclCallBack:stringForXMLString(name)
-                              type:entity->etype
-                          publicId:stringForXMLString(entity->ExternalID)
-                          systemId:stringForXMLString(entity->SystemID)
-                           content:stringForXMLString(entity->content)];
-    }
-}
-

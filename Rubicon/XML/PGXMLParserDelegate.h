@@ -180,6 +180,15 @@ NS_ASSUME_NONNULL_BEGIN
     -(nullable NSString *)parser:(PGXMLParser *)parser resolveInternalEntityForName:(NSString *)name;
 
     /**
+     * Sent when the parser encounters an entity which it needs to resolve.
+     *
+     * @param parser ...
+     * @param name ...
+     * @returns the resolved entity.
+     */
+    -(nullable NSString *)parser:(PGXMLParser *)parser resolveInternalParameterEntityForName:(NSString *)name;
+
+    /**
      * The parser reports ignorable whitespace in the same way as characters it's found.
      *
      * @param parser ...

@@ -170,6 +170,10 @@
     }
 
     -(void)clear {
+        [self removeAllObjects];
+    }
+
+    -(void)removeAllObjects {
         [self lock];
 
         @try {

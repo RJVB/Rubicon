@@ -59,15 +59,15 @@ typedef NS_ENUM(uint8_t, PGLogLevels) {
                      outputStream:(nullable NSOutputStream *)out
                       errorStream:(nullable NSOutputStream *)err NS_DESIGNATED_INITIALIZER;
 
-    -(void)trace:(NSString *)fmt, ...;
+    -(void)trace:(NSString *)fmt, ... NS_FORMAT_FUNCTION(1, 2);
 
-    -(void)info:(NSString *)fmt, ...;
+    -(void)info:(NSString *)fmt, ... NS_FORMAT_FUNCTION(1, 2);
 
-    -(void)debug:(NSString *)fmt, ...;
+    -(void)debug:(NSString *)fmt, ... NS_FORMAT_FUNCTION(1, 2);
 
-    -(void)warn:(NSString *)fmt, ...;
+    -(void)warn:(NSString *)fmt, ... NS_FORMAT_FUNCTION(1, 2);
 
-    -(void)error:(NSString *)fmt, ...;
+    -(void)error:(NSString *)fmt, ... NS_FORMAT_FUNCTION(1, 2);
 
     -(void)log:(NSString *)str atLevel:(PGLogLevels)level;
 

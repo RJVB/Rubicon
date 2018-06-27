@@ -17,26 +17,40 @@
 
 #import "PGXMLParsedEntity.h"
 #import "PGTools.h"
+#import "NSException+PGException.h"
+
+@interface PGXMLParsedEntity()
+
+    @property(copy) NSString *name;
+
+    -(BOOL)_isEqualToEntity:(PGXMLParsedEntity *)ent;
+
+    -(void)freeEntity:(xmlEntity *)ent;
+
+@end
 
 @implementation PGXMLParsedEntity {
         NSRecursiveLock *_lock;
         xmlEntityPtr    _xmlEntity;
+        NSString        *_name;
         NSString        *_content;
         NSString        *_publicID;
         NSString        *_systemID;
         xmlEntityType   _type;
-        xmlChar         *_xName;
-        xmlChar         *_xPublicID;
-        xmlChar         *_xSystemID;
+    }
+
+    -(instancetype)init {
+        self = [super init];
+        @throw [NSException exceptionWithName:NSIllegalSelectorException reason:@"Do not call this initializer."];
     }
 
     -(instancetype)initWithName:(NSString *)name content:(NSString *)content publicID:(NSString *)publicID systemID:(NSString *)systemID type:(xmlEntityType)type {
         self = [super init];
 
         if(self) {
-            _lock  = [NSRecursiveLock new];
-            _name  = [name copy];
-            _xName = ((xmlChar *)strdup(self.name.UTF8String));
+            _lock = [NSRecursiveLock new];
+
+            self.name     = name;
             self.content  = content;
             self.publicID = publicID;
             self.systemID = systemID;
@@ -66,19 +80,11 @@
         return (((((31u + self.name.hash) * 31u + self.content.hash) * 31u + self.publicID.hash) * 31u + self.systemID.hash) * 31u + (NSUInteger)self.type);
     }
 
-    +(instancetype)entityWithName:(NSString *)name content:(NSString *)content publicID:(NSString *)publicID systemID:(NSString *)systemID type:(xmlEntityType)type {
-        return [[self alloc] initWithName:name content:content publicID:publicID systemID:systemID type:type];
-    }
-
-    +(instancetype)entityWithName:(NSString *)name content:(NSString *)content {
-        return [[self alloc] initWithName:name content:content publicID:nil systemID:nil type:XML_INTERNAL_GENERAL_ENTITY];
-    }
-
-    -(id)copyWithZone:(nullable NSZone *)zone {
+    -(instancetype)copyWithZone:(nullable NSZone *)zone {
         PGXMLParsedEntity *copy = [((PGXMLParsedEntity *)[[self class] allocWithZone:zone]) init];
 
         if(copy != nil) {
-            copy->_name   = [_name copy];
+            copy.name     = self.name;
             copy.content  = self.content;
             copy.publicID = self.publicID;
             copy.systemID = self.systemID;
@@ -89,98 +95,139 @@
     }
 
     -(xmlEntityPtr)xmlEntity {
-        if(_xmlEntity == nil) {
-            [_lock lock];
-            @try {
-                if(_xmlEntity == nil) {
-                    _xPublicID = (self.publicID ? (xmlChar *)strdup(self.publicID.UTF8String) : NULL);
-                    _xSystemID = (self.systemID ? (xmlChar *)strdup(self.systemID.UTF8String) : NULL);
+        [self lock];
+        @try {
+            if((_xmlEntity == nil) && self.name.length) {
+                _xmlEntity = PGCalloc(1, sizeof(xmlEntity));
 
-                    xmlEntityPtr ent = PGCalloc(1, sizeof(xmlEntity));
-                    ent->name       = _xName;
-                    ent->ExternalID = _xPublicID;
-                    ent->SystemID   = _xSystemID;
-                    ent->type       = XML_ENTITY_DECL;
-                    ent->etype      = (xmlEntityType)self.type; //XML_INTERNAL_GENERAL_ENTITY;
-                    ent->content    = (xmlChar *)strdup(self.content.UTF8String);
-                    ent->length     = xmlStrlen(ent->content);
-                    ent->orig       = xmlStrdup(ent->content);
-                    _xmlEntity = ent;
-                }
+                _xmlEntity->type    = XML_ENTITY_DECL;
+                _xmlEntity->etype   = self.type;
+                _xmlEntity->name    = xmlStrdup((xmlChar *)self.name.UTF8String);
+                _xmlEntity->content = xmlStrdup((xmlChar *)(self.content ?: @"").UTF8String);
+                _xmlEntity->orig    = xmlStrdup(_xmlEntity->content);
+                _xmlEntity->length  = xmlStrlen(_xmlEntity->content);
+
+                if(self.publicID) _xmlEntity->ExternalID = xmlStrdup((xmlChar *)self.publicID.UTF8String);
+                if(self.systemID) _xmlEntity->SystemID   = xmlStrdup((xmlChar *)self.systemID.UTF8String);
             }
-            @finally { [_lock unlock]; }
         }
-
+        @finally { [self unlock]; }
         return _xmlEntity;
     }
 
-    -(void)freeEntity {
-        [_lock lock];
-        xmlEntityPtr ent = _xmlEntity;
-        _xmlEntity = NULL;
-        [_lock unlock];
-        [self _freeEntity:ent];
-    }
-
-    -(void)_freeEntity:(xmlEntity *)ent {
+    -(void)freeEntity:(xmlEntity *)ent {
         if(ent) {
-            free(ent->content);
-            free(ent->orig);
+            if(ent->name) free((void *)ent->name);
+            if(ent->content) free(ent->content);
+            if(ent->orig) free(ent->orig);
+            if(ent->ExternalID) free((void *)ent->ExternalID);
+            if(ent->SystemID) free((void *)ent->SystemID);
             free(ent);
-
-            if(_xPublicID) free(_xPublicID);
-            if(_xSystemID) free(_xSystemID);
         }
     }
 
     -(void)dealloc {
-        [self _freeEntity:_xmlEntity];
-        if(_xName) free(_xName);
+        [self freeEntity:_xmlEntity];
+    }
+
+    -(void)lock {
+        [_lock lock];
+    }
+
+    -(void)unlock {
+        [_lock unlock];
+    }
+
+    -(NSString *)name {
+        [self lock];
+        NSString *v = _name;
+        [self unlock];
+        return v;
     }
 
     -(NSString *)content {
-        return _content;
+        [self lock];
+        NSString *v = _content;
+        [self unlock];
+        return v;
     }
 
     -(NSString *)publicID {
-        return _publicID;
+        [self lock];
+        NSString *v = _publicID;
+        [self unlock];
+        return v;
     }
 
     -(NSString *)systemID {
-        return _systemID;
+        [self lock];
+        NSString *v = _systemID;
+        [self unlock];
+        return v;
     }
 
     -(xmlEntityType)type {
-        return _type;
+        [self lock];
+        xmlEntityType v = _type;
+        [self unlock];
+        return v;
+    }
+
+    -(void)setName:(NSString *)name {
+        [self lock];
+        if(!PGStringsEqual(_name, name)) {
+            _name = [name copy];
+            if(_xmlEntity) [self freeEntity:_xmlEntity];
+        }
+        [self unlock];
     }
 
     -(void)setContent:(NSString *)content {
+        [self lock];
         if(!PGStringsEqual(content, _content)) {
             _content = [content copy];
-            [self freeEntity];
+            if(_xmlEntity) [self freeEntity:_xmlEntity];
         }
+        [self unlock];
     }
 
     -(void)setPublicID:(NSString *)publicID {
+        [self lock];
         if(!PGStringsEqual(publicID, _publicID)) {
             _publicID = [publicID copy];
-            [self freeEntity];
+            if(_xmlEntity) [self freeEntity:_xmlEntity];
         }
+        [self unlock];
     }
 
     -(void)setSystemID:(NSString *)systemID {
+        [self lock];
         if(!PGStringsEqual(systemID, _systemID)) {
             _systemID = [systemID copy];
-            [self freeEntity];
+            if(_xmlEntity) [self freeEntity:_xmlEntity];
         }
+        [self unlock];
     }
 
     -(void)setType:(xmlEntityType)type {
+        [self lock];
         if(type != _type) {
             _type = type;
-            [self freeEntity];
+            if(_xmlEntity) [self freeEntity:_xmlEntity];
         }
+        [self unlock];
     }
 
+    +(instancetype)entityWithName:(NSString *)name content:(NSString *)content publicID:(NSString *)publicID systemID:(NSString *)systemID type:(xmlEntityType)type {
+        return [[self alloc] initWithName:name content:content publicID:publicID systemID:systemID type:type];
+    }
+
+    +(instancetype)entityWithName:(NSString *)name content:(NSString *)content {
+        return [[self alloc] initWithName:name content:content publicID:nil systemID:nil type:XML_INTERNAL_GENERAL_ENTITY];
+    }
+
+    +(instancetype)parameterEntityWithName:(NSString *)name content:(NSString *)content {
+        return [[self alloc] initWithName:name content:content publicID:nil systemID:nil type:XML_INTERNAL_PARAMETER_ENTITY];
+    }
 
 @end

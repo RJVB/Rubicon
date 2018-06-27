@@ -25,7 +25,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGXMLParsedEntity : NSObject<NSCopying>
+@interface PGXMLParsedEntity : NSObject<NSCopying, NSLocking>
 
     @property(readonly, copy) NSString      *name;
     @property(copy) /*     */ NSString      *content;
@@ -36,13 +36,29 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(instancetype)initWithName:(NSString *)name content:(NSString *)content publicID:(nullable NSString *)publicID systemID:(nullable NSString *)systemID type:(xmlEntityType)type;
 
+    -(instancetype)copyWithZone:(nullable NSZone *)zone;
+
+    -(BOOL)isEqual:(id)other;
+
+    -(BOOL)isEqualToEntity:(PGXMLParsedEntity *)other;
+
+    -(NSUInteger)hash;
+
+    -(void)lock;
+
+    -(void)unlock;
+
+    -(void)dealloc;
+
+    +(instancetype)entityWithName:(NSString *)name content:(NSString *)content;
+
+    +(instancetype)parameterEntityWithName:(NSString *)name content:(NSString *)content;
+
     +(instancetype)entityWithName:(NSString *)name
                           content:(NSString *)content
                          publicID:(nullable NSString *)publicID
                          systemID:(nullable NSString *)systemID
                              type:(xmlEntityType)type;
-
-    +(instancetype)entityWithName:(NSString *)name content:(NSString *)content;
 
 @end
 

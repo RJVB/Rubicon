@@ -1,9 +1,9 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGXMLParser.h
+ *    FILENAME: PGCString.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 5/26/18
+ *        DATE: 6/27/18
  *  VISIBILITY: Private
  *
  * Copyright © 2018 Project Galen. All rights reserved.
@@ -16,37 +16,29 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#ifndef RUBICON_PGXMLPARSER_H
-#define RUBICON_PGXMLPARSER_H
+#ifndef RUBICON_PGCSTRING_H
+#define RUBICON_PGCSTRING_H
 
-#import <Rubicon/PGTools.h>
-#import <Rubicon/PGXMLParserDelegate.h>
+#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGXMLParser : NSObject
+@interface PGCString : NSObject
 
-    @property(assign, nullable) /*   */ id<PGXMLParserDelegate> delegate;
-    @property(readonly) /*           */ NSUInteger              lineNumber;
-    @property(readonly) /*           */ NSUInteger              columnNumber;
-    @property(readonly) /*           */ BOOL                    isStandalone;
-    @property(readonly, nullable) /* */ NSError                 *parserError;
-    @property(readonly, copy, nullable) NSString                *publicId;
-    @property(readonly, copy, nullable) NSString                *systemId;
-    @property(readonly, copy, nullable) NSString                *version;
-    @property(readonly, copy, nullable) NSString                *encoding;
-    @property(readonly, nullable) /* */ NSError                 *inputStreamError;
+    @property(readonly) const char *cString;
+    @property(readonly) NSUInteger length;
+    @property(readonly) NSString   *nsString;
 
-    -(instancetype)initWithInputStream:(NSInputStream *)stream NS_DESIGNATED_INITIALIZER;
+    -(instancetype)initWithNSString:(nullable NSString *)string;
 
-    -(instancetype)initWithFilePath:(NSString *)filepath;
+    -(instancetype)initWithCString:(nullable const char *)cString NS_DESIGNATED_INITIALIZER;
 
-    -(instancetype)initWithURL:(NSURL *)url;
+    +(instancetype)stringWithNSString:(nullable NSString *)string;
 
-    -(BOOL)parse;
+    +(instancetype)stringWithCString:(nullable const char *)cString;
 
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif //RUBICON_PGXMLPARSER_H
+#endif //RUBICON_PGCSTRING_H

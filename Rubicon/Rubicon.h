@@ -52,6 +52,8 @@
 #import <Rubicon/PGXMLParserDelegate.h>
 #import <Rubicon/PGLogger.h>
 #import <Rubicon/PGRedBlackNode.h>
+#import <Rubicon/PGSimpleBuffer.h>
+#import <Rubicon/PGCString.h>
 
 FOUNDATION_EXPORT double              RubiconVersionNumber;
 FOUNDATION_EXPORT const unsigned char RubiconVersionString[];

@@ -1,9 +1,9 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGXMLParser.h
+ *    FILENAME: PGNSXMLParserDelegateTest.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 5/26/18
+ *        DATE: 6/21/18
  *  VISIBILITY: Private
  *
  * Copyright © 2018 Project Galen. All rights reserved.
@@ -16,37 +16,17 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#ifndef RUBICON_PGXMLPARSER_H
-#define RUBICON_PGXMLPARSER_H
+#ifndef RUBICON_PGNSXMLPARSERDELEGATETEST_H
+#define RUBICON_PGNSXMLPARSERDELEGATETEST_H
 
-#import <Rubicon/PGTools.h>
-#import <Rubicon/PGXMLParserDelegate.h>
+#import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGXMLParser : NSObject
-
-    @property(assign, nullable) /*   */ id<PGXMLParserDelegate> delegate;
-    @property(readonly) /*           */ NSUInteger              lineNumber;
-    @property(readonly) /*           */ NSUInteger              columnNumber;
-    @property(readonly) /*           */ BOOL                    isStandalone;
-    @property(readonly, nullable) /* */ NSError                 *parserError;
-    @property(readonly, copy, nullable) NSString                *publicId;
-    @property(readonly, copy, nullable) NSString                *systemId;
-    @property(readonly, copy, nullable) NSString                *version;
-    @property(readonly, copy, nullable) NSString                *encoding;
-    @property(readonly, nullable) /* */ NSError                 *inputStreamError;
-
-    -(instancetype)initWithInputStream:(NSInputStream *)stream NS_DESIGNATED_INITIALIZER;
-
-    -(instancetype)initWithFilePath:(NSString *)filepath;
-
-    -(instancetype)initWithURL:(NSURL *)url;
-
-    -(BOOL)parse;
+@interface PGNSXMLParserDelegateTest : NSObject<NSXMLParserDelegate>
 
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif //RUBICON_PGXMLPARSER_H
+#endif //RUBICON_PGNSXMLPARSERDELEGATETEST_H

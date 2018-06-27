@@ -62,5 +62,7 @@ NS_INLINE NSString *_Nullable PGLocalizedString(NSString *_Nonnull key) {
 #import "PGXMLParserDelegate.h"
 #import "PGLogger.h"
 #import "PGRedBlackNode.h"
+#import "PGSimpleBuffer.h"
+#import "PGCString.h"
 
 #endif //RUBICON_PGINTERNAL_H

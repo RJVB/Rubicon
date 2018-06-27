@@ -54,6 +54,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(void)clear;
 
+    -(void)removeAllObjects;
+
     -(NSArray<T> *)popAll;
 
     -(NSArray<T> *)peekAll;

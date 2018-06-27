@@ -35,10 +35,11 @@ static SEL PGXMLFoundIgWhitespSel;
 static SEL PGXMLFoundProcInstSel;
 static SEL PGXMLFoundCommentSel;
 static SEL PGXMLFoundCDATASel;
-static SEL PGXMLResolveExtEntSel;
 static SEL PGXMLParseErrSel;
 static SEL PGXMLValidationErrSel;
+static SEL PGXMLReslvExtEntSel;
 static SEL PGXMLReslvIntEntSel;
+static SEL PGXMLReslvIntPEntSel;
 
 @implementation PGXMLParser(PGXMLParserExtensions)
 
@@ -60,12 +61,13 @@ static SEL PGXMLReslvIntEntSel;
         PGXMLFoundProcInstSel   = @selector(parser:foundProcessingInstructionWithTarget:data:);
         PGXMLFoundCommentSel    = @selector(parser:foundComment:);
         PGXMLFoundCDATASel      = @selector(parser:foundCDATA:);
-        PGXMLResolveExtEntSel   = @selector(parser:resolveExternalEntityName:systemID:);
         PGXMLParseErrSel        = @selector(parser:parseErrorOccurred:);
         PGXMLValidationErrSel   = @selector(parser:validationErrorOccurred:);
         PGXMLDidStartDocSel     = @selector(parserDidStartDocument:);
         PGXMLDidEndDocSel       = @selector(parserDidEndDocument:);
+        PGXMLReslvExtEntSel     = @selector(parser:resolveExternalEntityName:systemID:);
         PGXMLReslvIntEntSel     = @selector(parser:resolveInternalEntityForName:);
+        PGXMLReslvIntPEntSel    = @selector(parser:resolveInternalParameterEntityForName:);
     }
 
     -(void)updateDelegateFunctions:(NSObject<PGXMLParserDelegate> *)d {
@@ -87,21 +89,19 @@ static SEL PGXMLReslvIntEntSel;
         self.foundProcInstFunc   =   (PGXMLFoundProcInstFunc_t)([d respondsToSelector:PGXMLFoundProcInstSel]   ? [d methodForSelector:PGXMLFoundProcInstSel]   : nil);
         self.foundCommentFunc    =    (PGXMLFoundCommentFunc_t)([d respondsToSelector:PGXMLFoundCommentSel]    ? [d methodForSelector:PGXMLFoundCommentSel]    : nil);
         self.foundCDATAFunc      =      (PGXMLFoundCDATAFunc_t)([d respondsToSelector:PGXMLFoundCDATASel]      ? [d methodForSelector:PGXMLFoundCDATASel]      : nil);
-        self.resolveExtEntFunc   =   (PGXMLResolveExtEntFunc_t)([d respondsToSelector:PGXMLResolveExtEntSel]   ? [d methodForSelector:PGXMLResolveExtEntSel]   : nil);
         self.parseErrFunc        =        (PGXMLParseErrFunc_t)([d respondsToSelector:PGXMLParseErrSel]        ? [d methodForSelector:PGXMLParseErrSel]        : nil);
         self.validationErrFunc   =   (PGXMLValidationErrFunc_t)([d respondsToSelector:PGXMLValidationErrSel]   ? [d methodForSelector:PGXMLValidationErrSel]   : nil);
+        self.reslvExtEntFunc     =   (PGXMLResolveExtEntFunc_t)([d respondsToSelector:PGXMLReslvExtEntSel]     ? [d methodForSelector:PGXMLReslvExtEntSel]     : nil);
         self.reslvIntEntFunc     =     (PGXMLReslvIntEntFunc_t)([d respondsToSelector:PGXMLReslvIntEntSel]     ? [d methodForSelector:PGXMLReslvIntEntSel]     : nil);
+        self.reslvIntPEntFunc    =     (PGXMLReslvIntEntFunc_t)([d respondsToSelector:PGXMLReslvIntPEntSel]    ? [d methodForSelector:PGXMLReslvIntPEntSel]    : nil);
         // @f:1
     }
 
     -(void)_foundNotationDeclarationWithName:(NSString *)name publicID:(NSString *)publicID systemID:(NSString *)systemID hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.foundNoteDeclFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.foundNoteDeclFunc)(self.delegate, PGXMLFoundNoteDeclSel, self, name, publicID, systemID);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate>  d = self.delegate;
+        PGXMLFoundNoteDeclFunc_t f = self.foundNoteDeclFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLFoundNoteDeclSel, self, name, publicID, systemID);
     }
 
     -(void)_foundUnparsedEntityDeclarationWithName:(NSString *)name
@@ -109,13 +109,10 @@ static SEL PGXMLReslvIntEntSel;
                                           systemID:(NSString *)systemID
                                       notationName:(NSString *)notationName
                                            hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.foundUnpEntDeclFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.foundUnpEntDeclFunc)(self.delegate, PGXMLFoundUnpEntDeclSel, self, name, publicID, systemID, notationName);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate>    d = self.delegate;
+        PGXMLFoundUnpEntDeclFunc_t f = self.foundUnpEntDeclFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLFoundUnpEntDeclSel, self, name, publicID, systemID, notationName);
     }
 
     -(void)_foundAttributeDeclarationWithName:(NSString *)attributeName
@@ -123,63 +120,45 @@ static SEL PGXMLReslvIntEntSel;
                                          type:(NSString *)type
                                  defaultValue:(NSString *)defaultValue
                                       hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.foundAttrDeclFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.foundAttrDeclFunc)(self.delegate, PGXMLFoundAttrDeclSel, self, attributeName, elementName, type, defaultValue);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate>  d = self.delegate;
+        PGXMLFoundAttrDeclFunc_t f = self.foundAttrDeclFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLFoundAttrDeclSel, self, attributeName, elementName, type, defaultValue);
     }
 
     -(void)_foundElementDeclarationWithName:(NSString *)elementName model:(NSString *)model hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.foundElemDeclFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.foundElemDeclFunc)(self.delegate, PGXMLFoundElemDeclSel, self, elementName, model);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate>  d = self.delegate;
+        PGXMLFoundElemDeclFunc_t f = self.foundElemDeclFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLFoundElemDeclSel, self, elementName, model);
     }
 
     -(void)_foundInternalEntityDeclarationWithName:(NSString *)name value:(NSString *)value hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.foundIntEntDeclFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.foundIntEntDeclFunc)(self.delegate, PGXMLFoundIntEntDeclSel, self, name, value);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate>    d = self.delegate;
+        PGXMLFoundIntEntDeclFunc_t f = self.foundIntEntDeclFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLFoundIntEntDeclSel, self, name, value);
     }
 
     -(void)_foundExternalEntityDeclarationWithName:(NSString *)name publicID:(NSString *)publicID systemID:(NSString *)systemID hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.foundExtEntDeclFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.foundExtEntDeclFunc)(self.delegate, PGXMLFoundExtEntDeclSel, self, name, publicID, systemID);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate>    d = self.delegate;
+        PGXMLFoundExtEntDeclFunc_t f = self.foundExtEntDeclFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLFoundExtEntDeclSel, self, name, publicID, systemID);
     }
 
     -(void)_didStartDocument:(BOOL *)hasImpl {
-        if(self.delegate && self.didStartDocFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.didStartDocFunc)(self.delegate, PGXMLDidStartDocSel, self);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate> d = self.delegate;
+        PGXMLDidStartDocFunc_t  f = self.didStartDocFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLDidStartDocSel, self);
     }
 
     -(void)_didEndDocument:(BOOL *)hasImpl {
-        if(self.delegate && self.didEndDocFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.didEndDocFunc)(self.delegate, PGXMLDidEndDocSel, self);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate> d = self.delegate;
+        PGXMLDidEndDocFunc_t    f = self.didEndDocFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLDidEndDocSel, self);
     }
 
     -(void)_didStartElement:(NSString *)elementName
@@ -187,135 +166,101 @@ static SEL PGXMLReslvIntEntSel;
               qualifiedName:(NSString *)qName
                  attributes:(NSArray<PGXMLParsedAttribute *> *)attributeDict
                     hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.didStartElemFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.didStartElemFunc)(self.delegate, PGXMLDidStartElemSel, self, elementName, namespaceURI, qName, attributeDict);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate> d = self.delegate;
+        PGXMLDidStartElemFunc_t f = self.didStartElemFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLDidStartElemSel, self, elementName, namespaceURI, qName, attributeDict);
     }
 
     -(void)_didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.didEndElemFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.didEndElemFunc)(self.delegate, PGXMLDidEndElemSel, self, elementName, namespaceURI, qName);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate> d = self.delegate;
+        PGXMLDidEndElemFunc_t   f = self.didEndElemFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLDidEndElemSel, self, elementName, namespaceURI, qName);
     }
 
     -(void)_didStartMappingPrefix:(NSString *)prefix toURI:(NSString *)namespaceURI hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.didStartMapPfxFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.didStartMapPfxFunc)(self.delegate, PGXMLDidStartMapPfxSel, self, prefix, namespaceURI);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate>   d = self.delegate;
+        PGXMLDidStartMapPfxFunc_t f = self.didStartMapPfxFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLDidStartMapPfxSel, self, prefix, namespaceURI);
     }
 
     -(void)_didEndMappingPrefix:(NSString *)prefix hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.didEndMapPfxFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.didEndMapPfxFunc)(self.delegate, PGXMLDidEndMapPfxSel, self, prefix);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate> d = self.delegate;
+        PGXMLDidEndMapPfxFunc_t f = self.didEndMapPfxFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLDidEndMapPfxSel, self, prefix);
     }
 
     -(void)_foundCharacters:(NSString *)string hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.foundCharsFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.foundCharsFunc)(self.delegate, PGXMLFoundCharsSel, self, string);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate> d = self.delegate;
+        PGXMLFoundCharsFunc_t   f = self.foundCharsFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLFoundCharsSel, self, string);
     }
 
     -(void)_foundIgnorableWhitespace:(NSString *)whitespaceString hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.foundIgnWhitespFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.foundIgnWhitespFunc)(self.delegate, PGXMLFoundIgWhitespSel, self, whitespaceString);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate>   d = self.delegate;
+        PGXMLFoundIgWhitespFunc_t f = self.foundIgnWhitespFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLFoundIgWhitespSel, self, whitespaceString);
     }
 
     -(void)_foundProcessingInstructionWithTarget:(NSString *)target data:(NSString *)data hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.foundProcInstFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.foundProcInstFunc)(self.delegate, PGXMLFoundProcInstSel, self, target, data);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate>  d = self.delegate;
+        PGXMLFoundProcInstFunc_t f = self.foundProcInstFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLFoundProcInstSel, self, target, data);
     }
 
     -(void)_foundComment:(NSString *)comment hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.foundCommentFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.foundCommentFunc)(self.delegate, PGXMLFoundCommentSel, self, comment);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate> d = self.delegate;
+        PGXMLFoundCommentFunc_t f = self.foundCommentFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLFoundCommentSel, self, comment);
     }
 
     -(void)_foundCDATA:(NSData *)CDATABlock hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.foundCDATAFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.foundCDATAFunc)(self.delegate, PGXMLFoundCDATASel, self, CDATABlock);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate> d = self.delegate;
+        PGXMLFoundCDATAFunc_t   f = self.foundCDATAFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLFoundCDATASel, self, CDATABlock);
     }
 
     -(void)_parseErrorOccurred:(NSError *)parseError hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.parseErrFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.parseErrFunc)(self.delegate, PGXMLParseErrSel, self, parseError);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate> d = self.delegate;
+        PGXMLParseErrFunc_t     f = self.parseErrFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLParseErrSel, self, parseError);
     }
 
     -(void)_validationErrorOccurred:(NSError *)validationError hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.validationErrFunc) {
-            if(hasImpl) *hasImpl = YES;
-            (*self.validationErrFunc)(self.delegate, PGXMLValidationErrSel, self, validationError);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-        }
+        id<PGXMLParserDelegate>  d = self.delegate;
+        PGXMLValidationErrFunc_t f = self.validationErrFunc;
+
+        if(setImplFlag(hasImpl, (d && f))) (*f)(d, PGXMLValidationErrSel, self, validationError);
     }
 
     -(NSData *)_resolveExternalEntityForName:(NSString *)name systemID:(NSString *)systemID hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.resolveExtEntFunc) {
-            if(hasImpl) *hasImpl = YES;
-            return (*self.resolveExtEntFunc)(self.delegate, PGXMLResolveExtEntSel, self, name, systemID);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-            return nil;
-        }
+        id<PGXMLParserDelegate>  d = self.delegate;
+        PGXMLResolveExtEntFunc_t f = self.reslvExtEntFunc;
+
+        return (setImplFlag(hasImpl, (d && f)) ? (*f)(d, PGXMLReslvExtEntSel, self, name, systemID) : nil);
     }
 
     -(NSString *)_resolveInternalEntityForName:(NSString *)name hasImpl:(BOOL *)hasImpl {
-        if(self.delegate && self.reslvIntEntFunc) {
-            if(hasImpl) *hasImpl = YES;
-            return (*self.reslvIntEntFunc)(self.delegate, PGXMLReslvIntEntSel, self, name);
-        }
-        else {
-            if(hasImpl) *hasImpl = NO;
-            return nil;
-        }
+        id<PGXMLParserDelegate> d = self.delegate;
+        PGXMLReslvIntEntFunc_t  f = self.reslvIntEntFunc;
+
+        return (setImplFlag(hasImpl, (d && f)) ? (*f)(d, PGXMLReslvIntEntSel, self, name) : nil);
+    }
+
+    -(NSString *)_resolveInternalParameterEntityForName:(NSString *)name hasImpl:(BOOL *)hasImpl {
+        id<PGXMLParserDelegate> d = self.delegate;
+        PGXMLReslvIntEntFunc_t  f = self.reslvIntPEntFunc;
+
+        return (setImplFlag(hasImpl, (d && f)) ? (*f)(d, PGXMLReslvIntPEntSel, self, name) : nil);
     }
 
 @end

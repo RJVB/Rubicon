@@ -1,9 +1,9 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGXMLParser.h
+ *    FILENAME: PGXMLParserInput.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 5/26/18
+ *        DATE: 6/21/18
  *  VISIBILITY: Private
  *
  * Copyright © 2018 Project Galen. All rights reserved.
@@ -16,37 +16,29 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#ifndef RUBICON_PGXMLPARSER_H
-#define RUBICON_PGXMLPARSER_H
+#ifndef RUBICON_PGXMLPARSERINPUT_H
+#define RUBICON_PGXMLPARSERINPUT_H
 
-#import <Rubicon/PGTools.h>
-#import <Rubicon/PGXMLParserDelegate.h>
+#import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGXMLParser : NSObject
+/**
+ * This class creates a read-only buffer of data from which multiple xmlParserInputPtr objects can be returned.
+ * It is up to the receiver of the xmlParserInputPtr to free that object when done.
+ */
+@interface PGXMLParserInput : NSObject
 
-    @property(assign, nullable) /*   */ id<PGXMLParserDelegate> delegate;
-    @property(readonly) /*           */ NSUInteger              lineNumber;
-    @property(readonly) /*           */ NSUInteger              columnNumber;
-    @property(readonly) /*           */ BOOL                    isStandalone;
-    @property(readonly, nullable) /* */ NSError                 *parserError;
-    @property(readonly, copy, nullable) NSString                *publicId;
-    @property(readonly, copy, nullable) NSString                *systemId;
-    @property(readonly, copy, nullable) NSString                *version;
-    @property(readonly, copy, nullable) NSString                *encoding;
-    @property(readonly, nullable) /* */ NSError                 *inputStreamError;
+    @property(readonly) NSUInteger length;
 
-    -(instancetype)initWithInputStream:(NSInputStream *)stream NS_DESIGNATED_INITIALIZER;
+    -(instancetype)initWithData:(NSData *)data;
 
-    -(instancetype)initWithFilePath:(NSString *)filepath;
+    +(instancetype)inputWithData:(NSData *)data;
 
-    -(instancetype)initWithURL:(NSURL *)url;
-
-    -(BOOL)parse;
+    -(xmlParserInputPtr)getNewParserInputForContext:(xmlParserCtxtPtr)ctx;
 
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif //RUBICON_PGXMLPARSER_H
+#endif //RUBICON_PGXMLPARSERINPUT_H

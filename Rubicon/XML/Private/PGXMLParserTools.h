@@ -28,6 +28,24 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#define CASTASPARSER(p)  (PG_BRDG_CAST(PGXMLParser)(p))
+#define PG_DEF_BUF_SZ ((size_t)(128))
+
+FOUNDATION_EXPORT NSString *const PGXMLMsg01;
+FOUNDATION_EXPORT NSString *const PGXMLKeyFormat;
+FOUNDATION_EXPORT NSString *const PGXMLInsideCallbackMsg;
+
+typedef PGXMLParser *__unsafe_unretained BridgedParserPtr;
+
+NS_INLINE BOOL setImplFlag(BOOL *pbool, BOOL flag) {
+    if(pbool) (*pbool) = flag;
+    return flag;
+}
+
+NS_INLINE NSString *createQName(NSString *localname, NSString *_Nullable prefix) {
+    return (prefix.length ? PGFormat(@"%@:%@", prefix, localname) : localname);
+}
+
 /**
  * In theory the libxml2 strings are simply UTF-8 encoded, null terminated C strings so the following
  * should be all that is needed to convert from xmlChar to NSString.
@@ -35,7 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param xmlstr the C string based on xmlChar
  * @return an instance of NSString.
  */
-NSString *_Nullable stringForXMLString(const xmlChar *_Nullable xmlstr);
+FOUNDATION_EXPORT NSString *_Nullable stringForXMLString(const xmlChar *_Nullable xmlstr);
 
 /**
  * In theory the libxml2 strings are simply UTF-8 encoded, null terminated C strings so the following
@@ -45,17 +63,15 @@ NSString *_Nullable stringForXMLString(const xmlChar *_Nullable xmlstr);
  * @param len the length of the C string.
  * @return an instance of NSString.
  */
-NSString *_Nullable stringForXMLStringLen(const xmlChar *_Nullable xmlstr, size_t len);
+FOUNDATION_EXPORT NSString *_Nullable stringForXMLStringLen(const xmlChar *_Nullable xmlstr, size_t len);
 
-NSError *createError(NSInteger code, NSString *description);
+FOUNDATION_EXPORT NSError *createError(NSInteger code, NSString *description);
 
-NS_INLINE NSString *createQName(NSString *localname, NSString *prefix) {
-    return (prefix.length ? PGFormat(@"%@:%@", prefix, localname) : localname);
-}
+FOUNDATION_EXPORT void entityHashScanner(void *payload, void *data, xmlChar *name);
 
 FOUNDATION_EXPORT BOOL createPushContext(PGXMLParser *parser, const void *buffer, NSInteger bytesRead, const char *filename);
 
-FOUNDATION_EXPORT BOOL parseChunk(PGXMLParser *parser, const void *buffer, NSInteger bcount, BOOL terminate, BOOL success);
+FOUNDATION_EXPORT BOOL parseChunk(xmlParserCtxtPtr ctx, const void *buffer, NSInteger bcount, BOOL terminate, BOOL success, NSError **error);
 
 FOUNDATION_EXPORT xmlParserInputPtr resolveEntityCallBack(void *ctx, const xmlChar *publicId, const xmlChar *systemId);
 
