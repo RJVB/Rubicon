@@ -127,34 +127,47 @@
     }
 
     -(void)removeAttributeWithName:(NSString *)name {
+        PGDOMAttr *attr = [self.attributes removeItemWithName:name];
+        attr.ownerElement = nil;
     }
 
     -(void)removeAttributeWithLocalName:(NSString *)localName namespaceURI:(NSString *)namespaceURI {
+        PGDOMAttr *attr = [self.attributes removeItemWithLocalName:localName namespaceURI:namespaceURI];
+        attr.ownerElement = nil;
     }
 
     -(nullable PGDOMAttr *)removeAttribute:(PGDOMAttr *)attr {
-        return nil;
+        PGDOMAttr *tattr = (attr.ownerElement == self) ? [self.attributes removeItemWithName:attr.name] : nil;
+        tattr.ownerElement = nil;
+        return tattr;
     }
 
     -(nullable PGDOMAttr *)removeAttributeNS:(PGDOMAttr *)attr {
-        return nil;
+        PGDOMAttr *tattr = (attr.ownerElement == self) ? [self.attributes removeItemWithLocalName:attr.localName namespaceURI:attr.namespaceURI] : nil;
+        tattr.ownerElement = nil;
+        return tattr;
     }
 
     -(void)setID:(BOOL)isID attributeWithName:(NSString *)name {
+        PGDOMAttr *attr = [self.attributes itemWithName:name];
+        attr.isID = isID;
     }
 
     -(void)setID:(BOOL)isID attributeWithLocalName:(NSString *)localName namespaceURI:(NSString *)namespaceURI {
+        PGDOMAttr *attr = [self.attributes itemWithLocalName:localName namespaceURI:namespaceURI];
+        attr.isID = isID;
     }
 
     -(void)setID:(BOOL)isID attribute:(PGDOMAttr *)attr {
+        if(attr.ownerElement == self) attr.isID = isID;
     }
 
     -(PGDOMNodeList<PGDOMElement *> *)getElementsByTagName:(NSString *)tagName {
-        return nil;
+        return [[PGDOMElementNodeList alloc] initWithOwnerNode:self tagName:tagName];
     }
 
     -(PGDOMNodeList<PGDOMElement *> *)getElementsByLocalName:(NSString *)localName namespaceURI:(NSString *)namespaceURI {
-        return nil;
+        return [[PGDOMElementNodeList alloc] initWithOwnerNode:self localName:localName namespaceURI:namespaceURI];
     }
 
 @end

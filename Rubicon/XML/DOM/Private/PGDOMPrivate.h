@@ -31,6 +31,7 @@
 #import "PGDOMNodeContainer.h"
 #import "PGDOMAttributeMap.h"
 #import "PGDOMNamedNodeMapImpl.h"
+#import "PGDOMElementNodeList.h"
 
 typedef PGMutableBinaryTreeDictionary<NSString *, PGDOMNode *>   *PGDOMNodeTree;
 typedef PGMutableBinaryTreeDictionary<NSString *, PGDOMNodeTree> *PGDOMNodeNodeTree;
@@ -165,6 +166,24 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface PGDOMNodeList<T:PGDOMNode *>()
+
+@end
+
+@interface PGDOMElementNodeList()
+
+    @property(nonatomic, readonly, nullable) NSString *tagName;
+    @property(nonatomic, readonly, nullable) NSString *localName;
+    @property(nonatomic, readonly, nullable) NSString *namespaceURI;
+
+    -(instancetype)initWithOwnerNode:(PGDOMElement *)ownerNode tagName:(NSString *)tagName;
+
+    -(instancetype)initWithOwnerNode:(PGDOMElement *)ownerNode localName:(NSString *)localName namespaceURI:(NSString *)namespaceURI;
+
+    -(void)nodeListChangeListener:(NSNotification *)notification;
+
+    -(void)load:(NSMutableArray<PGDOMNode *> *)list from:(PGDOMElement *)parent byTagName:(NSString *)tagName;
+
+    -(void)load:(NSMutableArray<PGDOMNode *> *)list from:(PGDOMElement *)parent byLocalName:(NSString *)localName namespaceURI:(NSString *)namespaceURI;
 
 @end
 
