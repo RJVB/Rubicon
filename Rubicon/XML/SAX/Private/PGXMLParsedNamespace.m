@@ -1,9 +1,9 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGXMLParserInput.m
+ *    FILENAME: PGXMLParsedNamespace.m
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 6/21/18
+ *        DATE: 5/30/18
  *
  * Copyright © 2018 Project Galen. All rights reserved.
  *
@@ -15,56 +15,44 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#import <libxml/tree.h>
-#import "PGXMLParserInput.h"
-#import "PGTools.h"
+#import "PGXMLParsedNamespace.h"
 
-@implementation PGXMLParserInput {
-        char *_buffer;
+@implementation PGXMLParsedNamespace {
     }
 
-    @synthesize length = _length;
-
-    -(instancetype)initWithData:(NSData *)data {
+    -(instancetype)initWithPrefix:(NSString *)prefix uri:(NSString *)uri {
         self = [super init];
 
         if(self) {
-            _length = data.length;
-            _buffer = PGMalloc(MAX(_length, 1));
-            if(_length) [data getBytes:_buffer length:_length];
+            _prefix = [prefix copy];
+            _uri    = [uri copy];
         }
 
         return self;
     }
 
-    -(instancetype)initWithBuffer:(void *)buffer length:(NSUInteger)length {
-        self = [super init];
+    +(instancetype)namespaceWithPrefix:(NSString *)prefix uri:(NSString *)uri {
+        return [[self alloc] initWithPrefix:prefix uri:uri];
+    }
 
-        if(self) {
-            _length = (buffer ? length : 0);
-            _buffer = PGMalloc(MAX(_length, 1));
-            if(_length) PGMemCopy(_buffer, buffer, _length);
-        }
+    -(BOOL)_isEqualToNamespace:(PGXMLParsedNamespace *)aNamespace {
+        return (PGStringsEqual(_prefix, aNamespace.prefix) && PGStringsEqual(_uri, aNamespace.uri));
+    }
 
+    -(BOOL)isEqual:(id)other {
+        return (other && ((other == self) || ([other isKindOfClass:[self class]] && [self _isEqualToNamespace:other])));
+    }
+
+    -(BOOL)isEqualToNamespace:(PGXMLParsedNamespace *)aNamespace {
+        return (aNamespace && ((aNamespace == self) || [self _isEqualToNamespace:aNamespace]));
+    }
+
+    -(NSUInteger)hash {
+        return (((31u + [self.prefix hash]) * 31u) + [self.uri hash]);
+    }
+
+    -(id)copyWithZone:(nullable NSZone *)zone {
         return self;
-    }
-
-    +(instancetype)inputWithData:(NSData *)data {
-        return [[self alloc] initWithData:data];
-    }
-
-    -(xmlParserInputPtr)getNewParserInputForContext:(xmlParserCtxtPtr)ctx {
-        xmlParserInputBufferPtr pib = xmlParserInputBufferCreateMem(_buffer, (int)_length, XML_CHAR_ENCODING_UTF8);
-        return (pib ? xmlNewIOInputStream(ctx, pib, XML_CHAR_ENCODING_UTF8) : NULL);
-    }
-
-    -(void)dealloc {
-        if(_buffer) {
-            free(_buffer);
-            _buffer = NULL;
-        }
-
-        _length = 0;
     }
 
 @end

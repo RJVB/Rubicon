@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGXMLParsedAttribute.m
+ *    FILENAME: PGXMLParserAttribute.m
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
  *        DATE: 5/26/18
@@ -15,9 +15,9 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#import "PGXMLParsedAttribute.h"
+#import "PGXMLParserTools.h"
 
-@implementation PGXMLParsedAttribute {
+@implementation PGXMLParserAttribute {
     }
 
     @synthesize localName = _localName;
@@ -56,7 +56,7 @@
         return (other && ((other == self) || ([other isKindOfClass:[self class]] && [self isEqualToAttribute:other])));
     }
 
-    -(BOOL)isEqualToAttribute:(PGXMLParsedAttribute *)attr {
+    -(BOOL)isEqualToAttribute:(PGXMLParserAttribute *)attr {
         return (attr &&
                 ((self == attr) ||
                  (PGStringsEqual(_localName, attr.localName) &&

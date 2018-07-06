@@ -16,8 +16,6 @@
  **********************************************************************************************************************************************************************************/
 
 #import "PGXMLParsedEntity.h"
-#import "PGTools.h"
-#import "NSException+PGException.h"
 
 @interface PGXMLParsedEntity()
 

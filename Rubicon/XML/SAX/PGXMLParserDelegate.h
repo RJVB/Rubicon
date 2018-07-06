@@ -20,7 +20,7 @@
 #define RUBICON_PGXMLPARSERDELEGATE_H
 
 #import <Rubicon/PGTools.h>
-#import "PGXMLParsedAttribute.h"
+#import <Rubicon/PGXMLParserAttribute.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -126,7 +126,7 @@ NS_ASSUME_NONNULL_BEGIN
      * @param qName ...
      * @param attributeDict ...
      */
-    -(void)parser:(PGXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(nullable NSString *)namespaceURI qualifiedName:(nullable NSString *)qName attributes:(NSArray<PGXMLParsedAttribute *> *)attributeDict;
+    -(void)parser:(PGXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(nullable NSString *)namespaceURI qualifiedName:(nullable NSString *)qName attributes:(NSArray<PGXMLParserAttribute *> *)attributeDict;
 
     /**
      * Sent when an end tag is encountered. The various parameters are supplied as above.

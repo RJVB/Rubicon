@@ -35,7 +35,8 @@ typedef void           (*PGXMLFoundIntEntDeclFunc_t)(id, SEL, PGXMLParser *, NSS
 typedef void           (*PGXMLFoundExtEntDeclFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable, NSString *_Nullable);
 typedef void               (*PGXMLDidStartDocFunc_t)(id, SEL, PGXMLParser *);
 typedef void                 (*PGXMLDidEndDocFunc_t)(id, SEL, PGXMLParser *);
-typedef void              (*PGXMLDidStartElemFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable, NSString *_Nullable, NSArray<PGXMLParsedAttribute *> *);
+
+typedef void              (*PGXMLDidStartElemFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable, NSString *_Nullable, NSArray<PGXMLParserAttribute *> *);
 typedef void                (*PGXMLDidEndElemFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable, NSString *_Nullable);
 typedef void            (*PGXMLDidStartMapPfxFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *);
 typedef void              (*PGXMLDidEndMapPfxFunc_t)(id, SEL, PGXMLParser *, NSString *);
@@ -152,7 +153,7 @@ typedef NSInteger           (*NSInputStreamReadFunc)(id, SEL, uint8_t *, NSUInte
 
     -(void)endDocumentCallBack;
 
-    -(void)startElementCallBack:(NSString *)name attributes:(NSArray<PGXMLParsedAttribute *> *)attributes;
+    -(void)startElementCallBack:(NSString *)name attributes:(NSArray<PGXMLParserAttribute *> *)attributes;
 
     -(void)endElementCallBack:(nullable NSString *)name;
 
@@ -177,8 +178,7 @@ typedef NSInteger           (*NSInputStreamReadFunc)(id, SEL, uint8_t *, NSUInte
     -(void)startElementNsCallBack:(NSString *)localname
                            prefix:(NSString *)prefix
                               URI:(NSString *)URI
-                       namespaces:(NSArray<PGXMLParsedNamespace *> *)namespaces
-                       attributes:(NSArray<PGXMLParsedAttribute *> *)attributes;
+                       namespaces:(NSArray<PGXMLParsedNamespace *> *)namespaces attributes:(NSArray<PGXMLParserAttribute *> *)attributes;
 
     -(void)endElementNsCallBack:(NSString *)localname prefix:(NSString *)prefix namespaceURI:(NSString *)namespaceURI;
 
@@ -209,7 +209,7 @@ typedef NSInteger           (*NSInputStreamReadFunc)(id, SEL, uint8_t *, NSUInte
     -(void)_foundExternalEntityDeclarationWithName:(NSString *)name publicID:(nullable NSString *)publicID systemID:(nullable NSString *)systemID hasImpl:(BOOL *)hasImpl;
     -(void)_didStartDocument:(BOOL *)hasImpl;
     -(void)_didEndDocument:(BOOL *)hasImpl;
-    -(void)_didStartElement:(NSString *)elementName namespaceURI:(nullable NSString *)namespaceURI qualifiedName:(nullable NSString *)qName attributes:(NSArray<PGXMLParsedAttribute *> *)attributeDict hasImpl:(BOOL *)hasImpl;
+    -(void)_didStartElement:(NSString *)elementName namespaceURI:(nullable NSString *)namespaceURI qualifiedName:(nullable NSString *)qName attributes:(NSArray<PGXMLParserAttribute *> *)attributeDict hasImpl:(BOOL *)hasImpl;
     -(void)_didEndElement:(NSString *)elementName namespaceURI:(nullable NSString *)namespaceURI qualifiedName:(nullable NSString *)qName hasImpl:(BOOL *)hasImpl;
     -(void)_didStartMappingPrefix:(NSString *)prefix toURI:(NSString *)namespaceURI hasImpl:(BOOL *)hasImpl;
     -(void)_didEndMappingPrefix:(NSString *)prefix hasImpl:(BOOL *)hasImpl;

@@ -1,9 +1,9 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGXMLParsedNamespace.h
+ *    FILENAME: PGXMLParserInput.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 5/30/18
+ *        DATE: 6/21/18
  *  VISIBILITY: Private
  *
  * Copyright © 2018 Project Galen. All rights reserved.
@@ -16,26 +16,29 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#ifndef RUBICON_PGXMLPARSEDNAMESPACE_H
-#define RUBICON_PGXMLPARSEDNAMESPACE_H
+#ifndef RUBICON_PGXMLPARSERINPUT_H
+#define RUBICON_PGXMLPARSERINPUT_H
 
-#import <Cocoa/Cocoa.h>
+#import "PGXMLParserTools.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGXMLParsedNamespace : NSObject<NSCopying>
+/**
+ * This class creates a read-only buffer of data from which multiple xmlParserInputPtr objects can be returned.
+ * It is up to the receiver of the xmlParserInputPtr to free that object when done.
+ */
+@interface PGXMLParserInput : NSObject
 
-    @property(readonly, copy) NSString *prefix;
-    @property(readonly, copy) NSString *uri;
+    @property(readonly) NSUInteger length;
 
-    -(instancetype)initWithPrefix:(NSString *)prefix uri:(NSString *)uri;
+    -(instancetype)initWithData:(NSData *)data;
 
-    -(BOOL)isEqualToNamespace:(PGXMLParsedNamespace *)other;
+    +(instancetype)inputWithData:(NSData *)data;
 
-    +(instancetype)namespaceWithPrefix:(NSString *)prefix uri:(NSString *)uri;
+    -(xmlParserInputPtr)getNewParserInputForContext:(xmlParserCtxtPtr)ctx;
 
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif //RUBICON_PGXMLPARSEDNAMESPACE_H
+#endif //RUBICON_PGXMLPARSERINPUT_H

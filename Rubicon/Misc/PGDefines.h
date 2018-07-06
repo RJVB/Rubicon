@@ -89,6 +89,7 @@ FOUNDATION_EXPORT NSString *const PGErrorMsgUnexpectedEndOfInput;
 FOUNDATION_EXPORT NSString *const PGErrorMsgNoDelegate;
 FOUNDATION_EXPORT NSString *const PGErrorMsgXMLParserAlreadyRun;
 FOUNDATION_EXPORT NSString *const PGErrorMsgCannotRotateNode;
+FOUNDATION_EXPORT NSString *const PGErrorMsgNoDirectCreation;
 
 #if !defined(PGAbstractClassError)
     #define PGAbstractClassError do {\
@@ -112,6 +113,10 @@ FOUNDATION_EXPORT NSString *const PGErrorMsgCannotRotateNode;
         @throw [NSException exceptionWithName:NSIllegalSelectorException reason:reason userInfo:nil];\
         __builtin_unreachable();\
     } while(0)
+#endif
+
+#if !defined(PGAbstractClassTest)
+    #define PGAbstractClassTest(c) do { if(self.class == [c class]) { PGAbstractClassError; }} while(0)
 #endif
 
 #endif //__Rubicon_PGDefines_H_

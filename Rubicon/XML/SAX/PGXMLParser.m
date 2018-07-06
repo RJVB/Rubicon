@@ -467,7 +467,7 @@ static SEL NSInputStreamReadSel;
         [self _didEndDocument:&hasImpl];
     }
 
-    -(void)startElementCallBack:(NSString *)name attributes:(NSArray<PGXMLParsedAttribute *> *)attributes {
+    -(void)startElementCallBack:(NSString *)name attributes:(NSArray<PGXMLParserAttribute *> *)attributes {
         [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
         BOOL hasImpl = NO;
         [self _didStartElement:name namespaceURI:nil qualifiedName:nil attributes:attributes hasImpl:&hasImpl];
@@ -482,8 +482,7 @@ static SEL NSInputStreamReadSel;
     -(void)startElementNsCallBack:(NSString *)localname
                            prefix:(NSString *)prefix
                               URI:(NSString *)URI
-                       namespaces:(NSArray<PGXMLParsedNamespace *> *)namespaces
-                       attributes:(NSArray<PGXMLParsedAttribute *> *)attributes {
+                       namespaces:(NSArray<PGXMLParsedNamespace *> *)namespaces attributes:(NSArray<PGXMLParserAttribute *> *)attributes {
         [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
         BOOL hasImpl = NO;
         [self.namespaceStack push:(namespaces.count ? namespaces : @[])];

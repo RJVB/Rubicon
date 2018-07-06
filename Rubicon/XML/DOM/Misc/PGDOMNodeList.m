@@ -1,10 +1,9 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGXMLParserInput.h
+ *    FILENAME: PGDOMNodeList.m
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 6/21/18
- *  VISIBILITY: Private
+ *        DATE: 6/29/18
  *
  * Copyright © 2018 Project Galen. All rights reserved.
  *
@@ -16,29 +15,27 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#ifndef RUBICON_PGXMLPARSERINPUT_H
-#define RUBICON_PGXMLPARSERINPUT_H
+#import "PGDOMNodeList.h"
+#import "PGDOMPrivate.h"
 
-#import <Cocoa/Cocoa.h>
+#pragma clang diagnostic push
 
-NS_ASSUME_NONNULL_BEGIN
+@implementation PGDOMNodeList {
+    }
 
-/**
- * This class creates a read-only buffer of data from which multiple xmlParserInputPtr objects can be returned.
- * It is up to the receiver of the xmlParserInputPtr to free that object when done.
- */
-@interface PGXMLParserInput : NSObject
+    -(void)nodeListChangeListener:(NSNotification *)notification {
+        if(notification.object == self.ownerNode) {
+            NSMutableArray<PGDOMNode *> *items = self.items;
+            PGDOMNode                   *node  = self.ownerNode.firstChild;
+            [items removeAllObjects];
 
-    @property(readonly) NSUInteger length;
-
-    -(instancetype)initWithData:(NSData *)data;
-
-    +(instancetype)inputWithData:(NSData *)data;
-
-    -(xmlParserInputPtr)getNewParserInputForContext:(xmlParserCtxtPtr)ctx;
+            while(node) {
+                [items addObject:node];
+                node = node.nextSibling;
+            }
+        }
+    }
 
 @end
 
-NS_ASSUME_NONNULL_END
-
-#endif //RUBICON_PGXMLPARSERINPUT_H
+#pragma clang diagnostic pop

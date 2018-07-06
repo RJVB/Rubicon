@@ -38,8 +38,8 @@ NS_INLINE NSString *extractAttrValue(cxch vstart, cxch vend) {
     return ((vstart && (vend > vstart)) ? stringForXMLStringLen(vstart, (vend - vstart)) : @"");
 }
 
-NS_INLINE void storeAttr(NSMutableArray<PGXMLParsedAttribute *> *attribs, pcxch rawAttribs, int j, BOOL def) {
-    [attribs addObject:[PGXMLParsedAttribute attributeWithLocalName:stringForXMLString(rawAttribs[j + 0])
+NS_INLINE void storeAttr(NSMutableArray<PGXMLParserAttribute *> *attribs, pcxch rawAttribs, int j, BOOL def) {
+    [attribs addObject:[PGXMLParserAttribute attributeWithLocalName:stringForXMLString(rawAttribs[j + 0])
                                                              prefix:stringForXMLString(rawAttribs[j + 1])
                                                                 URI:stringForXMLString(rawAttribs[j + 2])
                                                               value:extractAttrValue(rawAttribs[j + 3], rawAttribs[j + 4])
@@ -50,9 +50,9 @@ NS_INLINE void storeNamespace(NSMutableArray<PGXMLParsedNamespace *> *nmspcs, pc
     [nmspcs addObject:[PGXMLParsedNamespace namespaceWithPrefix:stringForXMLString(rawNmspcs[j + 0]) uri:stringForXMLString(rawNmspcs[j + 1])]];
 }
 
-NSArray<PGXMLParsedAttribute *> *convertAttributes(pcxch atts);
+NSArray<PGXMLParserAttribute *> *convertAttributes(pcxch atts);
 
-NSArray<PGXMLParsedAttribute *> *convertAttributesNS(int nb_attributes, pcxch attributes, int di);
+NSArray<PGXMLParserAttribute *> *convertAttributesNS(int nb_attributes, pcxch attributes, int di);
 
 NSArray<PGXMLParsedNamespace *> *convertNamespaces(int nb_namespaces, pcxch namespaces);
 
@@ -212,20 +212,20 @@ void endElementNsCallBack(void *ctx, cxch localname, cxch prefix, cxch URI) {
     [parser endElementNsCallBack:stringForXMLString(localname) prefix:stringForXMLString(prefix) namespaceURI:stringForXMLString(URI)];
 }
 
-NSArray<PGXMLParsedAttribute *> *convertAttributes(pcxch atts) {
-    NSMutableArray<PGXMLParsedAttribute *> *at = [NSMutableArray new];
+NSArray<PGXMLParserAttribute *> *convertAttributes(pcxch atts) {
+    NSMutableArray<PGXMLParserAttribute *> *at = [NSMutableArray new];
 
     for(NSUInteger i = 0; (atts[i + 0] != NULL); i += 2) {
         NSString *aName  = stringForXMLString(atts[i + 0]);
         NSString *aValue = stringForXMLString(atts[i + 1]);
-        if(aValue) [at addObject:[PGXMLParsedAttribute attributeWithLocalName:aName value:aValue]];
+        if(aValue) [at addObject:[PGXMLParserAttribute attributeWithLocalName:aName value:aValue]];
     }
 
     return at;
 }
 
-NSArray<PGXMLParsedAttribute *> *convertAttributesNS(int nb_attributes, pcxch attributes, int di) {
-    NSMutableArray<PGXMLParsedAttribute *> *at = [NSMutableArray arrayWithCapacity:(NSUInteger)nb_attributes];
+NSArray<PGXMLParserAttribute *> *convertAttributesNS(int nb_attributes, pcxch attributes, int di) {
+    NSMutableArray<PGXMLParserAttribute *> *at = [NSMutableArray arrayWithCapacity:(NSUInteger)nb_attributes];
 
     for(int i = 0; i < nb_attributes; i++) storeAttr(at, attributes, (i * 5), (i >= di));
     return at;

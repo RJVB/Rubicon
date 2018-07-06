@@ -19,10 +19,7 @@
 #ifndef __PGXMLPARSERTOOLS_H__
 #define __PGXMLPARSERTOOLS_H__
 
-#import "PGInternal.h"
 #import "PGXMLParsedNamespace.h"
-#import <libxml/parser.h>
-#import <libxml/SAX2.h>
 
 @class PGXMLParsedEntity;
 

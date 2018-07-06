@@ -74,8 +74,7 @@ foundAttributeDeclarationWithName:(NSString *)attributeName
     -(void)parser:(PGXMLParser *)parser
   didStartElement:(NSString *)elementName
      namespaceURI:(nullable NSString *)namespaceURI
-    qualifiedName:(nullable NSString *)qName
-       attributes:(NSArray<PGXMLParsedAttribute *> *)attributeDict {
+    qualifiedName:(nullable NSString *)qName attributes:(NSArray<PGXMLParserAttribute *> *)attributeDict {
     }
 
     -(void)parser:(PGXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(nullable NSString *)namespaceURI qualifiedName:(nullable NSString *)qName {

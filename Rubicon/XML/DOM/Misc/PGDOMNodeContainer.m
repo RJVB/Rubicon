@@ -1,9 +1,9 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGXMLParsedNamespace.m
+ *    FILENAME: PGDOMNodeContainer.m
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 5/30/18
+ *        DATE: 7/3/18
  *
  * Copyright © 2018 Project Galen. All rights reserved.
  *
@@ -16,44 +16,54 @@
  **********************************************************************************************************************************************************************************/
 
 #import "PGInternal.h"
-#import "PGXMLParsedNamespace.h"
+#import "PGDOMPrivate.h"
 
-@implementation PGXMLParsedNamespace {
+#pragma clang diagnostic push
+
+@implementation PGDOMNodeContainer {
     }
 
-    -(instancetype)initWithPrefix:(NSString *)prefix uri:(NSString *)uri {
+    @synthesize items = _items;
+
+    -(instancetype)init {
         self = [super init];
 
         if(self) {
-            _prefix = [prefix copy];
-            _uri    = [uri copy];
+            PGBadConstructorError;
         }
 
         return self;
     }
 
-    +(instancetype)namespaceWithPrefix:(NSString *)prefix uri:(NSString *)uri {
-        return [[self alloc] initWithPrefix:prefix uri:uri];
-    }
+    -(instancetype)initWithOwnerNode:(nullable PGDOMNode *)ownerNode {
+        self = [super initWithOwnerNode:ownerNode notificationName:PGDOMNodeListChangedNotification];
 
-    -(BOOL)_isEqualToNamespace:(PGXMLParsedNamespace *)aNamespace {
-        return (PGStringsEqual(_prefix, aNamespace.prefix) && PGStringsEqual(_uri, aNamespace.uri));
-    }
+        if(self) {
+            _items = [NSMutableArray new];
+        }
 
-    -(BOOL)isEqual:(id)other {
-        return (other && ((other == self) || ([other isKindOfClass:[self class]] && [self _isEqualToNamespace:other])));
-    }
-
-    -(BOOL)isEqualToNamespace:(PGXMLParsedNamespace *)aNamespace {
-        return (aNamespace && ((aNamespace == self) || [self _isEqualToNamespace:aNamespace]));
-    }
-
-    -(NSUInteger)hash {
-        return (((31u + [self.prefix hash]) * 31u) + [self.uri hash]);
-    }
-
-    -(id)copyWithZone:(nullable NSZone *)zone {
         return self;
     }
 
+#pragma clang diagnostic ignored "-Woverriding-method-mismatch"
+
+    -(PGDOMNode *)item:(NSUInteger)idx {
+        NSMutableArray<PGDOMNode *> *items = self.items;
+        return ((idx < items.count) ? items[idx] : nil);
+    }
+
+    -(NSUInteger)count {
+        return self.items.count;
+    }
+
+    -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained[])buffer count:(NSUInteger)len {
+        return [self.items countByEnumeratingWithState:state objects:buffer count:len];
+    }
+
+    -(PGDOMNode *)objectAtIndexedSubscript:(NSUInteger)idx {
+        return self.items[idx];
+    }
+
 @end
+
+#pragma clang diagnostic pop

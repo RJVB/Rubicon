@@ -64,3 +64,4 @@ NSString *const PGErrorMsgUnexpectedEndOfInput    = @"Unexpected end of input.";
 NSString *const PGErrorMsgNoDelegate              = @"No delegate set.";
 NSString *const PGErrorMsgXMLParserAlreadyRun     = @"XML Parser has already run.";
 NSString *const PGErrorMsgCannotRotateNode        = @"Cannot rotate node to the %@ because there is no child node to the %@";
+NSString *const PGErrorMsgNoDirectCreation        = @"You cannot directly create and instance of this class.";

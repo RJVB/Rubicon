@@ -15,7 +15,6 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#import "PGXMLParsedAttribute.h"
 #import "PGXMLParser+PGXMLParserExtensions.h"
 
 static SEL PGXMLFoundNoteDeclSel;
@@ -163,8 +162,7 @@ static SEL PGXMLReslvIntPEntSel;
 
     -(void)_didStartElement:(NSString *)elementName
                namespaceURI:(NSString *)namespaceURI
-              qualifiedName:(NSString *)qName
-                 attributes:(NSArray<PGXMLParsedAttribute *> *)attributeDict
+              qualifiedName:(NSString *)qName attributes:(NSArray<PGXMLParserAttribute *> *)attributeDict
                     hasImpl:(BOOL *)hasImpl {
         id<PGXMLParserDelegate> d = self.delegate;
         PGXMLDidStartElemFunc_t f = self.didStartElemFunc;

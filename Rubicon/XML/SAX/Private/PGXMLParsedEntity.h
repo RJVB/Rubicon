@@ -19,9 +19,7 @@
 #ifndef RUBICON_PGXMLPARSEDENTITY_H
 #define RUBICON_PGXMLPARSEDENTITY_H
 
-#import <Cocoa/Cocoa.h>
-#import <libxml/tree.h>
-#import <libxml/entities.h>
+#import "PGXMLParserTools.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
