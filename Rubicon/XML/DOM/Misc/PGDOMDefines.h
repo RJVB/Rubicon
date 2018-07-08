@@ -74,6 +74,7 @@ FOUNDATION_EXPORT NSString *const PGDOMMsgCreatingValidationRegex;
 FOUNDATION_EXPORT NSString *const PGDOMMsgValidationRegexCreated;
 
 FOUNDATION_EXPORT NSString *const PGDOMNodeListChangedNotification;
+FOUNDATION_EXPORT NSString *const PGDOMCascadeNodeListChangedNotification;
 
 FOUNDATION_EXPORT NSString *const PGDOMNamespaceURI1;
 FOUNDATION_EXPORT NSString *const PGDOMNamespaceURI2;

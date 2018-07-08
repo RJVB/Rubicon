@@ -162,8 +162,14 @@
         return oldNode;
     }
 
+    -(void)grandchildListChanged {
+        [self.ownerDocument.notificationCenter postNotificationName:PGDOMCascadeNodeListChangedNotification object:self];
+        [self.parentNode grandchildListChanged];
+    }
+
     -(void)postChildListChangeNotification {
         [self.ownerDocument.notificationCenter postNotificationName:PGDOMNodeListChangedNotification object:self];
+        [self.parentNode grandchildListChanged];
     }
 
 @end

@@ -19,8 +19,8 @@
 #ifndef RUBICON_PGDOMELEMENTNODELIST_H
 #define RUBICON_PGDOMELEMENTNODELIST_H
 
-#import <Rubicon/PGDOMNodeList.h>
-#import <Rubicon/PGDOMElement.h>
+#import "PGDOMNodeList.h"
+#import "PGDOMElement.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

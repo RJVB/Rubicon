@@ -54,7 +54,8 @@ NSString *const PGDOMMsgReference               = @"reference";
 NSString *const PGDOMMsgCreatingValidationRegex = @"Creating Validation Regex with Pattern: \"%@\"";
 NSString *const PGDOMMsgValidationRegexCreated  = @"Validation Regex Created.";
 
-NSString *const PGDOMNodeListChangedNotification = @"PGDOMNodeListChangedNotification";
+NSString *const PGDOMNodeListChangedNotification        = @"PGDOMNodeListChangedNotification";
+NSString *const PGDOMCascadeNodeListChangedNotification = @"PGDOMCascadeNodeListChangedNotification";
 
 NSString *const PGDOMNamespaceURI1 = @"http://www.w3.org/XML/1998/namespace";
 NSString *const PGDOMNamespaceURI2 = @"http://www.w3.org/2000/xmlns";

@@ -24,20 +24,29 @@
     @synthesize ownerNode = _ownerNode;
     @synthesize ownerDocument = _ownerDocument;
     @synthesize nc = _nc;
+    @synthesize notificationNames = _notificationNames;
 
     -(instancetype)initWithOwnerNode:(nullable PGDOMNode *)ownerNode notificationName:(NSNotificationName)notificationName {
         self = [super init];
 
         if(self) {
-            _ownerNode     = ownerNode;
-            _ownerDocument = _ownerNode.ownerDocument;
-            _nc            = (_ownerDocument.notificationCenter ?: [NSNotificationCenter defaultCenter]);
+            _ownerNode         = ownerNode;
+            _ownerDocument     = _ownerNode.ownerDocument;
+            _nc                = (_ownerDocument.notificationCenter ?: [NSNotificationCenter defaultCenter]);
+            _notificationNames = [NSMutableArray new];
 
-            [self.nc addObserver:self selector:@selector(nodeListChangeListener:) name:PGDOMNodeListChangedNotification object:self.ownerNode];
-            [self nodeListChangeListener:[NSNotification notificationWithName:notificationName object:self.ownerNode]];
+            [_notificationNames addObject:notificationName];
+            [self setupNotifications];
         }
 
         return self;
+    }
+
+    -(void)setupNotifications {
+        for(NSNotificationName notificationName in self.notificationNames) {
+            [self.nc addObserver:self selector:@selector(nodeListChangeListener:) name:notificationName object:self.ownerNode];
+            [self nodeListChangeListener:[NSNotification notificationWithName:notificationName object:self.ownerNode]];
+        }
     }
 
     -(void)dealloc {

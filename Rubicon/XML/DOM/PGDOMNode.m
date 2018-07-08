@@ -157,6 +157,10 @@
         return nil;
     }
 
+    -(void)grandchildListChanged {
+        [self.parentNode grandchildListChanged];
+    }
+
     -(PGDOMNodeList<PGDOMNode *> *)childNodes {
         PGSETIFNIL(self, _childNodes, [[PGDOMNodeList alloc] initWithOwnerNode:self]);
         return _childNodes;

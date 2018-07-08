@@ -49,6 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(PGDOMNamedNodeMap<PGDOMAttr *> *)createNewAttributeMap;
 
+    -(void)grandchildListChanged;
+
 @end
 
 @interface PGDOMParent()
@@ -59,6 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(void)postChildListChangeNotification;
 
+    -(void)grandchildListChanged;
 @end
 
 @interface PGDOMDocument()
@@ -143,11 +146,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGDOMNotifiedContainer()
 
-    @property(nonatomic, readonly, nullable) PGDOMNode            *ownerNode;
-    @property(nonatomic, readonly, nullable) PGDOMDocument        *ownerDocument;
-    @property(nonatomic, readonly) /*     */ NSNotificationCenter *nc;
+    @property(nonatomic, readonly, nullable) PGDOMNode                          *ownerNode;
+    @property(nonatomic, readonly, nullable) PGDOMDocument                      *ownerDocument;
+    @property(nonatomic, readonly) /*     */ NSNotificationCenter               *nc;
+    @property(nonatomic, readonly) /*     */ NSMutableArray<NSNotificationName> *notificationNames;
 
     -(instancetype)initWithOwnerNode:(nullable PGDOMNode *)ownerNode notificationName:(NSNotificationName)notificationName;
+
+    -(void)setupNotifications;
 
 @end
 
@@ -178,6 +184,10 @@ NS_ASSUME_NONNULL_BEGIN
     -(instancetype)initWithOwnerNode:(PGDOMElement *)ownerNode tagName:(NSString *)tagName;
 
     -(instancetype)initWithOwnerNode:(PGDOMElement *)ownerNode localName:(NSString *)localName namespaceURI:(NSString *)namespaceURI;
+
+    -(void)setupNotifications;
+
+    -(void)setupNotifications2;
 
     -(void)nodeListChangeListener:(NSNotification *)notification;
 

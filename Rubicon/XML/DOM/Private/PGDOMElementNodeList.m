@@ -34,6 +34,7 @@ NS_INLINE BOOL _compare(NSString *given, NSString *found) {
 
         if(self) {
             _tagName = (tagName.length ? tagName.copy : @"*");
+            [self setupNotifications];
         }
 
         return self;
@@ -45,13 +46,26 @@ NS_INLINE BOOL _compare(NSString *given, NSString *found) {
         if(self) {
             _localName    = (localName.length ? localName.copy : @"*");
             _namespaceURI = (namespaceURI.length ? namespaceURI.copy : @"*");
+
+            [self.notificationNames addObject:PGDOMCascadeNodeListChangedNotification];
+            [self setupNotifications2];
         }
 
         return self;
     }
 
+    -(void)setupNotifications {
+        /*
+         * We don't want the object to load the items from the owner until after the tagName or localName/namespaceURI have been set.
+         */
+    }
+
+    -(void)setupNotifications2 {
+        [super setupNotifications];
+    }
+
     -(void)nodeListChangeListener:(NSNotification *)notification {
-        if([notification.name isEqualToString:PGDOMNodeListChangedNotification] && (notification.object == self.ownerNode)) {
+        if([self.notificationNames containsObject:notification.name] && (notification.object == self.ownerNode)) {
             [self.items removeAllObjects];
             if(self.tagName.length) [self load:self.items from:(PGDOMElement *)self.ownerNode byTagName:self.tagName];
             else [self load:self.items from:(PGDOMElement *)self.ownerNode byLocalName:self.localName namespaceURI:self.namespaceURI];
