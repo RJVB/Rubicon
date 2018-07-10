@@ -90,6 +90,8 @@ FOUNDATION_EXPORT NSString *const PGErrorMsgNoDelegate;
 FOUNDATION_EXPORT NSString *const PGErrorMsgXMLParserAlreadyRun;
 FOUNDATION_EXPORT NSString *const PGErrorMsgCannotRotateNode;
 FOUNDATION_EXPORT NSString *const PGErrorMsgNoDirectCreation;
+FOUNDATION_EXPORT NSString *const PGErrorMsgIndexOutOfBounds;
+FOUNDATION_EXPORT NSString *const PGErrorMsgNoModificationAllowed;
 
 #if !defined(PGAbstractClassError)
     #define PGAbstractClassError do {\

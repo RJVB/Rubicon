@@ -17,6 +17,8 @@
 
 #import "PGDOMDefines.h"
 
+NSExceptionName const PGDOMException = @"PGDOMException";
+
 NSString *const PGDOMNodeNameCDataSection     = @"#cdata-section";
 NSString *const PGDOMNodeNameComment          = @"#comment";
 NSString *const PGDOMNodeNameDocument         = @"#document";

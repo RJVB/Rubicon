@@ -1,9 +1,9 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDOMDocument.h
+ *    FILENAME: PGDOMCharacterData.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 6/27/18
+ *        DATE: 7/8/18
  *  VISIBILITY: Private
  *
  * Copyright © 2018 Project Galen. All rights reserved.
@@ -16,22 +16,30 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#ifndef RUBICON_PGDOMDOCUMENT_H
-#define RUBICON_PGDOMDOCUMENT_H
+#ifndef RUBICON_PGDOMCHARACTERDATA_H
+#define RUBICON_PGDOMCHARACTERDATA_H
 
-#import <Rubicon/PGDOMParent.h>
-
-@class PGDOMText;
+#import <Rubicon/PGDOMNode.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGDOMDocument : PGDOMParent
+@interface PGDOMCharacterData : PGDOMNode
 
-    -(instancetype)init;
+    @property(nonatomic, readonly) /**/ NSUInteger length;
+    @property(nonatomic, copy) /*    */ NSString   *data;
 
-    -(PGDOMText *)createTextNode:(NSString *)content;
+    -(void)appendData:(NSString *)data;
+
+    -(void)insertData:(NSString *)data atOffset:(NSUInteger)offset;
+
+    -(void)deleteDataAtOffset:(NSUInteger)offset length:(NSUInteger)length;
+
+    -(void)replaceDataAtOffset:(NSUInteger)offset length:(NSUInteger)length withData:(NSString *)newData;
+
+    -(NSString *)substringDataAtOffset:(NSUInteger)offset length:(NSUInteger)length;
+
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif //RUBICON_PGDOMDOCUMENT_H
+#endif //RUBICON_PGDOMCHARACTERDATA_H

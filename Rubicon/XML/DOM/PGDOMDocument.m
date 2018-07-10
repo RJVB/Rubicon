@@ -33,4 +33,8 @@
         return self;
     }
 
+    -(PGDOMText *)createTextNode:(NSString *)content {
+        return [[PGDOMText alloc] initWithOwnerDocument:self data:content];
+    }
+
 @end

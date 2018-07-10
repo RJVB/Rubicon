@@ -1,9 +1,9 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDOMDocument.h
+ *    FILENAME: PGDOMText.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 6/27/18
+ *        DATE: 7/9/18
  *  VISIBILITY: Private
  *
  * Copyright © 2018 Project Galen. All rights reserved.
@@ -16,22 +16,24 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#ifndef RUBICON_PGDOMDOCUMENT_H
-#define RUBICON_PGDOMDOCUMENT_H
+#ifndef RUBICON_PGDOMTEXT_H
+#define RUBICON_PGDOMTEXT_H
 
-#import <Rubicon/PGDOMParent.h>
-
-@class PGDOMText;
+#import <Rubicon/PGDOMCharacterData.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGDOMDocument : PGDOMParent
+@interface PGDOMText : PGDOMCharacterData
 
-    -(instancetype)init;
+    @property(nonatomic, readonly) NSString *wholeText;
+    @property(nonatomic, readonly) BOOL     isElementContentWhitespace;
 
-    -(PGDOMText *)createTextNode:(NSString *)content;
+    -(instancetype)replaceWholeTextWith:(NSString *)content;
+
+    -(instancetype)splitTextAtOffset:(NSUInteger)offset;
+
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif //RUBICON_PGDOMDOCUMENT_H
+#endif //RUBICON_PGDOMTEXT_H

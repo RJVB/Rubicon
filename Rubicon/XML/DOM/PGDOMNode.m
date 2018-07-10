@@ -20,6 +20,7 @@
 @implementation PGDOMNode {
         PGDOMNodeList<PGDOMNode *>     *_childNodes;
         PGDOMNamedNodeMap<PGDOMAttr *> *_attributes;
+        BOOL                           _needsSyncData;
     }
 
     @synthesize nodeType = _nodeType;
@@ -27,6 +28,7 @@
     @synthesize previousSibling = _previousSibling;
     @synthesize nextSibling = _nextSibling;
     @synthesize ownerDocument = _ownerDocument;
+    @synthesize isReadOnly = _isReadOnly;
 
     -(instancetype)init {
         self = [super init];
@@ -45,8 +47,10 @@
             PGAbstractClassTest(PGDOMNode);
             _nodeType      = nodeType;
             _ownerDocument = ownerDocument;
-            if((_ownerDocument == nil) && (self.class != PGDOMDocument.class))
-                @throw [NSException exceptionWithName:NSInvalidArgumentException reason:PGDOMErrorMsgOwnerDocumentNull];
+            _isReadOnly    = NO;
+            _needsSyncData = NO;
+
+            if((_ownerDocument == nil) && self.needsOwnerDocument) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:PGDOMErrorMsgOwnerDocumentNull];
         }
 
         return self;
@@ -158,15 +162,18 @@
     }
 
     -(void)grandchildListChanged {
+        PGDOMSyncData;
         [self.parentNode grandchildListChanged];
     }
 
     -(PGDOMNodeList<PGDOMNode *> *)childNodes {
+        PGDOMSyncData;
         PGSETIFNIL(self, _childNodes, [[PGDOMNodeList alloc] initWithOwnerNode:self]);
         return _childNodes;
     }
 
     -(PGDOMNamedNodeMap<PGDOMAttr *> *)attributes {
+        PGDOMSyncData;
         PGSETIFNIL(self, _attributes, [self createNewAttributeMap]);
         return _attributes;
     }
@@ -175,5 +182,48 @@
         return [[PGDOMNamedNodeMap alloc] initWithOwnerNode:self];
     }
 
+    -(BOOL)isTextNode {
+        switch(self.nodeType) {
+            case PGDOMNodeTypeCDataSection:
+            case PGDOMNodeTypeText:
+                return YES;
+            default:
+                return NO;
+        }
+    }
+
+    -(BOOL)isEntityReference {
+        return (self.nodeType == PGDOMNodeTypeEntityReference);
+    }
+
+    -(BOOL)needsOwnerDocument {
+        switch(self.nodeType) {
+            case PGDOMNodeTypeDocument:
+            case PGDOMNOdeTypeDocumentFragment:
+                return NO;
+            default:
+                return YES;
+        }
+    }
+
+    -(BOOL)needsSyncData {
+        return _needsSyncData;
+    }
+
+    -(void)setNeedsSyncData:(BOOL)needsSyncData {
+        if(_needsSyncData != needsSyncData) {
+            _needsSyncData = needsSyncData;
+
+            if(needsSyncData) {
+                self.previousSibling.needsSyncData = needsSyncData;
+                self.nextSibling.needsSyncData     = needsSyncData;
+                self.parentNode.needsSyncData      = needsSyncData;
+            }
+        }
+    }
+
+    -(void)synchronizeData {
+        self.needsSyncData = NO;
+    }
 
 @end

@@ -36,6 +36,8 @@ typedef NS_ENUM(NSUInteger, PGDOMNodeTypes) {
     PGDOMNodeTypeText
 };
 
+FOUNDATION_EXPORT NSExceptionName const PGDOMException;
+
 FOUNDATION_EXPORT NSString *const PGDOMNodeNameCDataSection;
 FOUNDATION_EXPORT NSString *const PGDOMNodeNameComment;
 FOUNDATION_EXPORT NSString *const PGDOMNodeNameDocument;

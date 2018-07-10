@@ -32,11 +32,15 @@
 #import "PGDOMAttributeMap.h"
 #import "PGDOMNamedNodeMapImpl.h"
 #import "PGDOMElementNodeList.h"
+#import "PGDOMCharacterData.h"
+#import "PGDOMText.h"
 
 typedef PGMutableBinaryTreeDictionary<NSString *, PGDOMNode *>   *PGDOMNodeTree;
 typedef PGMutableBinaryTreeDictionary<NSString *, PGDOMNodeTree> *PGDOMNodeNodeTree;
 
 NS_ASSUME_NONNULL_BEGIN
+
+#define PGDOMSyncData do{if(self.needsSyncData)[self synchronizeData];}while(0)
 
 @interface PGDOMNode()
 
@@ -44,12 +48,18 @@ NS_ASSUME_NONNULL_BEGIN
     @property(nonatomic, nullable) /*     */ PGDOMNode *parentNode;
     @property(nonatomic, nullable) /*     */ PGDOMNode *previousSibling;
     @property(nonatomic, nullable) /*     */ PGDOMNode *nextSibling;
+    @property(nonatomic, readonly) /*     */ BOOL      isTextNode;
+    @property(nonatomic, readonly) /*     */ BOOL      isEntityReference;
+    @property(nonatomic) /*               */ BOOL      needsSyncData;
+    @property(nonatomic, readonly) /*     */ BOOL      needsOwnerDocument;
 
     -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(nullable PGDOMDocument *)ownerDocument;
 
     -(PGDOMNamedNodeMap<PGDOMAttr *> *)createNewAttributeMap;
 
     -(void)grandchildListChanged;
+
+    -(void)synchronizeData;
 
 @end
 
@@ -215,6 +225,28 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface PGDOMAttributeMap()
+
+@end
+
+@interface PGDOMCharacterData()
+
+    -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data;
+
+@end
+
+@interface PGDOMText()
+
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data;
+
+    -(BOOL)canModifyNext:(PGDOMNode *)node;
+
+    -(BOOL)canModifyPrev:(PGDOMNode *)node;
+
+    -(BOOL)hasTextOnlyChildren:(PGDOMNode *)node;
+
+    -(BOOL)getWholeTextBackward:(NSMutableString *)wholeText node:(PGDOMNode *)node parent:(PGDOMNode *)parent;
+
+    -(BOOL)getWholeTextForward:(NSMutableString *)wholeText node:(PGDOMNode *)node parent:(PGDOMNode *)parent;
 
 @end
 
