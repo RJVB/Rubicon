@@ -227,36 +227,41 @@
     }
 
     -(BOOL)hasTextOnlyChildren {
-        PGDOMNodeProcBlock okblk = ^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return NO; };
-        PGDOMNodeProcBlock noblk = ^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return YES; };
-        PGDOMNodeProcBlock enblk = ^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return !n.hasTextOnlyChildren; };
+        return (BOOL)[self textNodeProc:self.firstChild
+                                forward:YES
+                              entRefBlk:^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return !n.hasTextOnlyChildren; }
+                            textNodeBlk:^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return NO; }
+                             defaultBlk:^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return YES; }
+                       startReturnValue:NO
+                      finishReturnValue:YES];
+    }
 
-        return (BOOL)[self childTextNodeProc:YES entRefBlk:enblk textNodeBlk:okblk cdataNodeBlk:okblk defaultBlk:noblk startReturnValue:NO finishReturnValue:YES];
+    -(BOOL)canModify:(BOOL)f {
+        __block BOOL tc = NO;
+
+        return [self textNodeProc:(f ? self.nextSibling : self.previousSibling)
+                          forward:f
+                        entRefBlk:^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) {
+                            return (BOOL)[self textNodeProc:(f ? n.firstChild : n.lastChild)
+                                                    forward:f
+                                                  entRefBlk:^BOOL(PGDOMNode *n2, NSInteger *rv2, BOOL f2) { return !((BOOL)([n2 canModify:f2] ? (tc = YES) : (*rv = NO))); }
+                                                textNodeBlk:^BOOL(PGDOMNode *n2, NSInteger *rv2, BOOL f2) { return !(tc = YES); }
+                                                 defaultBlk:^BOOL(PGDOMNode *n2, NSInteger *rv2, BOOL f2) { return ((*rv = !tc) || YES); }
+                                           startReturnValue:YES
+                                          finishReturnValue:NO];
+                        }
+                      textNodeBlk:^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return NO; }
+                       defaultBlk:^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return YES; }
+                 startReturnValue:YES
+                finishReturnValue:YES];
     }
 
     -(BOOL)canModifyPrev {
-        return NO;
+        return [self canModify:NO];
     }
 
     -(BOOL)canModifyNext {
-        return NO;
-    }
-
-    -(NSInteger)childTextNodeProc:(BOOL)forward
-                        entRefBlk:(PGDOMNodeProcBlock)entRefBlk
-                      textNodeBlk:(PGDOMNodeProcBlock)textNodeBlk
-                     cdataNodeBlk:(PGDOMNodeProcBlock)cdataNodeBlk
-                       defaultBlk:(PGDOMNodeProcBlock)defaultBlk
-                 startReturnValue:(NSInteger)startReturnValue
-                finishReturnValue:(NSInteger)finishReturnValue {
-        return [self textNodeProc:(forward ? self.firstChild : self.lastChild)
-                          forward:forward
-                        entRefBlk:entRefBlk
-                      textNodeBlk:textNodeBlk
-                     cdataNodeBlk:cdataNodeBlk
-                       defaultBlk:defaultBlk
-                 startReturnValue:startReturnValue
-                finishReturnValue:finishReturnValue];
+        return [self canModify:YES];
     }
 
     -(NSInteger)textNodeProc:(PGDOMNode *)node
@@ -289,6 +294,23 @@
         }
 
         return finishReturnValue;
+    }
+
+    -(BOOL)textNodeProc:(PGDOMNode *)node
+                forward:(BOOL)forward
+              entRefBlk:(PGDOMNodeProcBlock)entRefBlk
+            textNodeBlk:(PGDOMNodeProcBlock)textNodeBlk
+             defaultBlk:(PGDOMNodeProcBlock)defaultBlk
+       startReturnValue:(BOOL)startReturnValue
+      finishReturnValue:(BOOL)finishReturnValue {
+        return (BOOL)[self textNodeProc:node
+                                forward:forward
+                              entRefBlk:entRefBlk
+                            textNodeBlk:textNodeBlk
+                           cdataNodeBlk:textNodeBlk
+                             defaultBlk:defaultBlk
+                       startReturnValue:startReturnValue
+                      finishReturnValue:finishReturnValue];
     }
 
 @end

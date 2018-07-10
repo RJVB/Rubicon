@@ -66,14 +66,6 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(void)synchronizeData;
 
-    -(NSInteger)childTextNodeProc:(BOOL)forward
-                        entRefBlk:(PGDOMNodeProcBlock)entRefBlk
-                      textNodeBlk:(PGDOMNodeProcBlock)textNodeBlk
-                     cdataNodeBlk:(PGDOMNodeProcBlock)cdataNodeBlk
-                       defaultBlk:(PGDOMNodeProcBlock)defaultBlk
-                 startReturnValue:(NSInteger)startReturnValue
-                finishReturnValue:(NSInteger)finishReturnValue;
-
     -(NSInteger)textNodeProc:(PGDOMNode *)node
                      forward:(BOOL)forward
                    entRefBlk:(PGDOMNodeProcBlock)entRefBlk
