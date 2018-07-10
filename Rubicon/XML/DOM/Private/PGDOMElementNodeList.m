@@ -72,19 +72,19 @@ NS_INLINE BOOL _compare(NSString *given, NSString *found) {
         }
     }
 
-    -(void)load:(NSMutableArray<PGDOMNode *> *)list from:(PGDOMElement *)parent byTagName:(NSString *)tagName {
+    -(void)load:(NSMutableArray<PGDOMElement *> *)list from:(PGDOMElement *)parent byTagName:(NSString *)tagName {
         for(PGDOMNode *node in parent.childNodes) {
             if(node.nodeType == PGDOMNodeTypeElement) {
-                if(_compare(tagName, node.nodeName)) [list addObject:node];
+                if(_compare(tagName, node.nodeName)) [list addObject:(PGDOMElement *)node];
                 [self load:list from:(PGDOMElement *)node byTagName:tagName];
             }
         }
     }
 
-    -(void)load:(NSMutableArray<PGDOMNode *> *)list from:(PGDOMElement *)parent byLocalName:(NSString *)localName namespaceURI:(NSString *)namespaceURI {
+    -(void)load:(NSMutableArray<PGDOMElement *> *)list from:(PGDOMElement *)parent byLocalName:(NSString *)localName namespaceURI:(NSString *)namespaceURI {
         for(PGDOMNode *node in parent.childNodes) {
             if(node.nodeType == PGDOMNodeTypeElement) {
-                if(_compare(localName, node.localName) && _compare(namespaceURI, node.namespaceURI)) [list addObject:node];
+                if(_compare(localName, node.localName) && _compare(namespaceURI, node.namespaceURI)) [list addObject:(PGDOMElement *)node];
                 [self load:list from:(PGDOMElement *)node byLocalName:localName namespaceURI:namespaceURI];
             }
         }

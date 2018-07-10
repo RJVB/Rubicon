@@ -38,6 +38,8 @@
 typedef PGMutableBinaryTreeDictionary<NSString *, PGDOMNode *>   *PGDOMNodeTree;
 typedef PGMutableBinaryTreeDictionary<NSString *, PGDOMNodeTree> *PGDOMNodeNodeTree;
 
+typedef BOOL (^PGDOMNodeProcBlock)(PGDOMNode *node, NSInteger *pRetValue, BOOL forward);
+
 NS_ASSUME_NONNULL_BEGIN
 
 #define PGDOMSyncData do{if(self.needsSyncData)[self synchronizeData];}while(0)
@@ -52,6 +54,9 @@ NS_ASSUME_NONNULL_BEGIN
     @property(nonatomic, readonly) /*     */ BOOL      isEntityReference;
     @property(nonatomic) /*               */ BOOL      needsSyncData;
     @property(nonatomic, readonly) /*     */ BOOL      needsOwnerDocument;
+    @property(nonatomic, readonly) /*     */ BOOL      hasTextOnlyChildren;
+    @property(nonatomic, readonly) /*     */ BOOL      canModifyPrev;
+    @property(nonatomic, readonly) /*     */ BOOL      canModifyNext;
 
     -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(nullable PGDOMDocument *)ownerDocument;
 
@@ -61,6 +66,22 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(void)synchronizeData;
 
+    -(NSInteger)childTextNodeProc:(BOOL)forward
+                        entRefBlk:(PGDOMNodeProcBlock)entRefBlk
+                      textNodeBlk:(PGDOMNodeProcBlock)textNodeBlk
+                     cdataNodeBlk:(PGDOMNodeProcBlock)cdataNodeBlk
+                       defaultBlk:(PGDOMNodeProcBlock)defaultBlk
+                 startReturnValue:(NSInteger)startReturnValue
+                finishReturnValue:(NSInteger)finishReturnValue;
+
+    -(NSInteger)textNodeProc:(PGDOMNode *)node
+                     forward:(BOOL)forward
+                   entRefBlk:(PGDOMNodeProcBlock)entRefBlk
+                 textNodeBlk:(PGDOMNodeProcBlock)textNodeBlk
+                cdataNodeBlk:(PGDOMNodeProcBlock)cdataNodeBlk
+                  defaultBlk:(PGDOMNodeProcBlock)defaultBlk
+            startReturnValue:(NSInteger)startReturnValue
+           finishReturnValue:(NSInteger)finishReturnValue;
 @end
 
 @interface PGDOMParent()
@@ -72,6 +93,7 @@ NS_ASSUME_NONNULL_BEGIN
     -(void)postChildListChangeNotification;
 
     -(void)grandchildListChanged;
+
 @end
 
 @interface PGDOMDocument()
@@ -201,9 +223,9 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(void)nodeListChangeListener:(NSNotification *)notification;
 
-    -(void)load:(NSMutableArray<PGDOMNode *> *)list from:(PGDOMElement *)parent byTagName:(NSString *)tagName;
+    -(void)load:(NSMutableArray<PGDOMElement *> *)list from:(PGDOMElement *)parent byTagName:(NSString *)tagName;
 
-    -(void)load:(NSMutableArray<PGDOMNode *> *)list from:(PGDOMElement *)parent byLocalName:(NSString *)localName namespaceURI:(NSString *)namespaceURI;
+    -(void)load:(NSMutableArray<PGDOMElement *> *)list from:(PGDOMElement *)parent byLocalName:(NSString *)localName namespaceURI:(NSString *)namespaceURI;
 
 @end
 
@@ -237,12 +259,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface PGDOMText()
 
     -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data;
-
-    -(BOOL)canModifyNext:(PGDOMNode *)node;
-
-    -(BOOL)canModifyPrev:(PGDOMNode *)node;
-
-    -(BOOL)hasTextOnlyChildren:(PGDOMNode *)node;
 
     -(BOOL)getWholeTextBackward:(NSMutableString *)wholeText node:(PGDOMNode *)node parent:(PGDOMNode *)parent;
 

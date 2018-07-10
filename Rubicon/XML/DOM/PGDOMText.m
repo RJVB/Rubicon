@@ -38,8 +38,8 @@
     }
 
     -(BOOL)canModifyNext:(PGDOMNode *)node {
-        BOOL      textFirstChild = NO;
         PGDOMNode *next          = node.nextSibling;
+        BOOL      textFirstChild = NO;
 
         while(next) {
             switch(next.nodeType) {
@@ -109,32 +109,6 @@
         }
 
         return YES;
-    }
-
-    -(BOOL)hasTextOnlyChildren:(PGDOMNode *)node {
-        PGDOMNode *child = node;
-
-        if(child) {
-            child = child.firstChild;
-
-            while(child) {
-                switch(child.nodeType) {
-                    case PGDOMNodeTypeEntityReference:
-                        if(![self hasTextOnlyChildren:child]) return NO;
-                    case PGDOMNodeTypeCDataSection:
-                    case PGDOMNodeTypeText:
-                        break;
-                    default:
-                        return NO;
-                }
-
-                child = child.nextSibling;
-            }
-
-            return YES;
-        }
-
-        return NO;
     }
 
     -(BOOL)getWholeTextBackward:(NSMutableString *)wholeText node:(PGDOMNode *)node parent:(PGDOMNode *)parent {

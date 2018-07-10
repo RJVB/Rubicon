@@ -24,7 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGDOMAttributeMap : PGDOMNamedNodeMapImpl<PGDOMAttr>
+@interface PGDOMAttributeMap : PGDOMNamedNodeMapImpl<PGDOMAttr *>
 
 @end
 

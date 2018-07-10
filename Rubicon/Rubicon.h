@@ -60,6 +60,7 @@
 #import <Rubicon/PGDOMElement.h>
 #import <Rubicon/PGDOMNamedNodeMap.h>
 #import <Rubicon/PGDOMNodeList.h>
+#import <Rubicon/PGDOMText.h>
 
 FOUNDATION_EXPORT double              RubiconVersionNumber;
 FOUNDATION_EXPORT const unsigned char RubiconVersionString[];

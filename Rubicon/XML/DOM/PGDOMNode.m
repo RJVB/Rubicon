@@ -226,4 +226,69 @@
         self.needsSyncData = NO;
     }
 
+    -(BOOL)hasTextOnlyChildren {
+        PGDOMNodeProcBlock okblk = ^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return NO; };
+        PGDOMNodeProcBlock noblk = ^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return YES; };
+        PGDOMNodeProcBlock enblk = ^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return !n.hasTextOnlyChildren; };
+
+        return (BOOL)[self childTextNodeProc:YES entRefBlk:enblk textNodeBlk:okblk cdataNodeBlk:okblk defaultBlk:noblk startReturnValue:NO finishReturnValue:YES];
+    }
+
+    -(BOOL)canModifyPrev {
+        return NO;
+    }
+
+    -(BOOL)canModifyNext {
+        return NO;
+    }
+
+    -(NSInteger)childTextNodeProc:(BOOL)forward
+                        entRefBlk:(PGDOMNodeProcBlock)entRefBlk
+                      textNodeBlk:(PGDOMNodeProcBlock)textNodeBlk
+                     cdataNodeBlk:(PGDOMNodeProcBlock)cdataNodeBlk
+                       defaultBlk:(PGDOMNodeProcBlock)defaultBlk
+                 startReturnValue:(NSInteger)startReturnValue
+                finishReturnValue:(NSInteger)finishReturnValue {
+        return [self textNodeProc:(forward ? self.firstChild : self.lastChild)
+                          forward:forward
+                        entRefBlk:entRefBlk
+                      textNodeBlk:textNodeBlk
+                     cdataNodeBlk:cdataNodeBlk
+                       defaultBlk:defaultBlk
+                 startReturnValue:startReturnValue
+                finishReturnValue:finishReturnValue];
+    }
+
+    -(NSInteger)textNodeProc:(PGDOMNode *)node
+                     forward:(BOOL)forward
+                   entRefBlk:(PGDOMNodeProcBlock)entRefBlk
+                 textNodeBlk:(PGDOMNodeProcBlock)textNodeBlk
+                cdataNodeBlk:(PGDOMNodeProcBlock)cdataNodeBlk
+                  defaultBlk:(PGDOMNodeProcBlock)defaultBlk
+            startReturnValue:(NSInteger)startReturnValue
+           finishReturnValue:(NSInteger)finishReturnValue {
+        NSInteger retValue = startReturnValue;
+
+        while(node) {
+            switch(node.nodeType) {
+                case PGDOMNodeTypeEntityReference:
+                    if(entRefBlk(node, &retValue, forward)) return retValue;
+                    break;
+                case PGDOMNodeTypeText:
+                    if(textNodeBlk(node, &retValue, forward)) return retValue;
+                    break;
+                case PGDOMNodeTypeCDataSection:
+                    if(cdataNodeBlk(node, &retValue, forward)) return retValue;
+                    break;
+                default:
+                    if(defaultBlk(node, &retValue, forward)) return retValue;
+                    break;
+            }
+
+            node = (forward ? node.nextSibling : node.previousSibling);
+        }
+
+        return finishReturnValue;
+    }
+
 @end
