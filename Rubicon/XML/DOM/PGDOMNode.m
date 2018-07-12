@@ -20,7 +20,6 @@
 @implementation PGDOMNode {
         PGDOMNodeList<PGDOMNode *>     *_childNodes;
         PGDOMNamedNodeMap<PGDOMAttr *> *_attributes;
-        BOOL                           _needsSyncData;
     }
 
     @synthesize nodeType = _nodeType;
@@ -29,6 +28,7 @@
     @synthesize nextSibling = _nextSibling;
     @synthesize ownerDocument = _ownerDocument;
     @synthesize isReadOnly = _isReadOnly;
+    @synthesize needsSyncData = _needsSyncData;
 
     -(instancetype)init {
         self = [super init];
@@ -62,7 +62,7 @@
                 return PGDOMNodeNameCDataSection;
             case PGDOMNodeTypeComment:
                 return PGDOMNodeNameComment;
-            case PGDOMNOdeTypeDocumentFragment:
+            case PGDOMNodeTypeDocumentFragment:
                 return PGDOMNodeNameDocumentFragment;
             case PGDOMNodeTypeDocument:
                 return PGDOMNodeNameDocument;
@@ -73,15 +73,15 @@
         }
     }
 
-    -(NSString *)nodeTypeDescription {
-        switch(self.nodeType) {
+    +(NSString *)nodeTypeDescription:(PGDOMNodeTypes)ntype {
+        switch(ntype) {
             case PGDOMNodeTypeAttribute:
                 return PGDOMNodeTypeDescAttribute;
             case PGDOMNodeTypeCDataSection:
                 return PGDOMNodeTypeDescCData;
             case PGDOMNodeTypeComment:
                 return PGDOMNodeTypeDescComment;
-            case PGDOMNOdeTypeDocumentFragment:
+            case PGDOMNodeTypeDocumentFragment:
                 return PGDOMNodeTypeDescDocumentFragment;
             case PGDOMNodeTypeDocument:
                 return PGDOMNodeTypeDescDocument;
@@ -102,6 +102,10 @@
             default:
                 return nil;
         }
+    }
+
+    -(NSString *)nodeTypeDescription {
+        return [PGDOMNode nodeTypeDescription:self.nodeType];
     }
 
     -(NSString *)nodeValue {
@@ -183,13 +187,8 @@
     }
 
     -(BOOL)isTextNode {
-        switch(self.nodeType) {
-            case PGDOMNodeTypeCDataSection:
-            case PGDOMNodeTypeText:
-                return YES;
-            default:
-                return NO;
-        }
+        PGDOMNodeTypes t = self.nodeType;
+        return ((t == PGDOMNodeTypeCDataSection) || (t == PGDOMNodeTypeText));
     }
 
     -(BOOL)isEntityReference {
@@ -197,29 +196,8 @@
     }
 
     -(BOOL)needsOwnerDocument {
-        switch(self.nodeType) {
-            case PGDOMNodeTypeDocument:
-            case PGDOMNOdeTypeDocumentFragment:
-                return NO;
-            default:
-                return YES;
-        }
-    }
-
-    -(BOOL)needsSyncData {
-        return _needsSyncData;
-    }
-
-    -(void)setNeedsSyncData:(BOOL)needsSyncData {
-        if(_needsSyncData != needsSyncData) {
-            _needsSyncData = needsSyncData;
-
-            if(needsSyncData) {
-                self.previousSibling.needsSyncData = needsSyncData;
-                self.nextSibling.needsSyncData     = needsSyncData;
-                self.parentNode.needsSyncData      = needsSyncData;
-            }
-        }
+        PGDOMNodeTypes t = self.nodeType;
+        return ((t != PGDOMNodeTypeDocument) && (t != PGDOMNodeTypeDocumentFragment));
     }
 
     -(void)synchronizeData {
@@ -227,33 +205,26 @@
     }
 
     -(BOOL)hasTextOnlyChildren {
-        return (BOOL)[self textNodeProc:self.firstChild
-                                forward:YES
-                              entRefBlk:^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return !n.hasTextOnlyChildren; }
-                            textNodeBlk:^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return NO; }
-                             defaultBlk:^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return YES; }
-                       startReturnValue:NO
-                      finishReturnValue:YES];
+        PGDOMProcBlk a = ^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return !n.hasTextOnlyChildren; };
+        PGDOMProcBlk b = ^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return NO; };
+        PGDOMProcBlk c = ^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return YES; };
+
+        return (BOOL)[self textProc:self.firstChild forward:YES blkEntRef:a blkText:b blkDefault:c defRetVal:NO endRetVal:YES];
     }
 
-    -(BOOL)canModify:(BOOL)f {
+    -(BOOL)canModify:(BOOL)fwd {
         __block BOOL tc = NO;
+        PGDOMProcBlk a  = ^BOOL(PGDOMNode *n1, NSInteger *rv1, BOOL f1) {
+            PGDOMProcBlk d = ^BOOL(PGDOMNode *n2, NSInteger *rv2, BOOL f2) { return !((BOOL)([n2 canModify:f2] ? (tc = YES) : (*rv1 = NO))); };
+            PGDOMProcBlk e = ^BOOL(PGDOMNode *n2, NSInteger *rv2, BOOL f2) { return !(tc = YES); };
+            PGDOMProcBlk f = ^BOOL(PGDOMNode *n2, NSInteger *rv2, BOOL f2) { return ((*rv1 = !tc) || YES); };
 
-        return [self textNodeProc:(f ? self.nextSibling : self.previousSibling)
-                          forward:f
-                        entRefBlk:^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) {
-                            return (BOOL)[self textNodeProc:(f ? n.firstChild : n.lastChild)
-                                                    forward:f
-                                                  entRefBlk:^BOOL(PGDOMNode *n2, NSInteger *rv2, BOOL f2) { return !((BOOL)([n2 canModify:f2] ? (tc = YES) : (*rv = NO))); }
-                                                textNodeBlk:^BOOL(PGDOMNode *n2, NSInteger *rv2, BOOL f2) { return !(tc = YES); }
-                                                 defaultBlk:^BOOL(PGDOMNode *n2, NSInteger *rv2, BOOL f2) { return ((*rv = !tc) || YES); }
-                                           startReturnValue:YES
-                                          finishReturnValue:NO];
-                        }
-                      textNodeBlk:^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return NO; }
-                       defaultBlk:^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return YES; }
-                 startReturnValue:YES
-                finishReturnValue:YES];
+            return (BOOL)[self textProc:NCHILD(n1, f1) forward:f1 blkEntRef:d blkText:e blkDefault:f defRetVal:YES endRetVal:NO];
+        };
+        PGDOMProcBlk b  = ^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return NO; };
+        PGDOMProcBlk c  = ^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return YES; };
+
+        return (BOOL)[self textProc:NSIBLING(self, fwd) forward:fwd blkEntRef:a blkText:b blkDefault:c defRetVal:YES endRetVal:YES];
     }
 
     -(BOOL)canModifyPrev {
@@ -264,53 +235,106 @@
         return [self canModify:YES];
     }
 
-    -(NSInteger)textNodeProc:(PGDOMNode *)node
-                     forward:(BOOL)forward
-                   entRefBlk:(PGDOMNodeProcBlock)entRefBlk
-                 textNodeBlk:(PGDOMNodeProcBlock)textNodeBlk
-                cdataNodeBlk:(PGDOMNodeProcBlock)cdataNodeBlk
-                  defaultBlk:(PGDOMNodeProcBlock)defaultBlk
-            startReturnValue:(NSInteger)startReturnValue
-           finishReturnValue:(NSInteger)finishReturnValue {
-        NSInteger retValue = startReturnValue;
-
-        while(node) {
-            switch(node.nodeType) {
-                case PGDOMNodeTypeEntityReference:
-                    if(entRefBlk(node, &retValue, forward)) return retValue;
-                    break;
-                case PGDOMNodeTypeText:
-                    if(textNodeBlk(node, &retValue, forward)) return retValue;
-                    break;
-                case PGDOMNodeTypeCDataSection:
-                    if(cdataNodeBlk(node, &retValue, forward)) return retValue;
-                    break;
-                default:
-                    if(defaultBlk(node, &retValue, forward)) return retValue;
-                    break;
-            }
-
-            node = (forward ? node.nextSibling : node.previousSibling);
-        }
-
-        return finishReturnValue;
+    -(NSInteger)textProc:(PGDOMNode *)n
+                 forward:(BOOL)fwd
+               blkEntRef:(PGDOMProcBlk)blkEntRef
+                 blkText:(PGDOMProcBlk)blkText
+                blkCData:(PGDOMProcBlk)blkCData
+              blkDefault:(PGDOMProcBlk)blkDefault
+               defRetVal:(NSInteger)x
+               endRetVal:(NSInteger)y {
+        return [self nodeProc:n
+                      forward:fwd
+                      blkAttr:nil
+                     blkCData:blkCData
+                   blkComment:nil
+                   blkDocFrag:nil
+                  blkDocument:nil
+                       blkDTD:nil
+                   blkElement:nil
+                    blkEntity:nil
+                    blkEntRef:blkEntRef
+                  blkNotation:nil
+                  blkProcInst:nil
+                      blkText:blkText
+                   blkDefault:blkDefault
+                    defRetVal:x
+                    endRetVal:y];
     }
 
-    -(BOOL)textNodeProc:(PGDOMNode *)node
-                forward:(BOOL)forward
-              entRefBlk:(PGDOMNodeProcBlock)entRefBlk
-            textNodeBlk:(PGDOMNodeProcBlock)textNodeBlk
-             defaultBlk:(PGDOMNodeProcBlock)defaultBlk
-       startReturnValue:(BOOL)startReturnValue
-      finishReturnValue:(BOOL)finishReturnValue {
-        return (BOOL)[self textNodeProc:node
-                                forward:forward
-                              entRefBlk:entRefBlk
-                            textNodeBlk:textNodeBlk
-                           cdataNodeBlk:textNodeBlk
-                             defaultBlk:defaultBlk
-                       startReturnValue:startReturnValue
-                      finishReturnValue:finishReturnValue];
+    -(NSInteger)textProc:(PGDOMNode *)n
+                 forward:(BOOL)fwd
+               blkEntRef:(PGDOMProcBlk)blkEntRef
+                 blkText:(PGDOMProcBlk)blkText
+              blkDefault:(PGDOMProcBlk)blkDefault
+               defRetVal:(BOOL)x
+               endRetVal:(BOOL)y {
+        return [self nodeProc:n
+                      forward:fwd
+                      blkAttr:nil
+                     blkCData:blkText
+                   blkComment:nil
+                   blkDocFrag:nil
+                  blkDocument:nil
+                       blkDTD:nil
+                   blkElement:nil
+                    blkEntity:nil
+                    blkEntRef:blkEntRef
+                  blkNotation:nil
+                  blkProcInst:nil
+                      blkText:blkText
+                   blkDefault:blkDefault
+                    defRetVal:x
+                    endRetVal:y];
+    }
+
+    -(NSInteger)nodeProc:(PGDOMNode *)n
+                 forward:(BOOL)fwd
+                 blkAttr:(PGDOMProcBlk)blkAttr
+                blkCData:(PGDOMProcBlk)blkCData
+              blkComment:(PGDOMProcBlk)blkComment
+              blkDocFrag:(PGDOMProcBlk)blkDocFrag
+             blkDocument:(PGDOMProcBlk)blkDocument
+                  blkDTD:(PGDOMProcBlk)blkDTD
+              blkElement:(PGDOMProcBlk)blkElement
+               blkEntity:(PGDOMProcBlk)blkEntity
+               blkEntRef:(PGDOMProcBlk)blkEntRef
+             blkNotation:(PGDOMProcBlk)blkNotation
+             blkProcInst:(PGDOMProcBlk)blkProcInst
+                 blkText:(PGDOMProcBlk)blkText
+              blkDefault:(PGDOMProcBlk)blkDefault
+               defRetVal:(NSInteger)x
+               endRetVal:(NSInteger)y {
+        NSInteger    rv = x;
+        PGDOMProcBlk dd = ^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return NO; };
+
+        if(!blkDefault) blkDefault = dd;
+
+        while(n) {
+            switch(n.nodeType) { /*@f:0*/
+                case PGDOMNodeTypeAttribute:             if((blkAttr ?: blkDefault)(n, &rv, fwd))     return rv; break;
+                case PGDOMNodeTypeCDataSection:          if((blkCData ?: blkDefault)(n, &rv, fwd))    return rv; break;
+                case PGDOMNodeTypeComment:               if((blkComment ?: blkDefault)(n, &rv, fwd))  return rv; break;
+                case PGDOMNodeTypeDocumentFragment:      if((blkDocFrag ?: blkDefault)(n, &rv, fwd))  return rv; break;
+                case PGDOMNodeTypeDocument:              if((blkDocument ?: blkDefault)(n, &rv, fwd)) return rv; break;
+                case PGDOMNodeTypeDTD:                   if((blkDTD ?: blkDefault)(n, &rv, fwd))      return rv; break;
+                case PGDOMNodeTypeElement:               if((blkElement ?: blkDefault)(n, &rv, fwd))  return rv; break;
+                case PGDOMNodeTypeEntity:                if((blkEntity ?: blkDefault)(n, &rv, fwd))   return rv; break;
+                case PGDOMNodeTypeEntityReference:       if((blkEntRef ?: blkDefault)(n, &rv, fwd))   return rv; break;
+                case PGDOMNodeTypeNotation:              if((blkNotation ?: blkDefault)(n, &rv, fwd)) return rv; break;
+                case PGDOMNodeTypeProcessingInstruction: if((blkProcInst ?: blkDefault)(n, &rv, fwd)) return rv; break;
+                case PGDOMNodeTypeText:                  if((blkText ?: blkDefault)(n, &rv, fwd))     return rv; break;
+                default:                                 if(blkDefault(n, &rv, fwd))                  return rv; break; /*@f:1*/
+            }
+
+            n = NSIBLING(n, fwd);
+        }
+
+        return y;
+    }
+
+    -(NSException *)createNoModificationException {
+        return [NSException exceptionWithName:PGDOMException reason:PGErrorMsgNoModificationAllowed];
     }
 
 @end

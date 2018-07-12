@@ -37,4 +37,14 @@
         return [[PGDOMText alloc] initWithOwnerDocument:self data:content];
     }
 
+    -(PGDOMCDataSection *)createCDataSection:(NSString *)content {
+        return [[PGDOMCDataSection alloc] initWithOwnerDocument:self data:content];
+    }
+
+    -(PGDOMText *)createTextNode:(NSString *)content ofType:(PGDOMNodeTypes)nodeType {
+        if(nodeType == PGDOMNodeTypeText) return [self createTextNode:content];
+        if(nodeType == PGDOMNodeTypeCDataSection) return [self createCDataSection:content];
+        @throw [NSException exceptionWithName:NSInvalidArgumentException reason:PGFormat(PGDOMErrorMsgNotTextNode, [PGDOMNode nodeTypeDescription:nodeType])];
+    }
+
 @end

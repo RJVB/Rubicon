@@ -20,7 +20,6 @@
 #define RUBICON_PGDOMATTR_H
 
 #import <Rubicon/PGDOMNamespaceAware.h>
-#import "PGDOMPrivate.h"
 
 @class PGDOMElement;
 
@@ -40,15 +39,6 @@ NS_ASSUME_NONNULL_BEGIN
 
     @property(nonatomic, readonly) PGDOMNamedNodeMap<PGDOMAttr *> *attributes;
 
-    -(BOOL)canModify:(BOOL)f;
-
-    -(BOOL)textNodeProc:(PGDOMNode *)node
-                forward:(BOOL)forward
-              entRefBlk:(PGDOMNodeProcBlock)entRefBlk
-            textNodeBlk:(PGDOMNodeProcBlock)textNodeBlk
-             defaultBlk:(PGDOMNodeProcBlock)defaultBlk
-       startReturnValue:(BOOL)startReturnValue
-      finishReturnValue:(BOOL)finishReturnValue;
 @end
 
 NS_ASSUME_NONNULL_END

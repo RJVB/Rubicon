@@ -24,8 +24,7 @@
 typedef NS_ENUM(NSUInteger, PGDOMNodeTypes) {
     PGDOMNodeTypeAttribute,
     PGDOMNodeTypeCDataSection,
-    PGDOMNodeTypeComment,
-    PGDOMNOdeTypeDocumentFragment,
+    PGDOMNodeTypeComment, PGDOMNodeTypeDocumentFragment,
     PGDOMNodeTypeDocument,
     PGDOMNodeTypeDTD,
     PGDOMNodeTypeElement,
@@ -69,6 +68,7 @@ FOUNDATION_EXPORT NSString *const PGDOMErrorMsgInvalidCharacter;
 FOUNDATION_EXPORT NSString *const PGDOMErrorMsgValidationRegexError;
 FOUNDATION_EXPORT NSString *const PGDOMErrorMsgOwnerDocumentNull;
 FOUNDATION_EXPORT NSString *const PGDOMErrorMsgNodeNameMissing;
+FOUNDATION_EXPORT NSString *const PGDOMErrorMsgNotTextNode;
 
 FOUNDATION_EXPORT NSString *const PGDOMMsgOld;
 FOUNDATION_EXPORT NSString *const PGDOMMsgReference;

@@ -49,7 +49,7 @@
         NSUInteger clen   = cdata.length;
 
         if(offset > clen) {
-            @throw [NSException exceptionWithName:NSInvalidArgumentException reason:PGErrorMsgIndexOutOfBounds];
+            @throw [self createIndexOutOfBoundsException];
         }
         if(data.length) {
             if(offset == clen) self.data = [cdata stringByAppendingString:data];
@@ -64,7 +64,7 @@
         NSUInteger eidx   = (offset + length);
 
         if((offset > clen) || (eidx > clen)) {
-            @throw [NSException exceptionWithName:NSInvalidArgumentException reason:PGErrorMsgIndexOutOfBounds];
+            @throw [self createIndexOutOfBoundsException];
         }
         else if((offset < clen) && (length > 0)) {
             NSString *pfx = [cdata substringToIndex:offset];
@@ -79,6 +79,10 @@
 
     -(NSString *)substringDataAtOffset:(NSUInteger)offset length:(NSUInteger)length {
         return [self.data substringWithRange:NSMakeRange(offset, length)];
+    }
+
+    -(NSException *)createIndexOutOfBoundsException {
+        return [NSException exceptionWithName:NSInvalidArgumentException reason:PGErrorMsgIndexOutOfBounds];
     }
 
 @end

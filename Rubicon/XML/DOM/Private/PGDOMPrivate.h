@@ -34,15 +34,18 @@
 #import "PGDOMElementNodeList.h"
 #import "PGDOMCharacterData.h"
 #import "PGDOMText.h"
+#import "PGDOMCDataSection.h"
 
 typedef PGMutableBinaryTreeDictionary<NSString *, PGDOMNode *>   *PGDOMNodeTree;
 typedef PGMutableBinaryTreeDictionary<NSString *, PGDOMNodeTree> *PGDOMNodeNodeTree;
 
-typedef BOOL (^PGDOMNodeProcBlock)(PGDOMNode *node, NSInteger *pRetValue, BOOL forward);
+typedef BOOL (^PGDOMProcBlk)(PGDOMNode *node, NSInteger *pRetValue, BOOL forward);
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define PGDOMSyncData do{if(self.needsSyncData)[self synchronizeData];}while(0)
+#define PGDOMSyncData  do{if(self.needsSyncData)[self synchronizeData];}while(0)
+#define NSIBLING(n, f) ((f)?(n.nextSibling):(n.previousSibling))
+#define NCHILD(n, f)   ((f)?(n.firstChild):(n.lastChild))
 
 @interface PGDOMNode()
 
@@ -66,14 +69,47 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(void)synchronizeData;
 
-    -(NSInteger)textNodeProc:(PGDOMNode *)node
-                     forward:(BOOL)forward
-                   entRefBlk:(PGDOMNodeProcBlock)entRefBlk
-                 textNodeBlk:(PGDOMNodeProcBlock)textNodeBlk
-                cdataNodeBlk:(PGDOMNodeProcBlock)cdataNodeBlk
-                  defaultBlk:(PGDOMNodeProcBlock)defaultBlk
-            startReturnValue:(NSInteger)startReturnValue
-           finishReturnValue:(NSInteger)finishReturnValue;
+    -(BOOL)canModify:(BOOL)fwd;
+
+    -(NSInteger)textProc:(nullable PGDOMNode *)n
+                 forward:(BOOL)fwd
+               blkEntRef:(nullable PGDOMProcBlk)blkEntRef
+                 blkText:(nullable PGDOMProcBlk)blkText
+              blkDefault:(nullable PGDOMProcBlk)blkDefault
+               defRetVal:(BOOL)x
+               endRetVal:(BOOL)y;
+
+    -(NSInteger)textProc:(nullable PGDOMNode *)n
+                 forward:(BOOL)fwd
+               blkEntRef:(nullable PGDOMProcBlk)blkEntRef
+                 blkText:(nullable PGDOMProcBlk)blkText
+                blkCData:(nullable PGDOMProcBlk)blkCData
+              blkDefault:(nullable PGDOMProcBlk)blkDefault
+               defRetVal:(NSInteger)x
+               endRetVal:(NSInteger)y;
+
+    -(NSInteger)nodeProc:(nullable PGDOMNode *)n
+                 forward:(BOOL)fwd
+                 blkAttr:(nullable PGDOMProcBlk)blkAttr
+                blkCData:(nullable PGDOMProcBlk)blkCData
+              blkComment:(nullable PGDOMProcBlk)blkComment
+              blkDocFrag:(nullable PGDOMProcBlk)blkDocFrag
+             blkDocument:(nullable PGDOMProcBlk)blkDocument
+                  blkDTD:(nullable PGDOMProcBlk)blkDTD
+              blkElement:(nullable PGDOMProcBlk)blkElement
+               blkEntity:(nullable PGDOMProcBlk)blkEntity
+               blkEntRef:(nullable PGDOMProcBlk)blkEntRef
+             blkNotation:(nullable PGDOMProcBlk)blkNotation
+             blkProcInst:(nullable PGDOMProcBlk)blkProcInst
+                 blkText:(nullable PGDOMProcBlk)blkText
+              blkDefault:(nullable PGDOMProcBlk)blkDefault
+               defRetVal:(NSInteger)x
+               endRetVal:(NSInteger)y;
+
+    +(NSString *)nodeTypeDescription:(PGDOMNodeTypes)ntype;
+
+    -(NSException *)createNoModificationException;
+
 @end
 
 @interface PGDOMParent()
@@ -92,6 +128,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     @property(nonatomic, readonly) NSNotificationCenter *notificationCenter;
 
+    -(PGDOMText *)createTextNode:(NSString *)content ofType:(PGDOMNodeTypes)nodeType;
 @end
 
 @interface PGDOMNamespaceAware()
@@ -166,6 +203,7 @@ NS_ASSUME_NONNULL_BEGIN
     -(PGDOMAttr *)_setAttribute:(PGDOMAttr *)attr;
 
     -(PGDOMAttr *)_setAttributeNS:(PGDOMAttr *)attr;
+
 @end
 
 @interface PGDOMNotifiedContainer()
@@ -246,15 +284,21 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data;
 
+    -(NSException *)createIndexOutOfBoundsException;
 @end
 
 @interface PGDOMText()
 
     -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data;
 
-    -(BOOL)getWholeTextBackward:(NSMutableString *)wholeText node:(PGDOMNode *)node parent:(PGDOMNode *)parent;
+    -(void)performAction:(PGDOMNodeAction)blkAction onTextNodesAdjacentToNode:(PGDOMNode *)node goingForward:(BOOL)fwd;
 
-    -(BOOL)getWholeTextForward:(NSMutableString *)wholeText node:(PGDOMNode *)node parent:(PGDOMNode *)parent;
+    -(void)performAction:(PGDOMNodeAction)action onTextNodesAdjacentToNode:(PGDOMNode *)node;
+@end
+
+@interface PGDOMCDataSection()
+
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data;
 
 @end
 

@@ -23,8 +23,8 @@
         NSString *_wholeText;
     }
 
-    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data {
-        self = [super initWithNodeType:PGDOMNodeTypeText ownerDocument:ownerDocument data:data];
+    -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data {
+        self = [super initWithNodeType:nodeType ownerDocument:ownerDocument data:data];
 
         if(self) {
         }
@@ -32,172 +32,111 @@
         return self;
     }
 
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data {
+        return (self = [self initWithNodeType:PGDOMNodeTypeText ownerDocument:ownerDocument data:data]);
+    }
+
     -(BOOL)isElementContentWhitespace {
         PGDOMSyncData;
         return _isElementContentWhitespace;
     }
 
-    -(BOOL)canModifyNext:(PGDOMNode *)node {
-        PGDOMNode *next          = node.nextSibling;
-        BOOL      textFirstChild = NO;
+    -(BOOL)getWholeText:(NSMutableString *)txt forward:(BOOL)fwd node:(PGDOMNode *)node parent:(PGDOMNode *)parent {
+        /*@f:0*/
+        PGDOMProcBlk a = ^BOOL(PGDOMNode *n, NSInteger *r, BOOL f) { NSString *v = n.nodeValue; if(v.length) { if(f) [txt appendString:v]; else [txt insertString:v atIndex:0]; } return NO; };
+        PGDOMProcBlk b = ^BOOL(PGDOMNode *n, NSInteger *r, BOOL f) { return [self getWholeText:txt forward:f node:NCHILD(n, f) parent:n]; };
+        PGDOMProcBlk c = ^BOOL(PGDOMNode *n, NSInteger *r, BOOL f) { return YES; };
 
-        while(next) {
-            switch(next.nodeType) {
-                case PGDOMNodeTypeEntityReference: {
-                    PGDOMNode *firstChild = next.firstChild;
-                    if(!firstChild) return NO;
-
-                    while(firstChild) {
-                        switch(firstChild.nodeType) {
-                            case PGDOMNodeTypeEntityReference:
-                                if(![self canModifyNext:firstChild]) return NO;
-                            case PGDOMNodeTypeText:
-                            case PGDOMNodeTypeCDataSection:
-                                textFirstChild = YES;
-                                break;
-                            default:
-                                return !textFirstChild;
-                        }
-
-                        firstChild = firstChild.nextSibling;
-                    }
-                }
-                case PGDOMNodeTypeText:
-                case PGDOMNodeTypeCDataSection:
-                    break;
-                default:
-                    return YES;
-            }
-            next = next.nextSibling;
-        }
-        return YES;
-    }
-
-    -(BOOL)canModifyPrev:(PGDOMNode *)node {
-        BOOL      textLastChild = NO;
-        PGDOMNode *prev         = node.previousSibling;
-
-        while(prev) {
-            switch(prev.nodeType) {
-                case PGDOMNodeTypeEntityReference: {
-                    PGDOMNode *lastChild = prev.lastChild;
-                    if(!lastChild) return NO;
-
-                    while(lastChild) {
-                        switch(lastChild.nodeType) {
-                            case PGDOMNodeTypeEntityReference:
-                                if(![self canModifyPrev:lastChild]) return NO;
-                            case PGDOMNodeTypeText:
-                            case PGDOMNodeTypeCDataSection:
-                                textLastChild = YES;
-                                break;
-                            default:
-                                return !textLastChild;
-                        }
-
-                        lastChild = lastChild.previousSibling;
-                    }
-                }
-                case PGDOMNodeTypeText:
-                case PGDOMNodeTypeCDataSection:
-                    break;
-                default:
-                    return YES;
-            }
-
-            prev = prev.previousSibling;
-        }
-
-        return YES;
-    }
-
-    -(BOOL)getWholeTextBackward:(NSMutableString *)wholeText node:(PGDOMNode *)node parent:(PGDOMNode *)parent {
-        while(node) {
-            switch(node.nodeType) {
-                case PGDOMNodeTypeEntityReference:
-                    if([self getWholeTextBackward:wholeText node:node.lastChild parent:node]) return YES;
-                    break;
-                case PGDOMNodeTypeText:
-                case PGDOMNodeTypeCDataSection:
-                    if(node.nodeValue.length) [wholeText insertString:node.nodeValue atIndex:0];
-                    break;
-                default:
-                    return YES;
-            }
-
-            node = node.previousSibling;
-        }
-
-        if(parent.nodeType == PGDOMNodeTypeEntityReference) {
-            [self getWholeTextBackward:wholeText node:parent.previousSibling parent:parent.parentNode];
-            return YES;
-        }
-
+        if([self textProc:node forward:fwd blkEntRef:b blkText:a blkDefault:c defRetVal:YES endRetVal:NO]) return YES;
+        if(parent.isEntityReference) { [self getWholeText:txt forward:fwd node:NSIBLING(parent, fwd) parent:parent.parentNode]; return YES; }
         return NO;
-    }
-
-    -(BOOL)getWholeTextForward:(NSMutableString *)wholeText node:(PGDOMNode *)node parent:(PGDOMNode *)parent {
-        while(node) {
-            switch(node.nodeType) {
-                case PGDOMNodeTypeEntityReference:
-                    if([self getWholeTextForward:wholeText node:node.firstChild parent:node]) return YES;
-                    break;
-                case PGDOMNodeTypeText:
-                case PGDOMNodeTypeCDataSection:
-                    if(node.nodeValue.length) [wholeText appendString:node.nodeValue];
-                    break;
-                default:
-                    return YES;
-            }
-
-            node = node.nextSibling;
-        }
-
-        if(parent.nodeType == PGDOMNodeTypeEntityReference) {
-            [self getWholeTextForward:wholeText node:parent.nextSibling parent:parent.parentNode];
-            return YES;
-        }
-
-        return NO;
+        /*@f:1*/
     }
 
     -(NSString *)wholeText {
         PGDOMSyncData;
 
         if(_wholeText == nil) {
-            NSMutableString *wholeText = [NSMutableString new];
-            PGDOMNode       *parent    = self.parentNode;
-            NSString        *data      = self.data;
+            NSMutableString *txt  = [NSMutableString new];
+            PGDOMNode       *prnt = self.parentNode;
+            NSString        *data = self.data;
 
-            if(data.length) [wholeText appendString:data];
+            if(data.length) [txt appendString:data];
 
-            if(parent) {
-                [self getWholeTextBackward:wholeText node:self.previousSibling parent:parent];
-                [self getWholeTextForward:wholeText node:self.nextSibling parent:parent];
+            if(prnt) {
+                [self getWholeText:txt forward:NO node:self.previousSibling parent:prnt];
+                [self getWholeText:txt forward:YES node:self.nextSibling parent:prnt];
             }
 
-            _wholeText = wholeText;
+            _wholeText = txt;
         }
 
         return _wholeText;
     }
 
+    typedef PGDOMNode *(^PGDOMNodeAction)(PGDOMNode *node, PGDOMNode *other, BOOL forward);
+
     -(instancetype)replaceWholeTextWith:(NSString *)content {
         PGDOMSyncData;
+        PGDOMNode *parent      = self.parentNode;
+        PGDOMText *currentNode = nil;
+
+        if(content.length == 0) {
+            [parent removeChild:self];
+            return nil;
+        }
+
+        if(!(self.canModifyPrev && self.canModifyNext)) @throw [self createNoModificationException];
+
+        if(self.isReadOnly) {
+            PGDOMText *node = [self.ownerDocument createTextNode:content];
+
+            if(parent) {
+                [parent insertChild:node before:self];
+                [parent removeChild:self];
+                currentNode = node;
+            }
+            else return node;
+        }
+        else {
+            self.data = content;
+            currentNode = self;
+        }
+
         self.needsSyncData = YES;
-        return nil;
+        [self         performAction:^PGDOMNode *(PGDOMNode *n, PGDOMNode *o, BOOL f) {
+            [n.parentNode removeChild:n];
+            return o;
+        } onTextNodesAdjacentToNode:currentNode];
+
+        return currentNode;
+    }
+
+    -(void)performAction:(PGDOMNodeAction)blkAction onTextNodesAdjacentToNode:(PGDOMNode *)node goingForward:(BOOL)fwd {
+        PGDOMNode *sibling = NSIBLING(node, fwd);
+
+        while(sibling) {
+            if(sibling.isTextNode || (sibling.isEntityReference && sibling.hasTextOnlyChildren)) sibling = blkAction(sibling, node, fwd); else break;
+            sibling = NSIBLING(sibling, fwd);
+        }
+    }
+
+    -(void)performAction:(PGDOMNodeAction)action onTextNodesAdjacentToNode:(PGDOMNode *)node {
+        [self performAction:action onTextNodesAdjacentToNode:node goingForward:NO];
+        [self performAction:action onTextNodesAdjacentToNode:node goingForward:YES];
     }
 
     -(instancetype)splitTextAtOffset:(NSUInteger)offset {
-        if(self.isReadOnly) @throw [NSException exceptionWithName:PGDOMException reason:PGErrorMsgNoModificationAllowed];
+        if(self.isReadOnly) @throw [self createNoModificationException];
         PGDOMSyncData;
         NSString *data = self.data;
 
-        if(offset > data.length) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:PGErrorMsgIndexOutOfBounds];
+        if(offset > data.length) @throw [self createIndexOutOfBoundsException];
 
         self.data = [data substringToIndex:offset];
-        PGDOMText *text = [self.ownerDocument createTextNode:[data substringFromIndex:offset]];
+        PGDOMText *text = [self.ownerDocument createTextNode:[data substringFromIndex:offset] ofType:self.nodeType];
         [self.parentNode insertChild:text before:self.nextSibling];
+
         self.needsSyncData = YES;
         return text;
     }
@@ -205,6 +144,18 @@
     -(void)synchronizeData {
         _wholeText = nil;
         [super synchronizeData];
+    }
+
+    -(void)setData:(NSString *)data {
+        [super setData:data];
+        self.needsSyncData = YES;
+
+        PGDOMNodeAction a = ^PGDOMNode *(PGDOMNode *n, PGDOMNode *o, BOOL f) {
+            n.needsSyncData = YES;
+            return n;
+        };
+
+        [self performAction:a onTextNodesAdjacentToNode:self];
     }
 
 @end

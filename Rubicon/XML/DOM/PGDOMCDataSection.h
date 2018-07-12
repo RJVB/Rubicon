@@ -1,9 +1,9 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDOMDocument.h
+ *    FILENAME: PGDOMCDataSection.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 6/27/18
+ *        DATE: 7/11/18
  *  VISIBILITY: Private
  *
  * Copyright © 2018 Project Galen. All rights reserved.
@@ -16,25 +16,16 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#ifndef RUBICON_PGDOMDOCUMENT_H
-#define RUBICON_PGDOMDOCUMENT_H
+#ifndef RUBICON_PGDOMCDATASECTION_H
+#define RUBICON_PGDOMCDATASECTION_H
 
-#import <Rubicon/PGDOMParent.h>
-
-@class PGDOMText;
-@class PGDOMCDataSection;
+#import <Rubicon/PGDOMText.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGDOMDocument : PGDOMParent
-
-    -(instancetype)init;
-
-    -(PGDOMText *)createTextNode:(NSString *)content;
-
-    -(PGDOMCDataSection *)createCDataSection:(NSString *)content;
+@interface PGDOMCDataSection : PGDOMText
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif //RUBICON_PGDOMDOCUMENT_H
+#endif //RUBICON_PGDOMCDATASECTION_H
