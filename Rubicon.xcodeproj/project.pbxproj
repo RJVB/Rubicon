@@ -41,6 +41,7 @@
 		1117D3B6D293EFCC6B79A730 /* NSException+PGException.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D67458555B2FB7089EA7 /* NSException+PGException.m */; };
 		1117D3C388A59BB1FA7DF2A4 /* PGStreamTee.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D339D0BDEAD3BB01496F /* PGStreamTee.m */; };
 		1117D4036196216C44784D3D /* PGRedBlackNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D0DB44E51C55A0A69ADC /* PGRedBlackNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1117D404B18DFA924A73E2D2 /* PGDOMComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DCB83B0E89C73793C1FD /* PGDOMComment.m */; };
 		1117D4099277902C6C2F1769 /* PGDOMNamedNodeMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DA386541F20FEB464692 /* PGDOMNamedNodeMap.m */; };
 		1117D43A0D1A8FC2E08604C8 /* GNUstep.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D613575E1934C599AC49 /* GNUstep.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D44078E92C7EE16A48DE /* PGMutableBinaryTreeDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D0AA07D1EBBB41EE031C /* PGMutableBinaryTreeDictionary.m */; };
@@ -50,6 +51,7 @@
 		1117D469C3B58961AF8B3625 /* PGXMLParserTools.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DC5E7768EE86A48B182F /* PGXMLParserTools.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		1117D46B27CF7C8554D1E8B7 /* PGDOMNodeList.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DB572A3DC64DC943C717 /* PGDOMNodeList.m */; };
 		1117D4D7F1496D075E420609 /* PGXMLParser+PGXMLParserExtensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DDCE6DF7A7AFBCBE7008 /* PGXMLParser+PGXMLParserExtensions.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		1117D509347DA7BAF63AADDA /* PGDOMProcessingInstruction.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D2724A5FFB0BF7720C0B /* PGDOMProcessingInstruction.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D51944FF1968C96F0B00 /* PGNSXMLParserDelegateTest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D6B93FC35E0C24006F92 /* PGNSXMLParserDelegateTest.h */; };
 		1117D51D09137676EB5C1E49 /* PGCString.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DFB8457BA6D1F10E5B23 /* PGCString.m */; };
 		1117D54DC79F27B863858629 /* PGXMLParsedEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D9FE9C234FE4FC3E9946 /* PGXMLParsedEntity.m */; };
@@ -79,6 +81,7 @@
 		1117D85F99E13A04B77EA615 /* PGCString.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D82999FFCFA328E2A2F1 /* PGCString.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D86E190AE0BF1ED8C58F /* PGMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DA275B678D9478E87A06 /* PGMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D892FFA2504EF88DFE13 /* PGTime.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D57792306E4C2744E086 /* PGTime.m */; };
+		1117D896A0CBCFB12B462ACD /* PGDOMComment.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DF17A7B0392D9C7996CE /* PGDOMComment.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D8C0D8FEA9BA9181C6E8 /* sem_timedwait.c in Sources */ = {isa = PBXBuildFile; fileRef = 1117D4804DC238152BA17B8A /* sem_timedwait.c */; };
 		1117D8D047B706C5F4AE1EF1 /* PGStack.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DA40A7107FFA3B41DC8C /* PGStack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D8FB31EC8997BF59027A /* PGDOMAttr.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D0E67833BC456DA875BA /* PGDOMAttr.m */; };
@@ -105,6 +108,7 @@
 		1117DBB362320F47607B2FBF /* PGTimedWait.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DC0934B0E763DA6F459C /* PGTimedWait.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117DBD9D6AD64E1617D3878 /* PGDOMPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D6D18295A896F1546BE0 /* PGDOMPrivate.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		1117DBE5EEA3BB3DA7A27471 /* PGXMLParserDelegateTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D3A5480B8052D70CAEBA /* PGXMLParserDelegateTest.m */; };
+		1117DBEA093E30521447A5A4 /* PGDOMProcessingInstruction.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D976EDA8C83AE86FFB16 /* PGDOMProcessingInstruction.m */; };
 		1117DBF9EDEF62D334C2499C /* PGDOMParent.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D68219DE5444DDB94DFF /* PGDOMParent.m */; };
 		1117DC2052B5DC1501CCEC52 /* PGXMLParsedEntity.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D61D87FD1A818C1EE041 /* PGXMLParsedEntity.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		1117DC251D6952EF4FC88B52 /* PGDOMNotifiedContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D7DB07DA8CB816E67F75 /* PGDOMNotifiedContainer.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -193,6 +197,7 @@
 		1117D21E23BCAE6BA362885B /* PGDOMParent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDOMParent.h; sourceTree = "<group>"; };
 		1117D2338336C1CA509E5C0E /* PGDOMCharacterData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDOMCharacterData.m; sourceTree = "<group>"; };
 		1117D241DE6403A689E68F28 /* PGCmdLineCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGCmdLineCommon.m; sourceTree = "<group>"; };
+		1117D2724A5FFB0BF7720C0B /* PGDOMProcessingInstruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDOMProcessingInstruction.h; sourceTree = "<group>"; };
 		1117D2814A46700C7AF7A992 /* PGEmptyEnumerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGEmptyEnumerator.m; sourceTree = "<group>"; };
 		1117D28F0D0CEFBEAE726655 /* PGCmdLineOption.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGCmdLineOption.m; sourceTree = "<group>"; };
 		1117D2F717122C3EB529C8F9 /* NSData+PGData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+PGData.m"; sourceTree = "<group>"; };
@@ -269,6 +274,7 @@
 		1117D8B8C4C0A02F6130775D /* PGDOMPrivate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDOMPrivate.m; sourceTree = "<group>"; };
 		1117D91CB932BC51C194C049 /* PGFilterOutputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFilterOutputStream.h; sourceTree = "<group>"; };
 		1117D96AC9AAF96394E7BA36 /* PGTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTools.h; sourceTree = "<group>"; };
+		1117D976EDA8C83AE86FFB16 /* PGDOMProcessingInstruction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDOMProcessingInstruction.m; sourceTree = "<group>"; };
 		1117D97FBF08A6629899B2B3 /* PGLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGLogger.m; sourceTree = "<group>"; };
 		1117D98CC9D8896CA6643ADA /* PGNestedEnumerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGNestedEnumerator.m; sourceTree = "<group>"; };
 		1117D98F7851197D44B4D885 /* PGDOMText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDOMText.h; sourceTree = "<group>"; };
@@ -300,6 +306,7 @@
 		1117DC59A7B77EC63A993424 /* PGBase64OutputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBase64OutputStream.h; sourceTree = "<group>"; };
 		1117DC59B8CAD45138536EEC /* PGQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGQueue.h; sourceTree = "<group>"; };
 		1117DC5E7768EE86A48B182F /* PGXMLParserTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGXMLParserTools.h; sourceTree = "<group>"; };
+		1117DCB83B0E89C73793C1FD /* PGDOMComment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDOMComment.m; sourceTree = "<group>"; };
 		1117DCCC597057A2315B1AC8 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		1117DCD305FDDE0A6C683876 /* PGDynamicBufferTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDynamicBufferTools.h; sourceTree = "<group>"; };
 		1117DCDD59FFDD45304EACFB /* PGFilterInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFilterInputStream.h; sourceTree = "<group>"; };
@@ -318,6 +325,7 @@
 		1117DE82453B585D6C3FCCEE /* PGDOMDefines.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDOMDefines.m; sourceTree = "<group>"; };
 		1117DE9490257230F6A1151A /* PGXMLParserTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGXMLParserTools.m; sourceTree = "<group>"; };
 		1117DF142B39004BD5A5EB74 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		1117DF17A7B0392D9C7996CE /* PGDOMComment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDOMComment.h; sourceTree = "<group>"; };
 		1117DF4F2F2422973A1156C3 /* PGDOMNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDOMNode.m; sourceTree = "<group>"; };
 		1117DF8222D67F4383089DCF /* NSObject+PGObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+PGObject.m"; sourceTree = "<group>"; };
 		1117DFB8457BA6D1F10E5B23 /* PGCString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGCString.m; sourceTree = "<group>"; };
@@ -667,6 +675,10 @@
 				1117D98F7851197D44B4D885 /* PGDOMText.h */,
 				1117D99FD4EF6484357F6287 /* PGDOMCDataSection.m */,
 				1117DD1F5DB26ABB7B5E9D6D /* PGDOMCDataSection.h */,
+				1117DCB83B0E89C73793C1FD /* PGDOMComment.m */,
+				1117DF17A7B0392D9C7996CE /* PGDOMComment.h */,
+				1117D976EDA8C83AE86FFB16 /* PGDOMProcessingInstruction.m */,
+				1117D2724A5FFB0BF7720C0B /* PGDOMProcessingInstruction.h */,
 			);
 			path = DOM;
 			sourceTree = "<group>";
@@ -827,8 +839,10 @@
 				1117DE9705D1B57B6CFB36DB /* PGDOMNodeList.h in Headers */,
 				1117D0975190B34169264929 /* PGDOMCDataSection.h in Headers */,
 				1117D23223C2D13536AECDD3 /* PGDOMNamedNodeMap.h in Headers */,
+				1117D896A0CBCFB12B462ACD /* PGDOMComment.h in Headers */,
 				1117D387AED31074F4073E0D /* PGInternal.h in Headers */,
 				1117DC251D6952EF4FC88B52 /* PGDOMNotifiedContainer.h in Headers */,
+				1117D509347DA7BAF63AADDA /* PGDOMProcessingInstruction.h in Headers */,
 				1117DB79E0D65135A1DECCAC /* PGDOMNodeContainer.h in Headers */,
 				1117D907273304E8BD264B9C /* PGCmdLineCommon.h in Headers */,
 				1117DF2C8530219304DA683D /* PGDOMText.h in Headers */,
@@ -1025,6 +1039,8 @@
 				1117D0D7D2B22DA5814CE834 /* PGDOMCharacterData.m in Sources */,
 				1117D74FA8F50234659884A9 /* PGDOMText.m in Sources */,
 				1117D717001AD18EF69F00B3 /* PGDOMCDataSection.m in Sources */,
+				1117D404B18DFA924A73E2D2 /* PGDOMComment.m in Sources */,
+				1117DBEA093E30521447A5A4 /* PGDOMProcessingInstruction.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

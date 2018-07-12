@@ -1,9 +1,9 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDOMDocument.m
+ *    FILENAME: PGDOMProcessingInstruction.m
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 6/27/18
+ *        DATE: 7/12/18
  *
  * Copyright © 2018 Project Galen. All rights reserved.
  *
@@ -15,37 +15,40 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#import "PGDOMDocument.h"
 #import "PGDOMPrivate.h"
 
-@implementation PGDOMDocument {
+@implementation PGDOMProcessingInstruction {
+        NSString *_target;
+        NSString *_data;
     }
 
-    @synthesize notificationCenter = _notificationCenter;
-
-    -(instancetype)init {
-        self = [super initWithNodeType:PGDOMNodeTypeDocument ownerDocument:nil];
+    -(instancetype)initWithOwnerDocument:(PGDOMDocument *)ownerDocument target:(NSString *)target data:(NSString *)data {
+        self = [super initWithNodeType:PGDOMNodeTypeProcessingInstruction ownerDocument:ownerDocument];
 
         if(self) {
-            _notificationCenter = [NSNotificationCenter new];
             self.isReadOnly = NO;
+            _target = (target ?: @"").copy;
+            _data   = (data ?: @"").copy;
         }
 
         return self;
     }
 
-    -(PGDOMText *)createTextNode:(NSString *)content {
-        return [[PGDOMText alloc] initWithOwnerDocument:self data:content];
+    -(NSString *)target {
+        PGDOMSyncData;
+        return _target;
     }
 
-    -(PGDOMCDataSection *)createCDataSection:(NSString *)content {
-        return [[PGDOMCDataSection alloc] initWithOwnerDocument:self data:content];
+    -(NSString *)data {
+        PGDOMSyncData;
+        return _data;
     }
 
-    -(PGDOMText *)createTextNode:(NSString *)content ofType:(PGDOMNodeTypes)nodeType {
-        if(nodeType == PGDOMNodeTypeText) return [self createTextNode:content];
-        if(nodeType == PGDOMNodeTypeCDataSection) return [self createCDataSection:content];
-        @throw [NSException exceptionWithName:NSInvalidArgumentException reason:PGFormat(PGDOMErrorMsgNotTextNode, [PGDOMNode nodeTypeDescription:nodeType])];
+    -(void)setData:(NSString *)data {
+        PGDOMSyncData;
+        PGDOMCheckRO;
+        _data = (data ?: @"").copy;
+        self.needsSyncData = YES;
     }
 
 @end

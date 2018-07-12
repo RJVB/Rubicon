@@ -74,10 +74,9 @@
         return _wholeText;
     }
 
-    typedef PGDOMNode *(^PGDOMNodeAction)(PGDOMNode *node, PGDOMNode *other, BOOL forward);
-
     -(instancetype)replaceWholeTextWith:(NSString *)content {
         PGDOMSyncData;
+        PGDOMCheckRO;
         PGDOMNode *parent      = self.parentNode;
         PGDOMText *currentNode = nil;
 
@@ -127,8 +126,8 @@
     }
 
     -(instancetype)splitTextAtOffset:(NSUInteger)offset {
-        if(self.isReadOnly) @throw [self createNoModificationException];
         PGDOMSyncData;
+        PGDOMCheckRO;
         NSString *data = self.data;
 
         if(offset > data.length) @throw [self createIndexOutOfBoundsException];
@@ -147,6 +146,8 @@
     }
 
     -(void)setData:(NSString *)data {
+        PGDOMSyncData;
+        PGDOMCheckRO;
         [super setData:data];
         self.needsSyncData = YES;
 

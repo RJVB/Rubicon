@@ -37,6 +37,7 @@
             _ownerElement = ownerElement;
             _isSpecified  = isSpecified;
             _isID         = isID;
+            self.isReadOnly      = NO;
             if(value) self.value = value;
         }
 
@@ -56,6 +57,7 @@
             _ownerElement = ownerElement;
             _isSpecified  = isSpecified;
             _isID         = isID;
+            self.isReadOnly      = NO;
             if(value) self.value = value;
         }
 
@@ -76,6 +78,7 @@
             _ownerElement = ownerElement;
             _isSpecified  = isSpecified;
             _isID         = isID;
+            self.isReadOnly      = NO;
             if(value) self.value = value;
         }
 
@@ -83,13 +86,8 @@
     }
 
     -(BOOL)canAcceptNode:(PGDOMNode *)node {
-        switch(node.nodeType) {
-            case PGDOMNodeTypeText:
-            case PGDOMNodeTypeEntityReference:
-                return YES;
-            default:
-                return NO;
-        }
+        PGDOMNodeTypes t = node.nodeType;
+        return ((t == PGDOMNodeTypeText) || (t == PGDOMNodeTypeEntityReference));
     }
 
     -(NSString *)name {

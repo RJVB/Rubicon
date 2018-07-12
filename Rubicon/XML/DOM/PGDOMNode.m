@@ -20,14 +20,14 @@
 @implementation PGDOMNode {
         PGDOMNodeList<PGDOMNode *>     *_childNodes;
         PGDOMNamedNodeMap<PGDOMAttr *> *_attributes;
+        PGDOMNodeTypes                 _nodeType;
+        PGDOMNode                      *_parentNode;
+        PGDOMNode                      *_previousSibling;
+        PGDOMNode                      *_nextSibling;
+        PGDOMDocument                  *_ownerDocument;
+        BOOL                           _isReadOnly;
     }
 
-    @synthesize nodeType = _nodeType;
-    @synthesize parentNode = _parentNode;
-    @synthesize previousSibling = _previousSibling;
-    @synthesize nextSibling = _nextSibling;
-    @synthesize ownerDocument = _ownerDocument;
-    @synthesize isReadOnly = _isReadOnly;
     @synthesize needsSyncData = _needsSyncData;
 
     -(instancetype)init {
@@ -47,8 +47,8 @@
             PGAbstractClassTest(PGDOMNode);
             _nodeType      = nodeType;
             _ownerDocument = ownerDocument;
-            _isReadOnly    = NO;
-            _needsSyncData = NO;
+            _isReadOnly    = YES;
+            _needsSyncData = YES;
 
             if((_ownerDocument == nil) && self.needsOwnerDocument) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:PGDOMErrorMsgOwnerDocumentNull];
         }
@@ -187,21 +187,24 @@
     }
 
     -(BOOL)isTextNode {
+        PGDOMSyncData;
         PGDOMNodeTypes t = self.nodeType;
         return ((t == PGDOMNodeTypeCDataSection) || (t == PGDOMNodeTypeText));
     }
 
     -(BOOL)isEntityReference {
+        PGDOMSyncData;
         return (self.nodeType == PGDOMNodeTypeEntityReference);
     }
 
     -(BOOL)needsOwnerDocument {
+        PGDOMSyncData;
         PGDOMNodeTypes t = self.nodeType;
         return ((t != PGDOMNodeTypeDocument) && (t != PGDOMNodeTypeDocumentFragment));
     }
 
     -(void)synchronizeData {
-        self.needsSyncData = NO;
+        _needsSyncData = NO;
     }
 
     -(BOOL)hasTextOnlyChildren {
@@ -209,6 +212,7 @@
         PGDOMProcBlk b = ^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return NO; };
         PGDOMProcBlk c = ^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return YES; };
 
+        PGDOMSyncData;
         return (BOOL)[self textProc:self.firstChild forward:YES blkEntRef:a blkText:b blkDefault:c defRetVal:NO endRetVal:YES];
     }
 
@@ -224,6 +228,7 @@
         PGDOMProcBlk b  = ^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return NO; };
         PGDOMProcBlk c  = ^BOOL(PGDOMNode *n, NSInteger *rv, BOOL f) { return YES; };
 
+        PGDOMSyncData;
         return (BOOL)[self textProc:NSIBLING(self, fwd) forward:fwd blkEntRef:a blkText:b blkDefault:c defRetVal:YES endRetVal:YES];
     }
 
@@ -245,18 +250,18 @@
                endRetVal:(NSInteger)y {
         return [self nodeProc:n
                       forward:fwd
-                      blkAttr:nil
-                     blkCData:blkCData
-                   blkComment:nil
-                   blkDocFrag:nil
-                  blkDocument:nil
-                       blkDTD:nil
-                   blkElement:nil
-                    blkEntity:nil
                     blkEntRef:blkEntRef
+                     blkCData:blkCData
+                      blkText:blkText
+                      blkAttr:nil
+                   blkElement:nil
+                   blkComment:nil
                   blkNotation:nil
                   blkProcInst:nil
-                      blkText:blkText
+                  blkDocument:nil
+                   blkDocFrag:nil
+                       blkDTD:nil
+                    blkEntity:nil
                    blkDefault:blkDefault
                     defRetVal:x
                     endRetVal:y];
@@ -269,39 +274,16 @@
               blkDefault:(PGDOMProcBlk)blkDefault
                defRetVal:(BOOL)x
                endRetVal:(BOOL)y {
-        return [self nodeProc:n
-                      forward:fwd
-                      blkAttr:nil
-                     blkCData:blkText
-                   blkComment:nil
-                   blkDocFrag:nil
-                  blkDocument:nil
-                       blkDTD:nil
-                   blkElement:nil
-                    blkEntity:nil
-                    blkEntRef:blkEntRef
-                  blkNotation:nil
-                  blkProcInst:nil
-                      blkText:blkText
-                   blkDefault:blkDefault
-                    defRetVal:x
-                    endRetVal:y];
+        return [self textProc:n forward:fwd blkEntRef:blkEntRef blkText:blkText blkCData:blkText blkDefault:blkDefault defRetVal:x endRetVal:y];
     }
 
     -(NSInteger)nodeProc:(PGDOMNode *)n
-                 forward:(BOOL)fwd
-                 blkAttr:(PGDOMProcBlk)blkAttr
-                blkCData:(PGDOMProcBlk)blkCData
-              blkComment:(PGDOMProcBlk)blkComment
-              blkDocFrag:(PGDOMProcBlk)blkDocFrag
-             blkDocument:(PGDOMProcBlk)blkDocument
+                 forward:(BOOL)fwd blkEntRef:(PGDOMProcBlk)blkEntRef blkCData:(PGDOMProcBlk)blkCData blkText:(PGDOMProcBlk)blkText
+                 blkAttr:(PGDOMProcBlk)blkAttr blkElement:(PGDOMProcBlk)blkElement
+              blkComment:(PGDOMProcBlk)blkComment blkNotation:(PGDOMProcBlk)blkNotation blkProcInst:(PGDOMProcBlk)blkProcInst
+             blkDocument:(PGDOMProcBlk)blkDocument blkDocFrag:(PGDOMProcBlk)blkDocFrag
                   blkDTD:(PGDOMProcBlk)blkDTD
-              blkElement:(PGDOMProcBlk)blkElement
                blkEntity:(PGDOMProcBlk)blkEntity
-               blkEntRef:(PGDOMProcBlk)blkEntRef
-             blkNotation:(PGDOMProcBlk)blkNotation
-             blkProcInst:(PGDOMProcBlk)blkProcInst
-                 blkText:(PGDOMProcBlk)blkText
               blkDefault:(PGDOMProcBlk)blkDefault
                defRetVal:(NSInteger)x
                endRetVal:(NSInteger)y {
@@ -312,19 +294,19 @@
 
         while(n) {
             switch(n.nodeType) { /*@f:0*/
-                case PGDOMNodeTypeAttribute:             if((blkAttr ?: blkDefault)(n, &rv, fwd))     return rv; break;
-                case PGDOMNodeTypeCDataSection:          if((blkCData ?: blkDefault)(n, &rv, fwd))    return rv; break;
-                case PGDOMNodeTypeComment:               if((blkComment ?: blkDefault)(n, &rv, fwd))  return rv; break;
-                case PGDOMNodeTypeDocumentFragment:      if((blkDocFrag ?: blkDefault)(n, &rv, fwd))  return rv; break;
-                case PGDOMNodeTypeDocument:              if((blkDocument ?: blkDefault)(n, &rv, fwd)) return rv; break;
-                case PGDOMNodeTypeDTD:                   if((blkDTD ?: blkDefault)(n, &rv, fwd))      return rv; break;
-                case PGDOMNodeTypeElement:               if((blkElement ?: blkDefault)(n, &rv, fwd))  return rv; break;
-                case PGDOMNodeTypeEntity:                if((blkEntity ?: blkDefault)(n, &rv, fwd))   return rv; break;
-                case PGDOMNodeTypeEntityReference:       if((blkEntRef ?: blkDefault)(n, &rv, fwd))   return rv; break;
+                case PGDOMNodeTypeEntityReference:       if((blkEntRef   ?: blkDefault)(n, &rv, fwd)) return rv; break;
+                case PGDOMNodeTypeCDataSection:          if((blkCData    ?: blkDefault)(n, &rv, fwd)) return rv; break;
+                case PGDOMNodeTypeText:                  if((blkText     ?: blkDefault)(n, &rv, fwd)) return rv; break;
+                case PGDOMNodeTypeAttribute:             if((blkAttr     ?: blkDefault)(n, &rv, fwd)) return rv; break;
+                case PGDOMNodeTypeElement:               if((blkElement  ?: blkDefault)(n, &rv, fwd)) return rv; break;
+                case PGDOMNodeTypeComment:               if((blkComment  ?: blkDefault)(n, &rv, fwd)) return rv; break;
                 case PGDOMNodeTypeNotation:              if((blkNotation ?: blkDefault)(n, &rv, fwd)) return rv; break;
                 case PGDOMNodeTypeProcessingInstruction: if((blkProcInst ?: blkDefault)(n, &rv, fwd)) return rv; break;
-                case PGDOMNodeTypeText:                  if((blkText ?: blkDefault)(n, &rv, fwd))     return rv; break;
-                default:                                 if(blkDefault(n, &rv, fwd))                  return rv; break; /*@f:1*/
+                case PGDOMNodeTypeDocument:              if((blkDocument ?: blkDefault)(n, &rv, fwd)) return rv; break;
+                case PGDOMNodeTypeDocumentFragment:      if((blkDocFrag  ?: blkDefault)(n, &rv, fwd)) return rv; break;
+                case PGDOMNodeTypeDTD:                   if((blkDTD      ?: blkDefault)(n, &rv, fwd)) return rv; break;
+                case PGDOMNodeTypeEntity:                if((blkEntity   ?: blkDefault)(n, &rv, fwd)) return rv; break;
+                default:                                 if(                 blkDefault(n, &rv, fwd)) return rv; break; /*@f:1*/
             }
 
             n = NSIBLING(n, fwd);
@@ -335,6 +317,60 @@
 
     -(NSException *)createNoModificationException {
         return [NSException exceptionWithName:PGDOMException reason:PGErrorMsgNoModificationAllowed];
+    }
+
+    -(PGDOMNodeTypes)nodeType {
+        PGDOMSyncData;
+        return _nodeType;
+    }
+
+    -(PGDOMNode *)parentNode {
+        PGDOMSyncData;
+        return _parentNode;
+    }
+
+    -(PGDOMNode *)previousSibling {
+        PGDOMSyncData;
+        return _previousSibling;
+    }
+
+    -(PGDOMNode *)nextSibling {
+        PGDOMSyncData;
+        return _nextSibling;
+    }
+
+    -(PGDOMDocument *)ownerDocument {
+        PGDOMSyncData;
+        return _ownerDocument;
+    }
+
+    -(BOOL)isReadOnly {
+        PGDOMSyncData;
+        return _isReadOnly;
+    }
+
+    -(void)setParentNode:(PGDOMNode *)parentNode {
+        PGDOMSyncData;
+        _parentNode    = parentNode;
+        _needsSyncData = YES;
+    }
+
+    -(void)setPreviousSibling:(PGDOMNode *)previousSibling {
+        PGDOMSyncData;
+        _previousSibling = previousSibling;
+        _needsSyncData   = YES;
+    }
+
+    -(void)setNextSibling:(PGDOMNode *)nextSibling {
+        PGDOMSyncData;
+        _nextSibling   = nextSibling;
+        _needsSyncData = YES;
+    }
+
+    -(void)setIsReadOnly:(BOOL)isReadOnly {
+        PGDOMSyncData;
+        _isReadOnly    = isReadOnly;
+        _needsSyncData = YES;
     }
 
 @end

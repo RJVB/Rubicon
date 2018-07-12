@@ -46,14 +46,17 @@ NS_INLINE void _sendNotification(PGDOMNode *node, NSNotificationName name) {
     }
 
     -(PGDOMNode *)firstChild {
+        PGDOMSyncData;
         return _firstChild;
     }
 
     -(PGDOMNode *)lastChild {
+        PGDOMSyncData;
         return _lastChild;
     }
 
     -(BOOL)canAcceptNode:(PGDOMNode *)node {
+        PGDOMSyncData;
         return (node.nodeType != PGDOMNodeTypeDocument);
     }
 
@@ -92,7 +95,8 @@ NS_INLINE void _sendNotification(PGDOMNode *node, NSNotificationName name) {
     }
 
     -(PGDOMNode *)appendChild:(PGDOMNode *)newNode {
-        if(self.isReadOnly) @throw [self createNoModificationException];
+        PGDOMSyncData;
+        PGDOMCheckRO;
         if(newNode) {
             [self testNewChildNode:newNode];
             [self _appendChild:newNode];
@@ -104,7 +108,8 @@ NS_INLINE void _sendNotification(PGDOMNode *node, NSNotificationName name) {
 
     -(PGDOMNode *)insertChild:(PGDOMNode *)newNode before:(PGDOMNode *)refNode {
         if(!refNode) return [self appendChild:newNode];
-        if(self.isReadOnly) @throw [self createNoModificationException];
+        PGDOMSyncData;
+        PGDOMCheckRO;
         if(newNode) {
             if(self != refNode.parentNode) @throw [self createException:PGFormat(PGDOMErrorMsgNodeNotChild, PGDOMMsgReference)];
             [self testNewChildNode:newNode];
@@ -116,7 +121,8 @@ NS_INLINE void _sendNotification(PGDOMNode *node, NSNotificationName name) {
     }
 
     -(PGDOMNode *)replaceChild:(PGDOMNode *)oldNode with:(PGDOMNode *)newNode {
-        if(self.isReadOnly) @throw [self createNoModificationException];
+        PGDOMSyncData;
+        PGDOMCheckRO;
         if(oldNode) {
             if(self != oldNode.parentNode) @throw [self createException:PGFormat(PGDOMErrorMsgNodeNotChild, PGDOMMsgOld)];
             /*
@@ -134,7 +140,8 @@ NS_INLINE void _sendNotification(PGDOMNode *node, NSNotificationName name) {
     }
 
     -(PGDOMNode *)removeChild:(PGDOMNode *)oldNode {
-        if(self.isReadOnly) @throw [self createNoModificationException];
+        PGDOMSyncData;
+        PGDOMCheckRO;
         if(oldNode) {
             if(self != oldNode.parentNode) @throw [self createException:PGFormat(PGDOMErrorMsgNodeNotChild, PGDOMMsgOld)];
             [self _removeChild:oldNode];
@@ -178,7 +185,7 @@ NS_INLINE void _sendNotification(PGDOMNode *node, NSNotificationName name) {
 
     -(void)_insertChild:(PGDOMNode *)newNode before:(PGDOMNode *)refNode {
         /*
-         * Asseert that there is at least one existing
+         * Assert that there is at least one existing
          * child node and that refNode is one of them.
          */
         newNode.parentNode                  = refNode.parentNode;

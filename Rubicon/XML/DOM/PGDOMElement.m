@@ -25,6 +25,7 @@
         self = [super initWithNodeType:PGDOMNodeTypeElement ownerDocument:ownerDocument qualifiedName:qualifiedName namespaceURI:namespaceURI];
 
         if(self) {
+            self.isReadOnly = NO;
         }
 
         return self;
@@ -34,6 +35,7 @@
         self = [super initWithNodeType:PGDOMNodeTypeElement ownerDocument:ownerDocument localName:localName prefix:prefix namespaceURI:namespaceURI];
 
         if(self) {
+            self.isReadOnly = NO;
         }
 
         return self;

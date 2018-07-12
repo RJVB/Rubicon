@@ -1,9 +1,10 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDOMDocument.m
+ *    FILENAME: PGDOMComment.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 6/27/18
+ *        DATE: 7/12/18
+ *  VISIBILITY: Private
  *
  * Copyright © 2018 Project Galen. All rights reserved.
  *
@@ -15,37 +16,16 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#import "PGDOMDocument.h"
-#import "PGDOMPrivate.h"
+#ifndef RUBICON_PGDOMCOMMENT_H
+#define RUBICON_PGDOMCOMMENT_H
 
-@implementation PGDOMDocument {
-    }
+#import <Rubicon/PGDOMCharacterData.h>
 
-    @synthesize notificationCenter = _notificationCenter;
+NS_ASSUME_NONNULL_BEGIN
 
-    -(instancetype)init {
-        self = [super initWithNodeType:PGDOMNodeTypeDocument ownerDocument:nil];
-
-        if(self) {
-            _notificationCenter = [NSNotificationCenter new];
-            self.isReadOnly = NO;
-        }
-
-        return self;
-    }
-
-    -(PGDOMText *)createTextNode:(NSString *)content {
-        return [[PGDOMText alloc] initWithOwnerDocument:self data:content];
-    }
-
-    -(PGDOMCDataSection *)createCDataSection:(NSString *)content {
-        return [[PGDOMCDataSection alloc] initWithOwnerDocument:self data:content];
-    }
-
-    -(PGDOMText *)createTextNode:(NSString *)content ofType:(PGDOMNodeTypes)nodeType {
-        if(nodeType == PGDOMNodeTypeText) return [self createTextNode:content];
-        if(nodeType == PGDOMNodeTypeCDataSection) return [self createCDataSection:content];
-        @throw [NSException exceptionWithName:NSInvalidArgumentException reason:PGFormat(PGDOMErrorMsgNotTextNode, [PGDOMNode nodeTypeDescription:nodeType])];
-    }
-
+@interface PGDOMComment : PGDOMCharacterData
 @end
+
+NS_ASSUME_NONNULL_END
+
+#endif //RUBICON_PGDOMCOMMENT_H

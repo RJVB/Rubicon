@@ -35,15 +35,20 @@
 #import "PGDOMCharacterData.h"
 #import "PGDOMText.h"
 #import "PGDOMCDataSection.h"
+#import "PGDOMComment.h"
+#import "PGDOMProcessingInstruction.h"
 
 typedef PGMutableBinaryTreeDictionary<NSString *, PGDOMNode *>   *PGDOMNodeTree;
 typedef PGMutableBinaryTreeDictionary<NSString *, PGDOMNodeTree> *PGDOMNodeNodeTree;
 
-typedef BOOL (^PGDOMProcBlk)(PGDOMNode *node, NSInteger *pRetValue, BOOL forward);
+typedef BOOL      (^PGDOMProcBlk)(PGDOMNode *node, NSInteger *pRetValue, BOOL forward);
+
+typedef PGDOMNode *(^PGDOMNodeAction)(PGDOMNode *node, PGDOMNode *other, BOOL forward);
 
 NS_ASSUME_NONNULL_BEGIN
 
 #define PGDOMSyncData  do{if(self.needsSyncData)[self synchronizeData];}while(0)
+#define PGDOMCheckRO   if(self.isReadOnly) @throw [self createNoModificationException]
 #define NSIBLING(n, f) ((f)?(n.nextSibling):(n.previousSibling))
 #define NCHILD(n, f)   ((f)?(n.firstChild):(n.lastChild))
 
@@ -60,6 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
     @property(nonatomic, readonly) /*     */ BOOL      hasTextOnlyChildren;
     @property(nonatomic, readonly) /*     */ BOOL      canModifyPrev;
     @property(nonatomic, readonly) /*     */ BOOL      canModifyNext;
+    @property(nonatomic) /*               */ BOOL      isReadOnly;
 
     -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(nullable PGDOMDocument *)ownerDocument;
 
@@ -89,19 +95,12 @@ NS_ASSUME_NONNULL_BEGIN
                endRetVal:(NSInteger)y;
 
     -(NSInteger)nodeProc:(nullable PGDOMNode *)n
-                 forward:(BOOL)fwd
-                 blkAttr:(nullable PGDOMProcBlk)blkAttr
-                blkCData:(nullable PGDOMProcBlk)blkCData
-              blkComment:(nullable PGDOMProcBlk)blkComment
-              blkDocFrag:(nullable PGDOMProcBlk)blkDocFrag
-             blkDocument:(nullable PGDOMProcBlk)blkDocument
+                 forward:(BOOL)fwd blkEntRef:(nullable PGDOMProcBlk)blkEntRef blkCData:(nullable PGDOMProcBlk)blkCData blkText:(nullable PGDOMProcBlk)blkText
+                 blkAttr:(nullable PGDOMProcBlk)blkAttr blkElement:(nullable PGDOMProcBlk)blkElement
+              blkComment:(nullable PGDOMProcBlk)blkComment blkNotation:(nullable PGDOMProcBlk)blkNotation blkProcInst:(nullable PGDOMProcBlk)blkProcInst
+             blkDocument:(nullable PGDOMProcBlk)blkDocument blkDocFrag:(nullable PGDOMProcBlk)blkDocFrag
                   blkDTD:(nullable PGDOMProcBlk)blkDTD
-              blkElement:(nullable PGDOMProcBlk)blkElement
                blkEntity:(nullable PGDOMProcBlk)blkEntity
-               blkEntRef:(nullable PGDOMProcBlk)blkEntRef
-             blkNotation:(nullable PGDOMProcBlk)blkNotation
-             blkProcInst:(nullable PGDOMProcBlk)blkProcInst
-                 blkText:(nullable PGDOMProcBlk)blkText
               blkDefault:(nullable PGDOMProcBlk)blkDefault
                defRetVal:(NSInteger)x
                endRetVal:(NSInteger)y;
@@ -129,6 +128,7 @@ NS_ASSUME_NONNULL_BEGIN
     @property(nonatomic, readonly) NSNotificationCenter *notificationCenter;
 
     -(PGDOMText *)createTextNode:(NSString *)content ofType:(PGDOMNodeTypes)nodeType;
+
 @end
 
 @interface PGDOMNamespaceAware()
@@ -285,6 +285,7 @@ NS_ASSUME_NONNULL_BEGIN
     -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data;
 
     -(NSException *)createIndexOutOfBoundsException;
+
 @end
 
 @interface PGDOMText()
@@ -294,11 +295,24 @@ NS_ASSUME_NONNULL_BEGIN
     -(void)performAction:(PGDOMNodeAction)blkAction onTextNodesAdjacentToNode:(PGDOMNode *)node goingForward:(BOOL)fwd;
 
     -(void)performAction:(PGDOMNodeAction)action onTextNodesAdjacentToNode:(PGDOMNode *)node;
+
 @end
 
 @interface PGDOMCDataSection()
 
     -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data;
+
+@end
+
+@interface PGDOMComment()
+
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data;
+
+@end
+
+@interface PGDOMProcessingInstruction()
+
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument target:(NSString *)target data:(NSString *)data;
 
 @end
 

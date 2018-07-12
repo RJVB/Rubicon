@@ -19,32 +19,33 @@
 #import "PGDOMPrivate.h"
 
 @implementation PGDOMCharacterData {
+        NSString *_data;
     }
-
-    @synthesize data = _data;
 
     -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data {
         self = [super initWithNodeType:nodeType ownerDocument:ownerDocument];
 
         if(self) {
             _data = (data ?: @"").copy;
+            self.isReadOnly = NO;
         }
 
         return self;
     }
 
     -(NSUInteger)length {
-        PGDOMSyncData;
         return self.data.length;
     }
 
     -(void)appendData:(NSString *)data {
         PGDOMSyncData;
+        PGDOMCheckRO;
         [self insertData:data atOffset:self.data.length];
     }
 
     -(void)insertData:(NSString *)data atOffset:(NSUInteger)offset {
         PGDOMSyncData;
+        PGDOMCheckRO;
         NSString   *cdata = self.data;
         NSUInteger clen   = cdata.length;
 
@@ -59,6 +60,7 @@
 
     -(void)deleteDataAtOffset:(NSUInteger)offset length:(NSUInteger)length {
         PGDOMSyncData;
+        PGDOMCheckRO;
         NSString   *cdata = self.data;
         NSUInteger clen   = cdata.length;
         NSUInteger eidx   = (offset + length);
@@ -70,6 +72,18 @@
             NSString *pfx = [cdata substringToIndex:offset];
             self.data = ((eidx < length) ? PGFormat(@"%@%@", pfx, [cdata substringFromIndex:eidx]) : pfx);
         }
+    }
+
+    -(void)setData:(NSString *)data {
+        PGDOMSyncData;
+        PGDOMCheckRO;
+        _data = (data ?: @"").copy;
+        self.needsSyncData = YES;
+    }
+
+    -(NSString *)data {
+        PGDOMSyncData;
+        return _data;
     }
 
     -(void)replaceDataAtOffset:(NSUInteger)offset length:(NSUInteger)length withData:(NSString *)newData {
