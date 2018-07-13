@@ -20,6 +20,7 @@
 #define RUBICON_PGDOMPRIVATE_H
 
 #import "PGInternal.h"
+#import "PGDOMDefines.h"
 #import "PGDOMNode.h"
 #import "PGDOMParent.h"
 #import "PGDOMNamespaceAware.h"
@@ -43,6 +44,7 @@
 #import "PGDOMLocator.h"
 #import "PGDOMImplementation.h"
 #import "PGDOMImplementationList.h"
+#import "PGDOMUserDataHandler.h"
 
 typedef PGMutableBinaryTreeDictionary<NSString *, PGDOMNode *>   *PGDOMNodeTree;
 typedef PGMutableBinaryTreeDictionary<NSString *, PGDOMNodeTree> *PGDOMNodeNodeTree;
@@ -101,10 +103,17 @@ NS_ASSUME_NONNULL_BEGIN
                endRetVal:(NSInteger)y;
 
     -(NSInteger)nodeProc:(nullable PGDOMNode *)n
-                 forward:(BOOL)fwd blkEntRef:(nullable PGDOMProcBlk)blkEntRef blkCData:(nullable PGDOMProcBlk)blkCData blkText:(nullable PGDOMProcBlk)blkText
-                 blkAttr:(nullable PGDOMProcBlk)blkAttr blkElement:(nullable PGDOMProcBlk)blkElement
-              blkComment:(nullable PGDOMProcBlk)blkComment blkNotation:(nullable PGDOMProcBlk)blkNotation blkProcInst:(nullable PGDOMProcBlk)blkProcInst
-             blkDocument:(nullable PGDOMProcBlk)blkDocument blkDocFrag:(nullable PGDOMProcBlk)blkDocFrag
+                 forward:(BOOL)fwd
+               blkEntRef:(nullable PGDOMProcBlk)blkEntRef
+                blkCData:(nullable PGDOMProcBlk)blkCData
+                 blkText:(nullable PGDOMProcBlk)blkText
+                 blkAttr:(nullable PGDOMProcBlk)blkAttr
+              blkElement:(nullable PGDOMProcBlk)blkElement
+              blkComment:(nullable PGDOMProcBlk)blkComment
+             blkNotation:(nullable PGDOMProcBlk)blkNotation
+             blkProcInst:(nullable PGDOMProcBlk)blkProcInst
+             blkDocument:(nullable PGDOMProcBlk)blkDocument
+              blkDocFrag:(nullable PGDOMProcBlk)blkDocFrag
                   blkDTD:(nullable PGDOMProcBlk)blkDTD
                blkEntity:(nullable PGDOMProcBlk)blkEntity
               blkDefault:(nullable PGDOMProcBlk)blkDefault
@@ -376,6 +385,17 @@ NS_ASSUME_NONNULL_BEGIN
     -(instancetype)init;
 
     -(void)setObject:(PGDOMImplementation *)obj atIndexedSubscript:(NSUInteger)idx;
+
+@end
+
+@interface PGDOMBlockUserDataHandler : PGDOMUserDataHandler
+
+    @property(nonatomic, copy, readonly) PGDOMUserDataHandlerBlock handler;
+
+    -(instancetype)initWithHandler:(PGDOMUserDataHandlerBlock)handler;
+
+    +(instancetype)handlerWithHandler:(PGDOMUserDataHandlerBlock)handler;
+
 
 @end
 

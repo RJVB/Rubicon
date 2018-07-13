@@ -1,9 +1,10 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDOMPrivate.m
+ *    FILENAME: PGDOMUserDataHandler.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 6/27/18
+ *        DATE: 7/13/18
+ *  VISIBILITY: Private
  *
  * Copyright © 2018 Project Galen. All rights reserved.
  *
@@ -15,35 +16,21 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#import "PGDOMPrivate.h"
+#ifndef RUBICON_PGDOMUSERDATAHANDLER_H
+#define RUBICON_PGDOMUSERDATAHANDLER_H
 
-@interface PGDOMBlockUserDataHandler()
+#import <Rubicon/PGDOMNode.h>
 
-    @property(nonatomic, copy) PGDOMUserDataHandlerBlock handler;
+NS_ASSUME_NONNULL_BEGIN
 
-@end
+@interface PGDOMUserDataHandler : NSObject
 
-@implementation PGDOMBlockUserDataHandler {
-    }
+    -(instancetype)init;
 
-    @synthesize handler = _handler;
-
-    -(instancetype)initWithHandler:(PGDOMUserDataHandlerBlock)handler {
-        self = [super init];
-
-        if(self) {
-            self.handler = handler;
-        }
-
-        return self;
-    }
-
-    +(instancetype)handlerWithHandler:(PGDOMUserDataHandlerBlock)handler {
-        return [[self alloc] initWithHandler:handler];
-    }
-
-    -(void)handleOperation:(PGDOMUserDataOperations)operation key:(NSString *)key data:(nullable NSString *)data src:(nullable PGDOMNode *)src dest:(nullable PGDOMNode *)dest {
-        self.handler(operation, key, data, src, dest);
-    }
+    -(void)handleOperation:(PGDOMUserDataOperations)operation key:(NSString *)key data:(nullable NSString *)data src:(nullable PGDOMNode *)src dest:(nullable PGDOMNode *)dest;
 
 @end
+
+NS_ASSUME_NONNULL_END
+
+#endif //RUBICON_PGDOMUSERDATAHANDLER_H

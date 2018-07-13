@@ -23,14 +23,20 @@
 
 typedef NS_ENUM(NSUInteger, PGDOMNodeTypes) {
     PGDOMNodeTypeDTD, PGDOMNodeTypeDTDEntity, PGDOMNodeTypeDTDNotation,
-    PGDOMNodeTypeAttribute,
-    PGDOMNodeTypeCDataSection, PGDOMNodeTypeComment,
-    PGDOMNodeTypeDocument, PGDOMNodeTypeDocumentFragment,
+    PGDOMNodeTypeAttribute, PGDOMNodeTypeCDataSection, PGDOMNodeTypeComment, PGDOMNodeTypeDocument, PGDOMNodeTypeDocumentFragment,
     PGDOMNodeTypeElement,
     PGDOMNodeTypeEntityReference,
     PGDOMNodeTypeProcessingInstruction,
     PGDOMNodeTypeText
 };
+
+typedef NS_ENUM(NSByte, PGDOMUserDataOperations) {
+    PGDOMNodeAdopted, PGDOMNodeCloned, PGDOMNodeDeleted, PGDOMNodeImported, PGDOMNodeRenamed
+};
+
+@class PGDOMNode;
+
+typedef void (^PGDOMUserDataHandlerBlock)(PGDOMUserDataOperations operation, NSString *key, NSString *_Nullable data, PGDOMNode *_Nullable src, PGDOMNode *_Nullable dest);
 
 FOUNDATION_EXPORT NSExceptionName const PGDOMException;
 
