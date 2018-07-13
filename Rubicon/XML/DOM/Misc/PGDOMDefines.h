@@ -22,15 +22,12 @@
 #import <Rubicon/PGTools.h>
 
 typedef NS_ENUM(NSUInteger, PGDOMNodeTypes) {
+    PGDOMNodeTypeDTD, PGDOMNodeTypeDTDEntity, PGDOMNodeTypeDTDNotation,
     PGDOMNodeTypeAttribute,
-    PGDOMNodeTypeCDataSection,
-    PGDOMNodeTypeComment, PGDOMNodeTypeDocumentFragment,
-    PGDOMNodeTypeDocument,
-    PGDOMNodeTypeDTD,
+    PGDOMNodeTypeCDataSection, PGDOMNodeTypeComment,
+    PGDOMNodeTypeDocument, PGDOMNodeTypeDocumentFragment,
     PGDOMNodeTypeElement,
-    PGDOMNodeTypeEntity,
     PGDOMNodeTypeEntityReference,
-    PGDOMNodeTypeNotation,
     PGDOMNodeTypeProcessingInstruction,
     PGDOMNodeTypeText
 };

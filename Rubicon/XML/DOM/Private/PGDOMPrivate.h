@@ -37,6 +37,12 @@
 #import "PGDOMCDataSection.h"
 #import "PGDOMComment.h"
 #import "PGDOMProcessingInstruction.h"
+#import "PGDOMDTDNotation.h"
+#import "PGDOMDTDEntity.h"
+#import "PGDOMDTD.h"
+#import "PGDOMLocator.h"
+#import "PGDOMImplementation.h"
+#import "PGDOMImplementationList.h"
 
 typedef PGMutableBinaryTreeDictionary<NSString *, PGDOMNode *>   *PGDOMNodeTree;
 typedef PGMutableBinaryTreeDictionary<NSString *, PGDOMNodeTree> *PGDOMNodeNodeTree;
@@ -313,6 +319,63 @@ NS_ASSUME_NONNULL_BEGIN
 @interface PGDOMProcessingInstruction()
 
     -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument target:(NSString *)target data:(NSString *)data;
+
+@end
+
+@interface PGDOMDTDNotation()
+
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument publicID:(nullable NSString *)publicID systemID:(nullable NSString *)systemID;
+
+@end
+
+@interface PGDOMDTDEntity()
+
+    -(instancetype)initWithOwnerDocument:(PGDOMDocument *)ownerDocument
+                           inputEncoding:(nullable NSString *)inputEncoding
+                            notationName:(nullable NSString *)notationName
+                                publicID:(nullable NSString *)publicID
+                                systemID:(nullable NSString *)systemID
+                             xmlEncoding:(nullable NSString *)xmlEncoding
+                              xmlVersion:(nullable NSString *)xmlVersion;
+
+@end
+
+@interface PGDOMDTD()
+
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument
+                                    name:(nullable NSString *)name
+                                publicID:(nullable NSString *)publicID
+                                systemID:(nullable NSString *)systemID
+                          internalSubset:(nullable NSString *)internalSubset
+                                entities:(PGDOMNamedNodeMap<PGDOMDTDEntity *> *)entities
+                               notations:(PGDOMNamedNodeMap<PGDOMDTDNotation *> *)notations;
+
+@end
+
+@interface PGDOMLocator()
+
+    -(instancetype)initWithLineNumber:(NSUInteger)lineNumber
+                         columnNumber:(NSUInteger)columnNumber
+                           byteOffset:(NSUInteger)byteOffset
+                          utf16Offset:(NSUInteger)utf16Offset
+                          relatedNode:(PGDOMNode *)relatedNode
+                                  uri:(NSString *)uri;
+
+@end
+
+@interface PGDOMImplementation()
+
+    -(instancetype)init;
+
+@end
+
+@interface PGDOMImplementationList()
+
+    @property(nonatomic, readonly) NSMutableArray<PGDOMImplementation *> *list;
+
+    -(instancetype)init;
+
+    -(void)setObject:(PGDOMImplementation *)obj atIndexedSubscript:(NSUInteger)idx;
 
 @end
 

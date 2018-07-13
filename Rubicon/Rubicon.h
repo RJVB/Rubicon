@@ -37,7 +37,13 @@
 #import <Rubicon/PGDOMCDataSection.h>
 #import <Rubicon/PGDOMComment.h>
 #import <Rubicon/PGDOMDocument.h>
+#import <Rubicon/PGDOMDTD.h>
+#import <Rubicon/PGDOMDTDEntity.h>
+#import <Rubicon/PGDOMDTDNotation.h>
 #import <Rubicon/PGDOMElement.h>
+#import <Rubicon/PGDOMImplementation.h>
+#import <Rubicon/PGDOMImplementationList.h>
+#import <Rubicon/PGDOMLocator.h>
 #import <Rubicon/PGDOMNamedNodeMap.h>
 #import <Rubicon/PGDOMNode.h>
 #import <Rubicon/PGDOMNodeList.h>

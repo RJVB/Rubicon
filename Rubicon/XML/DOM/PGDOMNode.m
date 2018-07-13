@@ -89,11 +89,11 @@
                 return PGDOMNodeTypeDescDTD;
             case PGDOMNodeTypeElement:
                 return PGDOMNodeTypeDescElement;
-            case PGDOMNodeTypeEntity:
+            case PGDOMNodeTypeDTDEntity:
                 return PGDOMNodeTypeDescEntity;
             case PGDOMNodeTypeEntityReference:
                 return PGDOMNodeTypeDescEntityReference;
-            case PGDOMNodeTypeNotation:
+            case PGDOMNodeTypeDTDNotation:
                 return PGDOMNodeTypeDescNotation;
             case PGDOMNodeTypeProcessingInstruction:
                 return PGDOMNodeTypeDescProcessingInstruction;
@@ -300,12 +300,12 @@
                 case PGDOMNodeTypeAttribute:             if((blkAttr     ?: blkDefault)(n, &rv, fwd)) return rv; break;
                 case PGDOMNodeTypeElement:               if((blkElement  ?: blkDefault)(n, &rv, fwd)) return rv; break;
                 case PGDOMNodeTypeComment:               if((blkComment  ?: blkDefault)(n, &rv, fwd)) return rv; break;
-                case PGDOMNodeTypeNotation:              if((blkNotation ?: blkDefault)(n, &rv, fwd)) return rv; break;
+                case PGDOMNodeTypeDTDNotation:              if((blkNotation ?: blkDefault)(n, &rv, fwd)) return rv; break;
                 case PGDOMNodeTypeProcessingInstruction: if((blkProcInst ?: blkDefault)(n, &rv, fwd)) return rv; break;
                 case PGDOMNodeTypeDocument:              if((blkDocument ?: blkDefault)(n, &rv, fwd)) return rv; break;
                 case PGDOMNodeTypeDocumentFragment:      if((blkDocFrag  ?: blkDefault)(n, &rv, fwd)) return rv; break;
                 case PGDOMNodeTypeDTD:                   if((blkDTD      ?: blkDefault)(n, &rv, fwd)) return rv; break;
-                case PGDOMNodeTypeEntity:                if((blkEntity   ?: blkDefault)(n, &rv, fwd)) return rv; break;
+                case PGDOMNodeTypeDTDEntity:                if((blkEntity   ?: blkDefault)(n, &rv, fwd)) return rv; break;
                 default:                                 if(                 blkDefault(n, &rv, fwd)) return rv; break; /*@f:1*/
             }
 
