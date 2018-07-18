@@ -134,6 +134,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(void)postChildListChangeNotification;
 
+    -(void)removeAllChildren:(nullable NSMutableArray<PGDOMNode *> *)removedNodes;
+
     -(void)grandchildListChanged;
 
 @end

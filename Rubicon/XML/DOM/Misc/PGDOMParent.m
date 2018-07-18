@@ -15,8 +15,6 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#import "PGDOMParent.h"
-#import "NSException+PGException.h"
 #import "PGDOMPrivate.h"
 
 NS_INLINE void _clearNodePointers(PGDOMNode *oldNode) {
@@ -151,12 +149,53 @@ NS_INLINE void _sendNotification(PGDOMNode *node, NSNotificationName name) {
         return oldNode;
     }
 
+    -(NSString *)textContent {
+        PGDOMSyncData;
+        return nil;
+    }
+
+    -(void)setTextContent:(NSString *)textContent {
+        PGDOMSyncData;
+        PGDOMCheckRO;
+        [self _removeAllChildren:nil];
+        if(textContent) {
+            _firstChild = _lastChild = [self.ownerDocument createTextNode:textContent];
+            _firstChild.parentNode = self;
+        }
+        [self postChildListChangeNotification];
+    }
+
     -(void)grandchildListChanged {
         _sendNotification(self, PGDOMCascadeNodeListChangedNotification);
     }
 
     -(void)postChildListChangeNotification {
         _sendNotification(self, PGDOMNodeListChangedNotification);
+    }
+
+    /**
+     * Quickly remove all the child nodes. Optionally put the removed
+     * nodes into an array in the same order they existed in this node.
+     *
+     * @param removedNodes an array to receive the removed nodes.
+     */
+    -(void)removeAllChildren:(NSMutableArray<PGDOMNode *> *)removedNodes {
+        [self _removeAllChildren:removedNodes];
+        [self postChildListChangeNotification];
+    }
+
+    -(void)_removeAllChildren:(NSMutableArray<PGDOMNode *> *)removedNodes {
+        PGDOMNode *node = _firstChild;
+
+        while(node) {
+            node = node.nextSibling;
+            node.parentNode      = nil;
+            node.nextSibling     = nil;
+            node.previousSibling = nil;
+            [removedNodes addObject:node];
+        }
+
+        _firstChild = _lastChild = nil;
     }
 
     -(void)_updateFirst:(PGDOMNode *)first last:(PGDOMNode *)last ifCurrentIs:(PGDOMNode *)existing {

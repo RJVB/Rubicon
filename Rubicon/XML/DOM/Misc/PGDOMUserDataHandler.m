@@ -15,7 +15,7 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#import "PGDOMUserDataHandler.h"
+#import "PGDOMPrivate.h"
 
 @implementation PGDOMUserDataHandler {
     }

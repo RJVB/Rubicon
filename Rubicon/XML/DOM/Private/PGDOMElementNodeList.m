@@ -15,7 +15,6 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#import "PGDOMElementNodeList.h"
 #import "PGDOMPrivate.h"
 
 NS_INLINE BOOL _compare(NSString *given, NSString *found) {

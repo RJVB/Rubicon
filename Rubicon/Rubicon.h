@@ -49,6 +49,7 @@
 #import <Rubicon/PGDOMNodeList.h>
 #import <Rubicon/PGDOMProcessingInstruction.h>
 #import <Rubicon/PGDOMText.h>
+#import <Rubicon/PGDOMUserDataHandler.h>
 #import <Rubicon/PGDynamicBuffers.h>
 #import <Rubicon/PGEmptyEnumerator.h>
 #import <Rubicon/PGFilterInputStream.h>

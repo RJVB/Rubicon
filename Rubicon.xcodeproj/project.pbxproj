@@ -60,7 +60,7 @@
 		1117D54DC79F27B863858629 /* PGXMLParsedEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D9FE9C234FE4FC3E9946 /* PGXMLParsedEntity.m */; };
 		1117D5567CE2BE5127E3E524 /* PGCmdLineDefines.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D091DA0A584D2A16E5E6 /* PGCmdLineDefines.m */; };
 		1117D568385D863CC434E5C3 /* PGTimedReadLock.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DAD7F761481916EB3AEE /* PGTimedReadLock.m */; };
-		1117D5F822739E2A537284EE /* PGDOMUserDataHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D5A5D96E4AF31A03B4D7 /* PGDOMUserDataHandler.h */; };
+		1117D5F822739E2A537284EE /* PGDOMUserDataHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D5A5D96E4AF31A03B4D7 /* PGDOMUserDataHandler.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D63E9D2E4D166A347214 /* NSString+PGString.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D82A3FCEF61B52811265 /* NSString+PGString.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D64603782901A7E2A4C2 /* PGFilterInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D7789FB0B9CCBF6A9247 /* PGFilterInputStream.m */; };
 		1117D671A9EE61407CCCF5BB /* PGNestedEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D98CC9D8896CA6643ADA /* PGNestedEnumerator.m */; };
@@ -902,6 +902,7 @@
 				1117DE223657ADA5B1B3D586 /* PGXMLParserAttribute.h in Headers */,
 				1117D469C3B58961AF8B3625 /* PGXMLParserTools.h in Headers */,
 				1117D4D7F1496D075E420609 /* PGXMLParser+PGXMLParserExtensions.h in Headers */,
+				1117D5F822739E2A537284EE /* PGDOMUserDataHandler.h in Headers */,
 				1117DBD9D6AD64E1617D3878 /* PGDOMPrivate.h in Headers */,
 				1117DAB0598F3B22F8766BCB /* PGDOMNamedNodeMapImpl.h in Headers */,
 				1117DA2C66DE26C6B8A74974 /* PGXMLParsedNamespace.h in Headers */,
@@ -910,7 +911,6 @@
 				1117DC2052B5DC1501CCEC52 /* PGXMLParsedEntity.h in Headers */,
 				1117D7E48AE6F3FBD22D3D82 /* PGXMLParserInput.h in Headers */,
 				1117DA2A078CCB841ACC6A0E /* PGDOMElementNodeList.h in Headers */,
-				1117D5F822739E2A537284EE /* PGDOMUserDataHandler.h in Headers */,
 				1117DA20A9D214D3A8F2FDD2 /* PGDOMImplementationList.h in Headers */,
 				1117DBC27F09D76B3A243399 /* PGDOMProcessingInstruction.h in Headers */,
 				1117D3CA47C8FDC8B290A590 /* PGDOMCDataSection.h in Headers */,
