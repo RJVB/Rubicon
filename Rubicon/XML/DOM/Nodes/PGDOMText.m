@@ -84,7 +84,7 @@
             return nil;
         }
 
-        if(!(self.canModifyPrev && self.canModifyNext)) @throw [self createNoModificationException];
+        if(!(self.canModifyPrev && self.canModifyNext)) @throw [self createNoModException];
 
         if(self.isReadOnly) {
             PGDOMText *node = [self.ownerDocument createTextNode:content];
@@ -157,5 +157,14 @@
 
         [self performAction:a onTextNodesAdjacentToNode:self];
     }
+
+    -(NSString *)textContent {
+        return self.data;
+    }
+
+    -(void)setTextContent:(NSString *)textContent {
+        self.data = textContent;
+    }
+
 
 @end

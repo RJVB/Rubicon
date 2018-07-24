@@ -31,6 +31,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface PGDOMBlockUserDataHandler : PGDOMUserDataHandler
+
+    @property(nonatomic, copy, readonly) PGDOMUserDataHandlerBlock handler;
+
+    -(instancetype)initWithHandler:(PGDOMUserDataHandlerBlock)handler;
+
+    +(instancetype)handlerWithHandler:(PGDOMUserDataHandlerBlock)handler;
+
+@end
+
 NS_ASSUME_NONNULL_END
 
 #endif //RUBICON_PGDOMUSERDATAHANDLER_H

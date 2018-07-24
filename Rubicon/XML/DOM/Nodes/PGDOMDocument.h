@@ -23,6 +23,7 @@
 
 @class PGDOMText;
 @class PGDOMCDataSection;
+@class PGDOMProcessingInstruction;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -33,6 +34,16 @@ NS_ASSUME_NONNULL_BEGIN
     -(PGDOMText *)createTextNode:(NSString *)content;
 
     -(PGDOMCDataSection *)createCDataSection:(NSString *)content;
+
+    -(PGDOMElement *)createElementWithTagName:(NSString *)tagName;
+
+    -(PGDOMElement *)createElementWithQualifiedName:(NSString *)qualifiedName namespaceURI:(nullable NSString *)namespaceURI;
+
+    -(PGDOMComment *)createComment:(NSString *)content;
+
+    -(PGDOMProcessingInstruction *)createProcessingInstruction:(NSString *)target data:(NSString *)data;
+
+    -(PGDOMNode *)adoptNode:(PGDOMNode *)node;
 @end
 
 NS_ASSUME_NONNULL_END

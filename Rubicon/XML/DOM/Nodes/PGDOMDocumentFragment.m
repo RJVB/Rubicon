@@ -1,10 +1,9 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDOMAttr.h
+ *    FILENAME: PGDOMDocumentFragment.m
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 6/29/18
- *  VISIBILITY: Private
+ *        DATE: 7/18/18
  *
  * Copyright © 2018 Project Galen. All rights reserved.
  *
@@ -16,33 +15,19 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#ifndef RUBICON_PGDOMATTR_H
-#define RUBICON_PGDOMATTR_H
+#import "PGDOMPrivate.h"
 
-#import <Rubicon/PGDOMNamespaceAware.h>
+@implementation PGDOMDocumentFragment {
+    }
 
-@class PGDOMElement;
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument {
+        self = [super initWithNodeType:PGDOMNodeTypeDocumentFragment ownerDocument:ownerDocument];
 
-NS_ASSUME_NONNULL_BEGIN
+        if(self) {
+            self.isReadOnly = NO;
+        }
 
-@interface PGDOMAttr : PGDOMNamespaceAware
-
-    @property(nonatomic, readonly, copy) /*    */ NSString     *name;
-    @property(nonatomic, copy) /*              */ NSString     *value;
-    @property(nonatomic, readonly) /*          */ BOOL         isSpecified;
-    @property(nonatomic, readonly) /*          */ BOOL         isID;
-    @property(nonatomic, readonly, nullable) /**/ PGDOMElement *ownerElement;
+        return self;
+    }
 
 @end
-
-@interface PGDOMNode()
-
-    @property(nonatomic, readonly) PGDOMNamedNodeMap<PGDOMAttr *> *attributes;
-
-    -(void)postUserDataOperation:(PGDOMUserDataOperations)operation dest:(nullable PGDOMNode *)dest;
-
-@end
-
-NS_ASSUME_NONNULL_END
-
-#endif //RUBICON_PGDOMATTR_H

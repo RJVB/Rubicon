@@ -29,7 +29,32 @@
         return self;
     }
 
+    -(void)handleOperation:(PGDOMUserDataOperations)operation key:(NSString *)key data:(NSString *)data src:(PGDOMNode *)src dest:(PGDOMNode *)dest {
+    }
+
+@end
+
+@implementation PGDOMBlockUserDataHandler {
+    }
+
+    @synthesize handler = _handler;
+
+    -(instancetype)initWithHandler:(PGDOMUserDataHandlerBlock)handler {
+        self = [super init];
+
+        if(self) {
+            self.handler = handler;
+        }
+
+        return self;
+    }
+
+    +(instancetype)handlerWithHandler:(PGDOMUserDataHandlerBlock)handler {
+        return [[self alloc] initWithHandler:handler];
+    }
+
     -(void)handleOperation:(PGDOMUserDataOperations)operation key:(NSString *)key data:(nullable NSString *)data src:(nullable PGDOMNode *)src dest:(nullable PGDOMNode *)dest {
+        self.handler(operation, key, data, src, dest);
     }
 
 @end

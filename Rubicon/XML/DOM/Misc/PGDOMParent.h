@@ -23,7 +23,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGDOMParent : PGDOMNode
+@interface PGDOMParent : PGDOMNode<NSLocking>
 
     -(BOOL)canAcceptNode:(PGDOMNode *)node;
 

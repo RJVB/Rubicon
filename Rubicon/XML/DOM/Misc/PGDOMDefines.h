@@ -21,9 +21,15 @@
 
 #import <Rubicon/PGTools.h>
 
-typedef NS_ENUM(NSUInteger, PGDOMNodeTypes) {
-    PGDOMNodeTypeDTD, PGDOMNodeTypeDTDEntity, PGDOMNodeTypeDTDNotation,
-    PGDOMNodeTypeAttribute, PGDOMNodeTypeCDataSection, PGDOMNodeTypeComment, PGDOMNodeTypeDocument, PGDOMNodeTypeDocumentFragment,
+typedef NS_ENUM(NSByte, PGDOMNodeTypes) {
+    PGDOMNodeTypeDTD,
+    PGDOMNodeTypeDTDEntity,
+    PGDOMNodeTypeDTDNotation,
+    PGDOMNodeTypeAttribute,
+    PGDOMNodeTypeCDataSection,
+    PGDOMNodeTypeComment,
+    PGDOMNodeTypeDocument,
+    PGDOMNodeTypeDocumentFragment,
     PGDOMNodeTypeElement,
     PGDOMNodeTypeEntityReference,
     PGDOMNodeTypeProcessingInstruction,
@@ -74,6 +80,7 @@ FOUNDATION_EXPORT NSString *const PGDOMErrorMsgNodeNameMissing;
 FOUNDATION_EXPORT NSString *const PGDOMErrorMsgNotTextNode;
 
 FOUNDATION_EXPORT NSString *const PGDOMMsgOld;
+FOUNDATION_EXPORT NSString *const PGDOMMsgNewChild;
 FOUNDATION_EXPORT NSString *const PGDOMMsgReference;
 FOUNDATION_EXPORT NSString *const PGDOMMsgCreatingValidationRegex;
 FOUNDATION_EXPORT NSString *const PGDOMMsgValidationRegexCreated;

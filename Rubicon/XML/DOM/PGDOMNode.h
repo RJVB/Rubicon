@@ -24,10 +24,11 @@
 #import <Rubicon/PGDOMNamedNodeMap.h>
 
 @class PGDOMDocument;
+@class PGDOMUserDataHandler;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGDOMNode : NSObject
+@interface PGDOMNode : NSObject<NSFastEnumeration>
 
     @property(nonatomic, readonly, copy) /*     */ NSString                   *nodeName;
     @property(nonatomic, nullable, copy) /*     */ NSString                   *nodeValue;
@@ -48,11 +49,17 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(PGDOMNode *)appendChild:(PGDOMNode *)newNode;
 
-    -(PGDOMNode *)insertChild:(PGDOMNode *)newNode before:(PGDOMNode *)refNode;
+    -(PGDOMNode *)insertChild:(PGDOMNode *)newNode before:(nullable PGDOMNode *)refNode;
 
     -(PGDOMNode *)replaceChild:(PGDOMNode *)oldNode with:(PGDOMNode *)newNode;
 
     -(PGDOMNode *)removeChild:(PGDOMNode *)oldNode;
+
+    -(nullable id)userDataForKey:(NSString *)key;
+
+    -(nullable id)setUserData:(nullable id)data forKey:(NSString *)key handler:(nullable PGDOMUserDataHandler *)handler;
+
+    -(NSEnumerator<PGDOMNode *> *)childNodeEnumerator;
 
 @end
 

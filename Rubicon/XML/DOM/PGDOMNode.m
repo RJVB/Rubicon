@@ -17,6 +17,8 @@
 
 #import "PGDOMPrivate.h"
 
+static NSArray<PGDOMNode *> *_emptyNodeArray = nil;
+
 @implementation PGDOMNode {
         PGDOMNodeList<PGDOMNode *>     *_childNodes;
         PGDOMNamedNodeMap<PGDOMAttr *> *_attributes;
@@ -29,6 +31,7 @@
     }
 
     @synthesize needsSyncData = _needsSyncData;
+    @synthesize userData = _userData;
 
     -(instancetype)init {
         self = [super init];
@@ -104,6 +107,10 @@
         }
     }
 
+    -(void)dealloc {
+        [self postUserDataOperation:PGDOMNodeDeleted dest:nil];
+    }
+
     -(NSString *)nodeTypeDescription {
         return [PGDOMNode nodeTypeDescription:self.nodeType];
     }
@@ -166,7 +173,6 @@
     }
 
     -(void)grandchildListChanged {
-        PGDOMSyncData;
         [self.parentNode grandchildListChanged];
     }
 
@@ -187,18 +193,15 @@
     }
 
     -(BOOL)isTextNode {
-        PGDOMSyncData;
         PGDOMNodeTypes t = self.nodeType;
         return ((t == PGDOMNodeTypeCDataSection) || (t == PGDOMNodeTypeText));
     }
 
     -(BOOL)isEntityReference {
-        PGDOMSyncData;
         return (self.nodeType == PGDOMNodeTypeEntityReference);
     }
 
     -(BOOL)needsOwnerDocument {
-        PGDOMSyncData;
         PGDOMNodeTypes t = self.nodeType;
         return ((t != PGDOMNodeTypeDocument) && (t != PGDOMNodeTypeDocumentFragment));
     }
@@ -278,10 +281,17 @@
     }
 
     -(NSInteger)nodeProc:(PGDOMNode *)n
-                 forward:(BOOL)fwd blkEntRef:(PGDOMProcBlk)blkEntRef blkCData:(PGDOMProcBlk)blkCData blkText:(PGDOMProcBlk)blkText
-                 blkAttr:(PGDOMProcBlk)blkAttr blkElement:(PGDOMProcBlk)blkElement
-              blkComment:(PGDOMProcBlk)blkComment blkNotation:(PGDOMProcBlk)blkNotation blkProcInst:(PGDOMProcBlk)blkProcInst
-             blkDocument:(PGDOMProcBlk)blkDocument blkDocFrag:(PGDOMProcBlk)blkDocFrag
+                 forward:(BOOL)fwd
+               blkEntRef:(PGDOMProcBlk)blkEntRef
+                blkCData:(PGDOMProcBlk)blkCData
+                 blkText:(PGDOMProcBlk)blkText
+                 blkAttr:(PGDOMProcBlk)blkAttr
+              blkElement:(PGDOMProcBlk)blkElement
+              blkComment:(PGDOMProcBlk)blkComment
+             blkNotation:(PGDOMProcBlk)blkNotation
+             blkProcInst:(PGDOMProcBlk)blkProcInst
+             blkDocument:(PGDOMProcBlk)blkDocument
+              blkDocFrag:(PGDOMProcBlk)blkDocFrag
                   blkDTD:(PGDOMProcBlk)blkDTD
                blkEntity:(PGDOMProcBlk)blkEntity
               blkDefault:(PGDOMProcBlk)blkDefault
@@ -300,12 +310,12 @@
                 case PGDOMNodeTypeAttribute:             if((blkAttr     ?: blkDefault)(n, &rv, fwd)) return rv; break;
                 case PGDOMNodeTypeElement:               if((blkElement  ?: blkDefault)(n, &rv, fwd)) return rv; break;
                 case PGDOMNodeTypeComment:               if((blkComment  ?: blkDefault)(n, &rv, fwd)) return rv; break;
-                case PGDOMNodeTypeDTDNotation:              if((blkNotation ?: blkDefault)(n, &rv, fwd)) return rv; break;
+                case PGDOMNodeTypeDTDNotation:           if((blkNotation ?: blkDefault)(n, &rv, fwd)) return rv; break;
                 case PGDOMNodeTypeProcessingInstruction: if((blkProcInst ?: blkDefault)(n, &rv, fwd)) return rv; break;
                 case PGDOMNodeTypeDocument:              if((blkDocument ?: blkDefault)(n, &rv, fwd)) return rv; break;
                 case PGDOMNodeTypeDocumentFragment:      if((blkDocFrag  ?: blkDefault)(n, &rv, fwd)) return rv; break;
                 case PGDOMNodeTypeDTD:                   if((blkDTD      ?: blkDefault)(n, &rv, fwd)) return rv; break;
-                case PGDOMNodeTypeDTDEntity:                if((blkEntity   ?: blkDefault)(n, &rv, fwd)) return rv; break;
+                case PGDOMNodeTypeDTDEntity:             if((blkEntity   ?: blkDefault)(n, &rv, fwd)) return rv; break;
                 default:                                 if(                 blkDefault(n, &rv, fwd)) return rv; break; /*@f:1*/
             }
 
@@ -315,8 +325,12 @@
         return y;
     }
 
-    -(NSException *)createNoModificationException {
+    -(NSException *)createNoModException {
         return [NSException exceptionWithName:PGDOMException reason:PGErrorMsgNoModificationAllowed];
+    }
+
+    -(NSException *)createInvArgException:(NSString *)reason {
+        return [NSException exceptionWithName:NSInvalidArgumentException reason:reason];
     }
 
     -(PGDOMNodeTypes)nodeType {
@@ -350,27 +364,102 @@
     }
 
     -(void)setParentNode:(PGDOMNode *)parentNode {
-        PGDOMSyncData;
-        _parentNode    = parentNode;
-        _needsSyncData = YES;
+        if(self.parentNode != parentNode) {
+            PGDOMCheckRO;
+            _parentNode    = parentNode;
+            _needsSyncData = YES;
+        }
     }
 
     -(void)setPreviousSibling:(PGDOMNode *)previousSibling {
-        PGDOMSyncData;
-        _previousSibling = previousSibling;
-        _needsSyncData   = YES;
+        if(self.previousSibling != previousSibling) {
+            PGDOMCheckRO;
+            _previousSibling = previousSibling;
+            _needsSyncData   = YES;
+        }
     }
 
     -(void)setNextSibling:(PGDOMNode *)nextSibling {
-        PGDOMSyncData;
-        _nextSibling   = nextSibling;
-        _needsSyncData = YES;
+        if(self.nextSibling != nextSibling) {
+            PGDOMCheckRO;
+            _nextSibling   = nextSibling;
+            _needsSyncData = YES;
+        }
     }
 
     -(void)setIsReadOnly:(BOOL)isReadOnly {
+        if(self.isReadOnly != isReadOnly) {
+            _isReadOnly    = isReadOnly;
+            _needsSyncData = YES;
+        }
+    }
+
+    -(id)userDataForKey:(NSString *)key {
         PGDOMSyncData;
-        _isReadOnly    = isReadOnly;
-        _needsSyncData = YES;
+        if(key.length) return self.userData[key];
+        @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Key is either empty or null."];
+    }
+
+    -(id)setUserData:(id)data forKey:(NSString *)key handler:(PGDOMUserDataHandler *)handler {
+        id oldData = [self userDataForKey:key];
+        PGDOMCheckRO;
+
+        if(data) {
+            PGSETIFNIL(self, _userData, [NSMutableDictionary new]);
+            self.userData[key] = [UserDataHolder holderWithKey:key data:data handler:handler];
+        }
+        else if(oldData) {
+            [self.userData removeObjectForKey:key];
+        }
+
+        return oldData;
+    }
+
+    -(void)postUserDataOperation:(PGDOMUserDataOperations)operation dest:(PGDOMNode *)dest {
+        PGDOMSyncData;
+        PGDOMNode *src = ((operation == PGDOMNodeDeleted) ? nil : self);
+
+        for(UserDataHolder *holder in self.userData.allValues) {
+            PGDOMUserDataHandler *handler = holder.handler;
+            if(handler) [handler handleOperation:operation key:holder.key data:holder.data src:src dest:dest];
+        }
+    }
+
+    -(void)setOwnerDocument:(PGDOMDocument *)document {
+        PGDOMSyncData;
+        _ownerDocument = document;
+    }
+
+    -(NSArray<PGDOMNode *> *)allChildNodes {
+        PGSETIFNIL([PGDOMNode class], _emptyNodeArray, [NSArray new]);
+        return _emptyNodeArray;
+    }
+
+    -(void)setAllChildNodes:(NSArray<PGDOMNode *> *)childNodes {
+    }
+
+    -(void)removeAllChildren:(nullable NSMutableArray<PGDOMNode *> *)removedNodes {
+    }
+
+    -(void)removeAllChildren {
+    }
+
+    -(void)appendAllChildNodes:(NSArray<PGDOMNode *> *)childNodes {
+    }
+
+    -(void)insertAllChildNodes:(NSArray<PGDOMNode *> *)childNodes before:(PGDOMNode *)refNode {
+    }
+
+    -(BOOL)isDocumentFragment {
+        return (self.nodeType == PGDOMNodeTypeDocumentFragment);
+    }
+
+    -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained _Nullable[_Nonnull])buffer count:(NSUInteger)len {
+        return 0;
+    }
+
+    -(NSEnumerator<PGDOMNode *> *)childNodeEnumerator {
+        return [[PGEmptyEnumerator alloc] init];
     }
 
 @end

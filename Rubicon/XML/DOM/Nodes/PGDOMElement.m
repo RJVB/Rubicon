@@ -40,6 +40,15 @@
         return self;
     }
 
+    -(instancetype)initWithOwnerDocument:(PGDOMDocument *)ownerDocument tagName:(NSString *)tagName {
+        self = [super initWithNodeType:PGDOMNodeTypeElement ownerDocument:ownerDocument nodeName:tagName];
+
+        if(self) {
+        }
+
+        return self;
+    }
+
     -(NSString *)tagName {
         return super.nodeName;
     }

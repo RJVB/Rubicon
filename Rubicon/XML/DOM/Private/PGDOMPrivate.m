@@ -17,33 +17,24 @@
 
 #import "PGDOMPrivate.h"
 
-@interface PGDOMBlockUserDataHandler()
-
-    @property(nonatomic, copy) PGDOMUserDataHandlerBlock handler;
-
-@end
-
-@implementation PGDOMBlockUserDataHandler {
+@implementation UserDataHolder {
     }
 
-    @synthesize handler = _handler;
-
-    -(instancetype)initWithHandler:(PGDOMUserDataHandlerBlock)handler {
+    -(instancetype)initWithKey:(NSString *)key data:(id)data handler:(PGDOMUserDataHandler *)handler {
         self = [super init];
 
         if(self) {
             self.handler = handler;
+            self.key     = key;
+            self.data    = data;
         }
 
         return self;
     }
 
-    +(instancetype)handlerWithHandler:(PGDOMUserDataHandlerBlock)handler {
-        return [[self alloc] initWithHandler:handler];
+    +(instancetype)holderWithKey:(NSString *)key data:(id)data handler:(PGDOMUserDataHandler *)handler {
+        return [[self alloc] initWithKey:key data:data handler:handler];
     }
 
-    -(void)handleOperation:(PGDOMUserDataOperations)operation key:(NSString *)key data:(nullable NSString *)data src:(nullable PGDOMNode *)src dest:(nullable PGDOMNode *)dest {
-        self.handler(operation, key, data, src, dest);
-    }
 
 @end

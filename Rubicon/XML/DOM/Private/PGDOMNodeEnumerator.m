@@ -1,10 +1,9 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDOMAttr.h
+ *    FILENAME: PGDOMNodeEnumerator.m
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 6/29/18
- *  VISIBILITY: Private
+ *        DATE: 7/20/18
  *
  * Copyright © 2018 Project Galen. All rights reserved.
  *
@@ -16,33 +15,40 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#ifndef RUBICON_PGDOMATTR_H
-#define RUBICON_PGDOMATTR_H
+#import "PGDOMNodeEnumerator.h"
+#import "PGDOMParent.h"
+#import "PGDOMPrivate.h"
 
-#import <Rubicon/PGDOMNamespaceAware.h>
+@implementation PGDOMNodeEnumerator {
+        PGDOMNode *_next;
+    }
 
-@class PGDOMElement;
+    @synthesize owner = _owner;
 
-NS_ASSUME_NONNULL_BEGIN
+    -(instancetype)initWithOwner:(PGDOMParent *)owner {
+        self = [super init];
 
-@interface PGDOMAttr : PGDOMNamespaceAware
+        if(self) {
+            _owner = owner;
+            _next  = owner.firstChild;
+        }
 
-    @property(nonatomic, readonly, copy) /*    */ NSString     *name;
-    @property(nonatomic, copy) /*              */ NSString     *value;
-    @property(nonatomic, readonly) /*          */ BOOL         isSpecified;
-    @property(nonatomic, readonly) /*          */ BOOL         isID;
-    @property(nonatomic, readonly, nullable) /**/ PGDOMElement *ownerElement;
+        return self;
+    }
+
+    +(instancetype)enumeratorWithOwner:(PGDOMParent *)owner {
+        return [[self alloc] initWithOwner:owner];
+    }
+
+    -(PGDOMNode *)nextObject {
+        if(_next) {
+            PGDOMNode *n = _next;
+            _next = n.nextSibling;
+            return n;
+        }
+
+        _owner = nil;
+        return nil;
+    }
 
 @end
-
-@interface PGDOMNode()
-
-    @property(nonatomic, readonly) PGDOMNamedNodeMap<PGDOMAttr *> *attributes;
-
-    -(void)postUserDataOperation:(PGDOMUserDataOperations)operation dest:(nullable PGDOMNode *)dest;
-
-@end
-
-NS_ASSUME_NONNULL_END
-
-#endif //RUBICON_PGDOMATTR_H

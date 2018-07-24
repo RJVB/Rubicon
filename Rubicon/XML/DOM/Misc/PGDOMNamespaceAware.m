@@ -115,7 +115,7 @@
         NSRegularExpression *regex = [PGDOMNamespaceAware validationRegex];
         if(regex) {
             @synchronized(regex) {
-                if(![regex matches:name]) @throw [self createException:PGDOMErrorMsgInvalidCharacter];
+                if(![regex matches:name]) @throw [self createInvArgException:PGDOMErrorMsgInvalidCharacter];
             }
         }
     }
@@ -125,8 +125,8 @@
 
         if(regex) {
             @synchronized(regex) {
-                if(![regex matches:localName]) @throw [self createException:PGDOMErrorMsgInvalidCharacter];
-                if(prefix.length && ![regex matches:prefix]) @throw [self createException:PGDOMErrorMsgInvalidCharacter];
+                if(![regex matches:localName]) @throw [self createInvArgException:PGDOMErrorMsgInvalidCharacter];
+                if(prefix.length && ![regex matches:prefix]) @throw [self createInvArgException:PGDOMErrorMsgInvalidCharacter];
             }
         }
     }
@@ -139,24 +139,20 @@
         NSUInteger pfxlen = pfx.length;
         BOOL       noURI  = (uri.length == 0);
 
-        if(lnm.length == 0) @throw [self createException:PGDOMErrorMsgLocalNameRequired];
+        if(lnm.length == 0) @throw [self createInvArgException:PGDOMErrorMsgLocalNameRequired];
         if(noURI) {
-            if(pfxlen) @throw [self createException:PGDOMErrorMsgNamespaceError];
+            if(pfxlen) @throw [self createInvArgException:PGDOMErrorMsgNamespaceError];
         }
         else {
-            if([pfx isEqualToString:PGDOMXMLPrefix] && ![uri isEqualToString:PGDOMNamespaceURI1]) @throw [self createException:PGDOMErrorMsgNamespaceError];
+            if([pfx isEqualToString:PGDOMXMLPrefix] && ![uri isEqualToString:PGDOMNamespaceURI1]) @throw [self createInvArgException:PGDOMErrorMsgNamespaceError];
 
             BOOL hasXMLNSPrefix = ([pfx isEqualToString:PGDOMXMLNSPrefix] || ((pfxlen == 0) && [lnm isEqualToString:PGDOMXMLNSPrefix]));
             BOOL hasXMLNSURI    = [uri isEqualToString:PGDOMNamespaceURI2];
 
-            if((hasXMLNSPrefix && !hasXMLNSURI) || (hasXMLNSURI && !hasXMLNSPrefix)) @throw [self createException:PGDOMErrorMsgNamespaceError];
+            if((hasXMLNSPrefix && !hasXMLNSURI) || (hasXMLNSURI && !hasXMLNSPrefix)) @throw [self createInvArgException:PGDOMErrorMsgNamespaceError];
         }
 
         [self validateCharacters:lnm prefix:pfx];
-    }
-
-    -(NSException *)createException:(NSString *)reason {
-        return [NSException exceptionWithName:NSInvalidArgumentException reason:reason];
     }
 
     +(NSRegularExpression *)validationRegex {
