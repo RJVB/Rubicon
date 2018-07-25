@@ -73,13 +73,17 @@ typedef NSInteger (*NSInputStreamReadFunc_t)(id, SEL, uint8_t *, NSUInteger);
 
     -(instancetype)initWithFilePath:(NSString *)filepath {
         self = [self initWithInputStream:[NSInputStream inputStreamWithFileAtPath:filepath]];
-        if(self) self.url = [NSURL fileURLWithPath:filepath];
+        if(self) {
+            _url = [NSURL fileURLWithPath:filepath];
+        }
         return self;
     }
 
     -(instancetype)initWithURL:(NSURL *)url {
         self = [self initWithInputStream:[NSInputStream inputStreamWithURL:url]];
-        if(self) self.url = url;
+        if(self) {
+            _url = [url copy];
+        }
         return self;
     }
 
@@ -119,87 +123,80 @@ typedef NSInteger (*NSInputStreamReadFunc_t)(id, SEL, uint8_t *, NSUInteger);
 
 #pragma mark Parsing
 
-    -(BOOL)tryParse {
-        PGSimpleBuffer          *b = [PGSimpleBuffer bufferWithLength:PG_DEF_BUF_SZ];
-        PGMethodImpl            *m = [PGMethodImpl methodWithSelector:@selector(read:maxLength:) forObject:self.input];
-        NSInputStreamReadFunc_t f  = (NSInputStreamReadFunc_t)m.f;
-        id                      o  = m.obj;
-        SEL                     s  = m.sel;
-        voidp                   bu = b.buffer;
-        NSUInteger              ln = b.length;
-        NSInteger               br = (*f)(o, s, bu, ln);
-
-        _version = _encoding = _publicId = _systemId = nil;
-
-        if(br > 0) {
-            [self setupSAXHandlerStructure];
-            @try {
-                PGCString *fn = [PGCString stringWithNSString:self.url.absoluteString];
-                BOOL      su  = NO, eof;
-
-                if(createPushContext(self, bu, br, fn.cString)) {
-                    @try {
-                        xmlParserCtxtPtr c = self.ctx;
-
-                        /*
-                         * Nice tight fast loop!
-                         */
-                        do {
-                            eof = ((br = (*f)(o, s, bu, ln)) <= 0);
-                            su  = !xmlParseChunk(c, bu, (int)(eof ? 0 : br), eof);
-                        }
-                        while(su && !eof);
-
-                        if((br < 0) && (self.parserError == nil)) self.parserError = self.inputStreamError;
-                        su = (su && (br == 0));
-                    }
-                    @finally {
-                        [self destroyParserContext];
-                    }
-                }
-
-                return su;
-            }
-            @finally {
-                [self destroySAXHandlerStructure];
-            }
-        }
-        else {
-            self.parserError = (br ? self.inputStreamError : createError(PGErrorCodeUnexpectedEndOfInput, PGErrorMsgUnexpectedEndOfInput));
-            return NO;
-        }
-    }
-
     -(BOOL)parse {
         [self.lck lock];
         @try {
-            @try {
-                if(self.hasRun) self.parserError = createError(PGErrorCodeXMLParserAlreadyRun, PGErrorMsgXMLParserAlreadyRun);
-                else if(!self.input) self.parserError = createError(PGErrorCodeNoInputStream, PGErrorMsgNoInputStream);
-                else if(!self.delegate) self.parserError = createError(PGErrorCodeNoDelegate, PGErrorMsgNoDelegate);
-                else if((self.parserError = PGOpenInputStream(self.input)) == nil) {
-                    @try {
-                        return [self tryParse];
+            if(self.hasRun) self.parserError = createError(PGErrorCodeXMLParserAlreadyRun, PGErrorMsgXMLParserAlreadyRun);
+            else if(!self.input) self.parserError = createError(PGErrorCodeNoInputStream, PGErrorMsgNoInputStream);
+            else if(!self.delegate) self.parserError = createError(PGErrorCodeNoDelegate, PGErrorMsgNoDelegate);
+            else if((self.parserError = PGOpenInputStream(self.input)) == nil) {
+                @try {
+                    PGSimpleBuffer          *b = [PGSimpleBuffer bufferWithLength:PG_DEF_BUF_SZ];
+                    id                      o  = self.input;
+                    SEL                     s  = @selector(read:maxLength:);
+                    NSInputStreamReadFunc_t f  = (NSInputStreamReadFunc_t)[o methodForSelector:s];
+                    voidp                   bu = b.buffer;
+                    NSUInteger              ln = b.length;
+                    NSInteger               br = (*f)(o, s, bu, ln);
+
+                    _version = _encoding = _publicId = _systemId = nil;
+
+                    if(br > 0) {
+                        [self setupSAXHandlerStructure];
+                        @try {
+                            PGCString *fn = [PGCString stringWithNSString:self.url.absoluteString];
+                            BOOL      su  = NO, eof;
+
+                            if(createPushContext(self, bu, br, fn.cString)) {
+                                @try {
+                                    xmlParserCtxtPtr c = self.ctx;
+
+                                    /*
+                                     * Nice tight fast loop!
+                                     */
+                                    do {
+                                        eof = ((br = (*f)(o, s, bu, ln)) <= 0);
+                                        su  = !xmlParseChunk(c, bu, (int)(eof ? 0 : br), eof);
+                                    }
+                                    while(su && !eof);
+
+                                    if((br < 0) && (self.parserError == nil)) self.parserError = self.inputStreamError;
+                                    su = (su && (br == 0));
+                                }
+                                @finally {
+                                    [self destroyParserContext];
+                                }
+                            }
+
+                            return su;
+                        }
+                        @finally {
+                            [self destroySAXHandlerStructure];
+                        }
                     }
-                    @catch(NSException *e) {
-                        self.parserError = e.makeError;
-                    }
-                    @finally {
-                        self.hasRun = YES;
-                        [self.input close];
+                    else {
+                        self.parserError = (br ? self.inputStreamError : createError(PGErrorCodeUnexpectedEndOfInput, PGErrorMsgUnexpectedEndOfInput));
+                        return NO;
                     }
                 }
+                @catch(NSException *e) {
+                    self.parserError = e.makeError;
+                }
+                @finally {
+                    [self setHasRun:YES];
+                    [self.input close];
+                    [self.inputs removeAllObjects];
+                    [self.entities removeAllObjects];
+                    [self.paramEntities removeAllObjects];
+                    [self.namespaceStack removeAllObjects];
+                }
             }
-            @finally {
-                [self.inputs removeAllObjects];
-                [self.entities removeAllObjects];
-                [self.paramEntities removeAllObjects];
-                [self.namespaceStack removeAllObjects];
-            }
-
-            return NO;
         }
-        @finally { [self.lck unlock]; }
+        @finally {
+            [self.lck unlock];
+        }
+
+        return NO;
     }
 
 #pragma mark Helper Methods
@@ -464,7 +461,9 @@ typedef NSInteger (*NSInputStreamReadFunc_t)(id, SEL, uint8_t *, NSUInteger);
 
     -(void)startElementNsCallBack:(NSString *)localname
                            prefix:(NSString *)prefix
-                              URI:(NSString *)URI namespaces:(NSArray<PGXMLParsedNamespace *> *)namespaces attributes:(NSArray<PGXMLParserAttribute *> *)attributes {
+                              URI:(NSString *)URI
+                       namespaces:(NSArray<PGXMLParsedNamespace *> *)namespaces
+                       attributes:(NSArray<PGXMLParserAttribute *> *)attributes {
         [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
         BOOL hasImpl = NO;
         [self.namespaceStack push:(namespaces.count ? namespaces : @[])];

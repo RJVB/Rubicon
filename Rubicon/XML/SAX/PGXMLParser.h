@@ -25,16 +25,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGXMLParser : NSObject
 
-    @property(assign, nullable) /*   */ id<PGXMLParserDelegate> delegate;
-    @property(readonly) /*           */ NSUInteger lineNumber;
-    @property(readonly) /*           */ NSUInteger columnNumber;
-    @property(readonly) /*           */ BOOL       isStandalone;
-    @property(readonly, copy, nullable) NSString   *publicId;
-    @property(readonly, copy, nullable) NSString   *systemId;
-    @property(readonly, copy, nullable) NSString   *version;
-    @property(readonly, copy, nullable) NSString   *encoding;
-    @property(readonly, nullable) /* */ NSError    *parserError;
-    @property(readonly, nullable) /* */ NSError    *inputStreamError;
+    @property(nonatomic, assign, nullable) /*   */ id<PGXMLParserDelegate> delegate;
+    @property(nonatomic, readonly) /*           */ NSUInteger              lineNumber;
+    @property(nonatomic, readonly) /*           */ NSUInteger              columnNumber;
+    @property(nonatomic, readonly) /*           */ BOOL                    isStandalone;
+    @property(nonatomic, readonly, copy, nullable) NSString                *publicId;
+    @property(nonatomic, readonly, copy, nullable) NSString                *systemId;
+    @property(nonatomic, readonly, copy, nullable) NSString                *version;
+    @property(nonatomic, readonly, copy, nullable) NSString                *encoding;
+    @property(nonatomic, readonly, nullable) /* */ NSError                 *parserError;
+    @property(nonatomic, readonly, nullable) /* */ NSError                 *inputStreamError;
 
     -(instancetype)initWithInputStream:(NSInputStream *)stream NS_DESIGNATED_INITIALIZER;
 

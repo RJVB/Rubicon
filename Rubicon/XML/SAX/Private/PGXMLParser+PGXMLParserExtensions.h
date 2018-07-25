@@ -27,75 +27,51 @@
 
 /* DO NOT CHANGE THE ORDER OF THESE!!!!! */
 typedef NS_ENUM(uint8_t, PGXMLMethodNames) {
-    PGXMLfoundNoteDeclMethod = 0,
-    PGXMLfoundUnpEntDeclMethod,
-    PGXMLfoundAttrDeclMethod,
-    PGXMLfoundElemDeclMethod,
-    PGXMLfoundIntEntDeclMethod,
-    PGXMLfoundExtEntDeclMethod,
-    PGXMLdidStartDocMethod,
-    PGXMLdidEndDocMethod,
-    PGXMLdidStartElemMethod,
-    PGXMLdidEndElemMethod,
-    PGXMLdidStartMapPfxMethod,
-    PGXMLdidEndMapPfxMethod,
-    PGXMLfoundCharsMethod,
-    PGXMLfoundIgnWhitespMethod,
-    PGXMLfoundProcInstMethod,
-    PGXMLfoundCommentMethod,
-    PGXMLfoundCDATAMethod,
-    PGXMLparseErrMethod,
-    PGXMLvalidationErrMethod,
-    PGXMLreslvExtEntMethod,
-    PGXMLreslvIntEntMethod,
-    PGXMLreslvIntPEntMethod
+    PGXMLFoundNoteDeclMethod = 0,
+    PGXMLFoundUnpEntDeclMethod,
+    PGXMLFoundAttrDeclMethod,
+    PGXMLFoundElemDeclMethod,
+    PGXMLFoundIntEntDeclMethod,
+    PGXMLFoundExtEntDeclMethod,
+    PGXMLDidStartDocMethod,
+    PGXMLDidEndDocMethod,
+    PGXMLDidStartElemMethod,
+    PGXMLDidEndElemMethod,
+    PGXMLDidStartMapPfxMethod,
+    PGXMLDidEndMapPfxMethod,
+    PGXMLFoundCharsMethod,
+    PGXMLFoundIgnWhitespMethod,
+    PGXMLFoundProcInstMethod,
+    PGXMLFoundCommentMethod,
+    PGXMLFoundCDATAMethod,
+    PGXMLParseErrMethod,
+    PGXMLValidationErrMethod,
+    PGXMLReslvExtEntMethod,
+    PGXMLReslvIntEntMethod,
+    PGXMLReslvIntPEntMethod
 };
 
 NS_ASSUME_NONNULL_BEGIN
 
-/* @f:0 */
-typedef void             (*PGXMLFoundNoteDeclFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable, NSString *_Nullable);
-typedef void           (*PGXMLFoundUnpEntDeclFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable, NSString *_Nullable, NSString *_Nullable);
-typedef void             (*PGXMLFoundAttrDeclFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *,          NSString *_Nullable, NSString *_Nullable);
-typedef void             (*PGXMLFoundElemDeclFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable);
-typedef void           (*PGXMLFoundIntEntDeclFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable);
-typedef void           (*PGXMLFoundExtEntDeclFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable, NSString *_Nullable);
-typedef void               (*PGXMLDidStartDocFunc_t)(id, SEL, PGXMLParser *);
-typedef void                 (*PGXMLDidEndDocFunc_t)(id, SEL, PGXMLParser *);
-typedef void              (*PGXMLDidStartElemFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable, NSString *_Nullable, NSArray<PGXMLParserAttribute *> *);
-typedef void                (*PGXMLDidEndElemFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable, NSString *_Nullable);
-typedef void            (*PGXMLDidStartMapPfxFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *);
-typedef void              (*PGXMLDidEndMapPfxFunc_t)(id, SEL, PGXMLParser *, NSString *);
-typedef void                (*PGXMLFoundCharsFunc_t)(id, SEL, PGXMLParser *, NSString *);
-typedef void            (*PGXMLFoundIgWhitespFunc_t)(id, SEL, PGXMLParser *, NSString *);
-typedef void             (*PGXMLFoundProcInstFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable);
-typedef void              (*PGXMLFoundCommentFunc_t)(id, SEL, PGXMLParser *, NSString *);
-typedef void                (*PGXMLFoundCDATAFunc_t)(id, SEL, PGXMLParser *,   NSData *);
-typedef void                  (*PGXMLParseErrFunc_t)(id, SEL, PGXMLParser *,  NSError *);
-typedef void             (*PGXMLValidationErrFunc_t)(id, SEL, PGXMLParser *,  NSError *);
-typedef NSData *_Nullable(*PGXMLResolveExtEntFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable);
-typedef NSString *_Nullable(*PGXMLReslvIntEntFunc_t)(id, SEL, PGXMLParser *, NSString *);
-/* @f:1 */
-
 @interface PGXMLParser()
 
-    @property(nullable) /* */ xmlParserCtxtPtr ctx;
-    @property(nullable) /* */ xmlSAXHandlerPtr saxHandler;
-    @property(nullable) /* */ NSError          *parserError;
-    @property(readonly) /* */ NSInputStream    *input;
-    @property(copy, nullable) NSURL            *url;
-    @property(copy, nullable) NSString         *publicId;
-    @property(copy, nullable) NSString         *systemId;
-    @property(readonly) /* */ NSRecursiveLock  *lck;
+    @property(nonatomic, nullable) /*           */ xmlParserCtxtPtr    ctx;
+    @property(nonatomic, nullable) /*           */ xmlSAXHandlerPtr    saxHandler;
+    @property(nonatomic, nullable) /*           */ NSError             *parserError;
+    @property(nonatomic, readonly) /*           */ NSInputStream       *input;
+    @property(nonatomic, readonly, copy, nullable) NSURL               *url;
+    @property(nonatomic, copy, nullable) /*     */ NSString            *publicId;
+    @property(nonatomic, copy, nullable) /*     */ NSString            *systemId;
+    @property(nonatomic, readonly) /*           */ NSRecursiveLock     *lck;
+    @property(nonatomic, readonly) /*           */ NSArray<NSString *> *typeNames;
+    @property(nonatomic, readonly) /*           */ PGLogger            *logger;
+    @property(nonatomic) /*                     */ BOOL                hasRun;
 
-    @property(readonly) /* */ NSMutableDictionary<NSString *, PGMethodImpl *>      *methods;
-    @property(readonly) /* */ NSMutableDictionary<NSString *, PGXMLParsedEntity *> *entities;
-    @property(readonly) /* */ NSMutableDictionary<NSString *, PGXMLParsedEntity *> *paramEntities;
-    @property(readonly) /* */ PGStack<NSArray<PGXMLParsedNamespace *> *>           *namespaceStack;
-    @property(readonly) /* */ NSMutableArray<PGXMLParserInput *>                   *inputs;
-    @property(readonly) /* */ NSArray<NSString *>                                  *typeNames;
-    @property(readonly) /* */ PGLogger                                             *logger;
-    @property /*           */ BOOL                                                 hasRun;
+    @property(nonatomic, readonly) NSMutableDictionary<NSString *, PGMethodImpl *>      *methods;
+    @property(nonatomic, readonly) NSMutableDictionary<NSString *, PGXMLParsedEntity *> *entities;
+    @property(nonatomic, readonly) NSMutableDictionary<NSString *, PGXMLParsedEntity *> *paramEntities;
+    @property(nonatomic, readonly) PGStack<NSArray<PGXMLParsedNamespace *> *>           *namespaceStack;
+    @property(nonatomic, readonly) NSMutableArray<PGXMLParserInput *>                   *inputs;
 
 #pragma mark Constructors and Destructors
 
@@ -180,7 +156,9 @@ typedef NSString *_Nullable(*PGXMLReslvIntEntFunc_t)(id, SEL, PGXMLParser *, NSS
 
     -(void)startElementNsCallBack:(NSString *)localname
                            prefix:(NSString *)prefix
-                              URI:(NSString *)URI namespaces:(NSArray<PGXMLParsedNamespace *> *)namespaces attributes:(NSArray<PGXMLParserAttribute *> *)attributes;
+                              URI:(NSString *)URI
+                       namespaces:(NSArray<PGXMLParsedNamespace *> *)namespaces
+                       attributes:(NSArray<PGXMLParserAttribute *> *)attributes;
 
     -(void)endElementNsCallBack:(NSString *)localname prefix:(NSString *)prefix namespaceURI:(NSString *)namespaceURI;
 
@@ -229,6 +207,30 @@ typedef NSString *_Nullable(*PGXMLReslvIntEntFunc_t)(id, SEL, PGXMLParser *, NSS
     // @f:1
 
 @end
+
+/* @f:0 */
+typedef void             (*PGXMLFoundNoteDeclFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable, NSString *_Nullable);
+typedef void           (*PGXMLFoundUnpEntDeclFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable, NSString *_Nullable, NSString *_Nullable);
+typedef void             (*PGXMLFoundAttrDeclFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *,          NSString *_Nullable, NSString *_Nullable);
+typedef void             (*PGXMLFoundElemDeclFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable);
+typedef void           (*PGXMLFoundIntEntDeclFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable);
+typedef void           (*PGXMLFoundExtEntDeclFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable, NSString *_Nullable);
+typedef void               (*PGXMLDidStartDocFunc_t)(id, SEL, PGXMLParser *);
+typedef void                 (*PGXMLDidEndDocFunc_t)(id, SEL, PGXMLParser *);
+typedef void              (*PGXMLDidStartElemFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable, NSString *_Nullable, NSArray<PGXMLParserAttribute *> *);
+typedef void                (*PGXMLDidEndElemFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable, NSString *_Nullable);
+typedef void            (*PGXMLDidStartMapPfxFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *);
+typedef void              (*PGXMLDidEndMapPfxFunc_t)(id, SEL, PGXMLParser *, NSString *);
+typedef void                (*PGXMLFoundCharsFunc_t)(id, SEL, PGXMLParser *, NSString *);
+typedef void            (*PGXMLFoundIgWhitespFunc_t)(id, SEL, PGXMLParser *, NSString *);
+typedef void             (*PGXMLFoundProcInstFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable);
+typedef void              (*PGXMLFoundCommentFunc_t)(id, SEL, PGXMLParser *, NSString *);
+typedef void                (*PGXMLFoundCDATAFunc_t)(id, SEL, PGXMLParser *,   NSData *);
+typedef void                  (*PGXMLParseErrFunc_t)(id, SEL, PGXMLParser *,  NSError *);
+typedef void             (*PGXMLValidationErrFunc_t)(id, SEL, PGXMLParser *,  NSError *);
+typedef NSData *_Nullable(*PGXMLResolveExtEntFunc_t)(id, SEL, PGXMLParser *, NSString *, NSString *_Nullable);
+typedef NSString *_Nullable(*PGXMLReslvIntEntFunc_t)(id, SEL, PGXMLParser *, NSString *);
+/* @f:1 */
 
 NS_ASSUME_NONNULL_END
 
