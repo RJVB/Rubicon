@@ -142,7 +142,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(void)appendAllChildNodes:(NSArray<PGDOMNode *> *)childNodes;
 
-    -(void)insertAllChildNodes:(NSArray<PGDOMNode *> *)childNodes before:(PGDOMNode *)refNode;
+    -(void)insertAllChildNodes:(NSArray<PGDOMNode *> *)childNodes before:(nullable PGDOMNode *)refNode;
 
 @end
 
@@ -166,21 +166,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGDOMDocumentFragment()
 
-    -(instancetype)initWithOwnerDocument:(PGDOMDocument *)ownerDocument;
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument;
 
 @end
 
 @interface PGDOMNamespaceAware()
 
-    -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType
-                      ownerDocument:(PGDOMDocument *)ownerDocument
+    -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(nullable PGDOMDocument *)ownerDocument
                       qualifiedName:(NSString *)qualifiedName namespaceURI:(nullable NSString *)namespaceURI;
 
-    -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType
-                      ownerDocument:(PGDOMDocument *)ownerDocument
+    -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(nullable PGDOMDocument *)ownerDocument
                           localName:(NSString *)localName prefix:(nullable NSString *)prefix namespaceURI:(nullable NSString *)namespaceURI;
 
-    -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(PGDOMDocument *)ownerDocument nodeName:(NSString *)nodeName;
+    -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(nullable PGDOMDocument *)ownerDocument nodeName:(NSString *)nodeName;
 
     +(NSRegularExpression *)validationRegex;
 
@@ -200,19 +198,19 @@ NS_ASSUME_NONNULL_BEGIN
     @property(nonatomic) /*     */ BOOL         isID;
     @property(nonatomic, nullable) PGDOMElement *ownerElement;
 
-    -(instancetype)initWithOwnerDocument:(PGDOMDocument *)ownerDocument ownerElement:(nullable PGDOMElement *)ownerElement
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument ownerElement:(nullable PGDOMElement *)ownerElement
                                     name:(NSString *)name
                                    value:(NSString *)value
                              isSpecified:(BOOL)isSpecified
                                     isID:(BOOL)isID;
 
-    -(instancetype)initWithOwnerDocument:(PGDOMDocument *)ownerDocument ownerElement:(nullable PGDOMElement *)ownerElement
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument ownerElement:(nullable PGDOMElement *)ownerElement
                            qualifiedName:(NSString *)qualifiedName namespaceURI:(nullable NSString *)namespaceURI
                                    value:(NSString *)value
                              isSpecified:(BOOL)isSpecified
                                     isID:(BOOL)isID;
 
-    -(instancetype)initWithOwnerDocument:(PGDOMDocument *)ownerDocument ownerElement:(nullable PGDOMElement *)ownerElement
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument ownerElement:(nullable PGDOMElement *)ownerElement
                                localName:(NSString *)localName prefix:(nullable NSString *)prefix namespaceURI:(nullable NSString *)namespaceURI
                                    value:(NSString *)value
                              isSpecified:(BOOL)isSpecified
@@ -222,14 +220,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGDOMElement()
 
-    -(instancetype)initWithOwnerDocument:(PGDOMDocument *)ownerDocument qualifiedName:(NSString *)qualifiedName namespaceURI:(nullable NSString *)namespaceURI;
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument qualifiedName:(NSString *)qualifiedName namespaceURI:(nullable NSString *)namespaceURI;
 
-    -(instancetype)initWithOwnerDocument:(PGDOMDocument *)ownerDocument
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument
                                localName:(NSString *)localName
                                   prefix:(nullable NSString *)prefix
                             namespaceURI:(nullable NSString *)namespaceURI;
 
-    -(instancetype)initWithOwnerDocument:(PGDOMDocument *)ownerDocument tagName:(NSString *)tagName;
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument tagName:(NSString *)tagName;
 
     -(PGDOMNamedNodeMap<PGDOMAttr *> *)createNewAttributeMap;
 
@@ -315,7 +313,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGDOMCharacterData()
 
-    -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(PGDOMDocument *)ownerDocument data:(NSString *)data;
+    -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data;
 
     -(NSException *)createIndexOutOfBoundsException;
 
@@ -323,7 +321,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGDOMText()
 
-    -(instancetype)initWithOwnerDocument:(PGDOMDocument *)ownerDocument data:(NSString *)data;
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data;
 
     -(void)performAction:(PGDOMNodeAction)blkAction onTextNodesAdjacentToNode:(PGDOMNode *)node goingForward:(BOOL)fwd;
 
@@ -333,31 +331,31 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGDOMCDataSection()
 
-    -(instancetype)initWithOwnerDocument:(PGDOMDocument *)ownerDocument data:(NSString *)data;
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data;
 
 @end
 
 @interface PGDOMComment()
 
-    -(instancetype)initWithOwnerDocument:(PGDOMDocument *)ownerDocument data:(NSString *)data;
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data;
 
 @end
 
 @interface PGDOMProcessingInstruction()
 
-    -(instancetype)initWithOwnerDocument:(PGDOMDocument *)ownerDocument target:(NSString *)target data:(NSString *)data;
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument target:(NSString *)target data:(NSString *)data;
 
 @end
 
 @interface PGDOMDTDNotation()
 
-    -(instancetype)initWithOwnerDocument:(PGDOMDocument *)ownerDocument publicID:(nullable NSString *)publicID systemID:(nullable NSString *)systemID;
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument publicID:(nullable NSString *)publicID systemID:(nullable NSString *)systemID;
 
 @end
 
 @interface PGDOMDTDEntity()
 
-    -(instancetype)initWithOwnerDocument:(PGDOMDocument *)ownerDocument
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument
                            inputEncoding:(nullable NSString *)inputEncoding
                             notationName:(nullable NSString *)notationName
                                 publicID:(nullable NSString *)publicID
@@ -369,7 +367,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGDOMDTD()
 
-    -(instancetype)initWithOwnerDocument:(PGDOMDocument *)ownerDocument
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument
                                     name:(nullable NSString *)name
                                 publicID:(nullable NSString *)publicID
                                 systemID:(nullable NSString *)systemID

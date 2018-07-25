@@ -86,7 +86,7 @@ NS_INLINE void _sanityCheck2(PGDOMNode *f, PGDOMNode *l) {
     }
 }
 
-NS_INLINE BOOL _sanityCheck1(PGDOMNode **first, PGDOMNode **last) {
+NS_INLINE BOOL _sanityCheck1(PGDOMNode *__strong *first, PGDOMNode *__strong *last) {
     PGDOMNode *f = *first;
     PGDOMNode *l = *last;
 
@@ -106,7 +106,7 @@ NS_INLINE BOOL _sanityCheck1(PGDOMNode **first, PGDOMNode **last) {
     return NO;
 }
 
-NS_INLINE void _sanityCheck(PGDOMNode **first, PGDOMNode **last) {
+NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *last) {
     _sanityCheck1(first, last);
     _sanityCheck2(*first, *last);
 }

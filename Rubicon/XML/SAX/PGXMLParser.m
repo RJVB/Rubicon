@@ -21,43 +21,19 @@
 #import "PGXMLParsedEntity.h"
 #import "PGXMLParserInput.h"
 
-static SEL NSInputStreamReadSel;
+typedef NSInteger (*NSInputStreamReadFunc_t)(id, SEL, uint8_t *, NSUInteger);
 
 @implementation PGXMLParser {
         id<PGXMLParserDelegate> __unsafe_unretained _delegate;
-        NSRecursiveLock                             *_lck;
     }
 
 #pragma mark Constructors and Destructors
 
     @synthesize parserError = _parserError;
-    @synthesize foundNoteDeclFunc = _foundNoteDeclFunc;
-    @synthesize foundUnpEntDeclFunc = _foundUnpEntDeclFunc;
-    @synthesize foundAttrDeclFunc = _foundAttrDeclFunc;
-    @synthesize foundElemDeclFunc = _foundElemDeclFunc;
-    @synthesize foundIntEntDeclFunc = _foundIntEntDeclFunc;
-    @synthesize foundExtEntDeclFunc = _foundExtEntDeclFunc;
-    @synthesize didStartDocFunc = _didStartDocFunc;
-    @synthesize didEndDocFunc = _didEndDocFunc;
-    @synthesize didStartElemFunc = _didStartElemFunc;
-    @synthesize didEndElemFunc = _didEndElemFunc;
-    @synthesize didStartMapPfxFunc = _didStartMapPfxFunc;
-    @synthesize didEndMapPfxFunc = _didEndMapPfxFunc;
-    @synthesize foundCharsFunc = _foundCharsFunc;
-    @synthesize foundIgnWhitespFunc = _foundIgnWhitespFunc;
-    @synthesize foundProcInstFunc = _foundProcInstFunc;
-    @synthesize foundCommentFunc = _foundCommentFunc;
-    @synthesize foundCDATAFunc = _foundCDATAFunc;
-    @synthesize parseErrFunc = _parseErrFunc;
-    @synthesize validationErrFunc = _validationErrFunc;
-    @synthesize reslvExtEntFunc = _reslvExtEntFunc;
-    @synthesize reslvIntEntFunc = _reslvIntEntFunc;
-    @synthesize reslvIntPEntFunc = _reslvIntPEntFunc;
     @synthesize hasRun = _hasRun;
     @synthesize ctx = _ctx;
     @synthesize saxHandler = _saxHandler;
     @synthesize input = _input;
-    @synthesize readFunc = _readFunc;
     @synthesize url = _url;
     @synthesize entities = _entities;
     @synthesize paramEntities = _paramEntities;
@@ -69,6 +45,8 @@ static SEL NSInputStreamReadSel;
     @synthesize systemId = _systemId;
     @synthesize version = _version;
     @synthesize encoding = _encoding;
+    @synthesize methods = _methods;
+    @synthesize lck = _lck;
 
     -(instancetype)init {
         self = [super init];
@@ -85,9 +63,9 @@ static SEL NSInputStreamReadSel;
             _inputs         = [NSMutableArray new];
             _entities       = [NSMutableDictionary new];
             _paramEntities  = [NSMutableDictionary new];
+            _methods        = [NSMutableDictionary new];
             _namespaceStack = [PGStack new];
             _input          = stream;
-            _readFunc       = (NSInputStreamReadFunc)[_input methodForSelector:NSInputStreamReadSel];
         }
 
         return self;
@@ -119,20 +97,20 @@ static SEL NSInputStreamReadSel;
 
     -(id<PGXMLParserDelegate>)delegate {
         id<PGXMLParserDelegate> d = nil;
-        [_lck lock];
-        @try { d = _delegate; } @finally { [_lck unlock]; }
+        [self.lck lock];
+        @try { d = _delegate; } @finally { [self.lck unlock]; }
         return d;
     }
 
     -(void)setDelegate:(id<PGXMLParserDelegate>)delegate {
-        [_lck lock];
+        [self.lck lock];
         @try {
             if(_delegate != delegate) {
                 _delegate = delegate;
-                [self updateDelegateFunctions:_delegate];
+                [self.methods removeAllObjects];
             }
         }
-        @finally { [_lck unlock]; }
+        @finally { [self.lck unlock]; }
     }
 
     -(NSError *)inputStreamError {
@@ -141,52 +119,59 @@ static SEL NSInputStreamReadSel;
 
 #pragma mark Parsing
 
-    -(BOOL)parseBuffer:(PGSimpleBuffer *)buffer bytesRead:(NSInteger)bytesRead {
-        PGCString  *filename = [PGCString stringWithNSString:self.url.absoluteString];
-        BOOL       nsuccess  = NO, eof;
-        voidp      buf       = buffer.buffer;
-        NSUInteger len       = buffer.length;
+    -(BOOL)tryParse {
+        PGSimpleBuffer          *b = [PGSimpleBuffer bufferWithLength:PG_DEF_BUF_SZ];
+        PGMethodImpl            *m = [PGMethodImpl methodWithSelector:@selector(read:maxLength:) forObject:self.input];
+        NSInputStreamReadFunc_t f  = (NSInputStreamReadFunc_t)m.f;
+        id                      o  = m.obj;
+        SEL                     s  = m.sel;
+        voidp                   bu = b.buffer;
+        NSUInteger              ln = b.length;
+        NSInteger               br = (*f)(o, s, bu, ln);
 
-        if(createPushContext(self, buf, bytesRead, filename.cString)) {
+        _version = _encoding = _publicId = _systemId = nil;
+
+        if(br > 0) {
+            [self setupSAXHandlerStructure];
             @try {
-                xmlParserCtxtPtr      ctx    = self.ctx;
-                NSInputStream         *input = self.input;
-                NSInputStreamReadFunc rfunc  = self.readFunc;
+                PGCString *fn = [PGCString stringWithNSString:self.url.absoluteString];
+                BOOL      su  = NO, eof;
 
-                /*
-                 * Nice tight fast loop!
-                 */
-                do {
-                    bytesRead = (*rfunc)(input, NSInputStreamReadSel, buf, len);
-                    eof       = (bytesRead <= 0);
-                    nsuccess  = !xmlParseChunk(ctx, buf, (int)(eof ? 0 : bytesRead), eof);
+                if(createPushContext(self, bu, br, fn.cString)) {
+                    @try {
+                        xmlParserCtxtPtr c = self.ctx;
+
+                        /*
+                         * Nice tight fast loop!
+                         */
+                        do {
+                            eof = ((br = (*f)(o, s, bu, ln)) <= 0);
+                            su  = !xmlParseChunk(c, bu, (int)(eof ? 0 : br), eof);
+                        }
+                        while(su && !eof);
+
+                        if((br < 0) && (self.parserError == nil)) self.parserError = self.inputStreamError;
+                        su = (su && (br == 0));
+                    }
+                    @finally {
+                        [self destroyParserContext];
+                    }
                 }
-                while(nsuccess && !eof);
 
-                if((bytesRead < 0) && (self.parserError == nil)) self.parserError = self.inputStreamError;
-                nsuccess = (nsuccess && (bytesRead == 0));
+                return su;
             }
             @finally {
-                [self destroyParserContext];
+                [self destroySAXHandlerStructure];
             }
         }
-
-        return nsuccess;
-    }
-
-    -(BOOL)tryParse:(PGSimpleBuffer *)buffer bytesRead:(NSInteger)bytesRead {
-        if(bytesRead > 0) {
-            [self setupSAXHandlerStructure];
-            @try { return [self parseBuffer:buffer bytesRead:bytesRead]; } @finally { [self destroySAXHandlerStructure]; }
-        }
         else {
-            self.parserError = (bytesRead ? self.inputStreamError : createError(PGErrorCodeUnexpectedEndOfInput, PGErrorMsgUnexpectedEndOfInput));
+            self.parserError = (br ? self.inputStreamError : createError(PGErrorCodeUnexpectedEndOfInput, PGErrorMsgUnexpectedEndOfInput));
             return NO;
         }
     }
 
     -(BOOL)parse {
-        [_lck lock];
+        [self.lck lock];
         @try {
             @try {
                 if(self.hasRun) self.parserError = createError(PGErrorCodeXMLParserAlreadyRun, PGErrorMsgXMLParserAlreadyRun);
@@ -194,9 +179,7 @@ static SEL NSInputStreamReadSel;
                 else if(!self.delegate) self.parserError = createError(PGErrorCodeNoDelegate, PGErrorMsgNoDelegate);
                 else if((self.parserError = PGOpenInputStream(self.input)) == nil) {
                     @try {
-                        _version = _encoding = _publicId = _systemId = nil;
-                        PGSimpleBuffer *b = [PGSimpleBuffer bufferWithLength:PG_DEF_BUF_SZ];
-                        return [self tryParse:b bytesRead:(*self.readFunc)(self.input, NSInputStreamReadSel, b.buffer, b.length)];
+                        return [self tryParse];
                     }
                     @catch(NSException *e) {
                         self.parserError = e.makeError;
@@ -216,7 +199,7 @@ static SEL NSInputStreamReadSel;
 
             return NO;
         }
-        @finally { [_lck unlock]; }
+        @finally { [self.lck unlock]; }
     }
 
 #pragma mark Helper Methods
@@ -481,8 +464,7 @@ static SEL NSInputStreamReadSel;
 
     -(void)startElementNsCallBack:(NSString *)localname
                            prefix:(NSString *)prefix
-                              URI:(NSString *)URI
-                       namespaces:(NSArray<PGXMLParsedNamespace *> *)namespaces attributes:(NSArray<PGXMLParserAttribute *> *)attributes {
+                              URI:(NSString *)URI namespaces:(NSArray<PGXMLParsedNamespace *> *)namespaces attributes:(NSArray<PGXMLParserAttribute *> *)attributes {
         [self.logger debug:@"%@", PGFormat(PGXMLInsideCallbackMsg, NSStringFromSelector(_cmd))];
         BOOL hasImpl = NO;
         [self.namespaceStack push:(namespaces.count ? namespaces : @[])];
@@ -631,8 +613,6 @@ static SEL NSInputStreamReadSel;
              * the actual shared library used.
              */
             LIBXML_TEST_VERSION
-            NSInputStreamReadSel = @selector(read:maxLength:);
-            [self setSelectors];
         });
     }
 

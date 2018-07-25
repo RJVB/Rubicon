@@ -37,6 +37,7 @@
 #import <Rubicon/PGDOMCDataSection.h>
 #import <Rubicon/PGDOMComment.h>
 #import <Rubicon/PGDOMDocument.h>
+#import <Rubicon/PGDOMDocumentFragment.h>
 #import <Rubicon/PGDOMDTD.h>
 #import <Rubicon/PGDOMDTDEntity.h>
 #import <Rubicon/PGDOMDTDNotation.h>
@@ -57,6 +58,7 @@
 #import <Rubicon/PGLinkedListNode.h>
 #import <Rubicon/PGLogger.h>
 #import <Rubicon/PGMacros.h>
+#import <Rubicon/PGMethodImpl.h>
 #import <Rubicon/PGMutableBinaryTreeDictionary.h>
 #import <Rubicon/PGNestedEnumerator.h>
 #import <Rubicon/PGQueue.h>
