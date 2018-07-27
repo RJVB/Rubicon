@@ -21,32 +21,37 @@
 
 #import "PGInternal.h"
 #import "PGDOMDefines.h"
-#import "PGDOMNode.h"
-#import "PGDOMParent.h"
-#import "PGDOMNamespaceAware.h"
-#import "PGDOMAttr.h"
-#import "PGDOMElement.h"
-#import "PGDOMNodeList.h"
-#import "PGDOMNamedNodeMap.h"
-#import "PGDOMNotifiedContainer.h"
-#import "PGDOMNodeContainer.h"
-#import "PGDOMAttributeMap.h"
-#import "PGDOMNamedNodeMapImpl.h"
-#import "PGDOMElementNodeList.h"
+
 #import "PGDOMCharacterData.h"
-#import "PGDOMText.h"
-#import "PGDOMCDataSection.h"
-#import "PGDOMComment.h"
-#import "PGDOMProcessingInstruction.h"
-#import "PGDOMDTDNotation.h"
-#import "PGDOMDTDEntity.h"
-#import "PGDOMDTD.h"
-#import "PGDOMLocator.h"
 #import "PGDOMImplementation.h"
 #import "PGDOMImplementationList.h"
+#import "PGDOMLocator.h"
+#import "PGDOMNamedNodeMap.h"
+#import "PGDOMNamespaceAware.h"
+#import "PGDOMNode.h"
+#import "PGDOMNodeContainer.h"
+#import "PGDOMNodeList.h"
+#import "PGDOMNotifiedContainer.h"
+#import "PGDOMParent.h"
 #import "PGDOMUserDataHandler.h"
-#import "PGDOMDocumentFragment.h"
+
+#import "PGDOMAttributeMap.h"
+#import "PGDOMElementNodeList.h"
+#import "PGDOMNamedNodeMapImpl.h"
 #import "PGDOMNodeEnumerator.h"
+
+#import "PGDOMAttr.h"
+#import "PGDOMCDataSection.h"
+#import "PGDOMComment.h"
+#import "PGDOMDocument.h"
+#import "PGDOMDocumentFragment.h"
+#import "PGDOMDTD.h"
+#import "PGDOMDTDEntity.h"
+#import "PGDOMDTDNotation.h"
+#import "PGDOMElement.h"
+#import "PGDOMEntityReference.h"
+#import "PGDOMProcessingInstruction.h"
+#import "PGDOMText.h"
 
 @class UserDataHolder;
 
@@ -59,12 +64,15 @@ typedef PGDOMNode *(^PGDOMNodeAction)(PGDOMNode *node, PGDOMNode *other, BOOL fo
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define PGDOMSyncData    do{if(self.needsSyncData)[self synchronizeData];}while(0)
-#define PGDOMCheckRO     do{if(self.isReadOnly)@throw[self createNoModException];}while(0)
-#define NSIBLING(n, f)   ((f)?(n.nextSibling):(n.previousSibling))
-#define NCHILD(n, f)     ((f)?(n.firstChild):(n.lastChild))
-#define FORCHILD(p, v)   FORSIBLING(p.firstChild, v)
-#define FORSIBLING(n, v) for(PGDOMNode *v = n; v != nil; v = v.nextSibling)
+#define PGDOMSyncDataN(n) do{if((n).needsSyncData)[(n) synchronizeData];}while(0)
+#define PGDOMSyncData     PGDOMSyncDataN(self)
+#define PGDOMCheckNRO(n)  do{if((n).isReadOnly)@throw[(n) createNoModException];}while(0)
+#define PGDOMCheckRO      PGDOMCheckNRO(self)
+#define NSIBLING(n, f)    ((f)?(n.nextSibling):(n.previousSibling))
+#define NCHILD(n, f)      ((f)?(n.firstChild):(n.lastChild))
+#define NVALUE(n)         ((n).nodeValue?:@"")
+#define FORSIBLING(n, v)  for(PGDOMNode *v = n; v != nil; v = v.nextSibling)
+#define FORCHILD(p, v)    FORSIBLING(p.firstChild, v)
 
 @interface PGDOMNode()
 
@@ -77,9 +85,6 @@ NS_ASSUME_NONNULL_BEGIN
     @property(nonatomic, readonly) /*     */ BOOL      isEntityReference;
     @property(nonatomic) /*               */ BOOL      needsSyncData;
     @property(nonatomic, readonly) /*     */ BOOL      needsOwnerDocument;
-    @property(nonatomic, readonly) /*     */ BOOL      hasTextOnlyChildren;
-    @property(nonatomic, readonly) /*     */ BOOL      canModifyPrev;
-    @property(nonatomic, readonly) /*     */ BOOL      canModifyNext;
     @property(nonatomic) /*               */ BOOL      isReadOnly;
 
     @property(nonatomic, readonly) /*     */ NSMutableDictionary<NSString *, UserDataHolder *> *userData;
@@ -92,43 +97,6 @@ NS_ASSUME_NONNULL_BEGIN
     -(void)grandchildListChanged;
 
     -(void)synchronizeData;
-
-    -(BOOL)canModify:(BOOL)fwd;
-
-    -(NSInteger)textProc:(nullable PGDOMNode *)n
-                 forward:(BOOL)fwd
-               blkEntRef:(nullable PGDOMProcBlk)blkEntRef
-                 blkText:(nullable PGDOMProcBlk)blkText
-              blkDefault:(nullable PGDOMProcBlk)blkDefault
-               defRetVal:(BOOL)x
-               endRetVal:(BOOL)y;
-
-    -(NSInteger)textProc:(nullable PGDOMNode *)n
-                 forward:(BOOL)fwd
-               blkEntRef:(nullable PGDOMProcBlk)blkEntRef
-                 blkText:(nullable PGDOMProcBlk)blkText
-                blkCData:(nullable PGDOMProcBlk)blkCData
-              blkDefault:(nullable PGDOMProcBlk)blkDefault
-               defRetVal:(NSInteger)x
-               endRetVal:(NSInteger)y;
-
-    -(NSInteger)nodeProc:(nullable PGDOMNode *)n
-                 forward:(BOOL)fwd
-               blkEntRef:(nullable PGDOMProcBlk)blkEntRef
-                blkCData:(nullable PGDOMProcBlk)blkCData
-                 blkText:(nullable PGDOMProcBlk)blkText
-                 blkAttr:(nullable PGDOMProcBlk)blkAttr
-              blkElement:(nullable PGDOMProcBlk)blkElement
-              blkComment:(nullable PGDOMProcBlk)blkComment
-             blkNotation:(nullable PGDOMProcBlk)blkNotation
-             blkProcInst:(nullable PGDOMProcBlk)blkProcInst
-             blkDocument:(nullable PGDOMProcBlk)blkDocument
-              blkDocFrag:(nullable PGDOMProcBlk)blkDocFrag
-                  blkDTD:(nullable PGDOMProcBlk)blkDTD
-               blkEntity:(nullable PGDOMProcBlk)blkEntity
-              blkDefault:(nullable PGDOMProcBlk)blkDefault
-               defRetVal:(NSInteger)x
-               endRetVal:(NSInteger)y;
 
     +(NSString *)nodeTypeDescription:(PGDOMNodeTypes)ntype;
 
@@ -172,11 +140,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGDOMNamespaceAware()
 
-    -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(nullable PGDOMDocument *)ownerDocument
-                      qualifiedName:(NSString *)qualifiedName namespaceURI:(nullable NSString *)namespaceURI;
+    -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType
+                      ownerDocument:(nullable PGDOMDocument *)ownerDocument
+                      qualifiedName:(NSString *)qualifiedName
+                       namespaceURI:(nullable NSString *)namespaceURI;
 
-    -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(nullable PGDOMDocument *)ownerDocument
-                          localName:(NSString *)localName prefix:(nullable NSString *)prefix namespaceURI:(nullable NSString *)namespaceURI;
+    -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType
+                      ownerDocument:(nullable PGDOMDocument *)ownerDocument
+                          localName:(NSString *)localName
+                             prefix:(nullable NSString *)prefix
+                       namespaceURI:(nullable NSString *)namespaceURI;
 
     -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(nullable PGDOMDocument *)ownerDocument nodeName:(NSString *)nodeName;
 
@@ -204,14 +177,19 @@ NS_ASSUME_NONNULL_BEGIN
                              isSpecified:(BOOL)isSpecified
                                     isID:(BOOL)isID;
 
-    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument ownerElement:(nullable PGDOMElement *)ownerElement
-                           qualifiedName:(NSString *)qualifiedName namespaceURI:(nullable NSString *)namespaceURI
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument
+                            ownerElement:(nullable PGDOMElement *)ownerElement
+                           qualifiedName:(NSString *)qualifiedName
+                            namespaceURI:(nullable NSString *)namespaceURI
                                    value:(NSString *)value
                              isSpecified:(BOOL)isSpecified
                                     isID:(BOOL)isID;
 
-    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument ownerElement:(nullable PGDOMElement *)ownerElement
-                               localName:(NSString *)localName prefix:(nullable NSString *)prefix namespaceURI:(nullable NSString *)namespaceURI
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument
+                            ownerElement:(nullable PGDOMElement *)ownerElement
+                               localName:(NSString *)localName
+                                  prefix:(nullable NSString *)prefix
+                            namespaceURI:(nullable NSString *)namespaceURI
                                    value:(NSString *)value
                              isSpecified:(BOOL)isSpecified
                                     isID:(BOOL)isID;
@@ -323,15 +301,22 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data;
 
-    -(void)performAction:(PGDOMNodeAction)blkAction onTextNodesAdjacentToNode:(PGDOMNode *)node goingForward:(BOOL)fwd;
-
-    -(void)performAction:(PGDOMNodeAction)action onTextNodesAdjacentToNode:(PGDOMNode *)node;
-
 @end
 
 @interface PGDOMCDataSection()
 
     -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data;
+
+@end
+
+@interface PGDOMEntityReference()
+
+    @property(nonatomic, nullable) PGDOMDTDEntity *entity;
+    @property(nonatomic, readonly) BOOL           hasOnlyTextChildren;
+
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument entity:(nullable PGDOMDTDEntity *)entity;
+
+    -(BOOL)hasOnlyTextChildren:(PGDOMEntityReference *)parent;
 
 @end
 
@@ -382,9 +367,7 @@ NS_ASSUME_NONNULL_BEGIN
     -(instancetype)initWithLineNumber:(NSUInteger)lineNumber
                          columnNumber:(NSUInteger)columnNumber
                            byteOffset:(NSUInteger)byteOffset
-                          utf16Offset:(NSUInteger)utf16Offset
-                          relatedNode:(PGDOMNode *)relatedNode
-                                  uri:(NSString *)uri;
+                          utf16Offset:(NSUInteger)utf16Offset relatedNode:(nullable PGDOMNode *)relatedNode uri:(nullable NSString *)uri;
 
 @end
 
@@ -412,13 +395,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UserDataHolder : NSObject
 
-    @property(nonatomic, copy) PGDOMUserDataHandler *handler;
-    @property(nonatomic, copy) NSString             *key;
-    @property(nonatomic) /* */ id                   data;
+    @property(nonatomic, nullable, copy) PGDOMUserDataHandler *handler;
+    @property(nonatomic, copy) /*     */ NSString             *key;
+    @property(nonatomic) /*           */ id                   data;
 
-    -(instancetype)initWithKey:(NSString *)key data:(id)data handler:(PGDOMUserDataHandler *)handler;
+    -(instancetype)initWithKey:(NSString *)key data:(id)data handler:(nullable PGDOMUserDataHandler *)handler;
 
-    +(instancetype)holderWithKey:(NSString *)key data:(id)data handler:(PGDOMUserDataHandler *)handler;
+    +(instancetype)holderWithKey:(NSString *)key data:(id)data handler:(nullable PGDOMUserDataHandler *)handler;
 
 @end
 

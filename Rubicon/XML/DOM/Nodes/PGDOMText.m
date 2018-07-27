@@ -17,22 +17,21 @@
 
 #import "PGDOMPrivate.h"
 
+#define canModifySiblings(n) (canModifySiblingsDirection(n, YES) && canModifySiblingsDirection(n, NO))
+#define removeAdjacentTextNodes(n) do{removeTextNodesAdjacentTo((n),NO);removeTextNodesAdjacentTo((n),YES);}while(0)
+
+BOOL canModifySiblingsDirection(PGDOMNode *node, BOOL fwd);
+
+void removeTextNodesAdjacentTo(PGDOMText *currentNode, BOOL fwd);
+
+NSString *getWholeText(PGDOMText *node);
+
 @implementation PGDOMText {
-        BOOL     _isElementContentWhitespace;
-        NSString *_wholeText;
-    }
-
-    -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data {
-        self = [super initWithNodeType:nodeType ownerDocument:ownerDocument data:data];
-
-        if(self) {
-        }
-
-        return self;
+        BOOL _isElementContentWhitespace;
     }
 
     -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data {
-        return (self = [self initWithNodeType:PGDOMNodeTypeText ownerDocument:ownerDocument data:data]);
+        return (self = [super initWithNodeType:PGDOMNodeTypeText ownerDocument:ownerDocument data:data]);
     }
 
     -(BOOL)isElementContentWhitespace {
@@ -40,88 +39,45 @@
         return _isElementContentWhitespace;
     }
 
-    -(BOOL)getWholeText:(NSMutableString *)txt forward:(BOOL)fwd node:(PGDOMNode *)node parent:(PGDOMNode *)parent {
-        /*@f:0*/
-        PGDOMProcBlk a = ^BOOL(PGDOMNode *n, NSInteger *r, BOOL f) { NSString *v = n.nodeValue; if(v.length) { if(f) [txt appendString:v]; else [txt insertString:v atIndex:0]; } return NO; };
-        PGDOMProcBlk b = ^BOOL(PGDOMNode *n, NSInteger *r, BOOL f) { return [self getWholeText:txt forward:f node:NCHILD(n, f) parent:n]; };
-        PGDOMProcBlk c = ^BOOL(PGDOMNode *n, NSInteger *r, BOOL f) { return YES; };
-
-        if([self textProc:node forward:fwd blkEntRef:b blkText:a blkDefault:c defRetVal:YES endRetVal:NO]) return YES;
-        if(parent.isEntityReference) { [self getWholeText:txt forward:fwd node:NSIBLING(parent, fwd) parent:parent.parentNode]; return YES; }
-        return NO;
-        /*@f:1*/
-    }
-
     -(NSString *)wholeText {
         PGDOMSyncData;
+        return getWholeText(self);
+    }
 
-        if(_wholeText == nil) {
-            NSMutableString *txt  = [NSMutableString new];
-            PGDOMNode       *prnt = self.parentNode;
-            NSString        *data = self.data;
+    -(PGDOMText *)replaceWholeTextWith:(NSString *)content node:(PGDOMText *)node {
+        PGDOMNode *parent = node.parentNode;
 
-            if(data.length) [txt appendString:data];
-
-            if(prnt) {
-                [self getWholeText:txt forward:NO node:self.previousSibling parent:prnt];
-                [self getWholeText:txt forward:YES node:self.nextSibling parent:prnt];
+        if(content) {
+            if(!canModifySiblings(node)) {
+                @throw [node createNoModException];
             }
+            else if(node.isReadOnly) {
+                PGDOMText *textNode = [node.ownerDocument createTextNode:content ofType:node.nodeType];
 
-            _wholeText = txt;
+                if(parent) {
+                    [parent replaceChild:node with:textNode];
+                    removeAdjacentTextNodes(textNode);
+                }
+
+                return textNode;
+            }
+            else {
+                node.data = content;
+                removeAdjacentTextNodes(node);
+                return node;
+            }
+        }
+        else if(parent) {
+            removeAdjacentTextNodes(node);
+            [parent removeChild:node];
         }
 
-        return _wholeText;
+        return nil;
     }
 
     -(instancetype)replaceWholeTextWith:(NSString *)content {
         PGDOMSyncData;
-        PGDOMCheckRO;
-        PGDOMNode *parent      = self.parentNode;
-        PGDOMText *currentNode = nil;
-
-        if(content.length == 0) {
-            [parent removeChild:self];
-            return nil;
-        }
-
-        if(!(self.canModifyPrev && self.canModifyNext)) @throw [self createNoModException];
-
-        if(self.isReadOnly) {
-            PGDOMText *node = [self.ownerDocument createTextNode:content];
-
-            if(parent) {
-                [parent insertChild:node before:self];
-                [parent removeChild:self];
-                currentNode = node;
-            }
-            else return node;
-        }
-        else {
-            self.data = content;
-            currentNode = self;
-        }
-
-        self.needsSyncData = YES;
-        [self         performAction:^PGDOMNode *(PGDOMNode *n, PGDOMNode *o, BOOL f) {
-            [n.parentNode removeChild:n];
-            return o;
-        } onTextNodesAdjacentToNode:currentNode];
-
-        return currentNode;
-    }
-
-    -(void)performAction:(PGDOMNodeAction)blkAction onTextNodesAdjacentToNode:(PGDOMNode *)node goingForward:(BOOL)fwd {
-        PGDOMNode *sibling = NSIBLING(node, fwd);
-
-        while(sibling) {
-            if(sibling.isTextNode || (sibling.isEntityReference && sibling.hasTextOnlyChildren)) sibling = blkAction(sibling, node, fwd); else break;
-            sibling = NSIBLING(sibling, fwd);
-        }
-    }
-
-    -(void)performAction:(PGDOMNodeAction)action onTextNodesAdjacentToNode:(PGDOMNode *)node {
-        [self performAction:action onTextNodesAdjacentToNode:node goingForward:NO];
-        [self performAction:action onTextNodesAdjacentToNode:node goingForward:YES];
+        return [self replaceWholeTextWith:content node:self];
     }
 
     -(instancetype)splitTextAtOffset:(NSUInteger)offset {
@@ -135,36 +91,122 @@
         PGDOMText *text = [self.ownerDocument createTextNode:[data substringFromIndex:offset] ofType:self.nodeType];
         [self.parentNode insertChild:text before:self.nextSibling];
 
-        self.needsSyncData = YES;
         return text;
     }
 
-    -(void)synchronizeData {
-        _wholeText = nil;
-        [super synchronizeData];
-    }
-
-    -(void)setData:(NSString *)data {
-        PGDOMSyncData;
-        PGDOMCheckRO;
-        [super setData:data];
-        self.needsSyncData = YES;
-
-        PGDOMNodeAction a = ^PGDOMNode *(PGDOMNode *n, PGDOMNode *o, BOOL f) {
-            n.needsSyncData = YES;
-            return n;
-        };
-
-        [self performAction:a onTextNodesAdjacentToNode:self];
-    }
-
-    -(NSString *)textContent {
-        return self.data;
-    }
-
-    -(void)setTextContent:(NSString *)textContent {
-        self.data = textContent;
-    }
-
-
 @end
+
+NS_INLINE BOOL isTextNodeType(PGDOMNode *node) {
+    PGDOMNodeTypes nt = node.nodeType;
+    return ((nt == PGDOMNodeTypeText) || (nt == PGDOMNodeTypeCDataSection) || ((nt == PGDOMNodeTypeEntityReference) && ((PGDOMEntityReference *)node).hasOnlyTextChildren));
+}
+
+BOOL canModifySiblingsDirectionEntRef(BOOL fwd, BOOL *retval, BOOL *textChild, PGDOMNode *child) {
+    if(child) {
+        do {
+            switch(child.nodeType) {
+                case PGDOMNodeTypeEntityReference:
+                    if(!canModifySiblingsDirection(child, fwd)) {
+                        (*retval) = NO;
+                        return YES;
+                    }
+                case PGDOMNodeTypeText:
+                case PGDOMNodeTypeCDataSection:
+                    (*textChild) = YES;
+                    break;
+                default:
+                    (*retval) = !(*textChild);
+                    return YES;
+            }
+        }
+        while((child = NSIBLING(child, fwd)));
+
+        return NO;
+    }
+
+    (*retval) = NO;
+    return YES;
+}
+
+BOOL canModifySiblingsDirection(PGDOMNode *node, BOOL fwd) {
+    BOOL      retval;
+    BOOL      textChild = NO;
+    PGDOMNode *next     = NSIBLING(node, fwd);
+
+    while(next) {
+        switch(next.nodeType) {
+            case PGDOMNodeTypeEntityReference:
+                if(canModifySiblingsDirectionEntRef(fwd, &retval, &textChild, NCHILD(next, fwd))) return retval;
+            case PGDOMNodeTypeText:
+            case PGDOMNodeTypeCDataSection:
+                break;
+            default:
+                return YES;
+        }
+
+        next = NSIBLING(next, fwd);
+    }
+
+    return YES;
+}
+
+void removeTextNodesAdjacentTo(PGDOMText *currentNode, BOOL fwd) {
+    PGDOMNode *parent = currentNode.parentNode;
+
+    if(parent) {
+        PGDOMNode *node = NSIBLING(currentNode, fwd);
+
+        while(node) {
+            if(isTextNodeType(node)) {
+                [parent removeChild:node];
+                node = NSIBLING(currentNode, fwd);
+            }
+            else node = nil;
+        }
+    }
+}
+
+PGDOMNode *findFirstSiblingTextNode(PGDOMNode *node) {
+    PGDOMNode *sibling = node.previousSibling;
+
+    while(sibling) {
+        if(isTextNodeType(sibling)) {
+            node    = sibling;
+            sibling = node.previousSibling;
+        }
+        else sibling = nil;
+    }
+
+    return node;
+}
+
+BOOL concatTextNodes(NSMutableString *buffer, PGDOMNode *node) {
+    NSMutableString *tbuffer = nil;
+
+    while(node) {
+        switch(node.nodeType) {
+            case PGDOMNodeTypeText:
+            case PGDOMNodeTypeCDataSection:
+                [buffer appendString:NVALUE(node)];
+                break;
+            case PGDOMNodeTypeEntityReference:
+                if(!tbuffer) tbuffer = [NSMutableString new];
+                if(concatTextNodes(tbuffer, node.firstChild)) return YES;
+                [buffer appendString:tbuffer];
+                tbuffer.string = @"";
+                break;
+            default:
+                return YES;
+        }
+
+        node = node.nextSibling;
+    }
+
+    return NO;
+}
+
+NSString *getWholeText(PGDOMText *node) {
+    NSMutableString *wholeText = [NSMutableString new];
+    concatTextNodes(wholeText, findFirstSiblingTextNode(node));
+    return wholeText;
+}

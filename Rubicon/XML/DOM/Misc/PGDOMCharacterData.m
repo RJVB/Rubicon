@@ -26,50 +26,49 @@
 
         if(self) {
             _data = (data ?: @"").copy;
-            self.isReadOnly = NO;
+            self.isReadOnly    = NO;
+            self.needsSyncData = YES;
         }
 
         return self;
     }
 
     -(NSUInteger)length {
-        return self.data.length;
+        PGDOMSyncData;
+        return _data.length;
     }
 
     -(void)appendData:(NSString *)data {
-        PGDOMSyncData;
-        PGDOMCheckRO;
         [self insertData:data atOffset:self.data.length];
     }
 
     -(void)insertData:(NSString *)data atOffset:(NSUInteger)offset {
         PGDOMSyncData;
         PGDOMCheckRO;
-        NSString   *cdata = self.data;
-        NSUInteger clen   = cdata.length;
+        NSUInteger clen = _data.length;
 
         if(offset > clen) {
             @throw [self createIndexOutOfBoundsException];
         }
-        if(data.length) {
-            if(offset == clen) self.data = [cdata stringByAppendingString:data];
-            else self.data = PGFormat(@"%@%@%@", [cdata substringToIndex:offset], data, [cdata substringFromIndex:offset]);
+        else if(data.length) {
+            _data = ((offset == clen) ? [_data stringByAppendingString:data] : PGFormat(@"%@%@%@", [_data substringToIndex:offset], data, [_data substringFromIndex:offset]));
+            self.needsSyncData = YES;
         }
     }
 
     -(void)deleteDataAtOffset:(NSUInteger)offset length:(NSUInteger)length {
         PGDOMSyncData;
         PGDOMCheckRO;
-        NSString   *cdata = self.data;
-        NSUInteger clen   = cdata.length;
-        NSUInteger eidx   = (offset + length);
+        NSUInteger clen = _data.length;
+        NSUInteger eidx = (offset + length);
 
         if((offset > clen) || (eidx > clen)) {
             @throw [self createIndexOutOfBoundsException];
         }
         else if((offset < clen) && (length > 0)) {
-            NSString *pfx = [cdata substringToIndex:offset];
-            self.data = ((eidx < length) ? PGFormat(@"%@%@", pfx, [cdata substringFromIndex:eidx]) : pfx);
+            NSString *pfx = [_data substringToIndex:offset];
+            _data = ((eidx < length) ? PGFormat(@"%@%@", pfx, [_data substringFromIndex:eidx]) : pfx);
+            self.needsSyncData = YES;
         }
     }
 
@@ -91,11 +90,20 @@
     }
 
     -(NSString *)substringDataAtOffset:(NSUInteger)offset length:(NSUInteger)length {
-        return [self.data substringWithRange:NSMakeRange(offset, length)];
+        PGDOMSyncData;
+        return [_data substringWithRange:NSMakeRange(offset, length)];
     }
 
     -(NSException *)createIndexOutOfBoundsException {
         return [NSException exceptionWithName:NSInvalidArgumentException reason:PGErrorMsgIndexOutOfBounds];
+    }
+
+    -(NSString *)textContent {
+        return (self.data ?: @"");
+    }
+
+    -(void)setTextContent:(NSString *)textContent {
+        self.data = textContent;
     }
 
 @end

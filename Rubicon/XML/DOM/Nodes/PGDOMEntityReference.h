@@ -1,9 +1,10 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDOMCDataSection.m
+ *    FILENAME: PGDOMEntityReference.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 7/11/18
+ *        DATE: 7/26/18
+ *  VISIBILITY: Private
  *
  * Copyright © 2018 Project Galen. All rights reserved.
  *
@@ -15,13 +16,16 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#import "PGDOMPrivate.h"
+#ifndef RUBICON_PGDOMENTITYREFERENCE_H
+#define RUBICON_PGDOMENTITYREFERENCE_H
 
-@implementation PGDOMCDataSection {
-    }
+#import <Rubicon/PGDOMParent.h>
 
-    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data {
-        return (self = [super initWithNodeType:PGDOMNodeTypeCDataSection ownerDocument:ownerDocument data:data]);
-    }
+NS_ASSUME_NONNULL_BEGIN
 
+@interface PGDOMEntityReference : PGDOMParent
 @end
+
+NS_ASSUME_NONNULL_END
+
+#endif //RUBICON_PGDOMENTITYREFERENCE_H

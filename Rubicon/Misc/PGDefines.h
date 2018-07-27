@@ -1,4 +1,4 @@
-/***************************************************************************//**
+/************************************************************************//**
  *     PROJECT: Rubicon
  *    FILENAME: PGDefines.h
  *         IDE: AppCode
@@ -20,7 +20,7 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
+ *//************************************************************************/
 
 #ifndef __Rubicon_PGDefines_H_
 #define __Rubicon_PGDefines_H_
@@ -92,33 +92,21 @@ FOUNDATION_EXPORT NSString *const PGErrorMsgCannotRotateNode;
 FOUNDATION_EXPORT NSString *const PGErrorMsgNoDirectCreation;
 FOUNDATION_EXPORT NSString *const PGErrorMsgIndexOutOfBounds;
 FOUNDATION_EXPORT NSString *const PGErrorMsgNoModificationAllowed;
+FOUNDATION_EXPORT NSString *const PGErrorMsgAbstractClass;
+FOUNDATION_EXPORT NSString *const PGErrorMsgAbstractMethod;
+FOUNDATION_EXPORT NSString *const PGErrorMsgBadConstructor;
 
-#if !defined(PGAbstractClassError)
-    #define PGAbstractClassError do {\
-        NSString *reason = PGFormat(@"Instances of abstract class %@ cannot be created.", NSStringFromClass([self class]));\
-        @throw [NSException exceptionWithName:NSIllegalSelectorException reason:reason userInfo:nil];\
-        __builtin_unreachable();\
-    } while(0)
-#endif
-
-#if !defined(PGBadConstructorError)
-    #define PGBadConstructorError do {\
-        NSString *reason = PGFormat(@"The selector \"%@\" cannot be used to create instances of the class %@.", NSStringFromSelector(_cmd), NSStringFromClass([self class]));\
-        @throw [NSException exceptionWithName:NSIllegalSelectorException reason:reason userInfo:nil];\
-        __builtin_unreachable();\
-    } while(0)
-#endif
-
-#if !defined(PGNotImplemented)
-    #define PGNotImplemented do {\
-        NSString *reason = PGFormat(@"The selector \"%@\" is abstract.", NSStringFromSelector(_cmd));\
-        @throw [NSException exceptionWithName:NSIllegalSelectorException reason:reason userInfo:nil];\
-        __builtin_unreachable();\
-    } while(0)
-#endif
-
-#if !defined(PGAbstractClassTest)
-    #define PGAbstractClassTest(c) do { if(self.class == [c class]) { PGAbstractClassError; }} while(0)
-#endif
+#if !defined(__PGExceptionTests__)
+    #define __PGExceptionTests__    1
+    #define PGClassTest(c)          ([self class]==[c class])
+    #define PGThrow(e, r)           @throw [NSException exceptionWithName:e reason:r userInfo:nil]
+    #define PGClassName(c)          NSStringFromClass([c class])
+    #define PGSelName(s)            NSStringFromSelector(s)
+    #define PGNoDirectCreationError do{PGThrow(NSIllegalSelectorException,PGFormat(PGErrorMsgNoDirectCreation,PGClassName(self)));__builtin_unreachable();}while(0)
+    #define PGAbstractClassError    do{PGThrow(NSIllegalSelectorException,PGFormat(PGErrorMsgAbstractClass,PGClassName(self)));__builtin_unreachable();}while(0)
+    #define PGBadConstructorError   do{PGThrow(NSIllegalSelectorException,PGFormat(PGErrorMsgBadConstructor,PGSelName(_cmd),PGClassName(self)));__builtin_unreachable();}while(0)
+    #define PGNotImplemented        do{PGThrow(NSIllegalSelectorException,PGFormat(PGErrorMsgAbstractMethod, PGSelName(_cmd)));__builtin_unreachable();}while(0)
+    #define PGAbstractClassTest(c)  do{if(PGClassTest(c))PGAbstractClassError;}while(0)
+#endif //__PGExceptionTests__
 
 #endif //__Rubicon_PGDefines_H_

@@ -116,10 +116,9 @@ NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *las
 #define SETPTR(n) do{if(!(n).previousSibling)_firstChild=(n);if(!(n).nextSibling)_lastChild=(n);}while(0)
 
 @implementation PGDOMParent {
-        PGDOMNode       *_firstChild;
-        PGDOMNode       *_lastChild;
-        NSUInteger      _childListChanged;
-        NSRecursiveLock *_lck;
+        PGDOMNode  *_firstChild;
+        PGDOMNode  *_lastChild;
+        NSUInteger _childListChanged;
     }
 
     -(instancetype)initWithNodeType:(PGDOMNodeTypes)nodeType ownerDocument:(PGDOMDocument *)ownerDocument {
@@ -130,23 +129,6 @@ NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *las
         }
 
         return self;
-    }
-
-    /**
-     * Although the PGDOM* library as a whole is not thread safe we want to
-     * make the operations here as atomic as possible. This is because we
-     * are dealing with a linked list of nodes that we don't want to get
-     * messed up if the operations happens to be called from separate
-     * threads. So we will be using a recursive lock to make sure that one
-     * operation on child nodes completes before another one starts.
-     */
-    -(void)lock {
-        PGSETIFNIL(self, _lck, [NSRecursiveLock new]);
-        [_lck lock];
-    }
-
-    -(void)unlock {
-        [_lck unlock];
     }
 
     -(BOOL)needsSyncData {
@@ -169,27 +151,32 @@ NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *las
     }
 
     -(BOOL)canAcceptNode:(PGDOMNode *)node {
-        PGDOMSyncData;
         return (node.nodeType != PGDOMNodeTypeDocument);
     }
 
     -(NSString *)textContent {
         NSMutableString *s = [NSMutableString new];
-        [self lock];
-        @try { FORCHILD(self, n) [s appendString:n.textContent]; } @finally { [self unlock]; }
+        FORCHILD(self, n) {
+            NSString *content = n.textContent;
+            if(content) [s appendString:content];
+        }
         return s;
     }
 
     -(NSArray<PGDOMNode *> *)allChildNodes {
         NSMutableArray<PGDOMNode *> *list = [NSMutableArray new];
-        [self lock];
-        @try { FORCHILD(self, n) [list addObject:n]; } @finally { [self unlock]; }
+        FORCHILD(self, n) [list addObject:n];
         return list;
     }
 
     -(void)testNewChildNode:(PGDOMNode *)node {
         if(!node) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNull, PGDOMMsgNewChild)];
-        if(node.isDocumentFragment) { FORCHILD(node, dfNode) [self _testNewChildNode:dfNode]; } else [self _testNewChildNode:node];
+        if(node.isDocumentFragment) {
+            FORCHILD(node, dfNode) [self _testNewChildNode:dfNode];
+        }
+        else {
+            [self _testNewChildNode:node];
+        }
     }
 
     -(PGDOMNode *)appendChild:(PGDOMNode *)newNode {
@@ -197,57 +184,41 @@ NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *las
     }
 
     -(PGDOMNode *)insertChild:(PGDOMNode *)newNode before:(PGDOMNode *)refNode {
-        [self lock];
-        @try {
-            PGDOMSyncData;
-            PGDOMCheckRO;
-            if(refNode && (self != refNode.parentNode)) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNotChild, PGDOMMsgReference)];
-            [self testNewChildNode:newNode];
-            [self _insertChild:newNode before:refNode];
-            PSTCHG;
-        }
-        @finally { [self unlock]; }
+        PGDOMSyncData;
+        PGDOMCheckRO;
+        if(refNode && (self != refNode.parentNode)) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNotChild, PGDOMMsgReference)];
+        [self testNewChildNode:newNode];
+        [self _insertChild:newNode before:refNode];
+        PSTCHG;
         return newNode;
     }
 
     -(PGDOMNode *)replaceChild:(PGDOMNode *)oldNode with:(PGDOMNode *)newNode {
-        [self lock];
-        @try {
-            PGDOMSyncData;
-            PGDOMCheckRO;
-            if(!oldNode) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNull, PGDOMMsgOld)];
-            if(self != oldNode.parentNode) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNotChild, PGDOMMsgOld)];
-            [self testNewChildNode:newNode];
-            [self _replaceChild:oldNode with:newNode];
-            PSTCHG;
-        }
-        @finally { [self unlock]; }
+        PGDOMSyncData;
+        PGDOMCheckRO;
+        if(!oldNode) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNull, PGDOMMsgOld)];
+        if(self != oldNode.parentNode) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNotChild, PGDOMMsgOld)];
+        [self testNewChildNode:newNode];
+        [self _replaceChild:oldNode with:newNode];
+        PSTCHG;
         return oldNode;
     }
 
     -(PGDOMNode *)removeChild:(PGDOMNode *)oldNode {
-        [self lock];
-        @try {
-            PGDOMSyncData;
-            PGDOMCheckRO;
-            if(!oldNode) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNull, PGDOMMsgOld)];
-            if(self != oldNode.parentNode) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNotChild, PGDOMMsgOld)];
-            [self _removeChild:oldNode];
-            PSTCHG;
-        }
-        @finally { [self unlock]; }
+        PGDOMSyncData;
+        PGDOMCheckRO;
+        if(!oldNode) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNull, PGDOMMsgOld)];
+        if(self != oldNode.parentNode) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNotChild, PGDOMMsgOld)];
+        [self _removeChild:oldNode];
+        PSTCHG;
         return oldNode;
     }
 
     -(void)setTextContent:(NSString *)textContent {
-        [self lock];
-        @try {
-            PGDOMSyncData;
-            PGDOMCheckRO;
-            [self _setTextContent:textContent];
-            PSTCHG;
-        }
-        @finally { [self unlock]; }
+        PGDOMSyncData;
+        PGDOMCheckRO;
+        [self _setTextContent:textContent];
+        PSTCHG;
     }
 
     /**
@@ -257,14 +228,10 @@ NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *las
      * @param removedNodes an array to receive the removed nodes.
      */
     -(void)removeAllChildren:(NSMutableArray<PGDOMNode *> *)removedNodes {
-        [self lock];
-        @try {
-            PGDOMSyncData;
-            PGDOMCheckRO;
-            [self _removeAllChildren:removedNodes];
-            PSTCHG;
-        }
-        @finally { [self unlock]; }
+        PGDOMSyncData;
+        PGDOMCheckRO;
+        [self _removeAllChildren:removedNodes];
+        PSTCHG;
     }
 
     -(void)removeAllChildren {
@@ -277,16 +244,12 @@ NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *las
      * @param childNodes an array of nodes to add to this node.
      */
     -(void)setAllChildNodes:(NSArray<PGDOMNode *> *)childNodes {
-        [self lock];
-        @try {
-            PGDOMSyncData;
-            PGDOMCheckRO;
-            [self _testAllNewChildNodes:childNodes];
-            [self _removeAllChildren:nil];
-            [self _insertAllChildNodes:childNodes before:nil];
-            PSTCHG;
-        }
-        @finally { [self unlock]; }
+        PGDOMSyncData;
+        PGDOMCheckRO;
+        [self _testAllNewChildNodes:childNodes];
+        [self _removeAllChildren:nil];
+        [self _insertAllChildNodes:childNodes before:nil];
+        PSTCHG;
     }
 
     -(void)appendAllChildNodes:(NSArray<PGDOMNode *> *)childNodes {
@@ -294,16 +257,12 @@ NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *las
     }
 
     -(void)insertAllChildNodes:(NSArray<PGDOMNode *> *)childNodes before:(PGDOMNode *)refNode {
-        [self lock];
-        @try {
-            PGDOMSyncData;
-            PGDOMCheckRO;
-            if(refNode && (self != refNode.parentNode)) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNotChild, PGDOMMsgReference)];
-            [self _testAllNewChildNodes:childNodes];
-            [self _insertAllChildNodes:childNodes before:refNode];
-            PSTCHG;
-        }
-        @finally { [self unlock]; }
+        PGDOMSyncData;
+        PGDOMCheckRO;
+        if(refNode && (self != refNode.parentNode)) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNotChild, PGDOMMsgReference)];
+        [self _testAllNewChildNodes:childNodes];
+        [self _insertAllChildNodes:childNodes before:refNode];
+        PSTCHG;
     }
 
     -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained _Nullable[_Nonnull])buffer count:(NSUInteger)len {
@@ -312,35 +271,31 @@ NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *las
          * operation that might change the list. And make sure an operation
          * doesn't change the list while we're getting it.
          */
-        [self lock];
         NSUInteger count = 0;
 
-        @try {
-            if(state->state == 0) {
-                PGDOMSyncData;
-                state->state = 1;
-                state->extra[0] = ((unsigned long)((__bridge void *)self.firstChild));
-                state->mutationsPtr = &_childListChanged;
+        if(state->state == 0) {
+            PGDOMSyncData;
+            state->state = 1;
+            state->extra[0] = ((unsigned long)((__bridge void *)self.firstChild));
+            state->mutationsPtr = &_childListChanged;
+        }
+
+        if(state->state == 1) {
+            PGDOMNode __unsafe_unretained *node = ((__bridge PGDOMNode *)((void *)state->extra[0]));
+
+            while(node && (count < len)) {
+                buffer[count++] = node;
+                node = node.nextSibling;
             }
 
-            if(state->state == 1) {
-                PGDOMNode __unsafe_unretained *node = ((__bridge PGDOMNode *)((void *)state->extra[0]));
-
-                while(node && (count < len)) {
-                    buffer[count++] = node;
-                    node = node.nextSibling;
-                }
-
-                if(node) {
-                    state->extra[0] = ((unsigned long)((__bridge void *)node));
-                }
-                else {
-                    state->extra[0] = 0;
-                    state->state = 2;
-                }
+            if(node) {
+                state->extra[0] = ((unsigned long)((__bridge void *)node));
+            }
+            else {
+                state->extra[0] = 0;
+                state->state = 2;
             }
         }
-        @finally { [self unlock]; }
 
         return count;
     }
@@ -481,13 +436,9 @@ NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *las
     -(void)_takeChildren:(PGDOMParent *)parent before:(PGDOMNode *)refNode {
         if(parent) {
             PGDOMNode *first = nil, *last = nil;
-            [parent lock];
-            @try {
-                first = parent.firstChild;
-                last  = parent.lastChild;
-                [parent _clearEndPointers];
-            }
-            @finally { [parent unlock]; }
+            first = parent.firstChild;
+            last  = parent.lastChild;
+            [parent _clearEndPointers];
             [self _insertNodeList:first last:last before:refNode];
         }
     }

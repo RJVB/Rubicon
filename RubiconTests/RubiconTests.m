@@ -99,7 +99,11 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
         return parser.parse;
     }
 
-    -(void)test82XMLParseDelegate {
+    -(void)test81Builtins {
+        PGNotImplemented;
+    }
+
+    -(void)t_est82XMLParseDelegate {
         NSLog(@"%@", @"Logging Test");
         SEL  logsel = @selector(debug:);
         LOGF logf   = (LOGF)[log methodForSelector:logsel];

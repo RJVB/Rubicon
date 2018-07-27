@@ -1,9 +1,9 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDOMCDataSection.m
+ *    FILENAME: PGDOMEntityReference.m
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 7/11/18
+ *        DATE: 7/26/18
  *
  * Copyright © 2018 Project Galen. All rights reserved.
  *
@@ -17,11 +17,42 @@
 
 #import "PGDOMPrivate.h"
 
-@implementation PGDOMCDataSection {
+@implementation PGDOMEntityReference {
     }
 
-    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument data:(NSString *)data {
-        return (self = [super initWithNodeType:PGDOMNodeTypeCDataSection ownerDocument:ownerDocument data:data]);
+    @synthesize entity = _entity;
+
+    -(instancetype)initWithOwnerDocument:(nullable PGDOMDocument *)ownerDocument entity:(nullable PGDOMDTDEntity *)entity {
+        self = [super initWithNodeType:PGDOMNodeTypeEntityReference ownerDocument:ownerDocument];
+
+        if(self) {
+            _entity = entity;
+        }
+
+        return self;
+    }
+
+    -(BOOL)hasOnlyTextChildren:(PGDOMEntityReference *)parent {
+        BOOL textOnly = YES;
+
+        FORCHILD(parent, n) {
+            switch(n.nodeType) {
+                case PGDOMNodeTypeEntityReference:
+                    if(![self hasOnlyTextChildren:(PGDOMEntityReference *)n]) return NO;
+                case PGDOMNodeTypeText:
+                case PGDOMNodeTypeCDataSection:
+                    break;
+                default:
+                    return NO;
+            }
+        }
+
+        return textOnly;
+    }
+
+    -(BOOL)hasOnlyTextChildren {
+        PGDOMSyncData;
+        return [self hasOnlyTextChildren:self];
     }
 
 @end

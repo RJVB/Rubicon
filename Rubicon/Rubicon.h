@@ -42,6 +42,7 @@
 #import <Rubicon/PGDOMDTDEntity.h>
 #import <Rubicon/PGDOMDTDNotation.h>
 #import <Rubicon/PGDOMElement.h>
+#import <Rubicon/PGDOMEntityReference.h>
 #import <Rubicon/PGDOMImplementation.h>
 #import <Rubicon/PGDOMImplementationList.h>
 #import <Rubicon/PGDOMLocator.h>
