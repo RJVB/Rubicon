@@ -47,20 +47,23 @@
 #pragma clang diagnostic ignored "-Woverriding-method-mismatch"
 
     -(PGDOMNode *)item:(NSUInteger)idx {
-        NSMutableArray<PGDOMNode *> *items = self.items;
-        return ((idx < items.count) ? items[idx] : nil);
+        return ((idx < _items.count) ? _items[idx] : nil);
     }
 
     -(NSUInteger)count {
-        return self.items.count;
+        return _items.count;
     }
 
     -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained[])buffer count:(NSUInteger)len {
-        return [self.items countByEnumeratingWithState:state objects:buffer count:len];
+        return [_items countByEnumeratingWithState:state objects:buffer count:len];
     }
 
     -(PGDOMNode *)objectAtIndexedSubscript:(NSUInteger)idx {
-        return self.items[idx];
+        return _items[idx];
+    }
+
+    -(NSUInteger)indexOfNode:(PGDOMNode *)node {
+        return [_items indexOfObjectIdenticalTo:node];
     }
 
 @end

@@ -66,7 +66,7 @@ NS_INLINE BOOL _compare(NSString *given, NSString *found) {
     -(void)nodeListChangeListener:(NSNotification *)notification {
         if([self.notificationNames containsObject:notification.name] && (notification.object == self.ownerNode)) {
             [self.items removeAllObjects];
-            if(self.tagName.length) [self load:self.items from:(PGDOMElement *)self.ownerNode byTagName:self.tagName];
+            if(self.tagName.notEmpty) [self load:self.items from:(PGDOMElement *)self.ownerNode byTagName:self.tagName];
             else [self load:self.items from:(PGDOMElement *)self.ownerNode byLocalName:self.localName namespaceURI:self.namespaceURI];
         }
     }

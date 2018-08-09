@@ -62,11 +62,11 @@
     }
 
     -(void)testShortName:(NSString *)shortName longName:(NSString *)longName {
-        if((shortName.length == 0) && (longName.length == 0)) {
+        if((shortName.isEmpty) && (longName.isEmpty)) {
             @throw [NSException exceptionWithName:NSInvalidArgumentException reason:PGErrorMsgCmdLineLongShortNULL];
         }
 
-        if(shortName.length) {
+        if(shortName.notEmpty) {
             NSRange r = [shortName rangeOfComposedCharacterSequenceAtIndex:0];
 
             if(!((r.location == 0) && (r.length == shortName.length))) {

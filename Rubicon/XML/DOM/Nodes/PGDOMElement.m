@@ -147,15 +147,24 @@
     }
 
     -(nullable PGDOMAttr *)removeAttribute:(PGDOMAttr *)attr {
-        PGDOMAttr *tattr = (attr.ownerElement == self) ? [self.attributes removeItemWithName:attr.name] : nil;
-        tattr.ownerElement = nil;
-        return tattr;
+        return [self _removeAttribute:attr];
     }
 
     -(nullable PGDOMAttr *)removeAttributeNS:(PGDOMAttr *)attr {
-        PGDOMAttr *tattr = (attr.ownerElement == self) ? [self.attributes removeItemWithLocalName:attr.localName namespaceURI:attr.namespaceURI] : nil;
-        tattr.ownerElement = nil;
-        return tattr;
+        return [self _removeAttribute:attr];
+    }
+
+    -(nullable PGDOMAttr *)_removeAttribute:(PGDOMAttr *)attr {
+        if(attr.ownerElement == self) {
+            PGDOMAttr
+                    *tattr = (attr.hasNamespace ?
+                              [self.attributes removeItemWithLocalName:attr.localName namespaceURI:attr.namespaceURI] :
+                              [self.attributes removeItemWithName:attr.name]);
+            tattr.ownerElement = nil;
+            return tattr;
+        }
+
+        return nil;
     }
 
     -(void)setID:(BOOL)isID attributeWithName:(NSString *)name {

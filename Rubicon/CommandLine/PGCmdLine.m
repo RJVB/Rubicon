@@ -257,7 +257,7 @@ NS_INLINE NSString *convertString(const char *cstr, NSStringEncoding encoding) {
 
         if(option) {
             if(option.argumentState != PGCmdLineArgNone) {
-                if(remaining.length > 0) {
+                if(remaining.notEmpty) {
                     [self processOption:option param:remaining item:name index:(*idx) error:error];
                     return YES;
                 }

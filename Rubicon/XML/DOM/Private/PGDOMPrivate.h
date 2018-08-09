@@ -62,11 +62,13 @@ typedef BOOL      (^PGDOMProcBlk)(PGDOMNode *node, NSInteger *pRetValue, BOOL fo
 
 typedef PGDOMNode *(^PGDOMNodeAction)(PGDOMNode *node, PGDOMNode *other, BOOL forward);
 
+typedef BOOL (^PGDOMSrchPred)(PGDOMNode *_obj, NSUInteger _idx, BOOL *_stop);
+
 NS_ASSUME_NONNULL_BEGIN
 
-#define PGDOMSyncDataN(n) do{if((n).needsSyncData)[(n) synchronizeData];}while(0)
+#define PGDOMSyncDataN(n) PGBLKOPEN if((n).needsSyncData){[(n) synchronizeData];} PGBLKCLOSE
+#define PGDOMCheckNRO(n)  PGBLKOPEN if((n).needsSyncData){[(n) synchronizeData];}if((n).isReadOnly){@throw[(n) createNoModException];} PGBLKCLOSE
 #define PGDOMSyncData     PGDOMSyncDataN(self)
-#define PGDOMCheckNRO(n)  do{if((n).isReadOnly)@throw[(n) createNoModException];}while(0)
 #define PGDOMCheckRO      PGDOMCheckNRO(self)
 #define NSIBLING(n, f)    ((f)?(n.nextSibling):(n.previousSibling))
 #define NCHILD(n, f)      ((f)?(n.firstChild):(n.lastChild))
@@ -111,6 +113,10 @@ NS_ASSUME_NONNULL_BEGIN
     -(void)appendAllChildNodes:(NSArray<PGDOMNode *> *)childNodes;
 
     -(void)insertAllChildNodes:(NSArray<PGDOMNode *> *)childNodes before:(nullable PGDOMNode *)refNode;
+
+    -(void)postUserDataOperation:(PGDOMUserDataOperations)operation dest:(nullable PGDOMNode *)dest;
+
+    -(PGDOMNode *)removeFromParent;
 
 @end
 
@@ -274,15 +280,31 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGDOMNamedNodeMapImpl<T:PGDOMNode *>()
 
-    @property(nonatomic, readonly) PGDOMNodeTree     nodeNameCache;
-    @property(nonatomic, readonly) PGDOMNodeNodeTree localNameCache;
+    -(PGDOMNode *)removeItem:(PGDOMNode *)node;
+
+    -(PGDOMNode *)removeItemNS:(PGDOMNode *)node;
+
+    -(NSUInteger)getCachedIndexForKey:(NSString *)key map:(NSMutableDictionary<NSString *, NSNumber *> *)map predicate:(PGDOMSrchPred)pred;
+
+    -(NSUInteger)indexOfItemWithName:(NSString *)name;
+
+    -(NSUInteger)indexOfItemWithLocalName:(NSString *)localName namespaceURI:(NSString *)namespaceURI;
+
+    -(NSUInteger)indexOfSimilarNode:(PGDOMNode *)node;
+
+    -(NSUInteger)indexOfSimilarNodeNS:(PGDOMNode *)node;
+
+    -(PGDOMNode *)removeNodeAtIndex:(NSUInteger)idx;
+
+    -(NSUInteger)findItem:(PGDOMSrchPred)pred;
+
+    -(void)postChangeNotification;
 
     -(void)clearCaches;
 
-    -(nullable T)removeNode:(nullable T)node;
+    -(void)addItem:(PGDOMNode *)node forIndex:(NSUInteger)idx;
 
-    -(nullable T)replaceNode:(nullable T)oldNode withNode:(T)newNode;
-
+    -(NSString *)createNSKeyWithLocalName:(NSString *)localName namespaceURI:(NSString *)namespaceURI nodeName:(NSString *)nodeName;
 @end
 
 @interface PGDOMAttributeMap()

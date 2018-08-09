@@ -19,7 +19,7 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
+ *//***************************************************************************/
 
 #import "PGInternal.h"
 
@@ -51,13 +51,21 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
 
 @implementation NSString(PGString)
 
+    -(BOOL)isEmpty {
+        return (self.length == 0);
+    }
+
+    -(BOOL)notEmpty {
+        return (self.length > 0);
+    }
+
     -(NSRange)range {
         NSRange r = { .location = 0, .length = self.length };
         return r;
     }
 
     -(NSString *)_stringByReplacingControlChars:(BOOL)includeSpaces {
-        if(self.length) {
+        if(self.notEmpty) {
             char *xstr = PGCleanStr(self.UTF8String ?: "", includeSpaces);
             if(xstr) return [[NSString alloc] initWithBytesNoCopy:xstr length:strlen(xstr) encoding:NSUTF8StringEncoding freeWhenDone:YES];
         }
@@ -140,7 +148,7 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
      * @return Either a copy of this NSString object or nil if this string is empty.
      */
     -(NSString *)nullIfTrimEmpty {
-        return [[self trim] nullIfEmpty];
+        return [[self trimNoCopy] nullIfEmpty];
     }
 
     -(NSUInteger)indexOfCharacter:(unichar)c {
@@ -243,7 +251,7 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
          * If the limit is only one, the separator is empty, or the separator is longer
          * than this string then return a copy of this string as the only element in the array.
          */
-        if((limit > 1) && (separator.length > 0) && (separator.length < self.length)) {
+        if((limit > 1) && (separator.notEmpty) && (separator.length < self.length)) {
             NSRange remaining  = self.range;
             NSRange foundRange = [self rangeOfString:separator options:0 range:remaining];
 
@@ -498,7 +506,7 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
         if(limit == 0) limit = NSUIntegerMax;
 
         // Make sure we actually have a pattern.
-        if(self.length && pattern.length && (limit > 1)) {
+        if(self.notEmpty && pattern.notEmpty && (limit > 1)) {
             NSError             *err   = nil;
             NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:options error:&err];
 
@@ -619,7 +627,7 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
     }
 
     -(NSStrArray)getCharactersAsArrayOfStrings {
-        if(self.length) {
+        if(self.notEmpty) {
             NSMutableArray<NSString *> *array = [NSMutableArray new];
 
             for(NSUInteger i = 0, j = self.length; i < j;) {
@@ -648,7 +656,7 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
     -(NSString *)stringByEscapingChars:(NSString *)characters withEscape:(NSString *)escChar {
         NSUInteger cl = characters.length;
 
-        if(cl && escChar.length) {
+        if(cl && escChar.notEmpty) {
             NSString        *tempEscChar = [NSRegularExpression escapedTemplateForString:[escChar substringWithRange:[escChar rangeOfComposedCharacterSequenceAtIndex:0]]];
             NSString        *template    = [NSString stringWithFormat:@"%@$1", tempEscChar];
             NSMutableString *pattern     = [NSMutableString new];

@@ -263,7 +263,7 @@ typedef NSInteger (*NSInputStreamReadFunc_t)(id, SEL, uint8_t *, NSUInteger);
     }
 
     -(xmlParserInputPtr)localResolveEntityForPublicID:(NSString *)publicID systemID:(NSString *)systemID {
-        if(systemID.length) {
+        if(systemID.notEmpty) {
             NSURL *url = [self urlForPublicID:publicID systemID:systemID];
             if(url) return [self xmlParserInputPtrFromData:[NSData dataWithContentsOfURL:url]];
         }
@@ -289,7 +289,7 @@ typedef NSInteger (*NSInputStreamReadFunc_t)(id, SEL, uint8_t *, NSUInteger);
 
     -(void)handleSubset:(NSString *)desc name:(NSString *)name externalID:(NSString *)externalID systemID:(NSString *)systemID {
         [self.logger debug:PGXMLMsg01, desc, name, externalID, systemID];
-        if(systemID.length) [self extractEntitiesFromDTDAtURL:[self urlForPublicID:externalID systemID:systemID] externalID:externalID];
+        if(systemID.notEmpty) [self extractEntitiesFromDTDAtURL:[self urlForPublicID:externalID systemID:systemID] externalID:externalID];
     }
 
 #pragma mark libxml2 Callback Handlers

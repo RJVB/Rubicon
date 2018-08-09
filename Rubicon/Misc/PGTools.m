@@ -213,7 +213,7 @@ NSURL *PGTemporaryFile(NSString *filenamePostfix, NSError **error) {
     NSURL *tempDir = PGTemporaryDirectory(error);
 
     if(tempDir) {
-        if(filenamePostfix.length == 0) filenamePostfix = @"temp.tmp";
+        if(filenamePostfix.isEmpty) filenamePostfix = @"temp.tmp";
         return [tempDir URLByAppendingPathComponent:PGFormat(@"%@_%@", [[NSProcessInfo processInfo] globallyUniqueString], filenamePostfix)];
     }
 
@@ -242,7 +242,7 @@ voidp PGMemDup(cvoidp src, size_t size) {
 }
 
 NSString *_validateDateOrTimeString(NSString *str, NSString *outputFormat, NSDateFormatterStyle dateStyle, NSDateFormatterStyle timeStyle, NSStrArray testFormats) {
-    if(str.length) {
+    if(str.notEmpty) {
         NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
 
         fmt.dateStyle                  = dateStyle;

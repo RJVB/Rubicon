@@ -26,7 +26,7 @@
 @implementation NSRegularExpression(PGRegularExpression)
 
     -(BOOL)matches:(NSString *)string range:(NSRange)range {
-        if(string.length && range.length) {
+        if(string.notEmpty && range.length) {
             NSArray<NSTextCheckingResult *> *matches = [self matchesInString:string options:0 range:range];
 
             if(matches.count == 1) {

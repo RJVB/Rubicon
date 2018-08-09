@@ -111,9 +111,9 @@ NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *las
     _sanityCheck2(*first, *last);
 }
 
-#define RMND(n)   do{if(self==(n).parentNode)[self _removeChild:(n)];else[n.parentNode removeChild:n];}while(0)
-#define PSTCHG    do{_childListChanged++;[self postChildListChangeNotification];}while(0)
-#define SETPTR(n) do{if(!(n).previousSibling)_firstChild=(n);if(!(n).nextSibling)_lastChild=(n);}while(0)
+#define RMND(n)   PGBLKOPEN if(self==(n).parentNode)[self _removeChild:(n)];else[n removeFromParent]; PGBLKCLOSE
+#define PSTCHG    PGBLKOPEN _childListChanged++;[self postChildListChangeNotification]; PGBLKCLOSE
+#define SETPTR(n) PGBLKOPEN if(!(n).previousSibling)_firstChild=(n);if(!(n).nextSibling)_lastChild=(n); PGBLKCLOSE
 
 @implementation PGDOMParent {
         PGDOMNode  *_firstChild;
@@ -184,7 +184,6 @@ NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *las
     }
 
     -(PGDOMNode *)insertChild:(PGDOMNode *)newNode before:(PGDOMNode *)refNode {
-        PGDOMSyncData;
         PGDOMCheckRO;
         if(refNode && (self != refNode.parentNode)) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNotChild, PGDOMMsgReference)];
         [self testNewChildNode:newNode];
@@ -194,7 +193,6 @@ NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *las
     }
 
     -(PGDOMNode *)replaceChild:(PGDOMNode *)oldNode with:(PGDOMNode *)newNode {
-        PGDOMSyncData;
         PGDOMCheckRO;
         if(!oldNode) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNull, PGDOMMsgOld)];
         if(self != oldNode.parentNode) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNotChild, PGDOMMsgOld)];
@@ -205,7 +203,6 @@ NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *las
     }
 
     -(PGDOMNode *)removeChild:(PGDOMNode *)oldNode {
-        PGDOMSyncData;
         PGDOMCheckRO;
         if(!oldNode) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNull, PGDOMMsgOld)];
         if(self != oldNode.parentNode) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNotChild, PGDOMMsgOld)];
@@ -215,7 +212,6 @@ NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *las
     }
 
     -(void)setTextContent:(NSString *)textContent {
-        PGDOMSyncData;
         PGDOMCheckRO;
         [self _setTextContent:textContent];
         PSTCHG;
@@ -228,7 +224,6 @@ NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *las
      * @param removedNodes an array to receive the removed nodes.
      */
     -(void)removeAllChildren:(NSMutableArray<PGDOMNode *> *)removedNodes {
-        PGDOMSyncData;
         PGDOMCheckRO;
         [self _removeAllChildren:removedNodes];
         PSTCHG;
@@ -244,7 +239,6 @@ NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *las
      * @param childNodes an array of nodes to add to this node.
      */
     -(void)setAllChildNodes:(NSArray<PGDOMNode *> *)childNodes {
-        PGDOMSyncData;
         PGDOMCheckRO;
         [self _testAllNewChildNodes:childNodes];
         [self _removeAllChildren:nil];
@@ -257,7 +251,6 @@ NS_INLINE void _sanityCheck(PGDOMNode *__strong *first, PGDOMNode *__strong *las
     }
 
     -(void)insertAllChildNodes:(NSArray<PGDOMNode *> *)childNodes before:(PGDOMNode *)refNode {
-        PGDOMSyncData;
         PGDOMCheckRO;
         if(refNode && (self != refNode.parentNode)) @throw [self createInvArgException:PGFormat(PGDOMErrorMsgNodeNotChild, PGDOMMsgReference)];
         [self _testAllNewChildNodes:childNodes];

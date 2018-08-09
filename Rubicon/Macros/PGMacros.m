@@ -38,7 +38,7 @@
 
         if(self) {
             self.macroHandler = macroHandler;
-            self.macroRegex   = ((macroRegex.length == 0) ? PGDefaultMacroRegex : macroRegex);
+            self.macroRegex   = ((macroRegex.isEmpty) ? PGDefaultMacroRegex : macroRegex);
         }
 
         return self;
@@ -76,7 +76,7 @@
                         [rString appendString:str];
                     }
 
-                    if(repl.length) [rString appendString:repl];
+                    if(repl.notEmpty) [rString appendString:repl];
                     lastLocation = (result.range.location + result.range.length);
                 }
 

@@ -27,6 +27,7 @@
 #import <Rubicon/NSData+PGData.h>
 #import <Rubicon/NSError+PGError.h>
 #import <Rubicon/NSException+PGException.h>
+#import <Rubicon/NSMutableDictionary+PGMutableDictionary.h>
 #import <Rubicon/NSObject+PGObject.h>
 #import <Rubicon/NSRegularExpression+PGRegularExpression.h>
 #import <Rubicon/NSString+PGString.h>

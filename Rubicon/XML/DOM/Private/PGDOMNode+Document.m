@@ -1,9 +1,9 @@
 /*******************************************************************************************************************************************************************************//**
  *     PROJECT: Rubicon
- *    FILENAME: PGDOMNamedNodeMap.m
+ *    FILENAME: PGDOMNode+Document.m
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 6/29/18
+ *        DATE: 7/30/18
  *
  * Copyright © 2018 Project Galen. All rights reserved.
  *
@@ -15,46 +15,7 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#import "PGDOMPrivate.h"
+#import "PGDOMNode+Document.h"
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Woverriding-method-mismatch"
-
-@implementation PGDOMNamedNodeMap {
-    }
-
-    -(PGDOMNode *)itemWithName:(NSString *)nodeName {
-        return nil;
-    }
-
-    -(PGDOMNode *)itemWithLocalName:(NSString *)localName namespaceURI:(NSString *)namespaceURI {
-        return nil;
-    }
-
-    -(PGDOMNode *)removeItemWithName:(NSString *)nodeName {
-        return nil;
-    }
-
-    -(PGDOMNode *)removeItemWithLocalName:(NSString *)localName namespaceURI:(NSString *)namespaceURI {
-        return nil;
-    }
-
-    -(PGDOMNode *)addItem:(PGDOMNode *)node {
-        return nil;
-    }
-
-    -(PGDOMNode *)addItemNS:(PGDOMNode *)node {
-        return nil;
-    }
-
-    -(PGDOMNode *)removeItem:(PGDOMNode *)node {
-        return nil;
-    }
-
-    -(PGDOMNode *)removeItemNS:(PGDOMNode *)node {
-        return nil;
-    }
-
+@implementation PGDOMNode(Document)
 @end
-
-#pragma clang diagnostic pop

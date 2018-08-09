@@ -17,8 +17,6 @@
 
 #import "PGDOMPrivate.h"
 
-static NSArray<PGDOMNode *> *_emptyNodeArray = nil;
-
 @implementation PGDOMNode {
         PGDOMNodeList<PGDOMNode *>     *_childNodes;
         PGDOMNamedNodeMap<PGDOMAttr *> *_attributes;
@@ -53,58 +51,41 @@ static NSArray<PGDOMNode *> *_emptyNodeArray = nil;
             _isReadOnly    = YES;
             _needsSyncData = YES;
 
-            if((_ownerDocument == nil) && self.needsOwnerDocument) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:PGDOMErrorMsgOwnerDocumentNull];
+            if((_ownerDocument == nil) && self.needsOwnerDocument) {
+                @throw [NSException exceptionWithName:NSInvalidArgumentException reason:PGDOMErrorMsgOwnerDocumentNull];
+            }
         }
 
         return self;
     }
 
     -(NSString *)nodeName {
-        switch(self.nodeType) {
-            case PGDOMNodeTypeCDataSection:
-                return PGDOMNodeNameCDataSection;
-            case PGDOMNodeTypeComment:
-                return PGDOMNodeNameComment;
-            case PGDOMNodeTypeDocumentFragment:
-                return PGDOMNodeNameDocumentFragment;
-            case PGDOMNodeTypeDocument:
-                return PGDOMNodeNameDocument;
-            case PGDOMNodeTypeText:
-                return PGDOMNodeNameText;
-            default:
-                return PGDOMNodeNameUnknown;
-        }
+        switch(self.nodeType) {/*@f:0*/
+             case PGDOMNodeTypeCDataSection:     return PGDOMNodeNameCDataSection;
+             case PGDOMNodeTypeComment:          return PGDOMNodeNameComment;
+             case PGDOMNodeTypeDocumentFragment: return PGDOMNodeNameDocumentFragment;
+             case PGDOMNodeTypeDocument:         return PGDOMNodeNameDocument;
+             case PGDOMNodeTypeText:             return PGDOMNodeNameText;
+             default:                            return PGDOMNodeNameUnknown;
+          /*@f:1*/}
     }
 
     +(NSString *)nodeTypeDescription:(PGDOMNodeTypes)ntype {
-        switch(ntype) {
-            case PGDOMNodeTypeAttribute:
-                return PGDOMNodeTypeDescAttribute;
-            case PGDOMNodeTypeCDataSection:
-                return PGDOMNodeTypeDescCData;
-            case PGDOMNodeTypeComment:
-                return PGDOMNodeTypeDescComment;
-            case PGDOMNodeTypeDocumentFragment:
-                return PGDOMNodeTypeDescDocumentFragment;
-            case PGDOMNodeTypeDocument:
-                return PGDOMNodeTypeDescDocument;
-            case PGDOMNodeTypeDTD:
-                return PGDOMNodeTypeDescDTD;
-            case PGDOMNodeTypeElement:
-                return PGDOMNodeTypeDescElement;
-            case PGDOMNodeTypeDTDEntity:
-                return PGDOMNodeTypeDescEntity;
-            case PGDOMNodeTypeEntityReference:
-                return PGDOMNodeTypeDescEntityReference;
-            case PGDOMNodeTypeDTDNotation:
-                return PGDOMNodeTypeDescNotation;
-            case PGDOMNodeTypeProcessingInstruction:
-                return PGDOMNodeTypeDescProcessingInstruction;
-            case PGDOMNodeTypeText:
-                return PGDOMNodeTypeDescText;
-            default:
-                return nil;
-        }
+        switch(ntype) {/*@f:0*/
+             case PGDOMNodeTypeAttribute:             return PGDOMNodeTypeDescAttribute;
+             case PGDOMNodeTypeCDataSection:          return PGDOMNodeTypeDescCData;
+             case PGDOMNodeTypeComment:               return PGDOMNodeTypeDescComment;
+             case PGDOMNodeTypeDocumentFragment:      return PGDOMNodeTypeDescDocumentFragment;
+             case PGDOMNodeTypeDocument:              return PGDOMNodeTypeDescDocument;
+             case PGDOMNodeTypeDTD:                   return PGDOMNodeTypeDescDTD;
+             case PGDOMNodeTypeElement:               return PGDOMNodeTypeDescElement;
+             case PGDOMNodeTypeDTDEntity:             return PGDOMNodeTypeDescEntity;
+             case PGDOMNodeTypeEntityReference:       return PGDOMNodeTypeDescEntityReference;
+             case PGDOMNodeTypeDTDNotation:           return PGDOMNodeTypeDescNotation;
+             case PGDOMNodeTypeProcessingInstruction: return PGDOMNodeTypeDescProcessingInstruction;
+             case PGDOMNodeTypeText:                  return PGDOMNodeTypeDescText;
+             default:                                 return nil;
+          /*@f:1*/}
     }
 
     -(void)dealloc {
@@ -272,6 +253,13 @@ static NSArray<PGDOMNode *> *_emptyNodeArray = nil;
         }
     }
 
+    -(void)setOwnerDocument:(PGDOMDocument *)document {
+        if(self.ownerDocument != document) {
+            _ownerDocument = document;
+            _needsSyncData = YES;
+        }
+    }
+
     -(void)setIsReadOnly:(BOOL)isReadOnly {
         if(self.isReadOnly != isReadOnly) {
             _isReadOnly    = isReadOnly;
@@ -281,7 +269,7 @@ static NSArray<PGDOMNode *> *_emptyNodeArray = nil;
 
     -(id)userDataForKey:(NSString *)key {
         PGDOMSyncData;
-        if(key.length) return self.userData[key];
+        if(key.notEmpty) return self.userData[key];
         @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Key is either empty or null."];
     }
 
@@ -310,12 +298,8 @@ static NSArray<PGDOMNode *> *_emptyNodeArray = nil;
         }
     }
 
-    -(void)setOwnerDocument:(PGDOMDocument *)document {
-        PGDOMSyncData;
-        _ownerDocument = document;
-    }
-
     -(NSArray<PGDOMNode *> *)allChildNodes {
+        static NSArray<PGDOMNode *> *_emptyNodeArray = nil;
         PGSETIFNIL([PGDOMNode class], _emptyNodeArray, [NSArray new]);
         return _emptyNodeArray;
     }
@@ -327,6 +311,29 @@ static NSArray<PGDOMNode *> *_emptyNodeArray = nil;
     }
 
     -(void)removeAllChildren {
+        NSString *aString = @"Bob";
+
+        PGSWITCH(aString);
+            PGCASE(@"Sue");
+                /* Do something. */
+                break;
+            PGCASE(@"Bob");
+                /* Do something. */
+                break;
+            PGDEFAULT;
+                /* Do something if none of the above. */
+                break;
+        PGSWITCHEND;
+
+        if([aString isEqualToString:@"Sue"]) {
+            /* Do something. */
+        }
+        else if([aString isEqualToString:@"Bob"]) {
+            /* Do something. */
+        }
+        else {
+            /* Do something if none of the above. */
+        }
     }
 
     -(void)appendAllChildNodes:(NSArray<PGDOMNode *> *)childNodes {
@@ -346,5 +353,16 @@ static NSArray<PGDOMNode *> *_emptyNodeArray = nil;
     -(NSEnumerator<PGDOMNode *> *)childNodeEnumerator {
         return [[PGEmptyEnumerator alloc] init];
     }
+
+    -(PGDOMNode *)removeFromParent {
+        PGDOMNode *parent = self.parentNode;
+        if(parent) [parent removeChild:self];
+        return parent;
+    }
+
+    -(BOOL)hasNamespace {
+        return (self.namespaceURI.nullIfTrimEmpty != nil);
+    }
+
 
 @end

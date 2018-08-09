@@ -45,7 +45,6 @@
     }
 
     -(void)setData:(NSString *)data {
-        PGDOMSyncData;
         PGDOMCheckRO;
         _data = (data ?: @"").copy;
         self.needsSyncData = YES;

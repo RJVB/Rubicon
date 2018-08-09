@@ -39,8 +39,6 @@ NS_ASSUME_NONNULL_BEGIN
 
     @property(nonatomic, readonly) PGDOMNamedNodeMap<PGDOMAttr *> *attributes;
 
-    -(void)postUserDataOperation:(PGDOMUserDataOperations)operation dest:(nullable PGDOMNode *)dest;
-
 @end
 
 NS_ASSUME_NONNULL_END

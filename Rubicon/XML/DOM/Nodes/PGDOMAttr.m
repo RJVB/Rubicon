@@ -101,4 +101,11 @@
         super.textContent = value;
     }
 
+    -(void)setOwnerElement:(PGDOMElement *)ownerElement {
+        if(_ownerElement != ownerElement) {
+            if(_ownerElement) [_ownerElement removeAttributeNS:self];
+            _ownerElement = ownerElement;
+        }
+    }
+
 @end

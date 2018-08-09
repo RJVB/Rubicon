@@ -34,6 +34,22 @@ typedef uint8_t                    NSByte;
 typedef NSArray<NSString *>        *NSStrArray;
 typedef NSMutableArray<NSString *> *NSMutableStrArray;
 
+#ifndef PGBLKOPEN
+    #define PGBLKOPEN  do {
+    #define PGBLKCLOSE } while(0)
+#endif
+
+#ifndef PGSWITCH
+    #define PGSWITCH(v) PGBLKOPEN NSString *__casev = [v copy]; BOOL __casefall; { __casefall = NO
+    #define PGCASE(v)   } if(__casefall || [v isEqualToString:__casev]) { __casefall = YES;
+    #define PGDEFAULT   } /* DEFAULT */ { __casefall = YES;
+    #define PGSWITCHEND } PGBLKCLOSE
+
+    #define PGSWTTCHC(v) PGBLKOPEN const char *__casevc = strdup(v); @try { BOOL __casefall; { __casefall = NO
+    #define PGCASEC(v)   } if(__casefall || (strcmp(__casevc, v) == 0)) { __casefall = YES;
+    #define PGSWITCHCEND }} @finally { if(__casevc) free(__casevc); }PGBLKCLOSE
+#endif
+
 #if defined(CGFLOAT_IS_DOUBLE) && CGFLOAT_IS_DOUBLE
 typedef CGFloat NSFloat;  // For the Sheldon Cooper in me.
 #else

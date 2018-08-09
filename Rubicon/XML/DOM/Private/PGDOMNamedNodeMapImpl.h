@@ -24,6 +24,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface PGDOMNamedNodeMapImpl<T:PGDOMNode *> : PGDOMNamedNodeMap<T>
+
 @end
 
 NS_ASSUME_NONNULL_END

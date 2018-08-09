@@ -78,6 +78,7 @@ FOUNDATION_EXPORT NSString *const PGDOMErrorMsgValidationRegexError;
 FOUNDATION_EXPORT NSString *const PGDOMErrorMsgOwnerDocumentNull;
 FOUNDATION_EXPORT NSString *const PGDOMErrorMsgNodeNameMissing;
 FOUNDATION_EXPORT NSString *const PGDOMErrorMsgNotTextNode;
+FOUNDATION_EXPORT NSString *const PGDOMErrorMsgOpNotSupported;
 
 FOUNDATION_EXPORT NSString *const PGDOMMsgOld;
 FOUNDATION_EXPORT NSString *const PGDOMMsgNewChild;

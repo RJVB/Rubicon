@@ -75,7 +75,7 @@
 
         if(self) {
             PGAbstractClassTest(PGDOMNamespaceAware);
-            if(nodeName.length == 0) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:PGDOMErrorMsgNodeNameMissing];
+            if(nodeName.isEmpty) @throw [NSException exceptionWithName:NSInvalidArgumentException reason:PGDOMErrorMsgNodeNameMissing];
 
             _nodeName     = nodeName.copy;
             _localName    = nodeName.copy;
@@ -126,7 +126,7 @@
         if(regex) {
             @synchronized(regex) {
                 if(![regex matches:localName]) @throw [self createInvArgException:PGDOMErrorMsgInvalidCharacter];
-                if(prefix.length && ![regex matches:prefix]) @throw [self createInvArgException:PGDOMErrorMsgInvalidCharacter];
+                if(prefix.notEmpty && ![regex matches:prefix]) @throw [self createInvArgException:PGDOMErrorMsgInvalidCharacter];
             }
         }
     }
@@ -137,9 +137,9 @@
 
     -(void)validateLocalName:(NSString *)lnm prefix:(NSString *)pfx namespaceURI:(NSString *)uri {
         NSUInteger pfxlen = pfx.length;
-        BOOL       noURI  = (uri.length == 0);
+        BOOL       noURI  = (uri.isEmpty);
 
-        if(lnm.length == 0) @throw [self createInvArgException:PGDOMErrorMsgLocalNameRequired];
+        if(lnm.isEmpty) @throw [self createInvArgException:PGDOMErrorMsgLocalNameRequired];
         if(noURI) {
             if(pfxlen) @throw [self createInvArgException:PGDOMErrorMsgNamespaceError];
         }

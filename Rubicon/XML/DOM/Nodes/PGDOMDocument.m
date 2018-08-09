@@ -17,11 +17,23 @@
 
 #import "PGDOMPrivate.h"
 
-NSString *const PGDOMErrorMsgOpNotSupported = @"Operation Not Supported.";
+typedef NS_ENUM(NSByte, PGDOMAdoptAction) {
+    PGDOMAdoptActionNode, PGDOMAdoptActionParent, PGDOMAdoptActionElement, PGDOMAdoptActionNever, PGDOMAdoptActionInvalid
+};
 
-@interface PGDOMNode(PGDOMDocument)
+typedef PGDOMNode *(^PGDOMAdoptBlock)(PGDOMDocument *_document, PGDOMNode *_node, PGDOMAdoptAction _action);
 
-    -(void)setOwnerDocument:(PGDOMDocument *)document;
+PGDOMNode *_adopt(PGDOMDocument *document, PGDOMNode *node, PGDOMAdoptBlock block);
+
+PGDOMNode *_adoptElement(PGDOMDocument *document, PGDOMElement *element);
+
+PGDOMNode *_adoptParent(PGDOMDocument *document, PGDOMParent *parent);
+
+PGDOMNode *_adoptNode(PGDOMDocument *document, PGDOMNode *node);
+
+@interface PGDOMNode()
+
+    @property(nonatomic, nullable) PGDOMDocument *ownerDocument;
 
 @end
 
@@ -71,45 +83,72 @@ NSString *const PGDOMErrorMsgOpNotSupported = @"Operation Not Supported.";
         return [[PGDOMProcessingInstruction alloc] initWithOwnerDocument:self target:target data:data];
     }
 
-    -(void)_adoptNode:(PGDOMNode *)node {
-        if(node.ownerDocument) [node.parentNode removeChild:node];
-        node.ownerDocument = self;
-        [node postUserDataOperation:PGDOMNodeAdopted dest:nil];
-    }
-
-    -(void)_adoptNodeRecursively:(PGDOMNode *)node {
-        [self _adoptNode:node];
-        NSArray<PGDOMNode *> *children = node.allChildNodes;
-
-        for(PGDOMNode *child in children) [self adoptNode:child];
-        for(PGDOMNode *child in children) [node appendChild:child];
-    }
-
     -(PGDOMNode *)adoptNode:(PGDOMNode *)node {
-        if(node) {
-            switch(node.nodeType) {
-                case PGDOMNodeTypeAttribute:
-                case PGDOMNodeTypeElement:
-                case PGDOMNodeTypeDocumentFragment:
-                case PGDOMNodeTypeProcessingInstruction:
-                case PGDOMNodeTypeCDataSection:
-                case PGDOMNodeTypeComment:
-                case PGDOMNodeTypeText:
-                    [self _adoptNodeRecursively:node];
-                    break;
-                case PGDOMNodeTypeEntityReference:
-                    [self _adoptNode:node];
-                    break;
-                case PGDOMNodeTypeDTDNotation:
-                case PGDOMNodeTypeDTDEntity:
-                    return nil;
-                case PGDOMNodeTypeDTD:
-                case PGDOMNodeTypeDocument:
-                    @throw [NSException exceptionWithName:PGDOMException reason:PGDOMErrorMsgOpNotSupported];
+        return _adopt(self, node, ^PGDOMNode *(PGDOMDocument *_document, PGDOMNode *_node, PGDOMAdoptAction _action) {
+            if(_node.nodeType == PGDOMNodeTypeAttribute) {
+                [((PGDOMAttr *)_node).ownerElement removeAttributeNS:((PGDOMAttr *)_node)];
             }
-        }
-
-        return node;
+            switch(_action) { /*@f:0*/
+                case PGDOMAdoptActionNode:    [_node removeFromParent]; return _adoptNode(_document, _node);
+                case PGDOMAdoptActionParent:  [_node removeFromParent]; return _adoptParent(_document, (PGDOMParent *)_node);
+                case PGDOMAdoptActionElement: [_node removeFromParent]; return _adoptElement(_document, (PGDOMElement *)_node);
+                case PGDOMAdoptActionNever:   return nil;
+                case PGDOMAdoptActionInvalid:
+                default: @throw [NSException exceptionWithName:PGDOMException reason:PGDOMErrorMsgOpNotSupported];
+            /*@f:1*/ }
+            return _node;
+        });
     }
 
 @end
+
+PGDOMNode *_adoptNode(PGDOMDocument *document, PGDOMNode *node) {
+    node.ownerDocument = document;
+    [node postUserDataOperation:PGDOMNodeAdopted dest:nil];
+    return node;
+}
+
+PGDOMNode *_adoptParent(PGDOMDocument *document, PGDOMParent *parent) {
+    for(PGDOMNode *child in parent.allChildNodes) {
+        _adopt(document, child, ^PGDOMNode *(PGDOMDocument *_document, PGDOMNode *_node, PGDOMAdoptAction _action) {
+            switch(_action) { /*@f:0*/
+                case PGDOMAdoptActionNode:    return _adoptNode(_document, _node);
+                case PGDOMAdoptActionParent:  return _adoptParent(_document, (PGDOMParent *)_node);
+                case PGDOMAdoptActionElement: return _adoptElement(_document, (PGDOMElement *)_node);
+                case PGDOMAdoptActionNever:
+                case PGDOMAdoptActionInvalid:
+                default: [_node removeFromParent]; return nil;
+            /*@f:1*/ }
+        });
+    }
+    return _adoptNode(document, parent);
+}
+
+PGDOMNode *_adoptElement(PGDOMDocument *document, PGDOMElement *element) {
+    for(PGDOMAttr *attr in element.attributes) {
+        _adoptParent(document, attr);
+    }
+    return _adoptParent(document, element);
+}
+
+PGDOMNode *_adopt(PGDOMDocument *document, PGDOMNode *node, PGDOMAdoptBlock block) {
+    if(node) {
+        switch(node.nodeType) { /*@f:0*/
+            case PGDOMNodeTypeElement:               return block(document, node, PGDOMAdoptActionElement);
+            case PGDOMNodeTypeAttribute:             return block(document, node, PGDOMAdoptActionParent);
+            case PGDOMNodeTypeDocumentFragment:      return block(document, node, PGDOMAdoptActionParent);
+            case PGDOMNodeTypeProcessingInstruction: return block(document, node, PGDOMAdoptActionNode);
+            case PGDOMNodeTypeCDataSection:          return block(document, node, PGDOMAdoptActionNode);
+            case PGDOMNodeTypeComment:               return block(document, node, PGDOMAdoptActionNode);
+            case PGDOMNodeTypeText:                  return block(document, node, PGDOMAdoptActionNode);
+            case PGDOMNodeTypeEntityReference:       return block(document, node, PGDOMAdoptActionNode);
+            case PGDOMNodeTypeDTDNotation:           return block(document, node, PGDOMAdoptActionNever);
+            case PGDOMNodeTypeDTDEntity:             return block(document, node, PGDOMAdoptActionNever);
+            case PGDOMNodeTypeDTD:                   return block(document, node, PGDOMAdoptActionInvalid);
+            case PGDOMNodeTypeDocument:              return block(document, node, PGDOMAdoptActionInvalid);
+            default:                                 return block(document, node, PGDOMAdoptActionInvalid);
+        /*@f:1*/ }
+    }
+
+    return node;
+}

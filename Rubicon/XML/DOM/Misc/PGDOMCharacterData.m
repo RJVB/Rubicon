@@ -43,21 +43,19 @@
     }
 
     -(void)insertData:(NSString *)data atOffset:(NSUInteger)offset {
-        PGDOMSyncData;
         PGDOMCheckRO;
         NSUInteger clen = _data.length;
 
         if(offset > clen) {
             @throw [self createIndexOutOfBoundsException];
         }
-        else if(data.length) {
+        else if(data.notEmpty) {
             _data = ((offset == clen) ? [_data stringByAppendingString:data] : PGFormat(@"%@%@%@", [_data substringToIndex:offset], data, [_data substringFromIndex:offset]));
             self.needsSyncData = YES;
         }
     }
 
     -(void)deleteDataAtOffset:(NSUInteger)offset length:(NSUInteger)length {
-        PGDOMSyncData;
         PGDOMCheckRO;
         NSUInteger clen = _data.length;
         NSUInteger eidx = (offset + length);
@@ -73,7 +71,6 @@
     }
 
     -(void)setData:(NSString *)data {
-        PGDOMSyncData;
         PGDOMCheckRO;
         _data = (data ?: @"").copy;
         self.needsSyncData = YES;

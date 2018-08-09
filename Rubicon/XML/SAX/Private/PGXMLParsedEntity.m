@@ -95,7 +95,7 @@
     -(xmlEntityPtr)xmlEntity {
         [self lock];
         @try {
-            if((_xmlEntity == nil) && self.name.length) {
+            if((_xmlEntity == nil) && self.name.notEmpty) {
                 _xmlEntity = PGCalloc(1, sizeof(xmlEntity));
 
                 _xmlEntity->type    = XML_ENTITY_DECL;

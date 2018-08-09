@@ -17,6 +17,7 @@
 
 #import "PGLogger.h"
 #import "pthread/pthread.h"
+#import "NSString+PGString.h"
 
 typedef NSInteger (*WriteFunc)(id, SEL, const uint8_t *, NSUInteger);
 
@@ -50,7 +51,7 @@ NS_INLINE BOOL statusOK(NSStream *s) {
 }
 
 NS_INLINE void writeString(NSString *str, NSOutputStream *ostream, WriteFunc writeFunc) {
-    if(str.length) {
+    if(str.notEmpty) {
         NSStreamStatus sstatus = ostream.streamStatus;
         if(sstatus == NSStreamStatusNotOpen) {
             [ostream open];

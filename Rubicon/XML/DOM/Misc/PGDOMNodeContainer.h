@@ -31,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(nullable T)item:(NSUInteger)idx;
 
+    -(NSUInteger)indexOfNode:(PGDOMNode *)node;
+
 @end
 
 NS_ASSUME_NONNULL_END

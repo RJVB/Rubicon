@@ -45,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
     @property(nonatomic, readonly, nullable) /* */ PGDOMNode                  *lastChild;
     @property(nonatomic, readonly, nullable) /* */ PGDOMDocument              *ownerDocument;
     @property(nonatomic, readonly) /*           */ PGDOMNodeList<PGDOMNode *> *childNodes;
-    @property(nonatomic, readonly) /*           */ BOOL                       isReadOnly;
+    @property(nonatomic, readonly) /*           */ BOOL                       hasNamespace;
 
     -(PGDOMNode *)appendChild:(PGDOMNode *)newNode;
 

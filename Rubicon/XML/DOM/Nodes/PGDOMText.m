@@ -18,7 +18,7 @@
 #import "PGDOMPrivate.h"
 
 #define canModifySiblings(n) (canModifySiblingsDirection(n, YES) && canModifySiblingsDirection(n, NO))
-#define removeAdjacentTextNodes(n) do{removeTextNodesAdjacentTo((n),NO);removeTextNodesAdjacentTo((n),YES);}while(0)
+#define removeAdjacentTextNodes(n) PGBLKOPEN removeTextNodesAdjacentTo((n),NO);removeTextNodesAdjacentTo((n),YES); PGBLKCLOSE
 
 BOOL canModifySiblingsDirection(PGDOMNode *node, BOOL fwd);
 
@@ -81,7 +81,6 @@ NSString *getWholeText(PGDOMText *node);
     }
 
     -(instancetype)splitTextAtOffset:(NSUInteger)offset {
-        PGDOMSyncData;
         PGDOMCheckRO;
         NSString *data = self.data;
 
@@ -161,20 +160,22 @@ void removeTextNodesAdjacentTo(PGDOMText *currentNode, BOOL fwd) {
                 [parent removeChild:node];
                 node = NSIBLING(currentNode, fwd);
             }
-            else node = nil;
+            else break;
         }
     }
 }
 
 PGDOMNode *findFirstSiblingTextNode(PGDOMNode *node) {
-    PGDOMNode *sibling = node.previousSibling;
+    if(node.parentNode) {
+        PGDOMNode *sibling = node.previousSibling;
 
-    while(sibling) {
-        if(isTextNodeType(sibling)) {
-            node    = sibling;
-            sibling = node.previousSibling;
+        while(sibling) {
+            if(isTextNodeType(sibling)) {
+                node    = sibling;
+                sibling = node.previousSibling;
+            }
+            else break;
         }
-        else sibling = nil;
     }
 
     return node;

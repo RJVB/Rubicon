@@ -40,7 +40,7 @@ FOUNDATION_EXPORT const NSByte UTF8_4ByteMarkerMask;
 #define PGThrowOutOfMemoryException @throw [NSException exceptionWithName:NSMallocException reason:@"Out of memory" userInfo:nil]
 #define PGThrowNullPointerException @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"NULL pointer." userInfo:nil]
 
-#define PGSETIFNIL(l, f, v) do { if((f) == nil) { @synchronized(l) { if((f) == nil) (f) = (v); }}} while(0)
+#define PGSETIFNIL(l, f, v) PGBLKOPEN  if((f) == nil) { @synchronized(l) { if((f) == nil) (f) = (v); }} PGBLKCLOSE
 
 #define PG_BRDG_CAST(t)  (__bridge t *)
 
