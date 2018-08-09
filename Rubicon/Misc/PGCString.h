@@ -23,15 +23,31 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGCString : NSObject
+@interface PGCString : NSObject<NSCopying>
 
-    @property(readonly) const char *cString;
-    @property(readonly) NSUInteger length;
-    @property(readonly) NSString   *nsString;
+    @property(nullable, readonly) const char *cString;
+    @property(nullable, readonly) NSString   *nsString;
+    @property(readonly) /*     */ NSUInteger length;
 
     -(instancetype)initWithNSString:(nullable NSString *)string;
 
     -(instancetype)initWithCString:(nullable const char *)cString NS_DESIGNATED_INITIALIZER;
+
+    -(BOOL)isEqualToCString:(nullable const char *)other;
+
+    -(BOOL)isEqualToNSString:(nullable NSString *)other;
+
+    -(BOOL)isEqual:(nullable id)other;
+
+    -(BOOL)isEqualToString:(nullable PGCString *)other;
+
+    -(NSUInteger)hash;
+
+    -(NSComparisonResult)compare:(nullable id)object;
+
+    -(NSComparisonResult)compareToNSString:(nullable NSString *)string;
+
+    -(NSComparisonResult)compareToCString:(nullable const char *)cString;
 
     +(instancetype)stringWithNSString:(nullable NSString *)string;
 

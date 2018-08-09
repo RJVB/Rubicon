@@ -26,6 +26,7 @@
 #define __Rubicon_PGDefines_H_
 
 #import <Rubicon/GNUstep.h>
+#import <Rubicon/PGCString.h>
 
 typedef const void                 *cvoidp;
 typedef void                       *voidp;
@@ -42,12 +43,12 @@ typedef NSMutableArray<NSString *> *NSMutableStrArray;
 #ifndef PGSWITCH
     #define PGSWITCH(v) PGBLKOPEN NSString *__casev = [v copy]; BOOL __casefall; { __casefall = NO
     #define PGCASE(v)   } if(__casefall || [v isEqualToString:__casev]) { __casefall = YES;
-    #define PGDEFAULT   } /* DEFAULT */ { __casefall = YES;
+    #define PGDEFAULT   } { __casefall = YES;
     #define PGSWITCHEND } PGBLKCLOSE
 
-    #define PGSWTTCHC(v) PGBLKOPEN const char *__casevc = strdup(v); @try { BOOL __casefall; { __casefall = NO
+    #define PGSWTTCHC(v) PGBLKOPEN PGCString *__casevc = [PGCString stringWithCString:v]; BOOL __casefall; { __casefall = NO
     #define PGCASEC(v)   } if(__casefall || (strcmp(__casevc, v) == 0)) { __casefall = YES;
-    #define PGSWITCHCEND }} @finally { if(__casevc) free(__casevc); }PGBLKCLOSE
+    #define PGSWITCHCEND } PGBLKCLOSE
 #endif
 
 #if defined(CGFLOAT_IS_DOUBLE) && CGFLOAT_IS_DOUBLE
@@ -111,6 +112,8 @@ FOUNDATION_EXPORT NSString *const PGErrorMsgNoModificationAllowed;
 FOUNDATION_EXPORT NSString *const PGErrorMsgAbstractClass;
 FOUNDATION_EXPORT NSString *const PGErrorMsgAbstractMethod;
 FOUNDATION_EXPORT NSString *const PGErrorMsgBadConstructor;
+FOUNDATION_EXPORT NSString *const PGErrorMsgCannotCompare;
+FOUNDATION_EXPORT NSString *const PGErrorMsgRangeOutOfBounds;
 
 #if !defined(__PGExceptionTests__)
     #define __PGExceptionTests__    1
@@ -118,11 +121,11 @@ FOUNDATION_EXPORT NSString *const PGErrorMsgBadConstructor;
     #define PGThrow(e, r)           @throw [NSException exceptionWithName:e reason:r userInfo:nil]
     #define PGClassName(c)          NSStringFromClass([c class])
     #define PGSelName(s)            NSStringFromSelector(s)
-    #define PGNoDirectCreationError do{PGThrow(NSIllegalSelectorException,PGFormat(PGErrorMsgNoDirectCreation,PGClassName(self)));__builtin_unreachable();}while(0)
-    #define PGAbstractClassError    do{PGThrow(NSIllegalSelectorException,PGFormat(PGErrorMsgAbstractClass,PGClassName(self)));__builtin_unreachable();}while(0)
-    #define PGBadConstructorError   do{PGThrow(NSIllegalSelectorException,PGFormat(PGErrorMsgBadConstructor,PGSelName(_cmd),PGClassName(self)));__builtin_unreachable();}while(0)
-    #define PGNotImplemented        do{PGThrow(NSIllegalSelectorException,PGFormat(PGErrorMsgAbstractMethod, PGSelName(_cmd)));__builtin_unreachable();}while(0)
-    #define PGAbstractClassTest(c)  do{if(PGClassTest(c))PGAbstractClassError;}while(0)
+    #define PGNoDirectCreationError PGBLKOPEN PGThrow(NSIllegalSelectorException,PGFormat(PGErrorMsgNoDirectCreation,PGClassName(self)));__builtin_unreachable(); PGBLKCLOSE
+    #define PGAbstractClassError    PGBLKOPEN PGThrow(NSIllegalSelectorException,PGFormat(PGErrorMsgAbstractClass,PGClassName(self)));__builtin_unreachable(); PGBLKCLOSE
+    #define PGBadConstructorError   PGBLKOPEN PGThrow(NSIllegalSelectorException,PGFormat(PGErrorMsgBadConstructor,PGSelName(_cmd),PGClassName(self)));__builtin_unreachable(); PGBLKCLOSE
+    #define PGNotImplemented        PGBLKOPEN PGThrow(NSIllegalSelectorException,PGFormat(PGErrorMsgAbstractMethod, PGSelName(_cmd)));__builtin_unreachable(); PGBLKCLOSE
+    #define PGAbstractClassTest(c)  PGBLKOPEN if(PGClassTest(c))PGAbstractClassError; PGBLKCLOSE
 #endif //__PGExceptionTests__
 
 #endif //__Rubicon_PGDefines_H_

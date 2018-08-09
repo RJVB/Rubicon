@@ -40,65 +40,10 @@ FOUNDATION_EXPORT const NSByte UTF8_4ByteMarkerMask;
 #define PGThrowOutOfMemoryException @throw [NSException exceptionWithName:NSMallocException reason:@"Out of memory" userInfo:nil]
 #define PGThrowNullPointerException @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"NULL pointer." userInfo:nil]
 
-#define PGSETIFNIL(l, f, v) PGBLKOPEN  if((f) == nil) { @synchronized(l) { if((f) == nil) (f) = (v); }} PGBLKCLOSE
+#define PGSETIFNIL(l, f, v)  PGBLKOPEN if((f) == nil) { @synchronized(l) { if((f) == nil) (f) = (v); }} PGBLKCLOSE
+#define PGSETIFZERO(l, f, v) PGBLKOPEN if((f) == (0)) { @synchronized(l) { if((f) == (0)) (f) = (v); }} PGBLKCLOSE
 
 #define PG_BRDG_CAST(t)  (__bridge t *)
-
-NS_INLINE voidp _Nonnull PGTestPtr(voidp _Nullable _ptr) {
-    if(_ptr) return (_ptr); else PGThrowOutOfMemoryException;
-}
-
-NS_INLINE void PGSwapPtr(voidp _Nonnull *_Nonnull x, voidp _Nonnull *_Nonnull y) {
-    voidp z = *x;
-    *x = *y;
-    *y = z;
-}
-
-NS_INLINE void PGSwapObjs(id _Nonnull *_Nonnull x, id _Nonnull *_Nonnull y) {
-    id z = *x;
-    *x = *y;
-    *y = z;
-}
-
-NS_INLINE char *_Nonnull PGStrdup(const char *_Nonnull str) {
-    return PGTestPtr(strdup(str));
-}
-
-NS_INLINE voidp _Nonnull PGMalloc(size_t _sz) {
-    return PGTestPtr(malloc(_sz));
-}
-
-NS_INLINE voidp _Nonnull PGCalloc(size_t count, size_t size) {
-    return PGTestPtr(calloc(count, size));
-}
-
-NS_INLINE voidp _Nonnull PGRealloc(voidp _Nullable _ptr, size_t _sz) {
-    return PGTestPtr(_ptr ? realloc(_ptr, _sz) : malloc(_sz));
-}
-
-NS_INLINE voidp _Nonnull PGMemMove(voidp _Nonnull dest, cvoidp _Nonnull src, size_t length) {
-    return (length ? memmove(dest, src, length) : dest);
-}
-
-NS_INLINE voidp _Nonnull PGMemCopy(voidp _Nonnull dest, cvoidp _Nonnull src, size_t length) {
-    return (length ? memcpy(dest, src, length) : dest);
-}
-
-NS_INLINE voidp _Nonnull PGMemPMove(voidp _Nonnull dest, cvoidp _Nonnull src, size_t length) {
-    return (length ? (memmove(dest, src, length) + length) : dest);
-}
-
-NS_INLINE voidp _Nonnull PGMemPCopy(voidp _Nonnull dest, cvoidp _Nonnull src, size_t length) {
-    return (length ? (memcpy(dest, src, length) + length) : dest);
-}
-
-NS_INLINE voidp _Nonnull PGMemShift(voidp _Nonnull src, NSInteger delta, NSUInteger length) {
-    return PGMemMove((src + delta), src, length);
-}
-
-NS_INLINE voidp _Nonnull PGMemPShift(voidp _Nonnull src, NSInteger delta, NSUInteger length) {
-    return (PGMemShift(src, delta, length) + length);
-}
 
 /**
  * Given a string, this function will prefix all of the specified characters with the escapeChar.
@@ -118,65 +63,6 @@ FOUNDATION_EXPORT NSString *_Nullable PGValidateTime(NSString *_Nonnull timeStri
 FOUNDATION_EXPORT NSByte *_Nonnull PGMemoryReverse(NSByte *_Nonnull buffer, NSUInteger length);
 
 FOUNDATION_EXPORT voidp _Nonnull PGMemDup(cvoidp _Nonnull src, size_t size);
-
-/**
- * If the given string reference is null then return an empty string literal. (@"")
- *
- * @param str the string reference.
- * @return the same string reference or @"" if the string reference is null.
- */
-NS_INLINE NSString *_Nonnull PGEmptyIfNull(NSString *const _Nullable str) {
-    return (str ?: @"");
-}
-
-/**
- * Test the equality of two objects. Safely handles the case of either or both objects being NULL.
- * Two objects are considered equal if both are NULL or [obj1 isEqual:obj2] returns TRUE.
- *
- * @param obj1 the first object.
- * @param obj2 the second object.
- * @return YES if both objects are either NULL or equal according to the isEqual: selector.
- */
-NS_INLINE BOOL PGObjectsEqual(id _Nullable obj1, id _Nullable obj2) {
-    return ((obj1 == nil) ? (obj2 == nil) : ((obj2 == nil) ? NO : [obj1 isEqual:obj2]));
-}
-
-/**
- * Test the equality of two strings. Safely handles the case of either or both strings being NULL.
- * Two strings are considered equal if both are NULL or [str1 isEqualToString:str2] returns TRUE.
- *
- * @param str1 the first string.
- * @param str2 the second string.
- * @return YES if both strings are either NULL or equal according to the isEqualToString: selector.
- */
-NS_INLINE BOOL PGStringsEqual(NSString *const _Nullable str1, NSString *const _Nullable str2) {
-    return ((str1 == nil) ? (str2 == nil) : (str2 && ((str1 == str2) || [str1 isEqualToString:str2])));
-}
-
-/**
- * Test the equality of two arrays. Safely handles the case of either or both arrays being NULL.
- *
- * @param ar1 the first array.
- * @param ar2 the second array.
- * @return YES if both string are either NULL or equal according to the isEqualToArray: selector.
- */
-NS_INLINE BOOL PGArraysEqual(NSArray *const _Nullable ar1, NSArray *const _Nullable ar2) {
-    return ((ar1 == nil) ? (ar2 == nil) : (ar2 && ((ar1 == ar2) || [ar1 isEqualToArray:ar2])));
-}
-
-/**
- * Safely set a value by reference without having to constantly write code to check the pointers validity.
- * If the value of reference is not nil then the pointer will be de-referenced and the value val will be
- * stored.  Otherwise the value val is simply returned.
- *
- * @param ref the reference.
- * @param val the value.
- * @return the value.
- */
-NS_INLINE id _Nullable PGSetReference(id _Nullable *_Nullable ref, id _Nullable val) {
-    if(ref) *ref = val;
-    return val;
-}
 
 FOUNDATION_EXPORT NSComparisonResult PGDateCompare(NSDate *_Nullable d1, NSDate *_Nullable d2);
 
@@ -269,13 +155,11 @@ FOUNDATION_EXPORT NSURL *_Nullable PGTemporaryDirectory(NSError *_Nullable *_Nul
  */
 FOUNDATION_EXPORT NSURL *_Nullable PGTemporaryFile(NSString *_Nonnull filenamePostfix, NSError *_Nullable *_Nullable error);
 
-NS_INLINE NSComparisonResult PGInvertComparison(NSComparisonResult cr) {
-    return ((NSComparisonResult)(((NSInteger)(cr)) * -1L));
-}
-
 FOUNDATION_EXPORT NSError *PGCreateError(NSString *domain, NSInteger code, NSString *description);
 
 FOUNDATION_EXPORT NSError *PGOpenInputStream(NSInputStream *input);
+
+FOUNDATION_EXPORT NSException *PGCreateCompareException(id obj1, id obj2);
 
 /**
  * This function provides a bit of an easier way to read from an input stream into a buffer. This function returns a simple YES if data
@@ -292,10 +176,102 @@ FOUNDATION_EXPORT NSError *PGOpenInputStream(NSInputStream *input);
  */
 FOUNDATION_EXPORT BOOL PGReadIntoBuffer(NSInputStream *input, void *buffer, NSUInteger maxLength, int *readStatus, NSError **error);
 
+#if __has_extension(attribute_overloadable)
+
+FOUNDATION_EXPORT NSUInteger PGCStringHash(const char *str, size_t len) __attribute__((overloadable));
+
+FOUNDATION_EXPORT char *PGCleanStr(const char *xstr, size_t len, char includeSpaces) __attribute__((overloadable));
+
+NS_INLINE NSUInteger __attribute__((overloadable)) PGCStringHash(const char *str) {
+    return PGCStringHash(str, (str ? strlen(str) : 0));
+}
+
+NS_INLINE char *__attribute__((overloadable)) PGCleanStr(const char *xstr, char includeSpaces) {
+    return PGCleanStr(xstr, strlen(xstr), includeSpaces);
+}
+
+#else
+
+FOUNDATION_EXPORT NSUInteger PGCStringHash(const char *str, size_t len);
+
 FOUNDATION_EXPORT char *PGCleanStrLen(const char *xstr, size_t len, char includeSpaces);
+
+NS_INLINE NSUInteger PGCStrHash(const char *str) {
+    return PGCStringHash(str, (str ? strlen(str) : 0));
+}
 
 NS_INLINE char *PGCleanStr(const char *xstr, char includeSpaces) {
     return PGCleanStrLen(xstr, strlen(xstr), includeSpaces);
+}
+
+#endif
+
+NS_INLINE voidp _Nonnull PGTestPtr(voidp _Nullable _ptr) {
+    if(_ptr) return (_ptr); else PGThrowOutOfMemoryException;
+}
+
+NS_INLINE void PGSwapPtr(voidp _Nonnull *_Nonnull x, voidp _Nonnull *_Nonnull y) {
+    voidp z = *x;
+    *x = *y;
+    *y = z;
+}
+
+NS_INLINE void PGSwapObjs(id _Nonnull *_Nonnull x, id _Nonnull *_Nonnull y) {
+    id z = *x;
+    *x = *y;
+    *y = z;
+}
+
+NS_INLINE char *_Nonnull PGStrdup(const char *_Nonnull str) {
+    return PGTestPtr(strdup(str));
+}
+
+NS_INLINE voidp _Nonnull PGMalloc(size_t _sz) {
+    return PGTestPtr(malloc(_sz));
+}
+
+NS_INLINE voidp _Nonnull PGCalloc(size_t count, size_t size) {
+    return PGTestPtr(calloc(count, size));
+}
+
+NS_INLINE voidp _Nonnull PGRealloc(voidp _Nullable _ptr, size_t _sz) {
+    return PGTestPtr(_ptr ? realloc(_ptr, _sz) : malloc(_sz));
+}
+
+NS_INLINE voidp _Nonnull PGMemMove(voidp _Nonnull dest, cvoidp _Nonnull src, size_t length) {
+    return (length ? memmove(dest, src, length) : dest);
+}
+
+NS_INLINE voidp _Nonnull PGMemCopy(voidp _Nonnull dest, cvoidp _Nonnull src, size_t length) {
+    return (length ? memcpy(dest, src, length) : dest);
+}
+
+NS_INLINE voidp _Nonnull PGMemPMove(voidp _Nonnull dest, cvoidp _Nonnull src, size_t length) {
+    return (length ? (memmove(dest, src, length) + length) : dest);
+}
+
+NS_INLINE voidp _Nonnull PGMemPCopy(voidp _Nonnull dest, cvoidp _Nonnull src, size_t length) {
+    return (length ? (memcpy(dest, src, length) + length) : dest);
+}
+
+NS_INLINE voidp _Nonnull PGMemShift(voidp _Nonnull src, NSInteger delta, NSUInteger length) {
+    return PGMemMove((src + delta), src, length);
+}
+
+NS_INLINE voidp _Nonnull PGMemPShift(voidp _Nonnull src, NSInteger delta, NSUInteger length) {
+    return (PGMemShift(src, delta, length) + length);
+}
+
+NS_INLINE NSComparisonResult PGCompareCStrings(const char *_Nullable s1, const char *_Nullable s2) {
+    if(s1 == s2) return NSOrderedSame;
+    if(s1 == NULL) return NSOrderedAscending;
+    if(s2 == NULL) return NSOrderedDescending;
+    int cc = strcmp(s1, s2);
+    return ((cc == 0) ? NSOrderedSame : ((cc < 0) ? NSOrderedAscending : NSOrderedDescending));
+}
+
+NS_INLINE NSComparisonResult PGInvertComparison(NSComparisonResult cr) {
+    return ((NSComparisonResult)(((NSInteger)(cr)) * -1L));
 }
 
 NS_INLINE NSUInteger PGRangeLength(NSUInteger startingLoc, NSUInteger endingLoc) {
@@ -306,10 +282,69 @@ NS_INLINE NSRange PGRangeFromIndexes(NSUInteger loc1, NSUInteger loc2) {
     return NSMakeRange(MIN(loc1, loc2), PGRangeLength(loc1, loc2));
 }
 
-NS_INLINE NSException *__nullable PGValidateRange(NSString *string, NSRange range) {
+NS_INLINE NSException *_Nullable PGValidateRange(NSString *_Nonnull string, NSRange range) {
     if(range.location < string.length && NSMaxRange(range) < string.length) return nil;
-    NSString *r = PGFormat(@"Range {%lu, %lu} out of bounds; string length %lu", range.location, range.length, string.length);
+    NSString *r = PGFormat(PGErrorMsgRangeOutOfBounds, range.location, range.length, string.length);
     return [NSException exceptionWithName:NSRangeException reason:r userInfo:nil];
+}
+
+/**
+ * If the given string reference is null then return an empty string literal. (@"")
+ *
+ * @param str the string reference.
+ * @return the same string reference or @"" if the string reference is null.
+ */
+NS_INLINE NSString *_Nonnull PGEmptyIfNull(NSString *const _Nullable str) {
+    return (str ?: @"");
+}
+
+/**
+ * Test the equality of two objects. Safely handles the case of either or both objects being NULL.
+ * Two objects are considered equal if both are NULL or [obj1 isEqual:obj2] returns TRUE.
+ *
+ * @param obj1 the first object.
+ * @param obj2 the second object.
+ * @return YES if both objects are either NULL or equal according to the isEqual: selector.
+ */
+NS_INLINE BOOL PGObjectsEqual(id _Nullable obj1, id _Nullable obj2) {
+    return ((obj1 == nil) ? (obj2 == nil) : ((obj2 == nil) ? NO : [obj1 isEqual:obj2]));
+}
+
+/**
+ * Test the equality of two strings. Safely handles the case of either or both strings being NULL.
+ * Two strings are considered equal if both are NULL or [str1 isEqualToString:str2] returns TRUE.
+ *
+ * @param str1 the first string.
+ * @param str2 the second string.
+ * @return YES if both strings are either NULL or equal according to the isEqualToString: selector.
+ */
+NS_INLINE BOOL PGStringsEqual(NSString *const _Nullable str1, NSString *const _Nullable str2) {
+    return ((str1 == nil) ? (str2 == nil) : (str2 && ((str1 == str2) || [str1 isEqualToString:str2])));
+}
+
+/**
+ * Test the equality of two arrays. Safely handles the case of either or both arrays being NULL.
+ *
+ * @param ar1 the first array.
+ * @param ar2 the second array.
+ * @return YES if both string are either NULL or equal according to the isEqualToArray: selector.
+ */
+NS_INLINE BOOL PGArraysEqual(NSArray *const _Nullable ar1, NSArray *const _Nullable ar2) {
+    return ((ar1 == nil) ? (ar2 == nil) : (ar2 && ((ar1 == ar2) || [ar1 isEqualToArray:ar2])));
+}
+
+/**
+ * Safely set a value by reference without having to constantly write code to check the pointers validity.
+ * If the value of reference is not nil then the pointer will be de-referenced and the value val will be
+ * stored.  Otherwise the value val is simply returned.
+ *
+ * @param ref the reference.
+ * @param val the value.
+ * @return the value.
+ */
+NS_INLINE id _Nullable PGSetReference(id _Nullable *_Nullable ref, id _Nullable val) {
+    if(ref) *ref = val;
+    return val;
 }
 
 #endif //__Rubicon_PGTools_H_

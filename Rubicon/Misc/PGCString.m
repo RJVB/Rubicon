@@ -19,7 +19,9 @@
 #import "PGTools.h"
 
 @implementation PGCString {
-        char *_cString;
+        char       *_cString;
+        NSString   *_nsString;
+        NSUInteger _hash;
     }
 
     @synthesize length = _length;
@@ -36,19 +38,22 @@
         self = [super init];
 
         if(self) {
-            _length  = (cString ? strlen(cString) : 0);
-            _cString = (_length ? PGStrdup(cString) : NULL);
+            _length   = (cString ? strlen(cString) : 0);
+            _cString  = (cString ? PGStrdup(cString) : NULL);
+            _nsString = nil;
+            _hash     = 0;
         }
 
         return self;
     }
 
     -(const char *)cString {
-        return (_cString ?: "");
+        return _cString;
     }
 
     -(NSString *)nsString {
-        return [NSString stringWithUTF8String:self.cString];
+        if(_cString) PGSETIFNIL(self, _nsString, [NSString stringWithUTF8String:_cString]);
+        return _nsString;
     }
 
     -(void)dealloc {
@@ -59,6 +64,54 @@
 
     -(NSString *)description {
         return self.nsString;
+    }
+
+    -(BOOL)isEqual:(id)other {
+        return (other && ((other == self) || ([other isKindOfClass:[self class]] && [self isEqualToCString:[other cString]])));
+    }
+
+    -(BOOL)isEqualToString:(PGCString *)string {
+        return (string && ((string == self) || [self isEqualToCString:string.cString]));
+    }
+
+    -(BOOL)isEqualToCString:(const char *)other {
+        return ((_cString == NULL) ? (other == NULL) : ((_cString == other) || (strcmp(_cString, other) == 0)));
+    }
+
+    -(BOOL)isEqualToNSString:(nullable NSString *)other {
+        return [self isEqualToCString:other.UTF8String];
+    }
+
+    -(NSUInteger)hash {
+        /*
+         * This class is immutable so we really only need
+         * to calculate the hash value once. We will do so
+         * on demand.
+         */
+        PGSETIFZERO(self, _hash, PGCStringHash(_cString, _length));
+        return _hash;
+    }
+
+    -(NSComparisonResult)compare:(id)object {
+        if(object) {
+            if(self == object) return NSOrderedSame;
+            else if([object isKindOfClass:[self class]]) return [self compareToCString:[((PGCString *)(object)) cString]];
+            else @throw PGCreateCompareException(self, object);
+        }
+
+        return NSOrderedDescending;
+    }
+
+    -(NSComparisonResult)compareToNSString:(NSString *)string {
+        return (string ? [self compareToCString:string.UTF8String] : NSOrderedDescending);
+    }
+
+    -(NSComparisonResult)compareToCString:(const char *)cString {
+        return PGCompareCStrings(_cString, cString);
+    }
+
+    -(id)copyWithZone:(nullable NSZone *)zone {
+        return [(PGCString *)[[self class] alloc] initWithCString:_cString];
     }
 
     +(instancetype)stringWithNSString:(NSString *)string {

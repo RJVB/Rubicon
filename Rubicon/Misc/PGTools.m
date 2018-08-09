@@ -175,9 +175,11 @@ NSComparisonResult PGStrCompare(NSString *str1, NSString *str2) {
 NSComparisonResult _PGCompare(id obj1, id obj2) {
     if([[obj1 superclassInCommonWith:obj2] instancesRespondToSelector:@selector(compare:)]) return [obj1 compare:obj2];
 
-    @throw [NSException exceptionWithName:NSInvalidArgumentException
-                                   reason:PGFormat(@"Class %@ cannot be compared to class %@.", NSStringFromClass([obj1 class]), NSStringFromClass([obj2 class]))
-                                 userInfo:nil];
+    @throw PGCreateCompareException(obj1, obj2);
+}
+
+NSException *PGCreateCompareException(id obj1, id obj2) {
+    return [NSException exceptionWithName:NSInvalidArgumentException reason:PGFormat(PGErrorMsgCannotCompare, NSStringFromClass([obj1 class]), NSStringFromClass([obj2 class]))];
 }
 
 /**
@@ -354,7 +356,13 @@ NS_INLINE void addStr(const char *str, StrBuffer *buffer) {
 
 #define UNICODEMASK(c) ((uint8_t)((c)&(0xc0)))
 
+// @f:0
+#if __has_extension(attribute_overloadable)
+char *__attribute__((overloadable)) PGCleanStr(const char *xstr, size_t len, char includeSpaces) {
+#else
 char *PGCleanStrLen(const char *xstr, size_t len, char includeSpaces) {
+#endif
+// @f:1
     if(xstr) {
         if(len) {
             size_t xlen   = (size_t)strlen(xstr);
@@ -396,3 +404,25 @@ char *PGCleanStrLen(const char *xstr, size_t len, char includeSpaces) {
     return NULL;
 }
 
+// @f:0
+#if __has_extension(attribute_overloadable)
+NSUInteger __attribute__((overloadable)) PGCStringHash(const char *str, size_t len) {
+#else
+NSUInteger PGCStringHash(const char *str, size_t len) {
+#endif
+// @f:1
+    NSUInteger _h = (31u + len);
+
+    if(str && len) {
+        /*
+         * Only bother with the first 256 characters.
+         */
+        size_t j = MIN(len, 256);
+        for(size_t i = 0; i < j; i++) _h = ((_h * 31u) + ((NSUInteger)str[i]));
+    }
+
+    /*
+     * Just in case we end up with a zero hash.
+     */
+    return (_h ?: 1);
+}
