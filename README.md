@@ -29,6 +29,7 @@ does greatly enhance the readability of the code significantly. To that end I ha
 created a set of macros to provide something similar to Objective-C's NSString objects
 and to standard C-style null-terminated strings.
 
+For example, where in the past you may have coded something like the following.
 ```objc
         NSString *aString = @"Bob";
 
@@ -42,8 +43,7 @@ and to standard C-style null-terminated strings.
             /* Do something if none of the above. */
         }
 ```
-
-can now be coded as...
+It can now be coded like the this.
 ```objc
         NSString *aString = @"Bob";
 
@@ -58,6 +58,27 @@ can now be coded as...
                 /* Do something if none of the above. */
                 break;
         PGSWITCHEND;
+```
+Also, just like a regular **switch** statement, if you omit the **break** statements
+then execution will fall through to the next **case** statement.  So the following...
+```objc
+        NSString *aString = @"Sue";
+
+        PGSWITCH(aString);
+            PGCASE(@"Sue");
+                puts("Sue");
+            PGCASE(@"Bob");
+                puts("Bob");
+                break;
+            PGDEFAULT;
+                puts("Default");
+                break;
+        PGSWITCHEND;
+```
+...would produce the following output.
+```text
+Sue
+Bob
 ```
 
 ## PGSimpleBuffer and PGCString
