@@ -20,6 +20,7 @@
 
 @implementation PGCString {
         char       *_cString;
+        char       *_iString;
         NSString   *_nsString;
         NSUInteger _hash;
     }
@@ -27,7 +28,7 @@
     @synthesize length = _length;
 
     -(instancetype)init {
-        return (self = [self initWithCString:NULL]);
+        return (self = [self initWithCString:""]);
     }
 
     -(instancetype)initWithNSString:(NSString *)string {
@@ -38,17 +39,18 @@
         self = [super init];
 
         if(self) {
-            _length   = (cString ? strlen(cString) : 0);
-            _cString  = (cString ? PGStrdup(cString) : NULL);
-            _nsString = nil;
-            _hash     = 0;
+            if(cString) {
+                _length  = strlen(cString);
+                _cString = PGStrdup(cString);
+            }
         }
 
         return self;
     }
 
     -(const char *)cString {
-        return _cString;
+        if(_cString) { @synchronized(self) { if(_iString) PGMemCopy(_iString, _cString, _length + 1); else _iString = PGStrdup(_cString); }}
+        return _iString;
     }
 
     -(NSString *)nsString {
@@ -58,6 +60,8 @@
 
     -(void)dealloc {
         if(_cString) free(_cString);
+        if(_iString) free(_iString);
+        _iString = NULL;
         _cString = NULL;
         _length  = 0;
     }
@@ -75,7 +79,7 @@
     }
 
     -(BOOL)isEqualToCString:(const char *)other {
-        return ((_cString == NULL) ? (other == NULL) : ((_cString == other) || (strcmp(_cString, other) == 0)));
+        return ((_cString == other) || (_cString && other && !strcmp(_cString, other)));
     }
 
     -(BOOL)isEqualToNSString:(nullable NSString *)other {

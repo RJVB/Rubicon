@@ -99,7 +99,35 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
         return parser.parse;
     }
 
-    -(void)test81Builtins {
+    -(void)_testStringSwitch:(NSString *)str {
+        PGSWITCH(str);
+            PGCASE(@"Sue");
+                NSLog(@"Her name was %@.", @"Sue");
+                break;
+            PGCASE(@"Cindy");
+                NSLog(@"Her name was %@.", @"Cindy");
+                break;
+            PGCASE(@"Mike");
+                NSLog(@"His name was %@.", @"Mike");
+                break;
+            PGCASE(@"Bob");
+                NSLog(@"His name was %@.", @"Bob");
+                break;
+            PGDEFAULT;
+                NSLog(@"%@ - %@", @"He who has no name", str);
+                break;
+        PGSWITCHEND;
+    }
+
+    -(void)test80StringSwitch {
+        [self _testStringSwitch:[@"Bob" copy]];
+        [self _testStringSwitch:[@"Sue" copy]];
+        [self _testStringSwitch:[@"Mike" copy]];
+        [self _testStringSwitch:[@"Cindy" copy]];
+        [self _testStringSwitch:[@"Harold" copy]];
+    }
+
+    -(void)t_est81Builtins {
         PGNotImplemented;
     }
 

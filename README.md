@@ -80,6 +80,64 @@ then execution will fall through to the next **case** statement.  So the followi
 Sue
 Bob
 ```
+For those that are curious, if given:
+```objc
+        PGSWITCH(str);
+            PGCASE(@"Sue");
+                NSLog(@"Her name was %@.", @"Sue");
+                break;
+            PGCASE(@"Cindy");
+                NSLog(@"Her name was %@.", @"Cindy");
+                break;
+            PGCASE(@"Mike");
+                NSLog(@"His name was %@.", @"Mike");
+                break;
+            PGCASE(@"Bob");
+                NSLog(@"His name was %@.", @"Bob");
+                break;
+            PGDEFAULT;
+                NSLog(@"%@ - %@", @"He who has no name", str);
+                break;
+        PGSWITCHEND;
+```
+The macros will expand as:
+```objc
+    do {
+        NSString *__pg_casev = [str copy];
+        BOOL     __pg_casefall;
+        {
+            __pg_casefall = NO;
+        }
+        if(__pg_casefall || [@"Sue" isEqualToString:__pg_casev]) {
+            __pg_casefall = YES;
+            NSLog(@"Her name was %@.", @"Sue");
+            break;
+        }
+        if(__pg_casefall || [@"Cindy" isEqualToString:__pg_casev]) {
+            __pg_casefall = YES;
+            NSLog(@"Her name was %@.", @"Cindy");
+            break;
+        }
+        if(__pg_casefall || [@"Mike" isEqualToString:__pg_casev]) {
+            __pg_casefall = YES;
+            NSLog(@"His name was %@.", @"Mike");
+            break;
+        }
+        if(__pg_casefall || [@"Bob" isEqualToString:__pg_casev]) {
+            __pg_casefall = YES;
+            NSLog(@"His name was %@.", @"Bob");
+            break;
+        }
+        {
+            __pg_casefall = YES;
+            NSLog(@"%@ - %@", @"He who has no name", str);
+            break;
+        }
+    }
+    while(0);
+```
+I know that seems like a bunch of extra unneeded code but CLANG's optimizer will remove
+what's not needed - such as the surrounding do/while statement.
 
 ## PGSimpleBuffer and PGCString
 

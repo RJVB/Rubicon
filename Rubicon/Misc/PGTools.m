@@ -356,16 +356,10 @@ NS_INLINE void addStr(const char *str, StrBuffer *buffer) {
 
 #define UNICODEMASK(c) ((uint8_t)((c)&(0xc0)))
 
-// @f:0
-#if __has_extension(attribute_overloadable)
-char *__attribute__((overloadable)) PGCleanStr(const char *xstr, size_t len, char includeSpaces) {
-#else
-char *PGCleanStrLen(const char *xstr, size_t len, char includeSpaces) {
-#endif
-// @f:1
-    if(xstr) {
+char *__pg_cleanstr(const char *str, size_t len, char includeSpaces) {
+    if(str) {
         if(len) {
-            size_t xlen   = (size_t)strlen(xstr);
+            size_t xlen   = (size_t)strlen(str);
             size_t strlen = MIN(xlen, len);
 
             StrBuffer  buffer = { .size = strlen, .idx = 0, .buffer = malloc(strlen) };
@@ -374,7 +368,7 @@ char *PGCleanStrLen(const char *xstr, size_t len, char includeSpaces) {
             const char **repl = (includeSpaces ? ASCII_REPL2 : ASCII_REPL1);
 
             while(i < strlen) {
-                ch = (uint8_t)xstr[i++];
+                ch = (uint8_t)str[i++];
                 if((ch <= 0x20) || (ch == 0x1f)) addStr(repl[ch], &buffer); else addChar(ch, &buffer);
             }
 
@@ -383,11 +377,11 @@ char *PGCleanStrLen(const char *xstr, size_t len, char includeSpaces) {
                  * The last character was part of a UTF-8 unicode multi-byte
                  * character so let's make sure we got the rest of the bytes.
                  */
-                ch = (uint8_t)xstr[i++];
+                ch = (uint8_t)str[i++];
 
                 while(UNICODEMASK(ch) == 0x80) { // Only worry about trailing unicode bytes, not the starter byte.
                     addChar(ch, &buffer);
-                    ch = (uint8_t)xstr[i++];
+                    ch = (uint8_t)str[i++];
                 }
             }
 
@@ -404,13 +398,7 @@ char *PGCleanStrLen(const char *xstr, size_t len, char includeSpaces) {
     return NULL;
 }
 
-// @f:0
-#if __has_extension(attribute_overloadable)
-NSUInteger __attribute__((overloadable)) PGCStringHash(const char *str, size_t len) {
-#else
-NSUInteger PGCStringHash(const char *str, size_t len) {
-#endif
-// @f:1
+NSUInteger __pg_cstringhash(const char *str, size_t len) {
     NSUInteger _h = (31u + len);
 
     if(str && len) {
@@ -426,3 +414,25 @@ NSUInteger PGCStringHash(const char *str, size_t len) {
      */
     return (_h ?: 1);
 }
+
+#if __has_extension(attribute_overloadable)
+
+char *__attribute__((overloadable)) PGCleanStr(const char *str, size_t len, char includeSpaces) {
+    return __pg_cleanstr(str, len, includeSpaces);
+}
+
+NSUInteger __attribute__((overloadable)) PGCStringHash(const char *str, size_t len) {
+    return __pg_cstringhash(str, len);
+}
+
+#else
+
+char *PGCleanStrLen(const char *str, size_t len, char includeSpaces) {
+    return __pg_cleanStr(str, len, includeSpaces);
+}
+
+NSUInteger PGCStringHash(const char *str, size_t len) {
+    return __pg_cstringhash(str, len);
+}
+
+#endif

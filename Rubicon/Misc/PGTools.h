@@ -40,8 +40,9 @@ FOUNDATION_EXPORT const NSByte UTF8_4ByteMarkerMask;
 #define PGThrowOutOfMemoryException @throw [NSException exceptionWithName:NSMallocException reason:@"Out of memory" userInfo:nil]
 #define PGThrowNullPointerException @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"NULL pointer." userInfo:nil]
 
-#define PGSETIFNIL(l, f, v)  PGBLKOPEN if((f) == nil) { @synchronized(l) { if((f) == nil) (f) = (v); }} PGBLKCLOSE
-#define PGSETIFZERO(l, f, v) PGBLKOPEN if((f) == (0)) { @synchronized(l) { if((f) == (0)) (f) = (v); }} PGBLKCLOSE
+#define PGSETIFNIL(l, f, v)  PGBLKOPEN if((f)  == nil) { @synchronized(l) { if((f)  == nil) (f) = (v); }} PGBLKCLOSE
+#define PGSETIFNULL(l, f, v) PGBLKOPEN if((f) == NULL) { @synchronized(l) { if((f) == NULL) (f) = (v); }} PGBLKCLOSE
+#define PGSETIFZERO(l, f, v) PGBLKOPEN if((f)  == (0)) { @synchronized(l) { if((f)  == (0)) (f) = (v); }} PGBLKCLOSE
 
 #define PG_BRDG_CAST(t)  (__bridge t *)
 
@@ -180,14 +181,14 @@ FOUNDATION_EXPORT BOOL PGReadIntoBuffer(NSInputStream *input, void *buffer, NSUI
 
 FOUNDATION_EXPORT NSUInteger PGCStringHash(const char *str, size_t len) __attribute__((overloadable));
 
-FOUNDATION_EXPORT char *PGCleanStr(const char *xstr, size_t len, char includeSpaces) __attribute__((overloadable));
+FOUNDATION_EXPORT char *PGCleanStr(const char *str, size_t len, char includeSpaces) __attribute__((overloadable));
 
 NS_INLINE NSUInteger __attribute__((overloadable)) PGCStringHash(const char *str) {
     return PGCStringHash(str, (str ? strlen(str) : 0));
 }
 
-NS_INLINE char *__attribute__((overloadable)) PGCleanStr(const char *xstr, char includeSpaces) {
-    return PGCleanStr(xstr, strlen(xstr), includeSpaces);
+NS_INLINE char *__attribute__((overloadable)) PGCleanStr(const char *str, char includeSpaces) {
+    return PGCleanStr(str, strlen(str), includeSpaces);
 }
 
 #else
@@ -200,8 +201,8 @@ NS_INLINE NSUInteger PGCStrHash(const char *str) {
     return PGCStringHash(str, (str ? strlen(str) : 0));
 }
 
-NS_INLINE char *PGCleanStr(const char *xstr, char includeSpaces) {
-    return PGCleanStrLen(xstr, strlen(xstr), includeSpaces);
+NS_INLINE char *PGCleanStr(const char *str, char includeSpaces) {
+    return PGCleanStrLen(str, strlen(str), includeSpaces);
 }
 
 #endif
