@@ -40,42 +40,6 @@ typedef NSMutableArray<NSString *> *NSMutableStrArray;
     #define PGBLKCLOSE } while(0)
 #endif
 
-NS_INLINE void __test(NSString *str) {
-    do {
-        NSString *__pg_casev = [str copy];
-        BOOL     __pg_casefall;
-        {
-            __pg_casefall = NO;
-        }
-        if(__pg_casefall || [@"Sue" isEqualToString:__pg_casev]) {
-            __pg_casefall = YES;
-            NSLog(@"Her name was %@.", @"Sue");
-            break;
-        }
-        if(__pg_casefall || [@"Cindy" isEqualToString:__pg_casev]) {
-            __pg_casefall = YES;
-            NSLog(@"Her name was %@.", @"Cindy");
-            break;
-        }
-        if(__pg_casefall || [@"Mike" isEqualToString:__pg_casev]) {
-            __pg_casefall = YES;
-            NSLog(@"His name was %@.", @"Mike");
-            break;
-        }
-        if(__pg_casefall || [@"Bob" isEqualToString:__pg_casev]) {
-            __pg_casefall = YES;
-            NSLog(@"His name was %@.", @"Bob");
-            break;
-        }
-        {
-            __pg_casefall = YES;
-            NSLog(@"%@ - %@", @"He who has no name", str);
-            break;
-        }
-    }
-    while(0);
-}
-
 #ifndef PGSWITCH
     #define PGSWITCH(v) PGBLKOPEN NSString *__pg_casev = [v copy]; BOOL __pg_casefall; { __pg_casefall = NO
     #define PGCASE(v)   } if(__pg_casefall || PGStringsEqual(__pg_casev, (v))) { __pg_casefall = YES;

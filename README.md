@@ -178,7 +178,7 @@ function that is found in most newer Linux versions. *see
 ## sem_timedwait
 
 The function **sem_timedwait** exists in most Linux implementations but because
-it is a rather new addition to the POSIX pthreads specification it does not exists
+it is a rather new addition to the POSIX pthreads specification it does not exist
 everywhere and macOS is no exception. However, because it's a very handy function,
 [Keith Shortridge](https://www.aao.gov.au/science/research/staff/Keith%20Shortridge "Keith Shortridge, AAO")
 from the Australian Astronomical Observatory (AAO) has created an implementation
