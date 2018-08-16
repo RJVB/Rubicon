@@ -45,6 +45,10 @@ FOUNDATION_EXPORT const NSByte UTF8_4ByteMarkerMask;
 
 #define PG_BRDG_CAST(t)  (__bridge t *)
 
+FOUNDATION_EXPORT size_t PGCopyString(char **ptr, const char *str);
+
+FOUNDATION_EXPORT NSUInteger PGByteBufferHash(const voidp buffer, size_t length);
+
 /**
  * Given a string, this function will prefix all of the specified characters with the escapeChar.
  *

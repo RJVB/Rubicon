@@ -30,6 +30,9 @@ NSExceptionName const PGSemaphoreException     = @"PGSemaphoreException";
 NSExceptionName const PGReadWriteLockException = @"PGReadWriteLockException";
 NSExceptionName const PGOSErrorException       = @"PGOSErrorException";
 
+NSNotificationName const PGSimpleBufferDataChangedNotification = @"PGSimpleBufferDataChangedNotification";
+NSNotificationName const PGSimpleBufferDeallocNotification     = @"PGSimpleBufferDeallocNotification";
+
 NSString *const PGDefaultSemaphoreNamePrefix = @"/sem";
 
 const NSInteger PGErrorCodeUnknownError       = 1;
@@ -38,9 +41,9 @@ const NSInteger PGErrorCodeCmdLineParseError  = 101;
 const NSInteger PGErrorCodeRegexPatternIsNULL = 102;
 const NSInteger PGErrorCodeNoDelegate         = 103;
 
-const NSInteger PGErrorCodeIOError                 = 200;
-const NSInteger PGErrorCodeNoInputStream           = 201;
-const NSInteger PGErrorCodeUnknownInputStreamError = 202;
+const NSInteger PGErrorCodeIOError                   = 200;
+const NSInteger PGErrorCodeNoInputStream             = 201;
+const NSInteger PGErrorCodeUnknownInputStreamError   = 202;
 const NSInteger PGErrorCodeInputStreamClosed       = 203;
 const NSInteger PGErrorCodeUnexpectedEndOfInput    = 204;
 
@@ -66,8 +69,10 @@ NSString *const PGErrorMsgCannotRotateNode        = @"Cannot rotate node to the 
 NSString *const PGErrorMsgNoDirectCreation        = @"You cannot directly create and instance of this class: %@";
 NSString *const PGErrorMsgIndexOutOfBounds        = @"Index out of bounds.";
 NSString *const PGErrorMsgNoModificationAllowed   = @"No modification allowed.";
-NSString *const PGErrorMsgAbstractClass           = @"Instances of abstract class \"%@\" cannot be created.";
-NSString *const PGErrorMsgAbstractMethod          = @"The method \"%@\" is abstract.";
-NSString *const PGErrorMsgBadConstructor          = @"The selector \"%@\" cannot be used to create instances of the class \"%@\".";
-NSString *const PGErrorMsgCannotCompare           = @"Class %@ cannot be compared to class %@.";
-NSString *const PGErrorMsgRangeOutOfBounds        = @"Range {%lu, %lu} out of bounds; max length %lu";
+NSString        *const PGErrorMsgAbstractClass       = @"Instances of abstract class \"%@\" cannot be created.";
+NSString        *const PGErrorMsgAbstractMethod      = @"The method \"%@\" is abstract.";
+NSString        *const PGErrorMsgBadConstructor      = @"The selector \"%@\" cannot be used to create instances of the class \"%@\".";
+NSString        *const PGErrorMsgCannotCompare       = @"Class %@ cannot be compared to class %@.";
+NSString        *const PGErrorMsgRangeOutOfBounds    = @"Range {%lu, %lu} out of bounds; max length %lu";
+NSString        *const PGErrorMsgZeroLengthBuffer    = @"Buffer cannot have zero length.";
+NSString        *const PGErrorMsgRotateCountTooLarge = @"Rotate count is greater than the length of the buffer.";

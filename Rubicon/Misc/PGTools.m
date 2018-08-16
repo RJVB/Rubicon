@@ -76,6 +76,20 @@ BOOL PGSaveImageAsPNG(NSBitmapImageRep *image, NSString *filename, NSError **err
     return [pngData writeToFile:filename options:0 error:error];
 }
 
+size_t PGCopyString(char **ptr, const char *str) {
+    size_t len = 0;
+
+    if(!ptr) PGThrowNullPointerException;
+    else if(str) {
+        len = strlen(str);
+        *ptr = PGMalloc(len + 1);
+        memcpy(*ptr, str, len + 1);
+    }
+    else *ptr = NULL;
+
+    return len;
+}
+
 NSString *PGStrError(int osErrNo) {
     return [NSString stringWithUTF8String:strerror(osErrNo)];
 }
@@ -397,21 +411,30 @@ char *__pg_cleanstr(const char *str, size_t len, char includeSpaces) {
     return NULL;
 }
 
-NSUInteger __pg_cstringhash(const char *str, size_t len) {
-    NSUInteger _h = (31u + len);
+NSUInteger PGByteBufferHash(const voidp buffer, size_t length) {
+    if(buffer) {
+        if(length) {
+            NSUInteger *p = buffer;
+            NSUInteger h  = (31u + length);
+            NSUInteger l  = MIN(length, 4096);
+            NSUInteger m = (l / sizeof(NSUInteger));
+            NSUInteger o = (l % sizeof(NSUInteger));
 
-    if(str && len) {
-        /*
-         * Only bother with the first 256 characters.
-         */
-        size_t j = MIN(len, 256);
-        for(size_t i = 0; i < j; i++) _h = ((_h * 31u) + ((NSUInteger)str[i]));
+            if(m) while(m--) h = ((h * 31u) + (*(p++)));
+
+            if(o) {
+                NSUInteger r = 0;
+                memcpy(&r, p, o);
+                h = ((h * 31u) + r);
+            }
+
+            return h;
+        }
+
+        return 1;
     }
 
-    /*
-     * Just in case we end up with a zero hash.
-     */
-    return (_h ?: 1);
+    return 0;
 }
 
 #if __has_extension(attribute_overloadable)
@@ -421,7 +444,7 @@ char *__attribute__((overloadable)) PGCleanStr(const char *str, size_t len, char
 }
 
 NSUInteger __attribute__((overloadable)) PGCStringHash(const char *str, size_t len) {
-    return __pg_cstringhash(str, len);
+    return PGByteBufferHash((voidp const)str, len);
 }
 
 #else

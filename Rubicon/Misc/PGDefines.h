@@ -93,6 +93,9 @@ FOUNDATION_EXPORT NSExceptionName const PGSemaphoreException;
 FOUNDATION_EXPORT NSExceptionName const PGReadWriteLockException;
 FOUNDATION_EXPORT NSExceptionName const PGOSErrorException;
 
+FOUNDATION_EXPORT NSNotificationName const PGSimpleBufferDataChangedNotification;
+FOUNDATION_EXPORT NSNotificationName const PGSimpleBufferDeallocNotification;
+
 FOUNDATION_EXPORT NSString *const PGDefaultSemaphoreNamePrefix;
 
 FOUNDATION_EXPORT NSString *const PGErrorMsgBadRegexPattern;
@@ -114,6 +117,8 @@ FOUNDATION_EXPORT NSString *const PGErrorMsgAbstractMethod;
 FOUNDATION_EXPORT NSString *const PGErrorMsgBadConstructor;
 FOUNDATION_EXPORT NSString *const PGErrorMsgCannotCompare;
 FOUNDATION_EXPORT NSString *const PGErrorMsgRangeOutOfBounds;
+FOUNDATION_EXPORT NSString *const PGErrorMsgZeroLengthBuffer;
+FOUNDATION_EXPORT NSString *const PGErrorMsgRotateCountTooLarge;
 
 #if !defined(__PGExceptionTests__)
     #define __PGExceptionTests__    1

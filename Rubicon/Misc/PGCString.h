@@ -4,7 +4,21 @@
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
  *        DATE: 6/27/18
- *  VISIBILITY: Private
+ *       NOTES: If you will be using PGCString in a multithreaded environment and you will be making changes to the underlying raw data
+ *              (updating the char array returned by the "cString" property) then it is advisable to lock this object before reading or
+ *              writing to the underlying string buffer and unlocking afterwards.For example:
+ *
+ *                  PGCString *pgcstr = [PGCString stringWithCString:"a string"];
+ *                  [pgcstr lock];
+ *                  @try {
+ *                      char *buf = pgcstr.cString;
+ *                      <do something that updates the contents of "buf">
+ *                  }
+ *                  @finally { [pgcstr unlock]; }
+ *
+ *              The methods hash, isEqual:, isEqualToCString:, isEqualToNSString:, isEqualToString:, compare:, compareToNSString:,
+ *              compareToCString:, setCString:, copy, and copyWithZone: automatically lock and unlock the object when called.
+ *
  *
  * Copyright © 2018 Project Galen. All rights reserved.
  *
@@ -23,9 +37,26 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PGCString : NSObject<NSCopying>
+/**
+ * If you will be using PGCString in a multithreaded environment and you will be making changes to the underlying raw data
+ * (updating the char array returned by the "cString" property) then it is advisable to lock this object before reading or
+ * writing to the underlying string buffer and unlocking afterwards. For example:
+ *
+ *     PGCString *pgcstr = [PGCString stringWithCString:"a string"];
+ *     [pgcstr lock];
+ *     @try {
+ *         char *buf = pgcstr.cString;
+ *         <do something that updates the contents of "buf">
+ *     }
+ *     @finally { [pgcstr unlock]; }
+ *
+ * The methods hash, isEqual:, isEqualToCString:, isEqualToNSString:, isEqualToString:, compare:, compareToNSString:,
+ * compareToCString:, setCString:, copy, and copyWithZone: automatically lock and unlock the object when called.
+ */
 
-    @property(nullable, readonly) const char *cString;
+@interface PGCString : NSObject<NSCopying, NSLocking>
+
+    @property(nullable) /*     */ const char *cString;
     @property(nullable, readonly) NSString   *nsString;
     @property(readonly) /*     */ NSUInteger length;
 
@@ -37,15 +68,17 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(BOOL)isEqualToNSString:(nullable NSString *)other;
 
-    -(BOOL)isEqual:(nullable id)other;
-
     -(BOOL)isEqualToString:(nullable PGCString *)other;
+
+    -(BOOL)isEqual:(nullable id)other;
 
     -(NSUInteger)hash;
 
     -(NSComparisonResult)compare:(nullable id)object;
 
     -(NSComparisonResult)compareToNSString:(nullable NSString *)string;
+
+    -(id)copyWithZone:(nullable NSZone *)zone;
 
     -(NSComparisonResult)compareToCString:(nullable const char *)cString;
 
