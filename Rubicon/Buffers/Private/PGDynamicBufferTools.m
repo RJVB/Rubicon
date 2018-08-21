@@ -17,227 +17,227 @@
 
 #import "PGDynamicBufferTools.h"
 
-#define NSUIntegerSize sizeof(NSUInteger)
-
-typedef union {
-    NSUInteger word;
-    NSByte     bytes[NSUIntegerSize];
-} NSHashHelper;
-
-#define HP            (31u)
-#define FOOHASH(h, v) ((h)=(((h)*(HP))+(v)))
-#define FOOCAST(t, p) (*((const t *)((cvoidp)(p))))
-
-NS_INLINE NSUInteger qCalculateHash3(const NSByte *b, NSUInteger *h, NSUInteger s, NSUInteger c, NSUInteger hash) {
-    if(c) {
-        NSHashHelper   hh = { .word = 0 };
-        for(NSUInteger i  = 0; i < c; i++) hh.bytes[i] = b[qPostAdd(h, 1, s)];
-        FOOHASH(hash, hh.word);
+void PGNormalizeByteQueue(PGByteQueuePtr q) {
+    if(q->qhead == q->qtail) {
+        q->qhead = q->qtail = 0;
     }
+    else if((q->qtail < q->qhead)) {
+        NSUInteger topSize  = (q->qsize - q->qhead);
+        NSUInteger dataSize = (q->qtail + topSize);
+        NSByte     *tbuf    = PGMalloc(q->qsize);
 
-    return hash;
-}
-
-NS_INLINE NSUInteger qCalculateHash2(const NSByte *b, NSUInteger *h, NSUInteger s, NSUInteger c, NSUInteger hash) {
-    for(NSUInteger i = 0; i < c; i++) FOOHASH(hash, FOOCAST(NSUInteger, b + qPostAdd(h, NSUIntegerSize, s)));
-    return hash;
-}
-
-NS_INLINE NSUInteger qCalculateHash1(const NSByte *b, NSUInteger h, NSUInteger s, NSUInteger c) {
-    return (c ? qCalculateHash3(b, &h, s, (c % NSUIntegerSize), qCalculateHash2(b, &h, s, (c / NSUIntegerSize), (HP + c))) : HP);
-}
-
-NSUInteger qCalculateHash(const PGByteQueue *q) {
-    return qCalculateHash1(q->qbuffer, q->qhead, q->qsize, QCOUNT(q));
-}
-
-PGByteQueue *qCreateNewBuffer(NSUInteger initialSize, NSUInteger currentSize) {
-    PGByteQueue *q = PGCalloc(1, sizeof(PGByteQueue));
-    q->qsize   = umax(currentSize, initialSize);
-    q->qinit   = initialSize;
-    q->qbuffer = PGCalloc(1, q->qsize);
-    return q;
-}
-
-PGByteQueue *qCopyQueueData(PGByteQueue *dest, const PGByteQueue *src) {
-    if(src && dest) {
-        BOOL w = QWRAPPED(src);
-
-        dest->qhead = 0;
-        dest->qtail = (w ? (QSZHD(src) + src->qtail) : QTLHD(src));
-
-        if(dest->qtail) {
-            NSUInteger t = (w ? QSZHD(src) : QTLHD(src));
-            PGMemCopy(dest->qbuffer, QHEADP(src), t);
-            if(w && src->qtail) PGMemCopy((dest->qbuffer + t), src->qbuffer, src->qtail);
-        }
-
-        return dest;
+        memcpy(tbuf, (q->qbuffer + q->qhead), topSize);
+        if(q->qtail) memcpy((tbuf + topSize), q->qbuffer, q->qtail);
+        free(q->qbuffer);
+        q->qbuffer = tbuf;
+        q->qhead   = 0;
+        q->qtail   = dataSize;
     }
-
-    PGThrowNullPointerException;
-}
-
-PGByteQueue *qCreateExactCopy(const PGByteQueue *q) {
-    if(q && q->qbuffer) {
-        PGByteQueue *c = qCreateNewBuffer(q->qinit, q->qsize);
-        c->qhead = q->qhead;
-        c->qtail = q->qtail;
-
-        if(QWRAPPED(q)) {
-            PGMemCopy(QHEADP(c), QHEADP(q), QSZHD(q));
-            PGMemCopy(c->qbuffer, q->qbuffer, q->qtail);
-        }
-        else {
-            PGMemCopy(QHEADP(c), QHEADP(q), QTLHD(q));
-        }
-
-        return c;
+    else if(q->qhead) {
+        NSUInteger dataSize = (q->qtail - q->qhead);
+        memmove(q->qbuffer, (q->qbuffer + q->qhead), dataSize);
+        q->qhead = 0;
+        q->qtail = dataSize;
     }
-
-    PGThrowNullPointerException;
 }
 
-PGByteQueue *qCreateNormalizedCopy(const PGByteQueue *q) {
-    if(q && q->qbuffer) return qCopyQueueData(qCreateNewBuffer(q->qinit, q->qsize), q); else PGThrowNullPointerException;
-}
+PGByteQueuePtr PGCreateByteQueue(NSUInteger initialSize) {
+    if(initialSize == 0) PGThrow(NSInvalidArgumentException, @"Zero length buffer size.");
+    PGByteQueuePtr q = malloc(sizeof(PGByteQueue));
 
-BOOL qCompareQueues(const PGByteQueue *q1, const PGByteQueue *q2) {
-    if(q1 && q2) {
-        NSUInteger   h1  = q1->qhead, t1 = q1->qtail, h2 = q2->qhead, s1 = q1->qsize, s2 = q2->qsize;
-        const NSByte *b1 = q1->qbuffer;
-        const NSByte *b2 = q2->qbuffer;
-
-        while(h1 != t1) {
-            if(b1[qPostAdd(&h1, 1, s1)] != b2[qPostAdd(&h2, 1, s2)]) return NO;
-        }
-
-        return YES;
-    }
-
-    return (q1 == q2);
-}
-
-PGByteQueue *qDestroyQueue(PGByteQueue *q) {
     if(q) {
-        if(q->qbuffer) {
-            memset(q->qbuffer, 0, q->qsize);
-            free(q->qbuffer);
-        }
+        q->qinit = q->qsize = MAX(initialSize, PGDynByteQueueMinSize);
+        q->qhead   = q->qtail = 0;
+        q->qbuffer = malloc(q->qsize);
 
-        memset(q, 0, sizeof(PGByteQueue));
+        if(q->qbuffer) return q;
+
         free(q);
     }
 
-    return NULL;
+    PGThrowOutOfMemoryException;
 }
 
-void qBottomUpFirst(PGByteQueue *q, NSUInteger lim) {
-    /*
-     * We start by moving the bottom up to make
-     * just enough room to move the top down. When
-     * we're done the data will already be at the
-     * beginning of the buffer.
-     */
-    PGMemMove((q->qbuffer + lim), q->qbuffer, q->qtail);
-    PGMemMove(q->qbuffer, QHEADP(q), lim);
-}
+void PGDestroyByteQueue(PGByteQueuePtr q, BOOL secure) {
+    if(q) {
+        if(q->qbuffer) {
+            if(secure) memset(q->qbuffer, 0, q->qsize);
+            free(q->qbuffer);
+        }
 
-void qTopDownFirst(PGByteQueue *q, NSUInteger lim, NSUInteger qc) {
-    /*
-     * We start by moving the top down as far as we can
-     * so that we can move the bottom up above it.
-     */
-    PGMemMove(QHEADP(q), QTAILP(q), lim);
-    PGMemMove((q->qbuffer + qc), q->qbuffer, q->qtail);
-    PGMemMove(q->qbuffer, QTAILP(q), qc);
-}
-
-void qUnwrapInPlaceAndShrink(PGByteQueue *q, NSUInteger lim, NSUInteger fsp, NSUInteger ns, NSUInteger qc) {
-    /*
-     * We have enough room to move the bottom up first
-     * which is nice because this will take one fewer
-     * move operation than if we had to move the top
-     * down first.
-     */
-    if(lim <= fsp) qBottomUpFirst(q, lim); else qTopDownFirst(q, lim, qc);
-    q->qhead   = 0;
-    q->qtail   = qc;
-    q->qbuffer = PGRealloc(q->qbuffer, (q->qsize = ns));
-}
-
-void qUnwrapWithTempAndShrink(PGByteQueue *q, NSUInteger lim, NSUInteger ns, NSUInteger qc) {
-    /*
-     * There's not enough room to efficiently unwrap the data
-     * so let's just create a new buffer and copy the data.
-     */
-    NSByte *b = PGMalloc((q->qsize = ns));
-
-    PGMemCopy(b, QHEADP(q), lim);
-    PGMemCopy((b + lim), q->qbuffer, q->qtail);
-    free(q->qbuffer); // Free the old buffer.
-
-    q->qbuffer = b;
-    q->qhead   = 0;
-    q->qtail   = qc;
-}
-
-void qUnwrapAndShrink(PGByteQueue *q, NSUInteger ns, NSUInteger qc) {
-    /*
-     * We would like to simply unwrap the data in-place. If we can't
-     * do that then we'll simply create a new buffer and copy the
-     * data over.
-     */
-    NSUInteger lim = QSZHD(q);
-    NSUInteger fsp = (q->qhead - q->qtail);
-
-    if(fsp < umin(lim, q->qtail)) qUnwrapWithTempAndShrink(q, lim, ns, qc); else qUnwrapInPlaceAndShrink(q, lim, fsp, ns, qc);
-}
-
-void qShrinkQueue(PGByteQueue *q, NSUInteger ns, NSUInteger qc) {
-    /*
-     * If the data is unwrapped then it's pretty straight forward.
-     */
-    PGMemMove(q->qbuffer, QHEADP(q), qc);
-    q->qhead   = 0;
-    q->qtail   = qc;
-    q->qbuffer = PGRealloc(q->qbuffer, (q->qsize = ns));
-}
-
-#define FOOMULT(v, f)             ((NSUInteger)(ceil(((double)(v))*((double)(f)))))
-#define FOOSHRINKTEST(mn, ns, qc) (((ns)>(mn))&&((qc)<=(FOOMULT((ns),(0.25)))))
-
-void _qTryShrink(PGByteQueue *q, NSUInteger qc, NSUInteger ns) {
-    /*
-     * As long as the data size is less than 1/4 the current buffer size
-     * then cut the buffer size in half but never make it less than the
-     * initial size.
-     */
-    if(FOOSHRINKTEST(q->qinit, ns, qc)) {
-        do { ns = umax(q->qinit, FOOMULT(ns, 0.5)); } while(FOOSHRINKTEST(q->qinit, ns, qc));
-        if(QWRAPPED(q)) qUnwrapAndShrink(q, ns, qc); else qShrinkQueue(q, ns, qc);
+        if(secure) memset(q, 0, sizeof(PGByteQueue));
+        free(q);
     }
 }
 
-void qTryShrink(PGByteQueue *q) {
-    if(q) _qTryShrink(q, QCOUNT(q), q->qsize); else PGThrowNullPointerException;
-}
+NSUInteger PGByteQueueEnsureRoom(PGByteQueuePtr q, NSUInteger delta) {
+    NSUInteger byteCount = PGQueueByteCount(q);
+    NSUInteger needed    = (byteCount + delta);
+    NSUInteger size      = q->qsize;
 
-NSUInteger qNextSize(NSUInteger needed, NSUInteger newSize) {
-    while(newSize <= needed) newSize *= 2;
-    return newSize;
-}
+    if(size <= needed) {
+        /* Take the current size and keep doubling it until we have enough room. */
+        do { size *= 2; } while(size <= needed);
 
-void _qTryGrow(PGByteQueue *q, NSUInteger needed, NSUInteger newSize) {
-    NSUInteger originalSize = q->qsize;
+        q->qbuffer = PGRealloc(q->qbuffer, size);
 
-    if(newSize <= needed) {
-        newSize = qNextSize(needed, newSize);
-        q->qbuffer = PGRealloc(q->qbuffer, (q->qsize = newSize));
-        if(QWRAPPED(q)) PGMemMove(QPTR(q, originalSize), q->qbuffer, qTailPostAdd(q, originalSize));
+        if(q->qtail && (q->qtail < q->qhead)) memmove((q->qbuffer + q->qsize), q->qbuffer, q->qtail);
+        if(q->qhead) memmove(q->qbuffer, (q->qbuffer + q->qhead), byteCount);
+
+        q->qhead = 0;
+        q->qtail = byteCount;
+        q->qsize = size;
     }
+
+    return q->qsize;
 }
 
-void qTryGrow(PGByteQueue *q, NSUInteger needed) {
-    if(q) _qTryGrow(q, needed, q->qsize); else PGThrowNullPointerException;
+NS_INLINE BOOL mcmp(const uint8_t *p1, const uint8_t *p2, size_t l) {
+    return ((l == 0) || (memcmp(p1, p2, l) == 0));
+}
+
+BOOL PGByteQueueCompare(PGByteQueuePtr q1, PGByteQueuePtr q2) {
+    if(q1 == q2) return YES;
+    if(q1 && q2) {
+        NSUInteger bc1 = PGQueueByteCount(q1);
+        NSUInteger bc2 = PGQueueByteCount(q2);
+
+        if(bc1 == bc2) {
+            if(bc1 == 0) return YES;
+
+            NSUInteger q1head   = q1->qhead; /* The index of queue 1's head pointer. */
+            NSUInteger q2head   = q2->qhead; /* The index of queue 2's head pointer. */
+            NSUInteger q1tail   = q1->qtail; /* The index of queue 1's tail pointer. */
+            NSUInteger q2tail   = q2->qtail; /* The index of queue 2's tail pointer. */
+            NSUInteger q1top    = (q1->qsize - q1head); /* The distance from queue 1's head pointer to the top of the buffer. */
+            NSUInteger q2top    = (q2->qsize - q2head); /* The distance from queue 2's head pointer to the top of the buffer. */
+            NSUInteger q2toprem = (q2top - q1top);
+            NSUInteger q1toprem = (q1top - q2top);
+            NSByte     *pq1buff = q1->qbuffer;
+            NSByte     *pq2buff = q2->qbuffer;
+            NSByte     *pq1head = (pq1buff + q1head);
+            NSByte     *pq2head = (pq2buff + q2head);
+            NSByte     *p2      = (pq2head + q1top);
+            NSByte     *p3      = (pq1buff + q2toprem);
+            NSByte     *p4      = (pq1head + q2top);
+            NSByte     *p5      = (pq2buff + q1toprem);
+
+            BOOL norm1 = (q1head < q1tail); /* True if queue 1 is NOT wrapped. */
+            BOOL norm2 = (q2head < q2tail); /* True if queue 2 is NOT wrapped. */
+            /*
+             * We have 6 use cases:
+             */
+            BOOL case1 = (norm1 && norm2);
+            /*
+             * 1) Neither queue is wrapped.
+             *
+             *               0   1   2   3   4   5   6   7   8   9   10  11
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *  Queue 1 -> |   |   | A | B | C | D | E | F | G | H |   |   |
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *                      |H|                             |T|
+             *
+             *               0   1   2   3   4   5   6   7   8   9   10  11
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *  Queue 2 -> | A | B | C | D | E | F | G | H |   |   |   |   |
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *              |H|                             |T|
+             */
+            BOOL case2 = norm1;
+            /*
+             * 2) Only the second queue is wrapped.
+             *
+             *               0   1   2   3   4   5   6   7   8   9   10  11
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *  Queue 1 -> |   |   | A | B | C | D | E | F | G | H |   |   |
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *                      |H|                             |T|
+             *
+             *               0   1   2   3   4   5   6   7   8   9   10  11
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *  Queue 2 -> | G | H |   |   |   |   | A | B | C | D | E | F |
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *                      |T|             |H|
+             */
+            BOOL case3 = norm2;
+            /*
+             * 3) Only the first queue is wrapped.
+             *
+             *               0   1   2   3   4   5   6   7   8   9   10  11
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *  Queue 1 -> | G | H |   |   |   |   | A | B | C | D | E | F |
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *                      |T|             |H|
+             *
+             *               0   1   2   3   4   5   6   7   8   9   10  11
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *  Queue 2 -> |   |   | A | B | C | D | E | F | G | H |   |   |
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *                      |H|                             |T|
+             */
+            BOOL case4 = (q1top == q2top);
+            /*
+             * 4) Both queues are wrapped but at the exact same point. (Their head pointers are the same.)
+             *
+             *               0   1   2   3   4   5   6   7   8   9   10  11
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *  Queue 1 -> | G | H |   |   |   |   | A | B | C | D | E | F |
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *                      |T|             |H|
+             *
+             *               0   1   2   3   4   5   6   7   8   9   10  11
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *  Queue 2 -> | G | H |   |   |   |   | A | B | C | D | E | F |
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *                      |T|             |H|
+             */
+            BOOL case5 = (q1top < q2top);
+            /*
+             * 5) Both queues are wrapped with the 1st queue's top portion smaller than the 2nd queue's.
+             *
+             *               0   1   2   3   4   5   6   7   8   9   10  11
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *  Queue 1 -> | D | E | F | G | H |   |   |   |   | A | B | C |
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *             |           |       ||T|            ||H|        |
+             *             \__________/\______/                \__________/
+             *               q2toprem   q2tail                    q1top
+             *
+             *               0   1   2   3   4   5   6   7   8   9   10  11
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *  Queue 2 -> | G | H |   |   |   |   | A | B | C | D | E | F |
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *             |       ||T|            ||H|        |           |
+             *             \______/                \__________/\__________/
+             *              q2tail                    q1top      q2toprem
+             */
+            /*
+             * 6) Both queues are wrapped with the 1st queue's top portion larger than the 2nd queue's.
+             *
+             *               0   1   2   3   4   5   6   7   8   9   10  11
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *  Queue 1 -> | G | H |   |   |   |   | A | B | C | D | E | F |
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *             |       ||T|            ||H|        |           |
+             *             \______/                \__________/\__________/
+             *              q1tail                    q2top      q1toprem
+             *
+             *               0   1   2   3   4   5   6   7   8   9   10  11
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *  Queue 2 -> | D | E | F | G | H |   |   |   |   | A | B | C |
+             *             +---+---+---+---+---+---+---+---+---+---+---+---+
+             *             |           |       ||T|            ||H|        |
+             *             \__________/\______/                \__________/
+             *               q1toprem   q1tail                    q2top
+             */
+            /**/ if(case1) return mcmp(pq1head, pq2head, bc1);
+            else if(case2) return (mcmp(pq1head, pq2head, q2top) && mcmp(p4, pq2buff, q2tail));
+            else if(case3) return (mcmp(pq2head, pq1head, q1top) && mcmp(p2, pq1buff, q1tail));
+            else if(case4) return (mcmp(pq1head, pq2head, q1top) && mcmp(pq1buff, pq2buff, q1tail));
+            else if(case5) return (mcmp(pq1head, pq2head, q1top) && mcmp(pq1buff, p2, q2toprem) && mcmp(p3, pq2buff, q2tail));
+            else /*     */ return (mcmp(pq2head, pq2head, q2top) && mcmp(pq2buff, p4, q1toprem) && mcmp(p5, pq1buff, q1tail));
+        }
+    }
+
+    return NO;
 }

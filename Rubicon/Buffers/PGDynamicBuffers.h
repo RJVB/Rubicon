@@ -28,11 +28,12 @@ FOUNDATION_EXPORT const NSUInteger PGDynByteQueueMinSize;
 
 typedef NSInteger (^PGDynamicByteBufferOpBlock)(NSByte *buffer, NSUInteger size, NSUInteger *pHead, NSUInteger *pTail, NSError **error);
 
-@interface PGDynamicByteQueue : NSObject<NSCopying>
+@interface PGDynamicByteQueue : NSObject<NSCopying, NSLocking>
 
     @property(readonly) NSUInteger count;
     @property(readonly) BOOL       isEmpty;
     @property /*     */ BOOL       willShrink;
+    @property /*     */ BOOL       secure;
 
     -(instancetype)init NS_DESIGNATED_INITIALIZER;
 

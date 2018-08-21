@@ -31,6 +31,7 @@ typedef struct {
     NSUInteger qtail;
     NSByte     *qbuffer;
 }                        PGByteQueue;
+typedef PGByteQueue      *PGByteQueuePtr;
 
 typedef struct {
     NSByte     *bytes;
@@ -38,78 +39,36 @@ typedef struct {
     NSUInteger aux1;
     NSUInteger aux2;
 }                        PGByteBuffer;
+typedef PGByteBuffer     *PGByteButterPtr;
 
 typedef struct {
     PGByteBuffer **list;
     NSUInteger   length;
 }                        PGByteBufferList;
+typedef PGByteBufferList *PGByteBufferListPtr;
 
 @interface PGDynamicByteQueue()
 
-    -(instancetype)initWithByteQueue:(const PGByteQueue *)byteQueue NS_DESIGNATED_INITIALIZER;
+    @property(readonly) NSUInteger     roomRemaining;
+    @property(nullable) PGByteQueuePtr q;
 
-    -(void)_createBuffer:(NSUInteger)initialSize;
-
-    -(void)_ensureSize:(NSUInteger)length;
-
-    -(NSInteger)_performOperation:(PGDynamicByteBufferOpBlock)opBlock byteQueue:(PGByteQueue *)queue error:(NSError **)error;
-
-    -(NSInteger)_performOperation:(PGDynamicByteBufferOpBlock)opBlock error:(NSError **)error;
-
-    -(void)_tryShrink;
-
-    -(NSByte *)_getBytes:(NSUInteger)len;
 @end
 
-#define QCOUNT(q)     ((((q)->qhead)<=((q)->qtail))?(((q)->qtail)-((q)->qhead)):((((q)->qsize)-((q)->qhead))+((q)->qtail)))
-#define QEMPTY(q)     (((q)->qhead)==((q)->qtail))
-#define QNOTEMPTY(q)  (((q)->qhead)!=((q)->qtail))
-#define QWRAPPED(q)   (((q)->qtail)<((q)->qhead))
-#define QPTR(q, d)    (((q)->qbuffer)+(d))
-#define QHEADP(q)     (((q)->qbuffer)+((q)->qhead))
-#define QTAILP(q)     (((q)->qbuffer)+((q)->qtail))
-#define QSZHD(q)      (((q)->qsize)-((q)->qhead))
-#define QTLHD(q)      (((q)->qtail)-((q)->qhead))
+FOUNDATION_EXPORT PGByteQueuePtr PGCreateByteQueue(NSUInteger initialSize);
 
-// @f:0
-NS_INLINE NSUInteger umin(NSUInteger i1, NSUInteger i2)                  { return ((i1 <= i2) ? i1 : i2);                         }
-NS_INLINE NSUInteger umax(NSUInteger i1, NSUInteger i2)                  { return ((i1 <= i2) ? i2 : i1);                         }
+FOUNDATION_EXPORT void PGNormalizeByteQueue(PGByteQueuePtr q);
 
-NS_INLINE NSUInteger qPreAdd(NSUInteger *i, NSUInteger d, NSUInteger s)  { return (*i) = (((*i) + d) % s);                        }
-NS_INLINE NSUInteger qPreSub(NSUInteger *i, NSUInteger d, NSUInteger s)  { return (*i) = (((d <= (*i)) ? (*i) : (s + (*i))) - d); }
-NS_INLINE NSUInteger qPostAdd(NSUInteger *i, NSUInteger d, NSUInteger s) { NSUInteger j = (*i); qPreAdd(i, d, s); return j;       }
-NS_INLINE NSUInteger qPostSub(NSUInteger *i, NSUInteger d, NSUInteger s) { NSUInteger j = (*i); qPreSub(i, d, s); return j;       }
+FOUNDATION_EXPORT void PGDestroyByteQueue(PGByteQueuePtr q, BOOL secure);
 
-NS_INLINE NSUInteger qHeadPostAdd(PGByteQueue *q, NSUInteger d)        { return qPostAdd(&q->qhead, d, q->qsize);               }
-NS_INLINE NSUInteger qTailPostAdd(PGByteQueue *q, NSUInteger d)        { return qPostAdd(&q->qtail, d, q->qsize);               }
-NS_INLINE NSUInteger qTailPreSub(PGByteQueue *q, NSUInteger d)         { return qPreSub(&q->qtail, d, q->qsize);                }
-NS_INLINE NSUInteger qHeadPreSub(PGByteQueue *q, NSUInteger d)         { return qPreSub(&q->qhead, d, q->qsize);                }
+FOUNDATION_EXPORT NSUInteger PGByteQueueEnsureRoom(PGByteQueuePtr q, NSUInteger delta);
 
-NS_INLINE NSByte *qHeadPreSubP(PGByteQueue *q, NSUInteger d)         { return (q->qbuffer + qHeadPreSub(q, d));               }
-NS_INLINE NSByte *qTailPreSubP(PGByteQueue *q, NSUInteger d)         { return (q->qbuffer + qTailPreSub(q, d));               }
-NS_INLINE NSByte *qHeadPostAddP(PGByteQueue *q, NSUInteger d)        { return (q->qbuffer + qHeadPostAdd(q, d));              }
-NS_INLINE NSByte *qTailPostAddP(PGByteQueue *q, NSUInteger d)        { return (q->qbuffer + qTailPostAdd(q, d));              }
-// @f:1
+NS_INLINE NSUInteger PGQueueByteCount(PGByteQueuePtr q) {
+    return (((q->qtail < q->qhead) ? (q->qtail + q->qsize) : q->qtail) - q->qhead);
+}
 
-PGByteQueue *qCreateNewBuffer(NSUInteger initialSize, NSUInteger currentSize);
-
-PGByteQueue *qCreateExactCopy(const PGByteQueue *q);
-
-PGByteQueue *qCreateNormalizedCopy(const PGByteQueue *q);
-
-PGByteQueue *qCopyQueueData(PGByteQueue *dest, const PGByteQueue *src);
-
-PGByteQueue *_Nullable qDestroyQueue(PGByteQueue *q);
-
-NSUInteger qCalculateHash(const PGByteQueue *q);
-
-BOOL qCompareQueues(const PGByteQueue *q1, const PGByteQueue *q2);
-
-NSUInteger qNextSize(NSUInteger needed, NSUInteger newSize);
-
-void qTryGrow(PGByteQueue *q, NSUInteger needed);
-
-void qTryShrink(PGByteQueue *q);
+NS_INLINE NSUInteger PGQueueRoomRemaining(PGByteQueuePtr q) {
+    return (((q->qtail < q->qhead) ? (q->qhead - q->qtail) : (q->qsize - q->qtail + q->qhead)) - 1);
+}
 
 NS_ASSUME_NONNULL_END
 
