@@ -71,22 +71,24 @@ void PGDestroyByteQueue(PGByteQueuePtr q, BOOL secure) {
 }
 
 NSUInteger PGByteQueueEnsureRoom(PGByteQueuePtr q, NSUInteger delta) {
-    NSUInteger byteCount = PGQueueByteCount(q);
-    NSUInteger needed    = (byteCount + delta);
-    NSUInteger size      = q->qsize;
+    if(PGByteQueueRoomRemaining(q) < delta) {
+        NSUInteger byteCount = PGByteQueueCount(q);
+        NSUInteger needed    = (byteCount + delta);
+        NSUInteger size      = q->qsize;
 
-    if(size <= needed) {
-        /* Take the current size and keep doubling it until we have enough room. */
-        do { size *= 2; } while(size <= needed);
+        if(size <= needed) {
+            /* Take the current size and keep doubling it until we have enough room. */
+            do { size *= 2; } while(size <= needed);
 
-        q->qbuffer = PGRealloc(q->qbuffer, size);
+            q->qbuffer = PGRealloc(q->qbuffer, size);
 
-        if(q->qtail && (q->qtail < q->qhead)) memmove((q->qbuffer + q->qsize), q->qbuffer, q->qtail);
-        if(q->qhead) memmove(q->qbuffer, (q->qbuffer + q->qhead), byteCount);
+            if(q->qtail && (q->qtail < q->qhead)) {
+                memmove((q->qbuffer + q->qsize), q->qbuffer, q->qtail);
+                q->qtail += q->qsize;
+            }
 
-        q->qhead = 0;
-        q->qtail = byteCount;
-        q->qsize = size;
+            q->qsize = size;
+        }
     }
 
     return q->qsize;
@@ -99,8 +101,8 @@ NS_INLINE BOOL mcmp(const uint8_t *p1, const uint8_t *p2, size_t l) {
 BOOL PGByteQueueCompare(PGByteQueuePtr q1, PGByteQueuePtr q2) {
     if(q1 == q2) return YES;
     if(q1 && q2) {
-        NSUInteger bc1 = PGQueueByteCount(q1);
-        NSUInteger bc2 = PGQueueByteCount(q2);
+        NSUInteger bc1 = PGByteQueueCount(q1);
+        NSUInteger bc2 = PGByteQueueCount(q2);
 
         if(bc1 == bc2) {
             if(bc1 == 0) return YES;

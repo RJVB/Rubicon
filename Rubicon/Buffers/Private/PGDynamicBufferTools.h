@@ -62,11 +62,13 @@ FOUNDATION_EXPORT void PGDestroyByteQueue(PGByteQueuePtr q, BOOL secure);
 
 FOUNDATION_EXPORT NSUInteger PGByteQueueEnsureRoom(PGByteQueuePtr q, NSUInteger delta);
 
-NS_INLINE NSUInteger PGQueueByteCount(PGByteQueuePtr q) {
+FOUNDATION_EXPORT BOOL PGByteQueueCompare(PGByteQueuePtr q1, PGByteQueuePtr q2);
+
+NS_INLINE NSUInteger PGByteQueueCount(PGByteQueuePtr q) {
     return (((q->qtail < q->qhead) ? (q->qtail + q->qsize) : q->qtail) - q->qhead);
 }
 
-NS_INLINE NSUInteger PGQueueRoomRemaining(PGByteQueuePtr q) {
+NS_INLINE NSUInteger PGByteQueueRoomRemaining(PGByteQueuePtr q) {
     return (((q->qtail < q->qhead) ? (q->qhead - q->qtail) : (q->qsize - q->qtail + q->qhead)) - 1);
 }
 
