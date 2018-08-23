@@ -143,7 +143,7 @@ BOOL rotateBuffer(uint8_t *buffer, BOOL left, NSUInteger delta, NSUInteger lengt
 
     -(NSUInteger)hash {
         [self lock];
-        @try { return PGByteBufferHash(_buffer, _length); } @finally { [self unlock]; }
+        @try { return PGHash(_buffer, _length); } @finally { [self unlock]; }
     }
 
     -(id)copyWithZone:(nullable NSZone *)zone {

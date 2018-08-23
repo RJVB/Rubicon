@@ -411,7 +411,7 @@ char *__pg_cleanstr(const char *str, size_t len, char includeSpaces) {
     return NULL;
 }
 
-NSUInteger PGByteBufferHash(const voidp buffer, size_t length) {
+NSUInteger PGHash(const voidp buffer, size_t length) {
     if(buffer) {
         if(length) {
             NSUInteger *p = buffer;
@@ -425,7 +425,7 @@ NSUInteger PGByteBufferHash(const voidp buffer, size_t length) {
             if(o) {
                 NSUInteger r = 0;
                 memcpy(&r, p, o);
-                h = ((h * 31u) + r);
+                h = ((h * 31u) + NSSwapLong(r));
             }
 
             return h;
@@ -437,24 +437,18 @@ NSUInteger PGByteBufferHash(const voidp buffer, size_t length) {
     return 0;
 }
 
-#if __has_extension(attribute_overloadable)
-
-char *__attribute__((overloadable)) PGCleanStr(const char *str, size_t len, char includeSpaces) {
+char *PG_OVERLOADABLE PGCleanStr(const char *str, size_t len, char includeSpaces) {
     return __pg_cleanstr(str, len, includeSpaces);
 }
 
-NSUInteger __attribute__((overloadable)) PGCStringHash(const char *str, size_t len) {
-    return PGByteBufferHash((voidp const)str, len);
+NSUInteger PG_OVERLOADABLE PGCStringHash(const char *str, size_t len) {
+    return PGHash((voidp const)str, len);
 }
 
-#else
+NSData *PGGetEmptyNSDataSingleton() {
+    static dispatch_once_t __singletonCreated      = 0;
+    static NSData          *__singletonEmptyNSData = nil;
 
-char *PGCleanStrLen(const char *str, size_t len, char includeSpaces) {
-    return __pg_cleanStr(str, len, includeSpaces);
+    dispatch_once(&__singletonCreated, ^{ __singletonEmptyNSData = [NSData new]; });
+    return __singletonEmptyNSData;
 }
-
-NSUInteger PGCStringHash(const char *str, size_t len) {
-    return __pg_cstringhash(str, len);
-}
-
-#endif

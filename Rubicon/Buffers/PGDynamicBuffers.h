@@ -43,6 +43,8 @@ typedef NSInteger (^PGDynamicByteBufferOpBlock)(NSByte *buffer, NSUInteger size,
 
     -(instancetype)initWithBytes:(const NSByte *)bytes length:(NSUInteger)length;
 
+    -(instancetype)initWithQueue:(PGDynamicByteQueue *)q;
+
     -(void)dealloc;
 
     -(BOOL)isEqual:(id)other;
@@ -61,11 +63,11 @@ typedef NSInteger (^PGDynamicByteBufferOpBlock)(NSByte *buffer, NSUInteger size,
 
     -(NSInteger)dequeue;
 
-    -(NSInteger)unqueue;
+    -(NSInteger)pop;
 
     -(NSUInteger)dequeue:(NSByte *)buffer maxLength:(NSUInteger)length;
 
-    -(NSUInteger)unqueue:(NSByte *)buffer maxLength:(NSUInteger)length;
+    -(NSUInteger)pop:(NSByte *)buffer maxLength:(NSUInteger)length;
 
     -(NSInteger)performOperation:(PGDynamicByteBufferOpBlock)opBlock restoreOnExceptionOrError:(BOOL)restoreFlag error:(NSError **)error;
 
@@ -73,11 +75,17 @@ typedef NSInteger (^PGDynamicByteBufferOpBlock)(NSByte *buffer, NSUInteger size,
 
     -(NSData *)getNSData:(NSUInteger)length;
 
+    -(NSString *)getNSString;
+
+    -(NSString *)getNSStringOfLength:(NSUInteger)length;
+
     -(NSString *)getNSString:(NSStringEncoding)encoding;
+
+    -(char *)getUTF8String;
 
     -(char *)getUTF8String:(NSUInteger)length;
 
-    -(NSString *)getNSString:(NSUInteger)length encoding:(NSStringEncoding)encoding;
+    -(NSString *)getNSString:(NSStringEncoding)encoding length:(NSUInteger)length;
 
 @end
 

@@ -84,7 +84,7 @@
 
     -(NSUInteger)hash {
         [self lock];
-        @try { return PGByteBufferHash(_cString, _length); } @finally { [self unlock]; }
+        @try { return PGHash(_cString, _length); } @finally { [self unlock]; }
     }
 
     -(NSComparisonResult)compareToCString:(const char *)cString {

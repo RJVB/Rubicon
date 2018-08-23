@@ -21,6 +21,8 @@
 
 #import <Rubicon/PGTime.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 FOUNDATION_EXPORT const NSByte UTF8_2ByteMarker;
 FOUNDATION_EXPORT const NSByte UTF8_3ByteMarker;
 FOUNDATION_EXPORT const NSByte UTF8_4ByteMarker;
@@ -36,8 +38,9 @@ FOUNDATION_EXPORT const NSByte UTF8_4ByteMarkerMask;
 #define PGBitsPerField   (8)
 #define PGFieldsPerPixel (4)
 
+#define PGThrowInvArgException(r)   @throw [NSException exceptionWithName:NSInvalidArgumentException reason:r userInfo:nil]
 #define PGThrowOutOfMemoryException @throw [NSException exceptionWithName:NSMallocException reason:@"Out of memory" userInfo:nil]
-#define PGThrowNullPointerException @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"NULL pointer." userInfo:nil]
+#define PGThrowNullPointerException PGThrowInvArgException(@"NULL Pointer")
 
 #define PGSETIFNIL(l, f, v)  PGBLKOPEN if((f)  == nil) { @synchronized(l) { if((f)  == nil) (f) = (v); }} PGBLKCLOSE
 #define PGSETIFNULL(l, f, v) PGBLKOPEN if((f) == NULL) { @synchronized(l) { if((f) == NULL) (f) = (v); }} PGBLKCLOSE
@@ -45,9 +48,21 @@ FOUNDATION_EXPORT const NSByte UTF8_4ByteMarkerMask;
 
 #define PG_BRDG_CAST(t)  (__bridge t *)
 
+#ifndef PG_HASOVERLOADABLE
+    #define PG_HASOVERLOADABLE __has_extension(attribute_overloadable)
+
+    #if PG_HASOVERLOADABLE
+        #define PG_OVERLOADABLE __attribute__((overloadable))
+    #else
+        #error "CLANG Overloadable Attribute must be supported."
+    #endif
+#endif
+
+FOUNDATION_EXPORT NSData *PGGetEmptyNSDataSingleton(void);
+
 FOUNDATION_EXPORT size_t PGCopyString(char **ptr, const char *str);
 
-FOUNDATION_EXPORT NSUInteger PGByteBufferHash(const voidp buffer, size_t length);
+FOUNDATION_EXPORT NSUInteger PGHash(const voidp buffer, size_t length);
 
 /**
  * Given a string, this function will prefix all of the specified characters with the escapeChar.
@@ -58,15 +73,15 @@ FOUNDATION_EXPORT NSUInteger PGByteBufferHash(const voidp buffer, size_t length)
  *            count as one character) then each character will be broken out separately.
  * @return a new string with the escaped sequences.
  */
-FOUNDATION_EXPORT NSString *_Nonnull PGEscapeString(NSString *_Nonnull str, NSString *_Nonnull escapeChar, ...) NS_REQUIRES_NIL_TERMINATION;
+FOUNDATION_EXPORT NSString *PGEscapeString(NSString *str, NSString *escapeChar, ...) NS_REQUIRES_NIL_TERMINATION;
 
-FOUNDATION_EXPORT NSString *_Nullable PGValidateDate(NSString *_Nonnull dateString);
+FOUNDATION_EXPORT NSString *_Nullable PGValidateDate(NSString *dateString);
 
-FOUNDATION_EXPORT NSString *_Nullable PGValidateTime(NSString *_Nonnull timeString);
+FOUNDATION_EXPORT NSString *_Nullable PGValidateTime(NSString *timeString);
 
-FOUNDATION_EXPORT NSByte *_Nonnull PGMemoryReverse(NSByte *_Nonnull buffer, NSUInteger length);
+FOUNDATION_EXPORT NSByte *PGMemoryReverse(NSByte *buffer, NSUInteger length);
 
-FOUNDATION_EXPORT voidp _Nonnull PGMemDup(cvoidp _Nonnull src, size_t size);
+FOUNDATION_EXPORT voidp PGMemDup(cvoidp src, size_t size);
 
 FOUNDATION_EXPORT NSComparisonResult PGDateCompare(NSDate *_Nullable d1, NSDate *_Nullable d2);
 
@@ -100,7 +115,7 @@ FOUNDATION_EXPORT NSComparisonResult PGCompare(id _Nullable obj1, id _Nullable o
  * @param height the height of the image.
  * @return a bitmap image for off-screen drawing.
  */
-FOUNDATION_EXPORT NSBitmapImageRep *_Nonnull PGCreateARGBImage(NSFloat width, NSFloat height);
+FOUNDATION_EXPORT NSBitmapImageRep *PGCreateARGBImage(NSFloat width, NSFloat height);
 
 /**
  * Takes an off-screen image and saves it as a PNG file.
@@ -110,7 +125,7 @@ FOUNDATION_EXPORT NSBitmapImageRep *_Nonnull PGCreateARGBImage(NSFloat width, NS
  * @param error a pointer to an error object field that will receive an error object if an error
  *              occurs.
  */
-FOUNDATION_EXPORT BOOL PGSaveImageAsPNG(NSBitmapImageRep *_Nonnull image, NSString *_Nonnull filename, NSError *_Nullable *_Nullable error);
+FOUNDATION_EXPORT BOOL PGSaveImageAsPNG(NSBitmapImageRep *image, NSString *filename, NSError *_Nullable *_Nullable error);
 
 /**
  * Returns an NSString as by calling the C function strerror(int).
@@ -118,7 +133,7 @@ FOUNDATION_EXPORT BOOL PGSaveImageAsPNG(NSBitmapImageRep *_Nonnull image, NSStri
  * @param osErrNo the C library error number usually obtained from the global variable errno.
  * @return The C library generated error message as an NSString object.
  */
-FOUNDATION_EXPORT NSString *_Nonnull PGStrError(int osErrNo);
+FOUNDATION_EXPORT NSString *PGStrError(int osErrNo);
 
 /**
  * Convenience function for [NSString stringWithFormat:fmt, ...].
@@ -126,7 +141,7 @@ FOUNDATION_EXPORT NSString *_Nonnull PGStrError(int osErrNo);
  * @param ... the parameters.
  * @return a new string.
  */
-FOUNDATION_EXPORT NSString *_Nonnull PGFormat(NSString *_Nonnull fmt, ...) NS_FORMAT_FUNCTION(1, 2);
+FOUNDATION_EXPORT NSString *PGFormat(NSString *fmt, ...) NS_FORMAT_FUNCTION(1, 2);
 
 FOUNDATION_EXPORT void PGPrintf(NSString *fmt, ...) NS_FORMAT_FUNCTION(1, 2);
 
@@ -140,7 +155,7 @@ FOUNDATION_EXPORT void PGFPrintfVA(NSString *filename, NSError **error, NSString
 
 FOUNDATION_EXPORT NSString *PGFormatVA(NSString *fmt, va_list args);
 
-FOUNDATION_EXPORT void PGLog(NSString *_Nonnull fmt, ...) NS_FORMAT_FUNCTION(1, 2);
+FOUNDATION_EXPORT void PGLog(NSString *fmt, ...) NS_FORMAT_FUNCTION(1, 2);
 
 /**
  * Convenience function for getting the user's temporary file directory.
@@ -157,7 +172,7 @@ FOUNDATION_EXPORT NSURL *_Nullable PGTemporaryDirectory(NSError *_Nullable *_Nul
  * @param error a pointer to an error object field that will receive an error object if an error occurs.
  * @return a URL to a temporary file or NULL if an error occurs.
  */
-FOUNDATION_EXPORT NSURL *_Nullable PGTemporaryFile(NSString *_Nonnull filenamePostfix, NSError *_Nullable *_Nullable error);
+FOUNDATION_EXPORT NSURL *_Nullable PGTemporaryFile(NSString *filenamePostfix, NSError *_Nullable *_Nullable error);
 
 FOUNDATION_EXPORT NSError *PGCreateError(NSString *domain, NSInteger code, NSString *description);
 
@@ -180,90 +195,80 @@ FOUNDATION_EXPORT NSException *PGCreateCompareException(id obj1, id obj2);
  */
 FOUNDATION_EXPORT BOOL PGReadIntoBuffer(NSInputStream *input, void *buffer, NSUInteger maxLength, int *readStatus, NSError **error);
 
-#if __has_extension(attribute_overloadable)
+FOUNDATION_EXPORT NSUInteger PGCStringHash(const char *str, size_t len) PG_OVERLOADABLE;
 
-FOUNDATION_EXPORT NSUInteger PGCStringHash(const char *str, size_t len) __attribute__((overloadable));
+FOUNDATION_EXPORT char *PGCleanStr(const char *str, size_t len, char includeSpaces) PG_OVERLOADABLE;
 
-FOUNDATION_EXPORT char *PGCleanStr(const char *str, size_t len, char includeSpaces) __attribute__((overloadable));
-
-NS_INLINE NSUInteger __attribute__((overloadable)) PGCStringHash(const char *str) {
+NS_INLINE NSUInteger PG_OVERLOADABLE PGCStringHash(const char *str) {
     return PGCStringHash(str, (str ? strlen(str) : 0));
 }
 
-NS_INLINE char *__attribute__((overloadable)) PGCleanStr(const char *str, char includeSpaces) {
+NS_INLINE char *PG_OVERLOADABLE PGCleanStr(const char *str, char includeSpaces) {
     return PGCleanStr(str, strlen(str), includeSpaces);
 }
 
-#else
-
-FOUNDATION_EXPORT NSUInteger PGCStringHash(const char *str, size_t len);
-
-FOUNDATION_EXPORT char *PGCleanStrLen(const char *xstr, size_t len, char includeSpaces);
-
-NS_INLINE NSUInteger PGCStrHash(const char *str) {
-    return PGCStringHash(str, (str ? strlen(str) : 0));
-}
-
-NS_INLINE char *PGCleanStr(const char *str, char includeSpaces) {
-    return PGCleanStrLen(str, strlen(str), includeSpaces);
-}
-
-#endif
-
-NS_INLINE voidp _Nonnull PGTestPtr(voidp _Nullable _ptr) {
+NS_INLINE voidp PGTestPtr(voidp _Nullable _ptr) {
     if(_ptr) return (_ptr); else PGThrowOutOfMemoryException;
 }
 
-NS_INLINE void PGSwapPtr(voidp _Nonnull *_Nonnull x, voidp _Nonnull *_Nonnull y) {
+NS_INLINE void PGSwapPtr(voidp *x, voidp *y) {
     voidp z = *x;
     *x = *y;
     *y = z;
 }
 
-NS_INLINE void PGSwapObjs(id _Nonnull *_Nonnull x, id _Nonnull *_Nonnull y) {
+NS_INLINE void PGSwapObjs(id *x, id *y) {
     id z = *x;
     *x = *y;
     *y = z;
 }
 
-NS_INLINE char *_Nonnull PGStrdup(const char *_Nonnull str) {
+NS_INLINE char *PGStrdup(const char *str) {
     return PGTestPtr(strdup(str));
 }
 
-NS_INLINE voidp _Nonnull PGMalloc(size_t _sz) {
+NS_INLINE voidp PGMalloc(size_t _sz) {
     return PGTestPtr(malloc(_sz));
 }
 
-NS_INLINE voidp _Nonnull PGCalloc(size_t count, size_t size) {
+NS_INLINE voidp PGCalloc(size_t count, size_t size) {
     return PGTestPtr(calloc(count, size));
 }
 
-NS_INLINE voidp _Nonnull PGRealloc(voidp _Nullable _ptr, size_t _sz) {
+NS_INLINE voidp PGRealloc(voidp _Nullable _ptr, size_t _sz) {
     return PGTestPtr(_ptr ? realloc(_ptr, _sz) : malloc(_sz));
 }
 
-NS_INLINE voidp _Nonnull PGMemMove(voidp _Nonnull dest, cvoidp _Nonnull src, size_t length) {
+NS_INLINE voidp PGMemMove(voidp dest, cvoidp src, size_t length) {
     return (length ? memmove(dest, src, length) : dest);
 }
 
-NS_INLINE voidp _Nonnull PGMemCopy(voidp _Nonnull dest, cvoidp _Nonnull src, size_t length) {
+NS_INLINE voidp PGMemCopy(voidp dest, cvoidp src, size_t length) {
     return (length ? memcpy(dest, src, length) : dest);
 }
 
-NS_INLINE voidp _Nonnull PGMemPMove(voidp _Nonnull dest, cvoidp _Nonnull src, size_t length) {
+NS_INLINE voidp PGMemPMove(voidp dest, cvoidp src, size_t length) {
     return (length ? (memmove(dest, src, length) + length) : dest);
 }
 
-NS_INLINE voidp _Nonnull PGMemPCopy(voidp _Nonnull dest, cvoidp _Nonnull src, size_t length) {
+NS_INLINE voidp PGMemPCopy(voidp dest, cvoidp src, size_t length) {
     return (length ? (memcpy(dest, src, length) + length) : dest);
 }
 
-NS_INLINE voidp _Nonnull PGMemShift(voidp _Nonnull src, NSInteger delta, NSUInteger length) {
+NS_INLINE voidp PGMemShift(voidp src, NSInteger delta, NSUInteger length) {
     return PGMemMove((src + delta), src, length);
 }
 
-NS_INLINE voidp _Nonnull PGMemPShift(voidp _Nonnull src, NSInteger delta, NSUInteger length) {
+NS_INLINE voidp PGMemPShift(voidp src, NSInteger delta, NSUInteger length) {
     return (PGMemShift(src, delta, length) + length);
+}
+
+NS_INLINE NSInteger PGMemCmp(cvoidp p1, cvoidp p2, NSUInteger length) {
+    return (length ? memcmp(p1, p2, length) : 0);
+}
+
+NS_INLINE BOOL PGMemEqu(cvoidp p1, cvoidp p2, NSUInteger length) {
+    return ((length == 0) || (memcmp(p1, p2, length) == 0));
 }
 
 NS_INLINE NSComparisonResult PGCompareCStrings(const char *_Nullable s1, const char *_Nullable s2) {
@@ -286,7 +291,7 @@ NS_INLINE NSRange PGRangeFromIndexes(NSUInteger loc1, NSUInteger loc2) {
     return NSMakeRange(MIN(loc1, loc2), PGRangeLength(loc1, loc2));
 }
 
-NS_INLINE NSException *_Nullable PGValidateRange(NSString *_Nonnull string, NSRange range) {
+NS_INLINE NSException *_Nullable PGValidateRange(NSString *string, NSRange range) {
     if(range.location < string.length && NSMaxRange(range) < string.length) return nil;
     NSString *r = PGFormat(PGErrorMsgRangeOutOfBounds, range.location, range.length, string.length);
     return [NSException exceptionWithName:NSRangeException reason:r userInfo:nil];
@@ -298,7 +303,7 @@ NS_INLINE NSException *_Nullable PGValidateRange(NSString *_Nonnull string, NSRa
  * @param str the string reference.
  * @return the same string reference or @"" if the string reference is null.
  */
-NS_INLINE NSString *_Nonnull PGEmptyIfNull(NSString *const _Nullable str) {
+NS_INLINE NSString *PGEmptyIfNull(NSString *const _Nullable str) {
     return (str ?: @"");
 }
 
@@ -350,5 +355,7 @@ NS_INLINE id _Nullable PGSetReference(id _Nullable *_Nullable ref, id _Nullable 
     if(ref) *ref = val;
     return val;
 }
+
+NS_ASSUME_NONNULL_END
 
 #endif //__Rubicon_PGTools_H_

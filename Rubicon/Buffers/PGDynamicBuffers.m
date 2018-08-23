@@ -15,10 +15,19 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
+#import "PGDynamicBuffers.h"
 #import "PGDynamicBufferTools.h"
 
 const NSUInteger PGDynByteQueueMinSize            = ((NSUInteger)(5));
 const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
+
+@interface PGDynamicByteQueue()
+
+    @property(readonly) NSUInteger     roomRemaining;
+    @property(nullable) PGByteQueuePtr q;
+
+    -(instancetype)initWithByteQueue:(PGByteQueuePtr)q;
+@end
 
 @implementation PGDynamicByteQueue {
         NSRecursiveLock *_lck;
@@ -32,7 +41,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
         self = [super init];
 
         if(self) {
-            _q = PGCreateByteQueue(PGDynByteQueueDefaultInitialSize);
+            _q = PGByteQueueCreate(PGDynByteQueueDefaultInitialSize);
         }
 
         return self;
@@ -42,7 +51,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
         self = [super init];
 
         if(self) {
-            _q = PGCreateByteQueue(initialSize);
+            _q = PGByteQueueCreate(initialSize);
         }
 
         return self;
@@ -75,6 +84,21 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
         return self;
     }
 
+    -(instancetype)initWithByteQueue:(PGByteQueuePtr)q {
+        self = [self initWithInitialSize:(q ? q->qsize : PGDynByteQueueMinSize)];
+
+        if(self) {
+            if(!q) PGThrowNullPointerException;
+            PGByteQueueCopy(self.q, q);
+        }
+
+        return self;
+    }
+
+    -(instancetype)initWithQueue:(PGDynamicByteQueue *)q {
+        return (self = [self initWithByteQueue:q.q]);
+    }
+
 #pragma mark Private Properties
 
     -(NSUInteger)roomRemaining {
@@ -87,7 +111,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
 #pragma mark Private Methods
 
     -(void)_deallocQueue {
-        PGDestroyByteQueue(self.q, self.secure);
+        PGByteQueueDestroy(self.q, self.secure);
         if(self.secure) self.q = NULL;
     }
 
@@ -96,7 +120,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
     }
 
     -(void)_unwrapQueue:(NSUInteger)newSize {
-        PGNormalizeByteQueue(self.q);
+        PGByteQueueNormalize(self.q);
     }
 
     -(BOOL)_isEqualToQueue:(PGDynamicByteQueue *)other {
@@ -147,76 +171,42 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
 
     -(void)queue:(NSByte)byte {
         [self lock];
-        @try {
-            PGByteQueuePtr q = self.q;
-            PGByteQueueEnsureRoom(q, 1);
-            q->qbuffer[q->qtail] = byte;
-            q->qtail = ((q->qtail + 1) % q->qsize);
-        }
-        @finally { [self unlock]; }
+        @try { PGByteQueueQueue(self.q, byte); } @finally { [self unlock]; }
     }
 
     -(void)queue:(const NSByte *)buffer length:(NSUInteger)length {
-        if(buffer && length) {
-            [self lock];
-            @try {
-                PGByteQueuePtr q = self.q;
-                PGByteQueueEnsureRoom(q, length);
-
-                if(q->qtail == q->qhead) {
-                    PGMemCopy(q->qbuffer, buffer, length);
-                    q->qhead = 0;
-                    q->qtail = length;
-                }
-                else if(q->qtail < q->qhead) {
-                    PGMemCopy((q->qbuffer + q->qtail), buffer, length);
-                    q->qtail += length;
-                }
-                else {
-                    NSUInteger tsz = (q->qsize - q->qtail);
-                    NSUInteger csz = MIN(tsz, length);
-                    NSUInteger rsz = (length - csz);
-
-                    PGMemCopy((q->qbuffer + q->qtail), buffer, csz);
-                    q->qtail = ((q->qtail + csz) % q->qsize);
-                    PGMemCopy((q->qbuffer + q->qtail), (buffer + csz), rsz);
-                    q->qtail += rsz;
-                }
-            }
-            @finally { [self unlock]; }
-        }
-        else if(length) PGThrowNullPointerException;
+        [self lock];
+        @try { PGByteQueueQueue(self.q, buffer, length); } @finally { [self unlock]; }
     }
 
     -(void)requeue:(NSByte)byte {
+        [self lock];
+        @try { PGByteQueueRequeue(self.q, byte); } @finally { [self unlock]; }
     }
 
     -(void)requeue:(const NSByte *)buffer length:(NSUInteger)length {
+        [self lock];
+        @try { PGByteQueueRequeue(self.q, buffer, length); } @finally { [self unlock]; }
     }
 
     -(NSInteger)dequeue {
         [self lock];
-        @try {
-            PGByteQueuePtr q = self.q;
-            if(q->qhead == q->qtail) return EOF;
-            NSInteger b = q->qbuffer[q->qhead];
-            q->qhead = ((q->qhead + 1) % q->qsize);
-            return b;
-        }
-        @finally { [self unlock]; }
-    }
-
-    -(NSInteger)unqueue {
-        PGByteQueuePtr q = self.q;
-        return ((q->qhead == q->qtail) ? EOF : q->qbuffer[q->qtail = ((q->qtail ?: q->qsize) - 1)]);
+        @try { return PGByteQueueDequeue(self.q); } @finally { [self unlock]; }
     }
 
     -(NSUInteger)dequeue:(NSByte *)buffer maxLength:(NSUInteger)length {
-        return 0;
+        [self lock];
+        @try { return PGByteQueueDequeue(self.q, buffer, length); } @finally { [self unlock]; }
     }
 
-    -(NSUInteger)unqueue:(NSByte *)buffer maxLength:(NSUInteger)length {
-        return 0;
+    -(NSInteger)pop {
+        [self lock];
+        @try { return PGByteQueuePop(self.q); } @finally { [self unlock]; }
+    }
+
+    -(NSUInteger)pop:(NSByte *)buffer maxLength:(NSUInteger)length {
+        [self lock];
+        @try { return PGByteQueuePop(self.q, buffer, length); } @finally { [self unlock]; }
     }
 
     -(NSInteger)performOperation:(PGDynamicByteBufferOpBlock)opBlock restoreOnExceptionOrError:(BOOL)restoreFlag error:(NSError **)error {
@@ -224,27 +214,48 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
     }
 
     -(NSData *)getNSData {
-        return nil;
+        [self lock];
+        @try { return PGByteQueueGetNSData(self.q); } @finally { [self unlock]; }
     }
 
     -(NSData *)getNSData:(NSUInteger)length {
-        return nil;
+        [self lock];
+        @try { return PGByteQueueGetNSData(self.q, length); } @finally { [self unlock]; }
+    }
+
+    -(NSString *)getNSString {
+        [self lock];
+        @try { return PGByteQueueGetNSString(self.q, NSUTF8StringEncoding); } @finally { [self unlock]; }
+    }
+
+    -(NSString *)getNSStringOfLength:(NSUInteger)length {
+        [self lock];
+        @try { return PGByteQueueGetNSString(self.q, NSUTF8StringEncoding, length); } @finally { [self unlock]; }
     }
 
     -(NSString *)getNSString:(NSStringEncoding)encoding {
-        return nil;
+        [self lock];
+        @try { return PGByteQueueGetNSString(self.q, encoding); } @finally { [self unlock]; }
+    }
+
+    -(NSString *)getNSString:(NSStringEncoding)encoding length:(NSUInteger)length {
+        [self lock];
+        @try { return PGByteQueueGetNSString(self.q, encoding, length); } @finally { [self unlock]; }
+    }
+
+    -(char *)getUTF8String {
+        [self lock];
+        @try { return strdup(PGByteQueueCount(self.q) ? PGByteQueueGetNSString(self.q, NSUTF8StringEncoding).UTF8String : ""); } @finally { [self unlock]; }
     }
 
     -(char *)getUTF8String:(NSUInteger)length {
-        return NULL;
-    }
-
-    -(NSString *)getNSString:(NSUInteger)length encoding:(NSStringEncoding)encoding {
-        return nil;
+        [self lock];
+        @try { return strdup((length && PGByteQueueCount(self.q)) ? PGByteQueueGetNSString(self.q, NSUTF8StringEncoding, length).UTF8String : ""); } @finally { [self unlock]; }
     }
 
     -(id)copyWithZone:(nullable NSZone *)zone {
-        return nil;
+        [self lock];
+        @try { return [(PGDynamicByteQueue *)[[self class] alloc] initWithByteQueue:self.q]; } @finally { [self unlock]; }
     }
 
     -(void)lock {

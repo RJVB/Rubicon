@@ -119,6 +119,7 @@ FOUNDATION_EXPORT NSString *const PGErrorMsgCannotCompare;
 FOUNDATION_EXPORT NSString *const PGErrorMsgRangeOutOfBounds;
 FOUNDATION_EXPORT NSString *const PGErrorMsgZeroLengthBuffer;
 FOUNDATION_EXPORT NSString *const PGErrorMsgRotateCountTooLarge;
+FOUNDATION_EXPORT NSString *const PGErrorMsgNoData;
 
 #if !defined(__PGExceptionTests__)
     #define __PGExceptionTests__    1

@@ -53,6 +53,7 @@
 #import <Rubicon/PGDOMText.h>
 #import <Rubicon/PGDOMUserDataHandler.h>
 #import <Rubicon/PGDynamicBuffers.h>
+#import <Rubicon/PGDynamicBufferTools.h>
 #import <Rubicon/PGEmptyEnumerator.h>
 #import <Rubicon/PGFilterInputStream.h>
 #import <Rubicon/PGFilterOutputStream.h>
