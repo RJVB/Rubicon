@@ -25,6 +25,13 @@
 #ifndef __Rubicon_GNUstep_H_
 #define __Rubicon_GNUstep_H_
 
+/*
+ * This library is designed to work with clang.
+ */
+#if !defined(__clang__) || (__clang_major__ < 5)
+    #error "Unsupported compiler detected"
+#endif
+
 #import <Cocoa/Cocoa.h>
 
 #include <sys/cdefs.h>

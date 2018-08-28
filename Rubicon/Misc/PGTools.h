@@ -62,7 +62,7 @@ FOUNDATION_EXPORT NSData *PGGetEmptyNSDataSingleton(void);
 
 FOUNDATION_EXPORT size_t PGCopyString(char **ptr, const char *str);
 
-FOUNDATION_EXPORT NSUInteger PGHash(const voidp buffer, size_t length);
+FOUNDATION_EXPORT NSUInteger PGHash(const void *buffer, size_t length);
 
 /**
  * Given a string, this function will prefix all of the specified characters with the escapeChar.

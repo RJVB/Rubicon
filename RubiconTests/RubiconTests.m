@@ -11,6 +11,7 @@
 #import "PGXMLParserDelegateTest.h"
 #import "CommonBaseClass.h"
 #import "PGNSXMLParserDelegateTest.h"
+#import <sys/random.h>
 
 #define INDICATOR(x) ((x) ? @"✅" : @"⛔️")
 
@@ -145,6 +146,48 @@ void FOutput(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
         NSUInteger r = 0;
         memcpy(&r, data, 4);
         NSLog(@"%@: %@", @"     Hash", [self hexDebug:r]);
+
+        NSUInteger rbufsz  = 256;
+        uint8_t    *random = calloc(1, rbufsz);
+
+        if(random) {
+            @try {
+                if(getentropy(random, rbufsz)) {
+                    XCTFail(@"Unable to get random number set: %@", @(errno));
+                }
+                else {
+                    NSUInteger ph = 0;
+                    NSLog(@"Hashing %@ bytes: Phase %@", @(++ph), @(rbufsz));
+                    NSUInteger     *z1 = (NSUInteger *)random;
+                    NSUInteger     q   = (rbufsz / sizeof(NSUInteger));
+                    NSUInteger     h   = 1;
+                    for(NSUInteger i   = 0; i < q; ++i) {
+                        h = ((h * 31u) + z1[i]);
+                    }
+                    NSLog(@"Phase %@ Hash Value: %@", @(ph), @(h));
+
+                    NSLog(@"Hashing %@ bytes: Phase %@", @(++ph), @(rbufsz));
+                    h = 1;
+                    NSUInteger     q1 = (q / 2);
+                    for(NSUInteger i  = 0; i < q1; ++i) {
+                        h = ((h * 31u) + z1[i]);
+                    }
+                    NSUInteger     z  = 0;
+                    memcpy(&z, &z1[q1], sizeof(NSUInteger));
+                    h = ((h * 31u) + z);
+                    for(NSUInteger i = (q1 + 1); i < q; ++i) {
+                        h = ((h * 31u) + z1[i]);
+                    }
+                    NSLog(@"Phase %@ Hash Value: %@", @(ph), @(h));
+                }
+            }
+            @finally {
+                free(random);
+            }
+        }
+        else {
+            XCTFail(@"Unable to allocate %@ byte buffer.", @(errno));
+        }
     }
 
     -(void)_testStringSwitch:(NSString *)str {

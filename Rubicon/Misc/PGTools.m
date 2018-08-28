@@ -411,30 +411,27 @@ char *__pg_cleanstr(const char *str, size_t len, char includeSpaces) {
     return NULL;
 }
 
-NSUInteger PGHash(const voidp buffer, size_t length) {
-    if(buffer) {
-        if(length) {
-            NSUInteger *p = buffer;
-            NSUInteger h  = (31u + length);
-            NSUInteger l  = MIN(length, 4096);
-            NSUInteger m = (l / sizeof(NSUInteger));
-            NSUInteger o = (l % sizeof(NSUInteger));
-
-            if(m) while(m--) h = ((h * 31u) + (*(p++)));
-
-            if(o) {
-                NSUInteger r = 0;
-                memcpy(&r, p, o);
-                h = ((h * 31u) + NSSwapLong(r));
-            }
-
-            return h;
-        }
-
-        return 1;
+NSUInteger PGHashEnding(NSUInteger hash, const void *buffer, size_t length) {
+    if(length) {
+        NSUInteger r = 0;
+        memcpy(&r, buffer, length);
+        hash = ((hash * 31u) + r);
     }
 
-    return 0;
+    return hash;
+}
+
+NSUInteger PGHashMain(NSUInteger hash, const void *buffer, size_t length) {
+    NSUInteger       m  = (length / sizeof(NSUInteger));
+    NSUInteger       o  = (length % sizeof(NSUInteger));
+    const NSUInteger *p = buffer;
+
+    if(m) { while(m--) hash = ((hash * 31u) + (*(p++))); }
+    return PGHashEnding(hash, p, o);
+}
+
+NSUInteger PGHash(const void *buffer, size_t length) {
+    return (buffer ? (length ? PGHashMain((31u + length), buffer, MIN(length, 4096)) : 1) : 0);
 }
 
 char *PG_OVERLOADABLE PGCleanStr(const char *str, size_t len, char includeSpaces) {

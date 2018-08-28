@@ -27,8 +27,14 @@
 #endif
 
 NS_INLINE NSString *_Nullable PGLocalizedString(NSString *_Nonnull key) {
-    return [[NSBundle bundleWithIdentifier:@"com.projectgalen.Rubicon"] localizedStringForKey:key value:nil table:nil];
+    return [RubiconBundle localizedStringForKey:key value:nil table:nil];
 }
+
+#if !defined(__PG_INCLUDE_ENTROPY__)
+
+    #include <sys/random.h>
+
+#endif /* !defined(__PG_INCLUDE_ENTROPY__) */
 
 #import "NSArray+PGArray.h"
 #import "NSBitmapImageRep+PGBitmapImageRep.h"
