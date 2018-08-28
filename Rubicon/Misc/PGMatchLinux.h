@@ -24,23 +24,22 @@
 #ifndef __PGMATCHLINUX_H__
 #define __PGMATCHLINUX_H__
 
-#include <stdio.h>
-#include <errno.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #if defined(__APPLE__)
 
-#if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12)
-    #define __PG_INCLUDE_ENTROPY__ 1
-#endif /* defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12) */
+    #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12)
+        #define __PG_INCLUDE_ENTROPY__ 1
+    #endif /* defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12) */
 
-#if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 102000)
-    #define __PG_INCLUDE_RANDOM__ 1
-#endif /* defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 102000) */
+    #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 102000)
+        #define __PG_INCLUDE_RANDOM__ 1
+    #endif /* defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 102000) */
 
-#if defined(__PG_INCLUDE_ENTROPY__)
+#endif /* defined(__APPLE__) */
+
+#if defined(__PG_INCLUDE_ENTROPY__) && (__PG_INCLUDE_ENTROPY__)
 
 extern unsigned char pg_getentropy_pseudo;
 
@@ -52,23 +51,12 @@ __END_DECLS
 
 #endif /* defined(__PG_INCLUDE_ENTROPY__) */
 
-#if defined(__PG_INCLUDE_RANDOM__)
+#if defined(__PG_INCLUDE_RANDOM__) && (__PG_INCLUDE_RANDOM__)
 
 extern unsigned char pg_getrandom_strict;
 
 typedef enum __pg_getrandom_flags {
-    /*
-     * Use the /dev/random (blocking) source instead of the /dev/urandom (non-blocking)
-     * source to obtain randomness. If this flag is specified, the call may block,
-     * potentially for quite some time, even after the randomness source has been
-     * initialized. If it is not specified, the call can only block when the system
-     * has just booted and the randomness source has not yet been initialized.
-     */
-            GRND_RANDOM   = 1,  //
-    /*
-     * Instead of blocking, return to the caller immediately if no data is available. This value is ignored.
-     */
-            GRND_NONBLOCK = 2 //
+    GRND_RANDOM = 1, GRND_NONBLOCK = 2
 }                    PG_GETRANDOM_FLAGS;
 
 __BEGIN_DECLS
@@ -86,7 +74,5 @@ ssize_t getrandom(void *buffer, size_t length, unsigned int flags);
 __END_DECLS
 
 #endif /* defined(__PG_INCLUDE_RANDOM__) */
-
-#endif /* defined(__APPLE__) */
 
 #endif /* __PGMATCHLINUX_H__ */

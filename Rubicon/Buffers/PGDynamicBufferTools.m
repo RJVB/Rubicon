@@ -15,8 +15,6 @@
  * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  **********************************************************************************************************************************************************************************/
 
-#import "PGDynamicBuffers.h"
-#import "PGDynamicBufferTools.h"
 #import "PGInternal.h"
 
 PGByteBufferPtr PGByteBufferCreate(NSUInteger size) PG_OVERLOADABLE {
@@ -57,11 +55,10 @@ void PGByteBufferDestroy(PGByteBufferPtr bb, BOOL secure) {
     if(bb) {
         if(bb->bytes) {
             if(secure) {
-                NSUInteger pages = (bb->size / 256);
-                NSUInteger overg = (pages * 256);
-
-                for(NSUInteger i = 0; i < pages; ++i) getentropy((bb->bytes + (i * 256)), 256);
-                if(overg < bb->size) getentropy((bb->bytes + overg), (bb->size - overg));
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "CannotResolve"
+                getrandom(bb->bytes, bb->size, 0);
+#pragma clang diagnostic pop
             }
 
             free(bb->bytes);
@@ -77,15 +74,17 @@ BOOL PGByteBufferCompare(PGByteBufferPtr b1, PGByteBufferPtr b2) {
 }
 
 NSUInteger PGByteBufferHash(PGByteBufferPtr b) {
-    return 0;
+    return (b ? PGHash(b->bytes, b->length) : 0);
 }
 
 NSData *PGByteBufferGetNSData(PGByteBufferPtr b, NSUInteger maxLength) PG_OVERLOADABLE {
-    return nil;
+    if(!b) PGThrowNullPointerException;
+    NSUInteger cc = MIN(b->size, MIN(b->length, maxLength));
+    return (cc ? [[NSData alloc] initWithBytes:b->bytes length:cc] : [NSData new]);
 }
 
 NSData *PGByteBufferGetNSData(PGByteBufferPtr b) PG_OVERLOADABLE {
-    return nil;
+    return PGByteBufferGetNSData(b, (b ? MIN(b->length, b->size) : 0));
 }
 
 #define PGByteQueueNeedReset(q) ((q)->qhead && ((q)->qhead == (q)->qtail))
@@ -116,18 +115,64 @@ NS_INLINE NSUInteger PGByteQueueWhenEmpty(PGByteQueuePtr q, NSUInteger delta) {
 }
 
 PGByteQueuePtr PGByteQueueCreate(NSUInteger initialSize) {
-    return NULL;
+    if(initialSize == 0) PGThrowInvArgException(PGErrorMsgZeroLengthBuffer);
+    PGByteQueuePtr q = PGCalloc(1, sizeof(PGByteQueue));
+    q->qbuffer = malloc(q->qsize = q->qinit = MAX(initialSize, 2)); // Enough to hold at least one byte...
+    if(q->qbuffer) return q;
+    free(q);
+    PGThrowOutOfMemoryException;
 }
 
 PGByteQueuePtr PGByteQueueCopy(PGByteQueuePtr dest, PGByteQueuePtr src) {
-    return NULL;
+    if(!src) PGThrowNullPointerException;
+
+    if(dest) {
+        dest->qhead = dest->qtail = 0;
+        PGByteQueueEnsureRoom(dest, PGByteQueueCount(src));
+    }
+    else {
+        dest = PGByteQueueCreate(src->qsize);
+        dest->qinit = src->qinit;
+    }
+
+    if(PGByteQueueCount(src)) {
+        NSByte *srchead = (src->qbuffer + src->qhead);
+        dest->qtail = PGByteQueueCount(src);
+
+        if(src->qhead <= src->qtail) {
+            memcpy(dest->qbuffer, srchead, (src->qtail - src->qhead));
+        }
+        else {
+            NSUInteger cc = (src->qsize - src->qhead);
+
+            memcpy(dest->qbuffer, srchead, cc);
+            if(src->qtail) memcpy((dest->qbuffer + cc), src->qbuffer, src->qtail);
+        }
+    }
+
+    return dest;
 }
 
 void PGByteQueueNormalize(PGByteQueuePtr q) {
 }
 
 NSUInteger PGByteQueueEnsureRoom(PGByteQueuePtr q, NSUInteger delta) {
-    return 0;
+    if(!q) PGThrowNullPointerException;
+    if(delta) {
+        NSUInteger ns     = q->qsize;
+        NSUInteger needed = (PGByteQueueCount(q) + delta);
+
+        if(ns <= needed) {
+            do { ns *= 2; } while(ns <= needed);
+            q->qbuffer = PGRealloc(q->qbuffer, ns);
+            if(q->qtail < q->qhead) {
+                if(q->qtail) memmove((q->qbuffer + q->qsize), q->qbuffer, q->qtail);
+                q->qtail += q->qsize;
+            }
+            q->qsize   = ns;
+        }
+    }
+    return q->qsize;
 }
 
 NSUInteger PGByteQueueResize(PGByteQueuePtr q, NSUInteger spaceNeeded) {
@@ -139,6 +184,17 @@ BOOL PGByteQueueCompare(PGByteQueuePtr q1, PGByteQueuePtr q2) {
 }
 
 void PGByteQueueDestroy(PGByteQueuePtr q, BOOL secure) {
+    if(q) {
+        if(q->qbuffer) {
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "CannotResolve"
+            if(secure) getrandom(q->qbuffer, q->qsize, 0);
+#pragma clang diagnostic pop
+            free(q->qbuffer);
+        }
+        memset(q, 0, sizeof(PGByteQueue));
+        free(q);
+    }
 }
 
 void PGByteQueueQueue(PGByteQueuePtr q, NSByte byte) PG_OVERLOADABLE {

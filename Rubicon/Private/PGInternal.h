@@ -19,44 +19,63 @@
 
 #import "PGTools.h"
 
+#if !defined(__PG_INCLUDE_ENTROPY__) || !defined(__PG_INCLUDE_RANDOM__)
+
+    #include <sys/random.h>
+
+#endif /* !defined(__PG_INCLUDE_ENTROPY__) || !defined(__PG_INCLUDE_RANDOM__) */
+
 #define RubiconBundle [NSBundle bundleWithIdentifier:@"com.projectgalen.Rubicon"]
 
 #ifdef NSLocalizedString
     #undef NSLocalizedString
     #define NSLocalizedString(key, comment) [RubiconBundle localizedStringForKey:(key) value:@"" table:nil]
-#endif
+#endif /* NSLocalizedString */
 
 NS_INLINE NSString *_Nullable PGLocalizedString(NSString *_Nonnull key) {
     return [RubiconBundle localizedStringForKey:key value:nil table:nil];
 }
-
-#if !defined(__PG_INCLUDE_ENTROPY__)
-
-    #include <sys/random.h>
-
-#endif /* !defined(__PG_INCLUDE_ENTROPY__) */
 
 #import "NSArray+PGArray.h"
 #import "NSBitmapImageRep+PGBitmapImageRep.h"
 #import "NSData+PGData.h"
 #import "NSError+PGError.h"
 #import "NSException+PGException.h"
+#import "NSMutableDictionary+PGMutableDictionary.h"
 #import "NSObject+PGObject.h"
 #import "NSRegularExpression+PGRegularExpression.h"
 #import "NSString+PGString.h"
 #import "PGBase64OutputStream.h"
 #import "PGCString.h"
 #import "PGCmdLine.h"
-#import "PGCmdLineDefines.h"
-#import "PGCmdLineOption.h"
+#import "PGDOMAttr.h"
+#import "PGDOMCDataSection.h"
+#import "PGDOMComment.h"
+#import "PGDOMDocument.h"
+#import "PGDOMDocumentFragment.h"
+#import "PGDOMDTD.h"
+#import "PGDOMDTDEntity.h"
+#import "PGDOMDTDNotation.h"
+#import "PGDOMElement.h"
+#import "PGDOMEntityReference.h"
+#import "PGDOMImplementation.h"
+#import "PGDOMImplementationList.h"
+#import "PGDOMLocator.h"
+#import "PGDOMNamedNodeMap.h"
 #import "PGDOMNode.h"
+#import "PGDOMNodeList.h"
+#import "PGDOMProcessingInstruction.h"
+#import "PGDOMText.h"
+#import "PGDOMUserDataHandler.h"
 #import "PGDynamicBuffers.h"
+#import "PGDynamicBufferTools.h"
 #import "PGEmptyEnumerator.h"
 #import "PGFilterInputStream.h"
 #import "PGFilterOutputStream.h"
 #import "PGLinkedListNode.h"
 #import "PGLogger.h"
 #import "PGMacros.h"
+#import "PGMethodImpl.h"
 #import "PGMutableBinaryTreeDictionary.h"
 #import "PGNestedEnumerator.h"
 #import "PGQueue.h"

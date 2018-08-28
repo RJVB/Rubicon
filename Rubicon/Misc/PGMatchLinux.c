@@ -22,16 +22,14 @@
  *//************************************************************************/
 
 #include "PGMatchLinux.h"
+#include <errno.h>
+#include <fcntl.h>
 
-#if defined(__APPLE__)
-
-// @f:0
 #if !defined(__PG_INCLUDE_ENTROPY__)
     #include <sys/random.h>
 #endif /* !defined(__PG_INCLUDE_ENTROPY__) */
-// @f:1
 
-#define ERRRETVAL              (-1)
+#define ERRRETVAL (-1)
 
 int __ret_errno(int _errno, int _ret) {
     errno = _errno;
@@ -80,15 +78,7 @@ ssize_t __getrandom(void *buffer, size_t length, char blkread, char blksrc) {
     return ((blkread || pg_getrandom_strict) ? __getrandom_normal(buffer, length, randsrc(blksrc), (blkread ? O_NONBLOCK : 0)) : __getrandom_getentropy(buffer, length));
 }
 
-#if defined(__PG_INCLUDE_RANDOM__)
-
-ssize_t getrandom(void *buffer, size_t length, unsigned int flags) {
-    return (buffer ? (length ? __getrandom(buffer, length, ((flags & GRND_NONBLOCK) != 0), ((flags & GRND_RANDOM) != 0)) : 0) : __ret_errno(EFAULT, ERRRETVAL));
-}
-
-#endif /* defined(__PG_INCLUDE_RANDOM__) */
-
-#if defined(__PG_INCLUDE_ENTROPY__)
+#if defined(__PG_INCLUDE_ENTROPY__) && (__PG_INCLUDE_ENTROPY__)
 
 unsigned char pg_getentropy_pseudo = 0;
 
@@ -107,4 +97,11 @@ int getentropy(void *buffer, size_t size) {
 
 #endif /* defined(__PG_INCLUDE_ENTROPY__) */
 
-#endif /* defined(__APPLE__) */
+#if defined(__PG_INCLUDE_RANDOM__) && (__PG_INCLUDE_RANDOM__)
+
+ssize_t getrandom(void *buffer, size_t length, unsigned int flags) {
+    return (buffer ? (length ? __getrandom(buffer, length, ((flags & GRND_NONBLOCK) != 0), ((flags & GRND_RANDOM) != 0)) : 0) : __ret_errno(EFAULT, ERRRETVAL));
+}
+
+#endif /* defined(__PG_INCLUDE_RANDOM__) */
+
