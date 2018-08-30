@@ -29,14 +29,15 @@
 
 #if defined(__APPLE__)
 
+    #include <Availability.h>
+
     #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12)
         #define __PG_INCLUDE_ENTROPY__ 1
-    #endif /* defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12) */
+    #endif
 
-    #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 102000)
-        #define __PG_INCLUDE_RANDOM__ 1
-    #endif /* defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 102000) */
-
+// #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12)
+    #define __PG_INCLUDE_RANDOM__ 1
+// #endif
 #endif /* defined(__APPLE__) */
 
 #if defined(__PG_INCLUDE_ENTROPY__) && (__PG_INCLUDE_ENTROPY__)
@@ -49,7 +50,7 @@ int getentropy(void *buffer, size_t size);
 
 __END_DECLS
 
-#endif /* defined(__PG_INCLUDE_ENTROPY__) */
+#endif /* defined(__PG_INCLUDE_ENTROPY__) && (__PG_INCLUDE_ENTROPY__) */
 
 #if defined(__PG_INCLUDE_RANDOM__) && (__PG_INCLUDE_RANDOM__)
 
@@ -73,6 +74,6 @@ ssize_t getrandom(void *buffer, size_t length, unsigned int flags);
 
 __END_DECLS
 
-#endif /* defined(__PG_INCLUDE_RANDOM__) */
+#endif /* defined(__PG_INCLUDE_RANDOM__) && (__PG_INCLUDE_RANDOM__) */
 
 #endif /* __PGMATCHLINUX_H__ */

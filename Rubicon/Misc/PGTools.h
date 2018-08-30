@@ -271,6 +271,11 @@ NS_INLINE BOOL PGMemEqu(cvoidp p1, cvoidp p2, NSUInteger length) {
     return ((length == 0) || (memcmp(p1, p2, length) == 0));
 }
 
+NS_INLINE size_t memlmove(void *dest, const void *src, size_t length) {
+    if(length) memmove(dest, src, length);
+    return length;
+}
+
 NS_INLINE NSComparisonResult PGCompareCStrings(const char *_Nullable s1, const char *_Nullable s2) {
     if(s1 == s2) return NSOrderedSame;
     if(s1 == NULL) return NSOrderedAscending;
@@ -354,6 +359,13 @@ NS_INLINE BOOL PGArraysEqual(NSArray *const _Nullable ar1, NSArray *const _Nulla
 NS_INLINE id _Nullable PGSetReference(id _Nullable *_Nullable ref, id _Nullable val) {
     if(ref) *ref = val;
     return val;
+}
+
+NS_INLINE void PGFreeBuffer(void *_Nullable buffer, size_t length, char secure) {
+    if(buffer) {
+        if(secure) getrandom(buffer, length, 0);
+        free(buffer);
+    }
 }
 
 NS_ASSUME_NONNULL_END

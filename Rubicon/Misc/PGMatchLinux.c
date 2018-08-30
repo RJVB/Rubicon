@@ -25,41 +25,45 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#if !defined(__PG_INCLUDE_ENTROPY__)
+int __ret_errno(int _errno, int _ret);
+
+int __getrandom_normal(void *buffer, size_t length, const char *rndsrc, int openflags);
+
+#if defined(__PG_INCLUDE_ENTROPY__) && (__PG_INCLUDE_ENTROPY__)
+
+#include <sys/time.h>
+
+unsigned char pg_getentropy_pseudo = 0;
+
+int getentropy(void *buffer, size_t size) {
+    if(pg_getentropy_pseudo) {
+        srandom((unsigned int)(time(0) & 0xffffffff));
+        int8_t *bbuf = buffer;
+
+        for(size_t i = 0; i < size; ++i) bbuf[i] = (uint8_t)(random() & 0xff);
+        return 0;
+    }
+    else {
+        return __getrandom_normal(buffer, size, "/dev/urandom", O_NONBLOCK);
+    }
+}
+
+#else
+
     #include <sys/random.h>
-#endif /* !defined(__PG_INCLUDE_ENTROPY__) */
 
-#define ERRRETVAL (-1)
+#endif /* defined(__PG_INCLUDE_ENTROPY__) && (__PG_INCLUDE_ENTROPY__) */
 
-int __ret_errno(int _errno, int _ret) {
-    errno = _errno;
-    return _ret;
-}
-
-ssize_t __get_entropy(void *buffer, size_t offset, size_t length) {
-    return (getentropy((buffer + offset), length) ? __ret_errno(((errno == ENOSYS || errno == EFAULT) ? errno : ENOSYS), ERRRETVAL) : 0);
-}
+#if defined(__PG_INCLUDE_RANDOM__) && (__PG_INCLUDE_RANDOM__)
 
 #define PGGetEntropyPageSize   ((size_t)(256))
 #define randsrc(b)             ((b) ? "/dev/random" : "/dev/urandom")
+#define ERRRETVAL (-1)
 
 unsigned char pg_getrandom_strict = 0;
 
-int __getrandom_normal(void *buffer, size_t length, const char *randsrc, int openflags) {
-    size_t tr = 0;
-    int    fd = open(randsrc, openflags, 0);
-
-    if(fd < 0) return __ret_errno(((errno == EINTR) ? EINTR : ENOSYS), ERRRETVAL);
-
-    do {
-        ssize_t br = read(fd, (buffer + tr), (length - tr));
-        if(br < 0) return (((errno == EAGAIN) || (errno == EINTR)) ? ERRRETVAL : __ret_errno(ENOSYS, ERRRETVAL));
-        if(br == 0) return __ret_errno(ENOSYS, ERRRETVAL);
-        tr += br;
-    }
-    while(tr < length);
-
-    return 0;
+ssize_t __get_entropy(void *buffer, size_t offset, size_t length) {
+    return (getentropy((buffer + offset), length) ? __ret_errno(((errno == ENOSYS || errno == EFAULT) ? errno : ENOSYS), ERRRETVAL) : 0);
 }
 
 ssize_t __getrandom_getentropy(void *buffer, size_t length) {
@@ -78,30 +82,31 @@ ssize_t __getrandom(void *buffer, size_t length, char blkread, char blksrc) {
     return ((blkread || pg_getrandom_strict) ? __getrandom_normal(buffer, length, randsrc(blksrc), (blkread ? O_NONBLOCK : 0)) : __getrandom_getentropy(buffer, length));
 }
 
-#if defined(__PG_INCLUDE_ENTROPY__) && (__PG_INCLUDE_ENTROPY__)
-
-unsigned char pg_getentropy_pseudo = 0;
-
-int getentropy(void *buffer, size_t size) {
-    if(pg_getentropy_pseudo) {
-        srandom((unsigned int)(time(0) & 0xffffffff));
-        int8_t *bbuf = buffer;
-
-        for(size_t i = 0; i < size; ++i) bbuf[i] = (uint8_t)(random() & 0xff);
-        return 0;
-    }
-    else {
-        return __getrandom_normal(buffer, size, "/dev/urandom", O_NONBLOCK);
-    }
-}
-
-#endif /* defined(__PG_INCLUDE_ENTROPY__) */
-
-#if defined(__PG_INCLUDE_RANDOM__) && (__PG_INCLUDE_RANDOM__)
-
 ssize_t getrandom(void *buffer, size_t length, unsigned int flags) {
     return (buffer ? (length ? __getrandom(buffer, length, ((flags & GRND_NONBLOCK) != 0), ((flags & GRND_RANDOM) != 0)) : 0) : __ret_errno(EFAULT, ERRRETVAL));
 }
 
-#endif /* defined(__PG_INCLUDE_RANDOM__) */
+#endif /* defined(__PG_INCLUDE_RANDOM__) && (__PG_INCLUDE_RANDOM__) */
+
+int __getrandom_normal(void *buffer, size_t length, const char *rndsrc, int openflags) {
+    size_t tr = 0;
+    int    fd = open(rndsrc, openflags, 0);
+
+    if(fd < 0) return __ret_errno(((errno == EINTR) ? EINTR : ENOSYS), ERRRETVAL);
+
+    do {
+        ssize_t br = read(fd, (buffer + tr), (length - tr));
+        if(br < 0) return (((errno == EAGAIN) || (errno == EINTR)) ? ERRRETVAL : __ret_errno(ENOSYS, ERRRETVAL));
+        if(br == 0) return __ret_errno(ENOSYS, ERRRETVAL);
+        tr += br;
+    }
+    while(tr < length);
+
+    return 0;
+}
+
+int __ret_errno(int _errno, int _ret) {
+    errno = _errno;
+    return _ret;
+}
 

@@ -23,55 +23,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef struct {
-    NSUInteger qinit; // The initial size of the queue.
-    NSUInteger qsize; // The current size of the queue.
-    NSUInteger qhead;
-    NSUInteger qtail;
-    NSByte     *qbuffer;
-}                        PGByteQueue;
-typedef PGByteQueue      *PGByteQueuePtr;
-
-#define PGByteQueueCount(q)         ((((q)->qtail < (q)->qhead) ? ((q)->qtail + (q)->qsize) : (q)->qtail) - (q)->qhead)
-#define PGByteQueueRoomRemaining(q) ((((q)->qtail < (q)->qhead) ? ((q)->qhead - (q)->qtail) : ((q)->qsize - (q)->qtail + (q)->qhead)) - 1)
-
-FOUNDATION_EXPORT PGByteQueuePtr PGByteQueueCreate(NSUInteger initialSize);
-
-FOUNDATION_EXPORT PGByteQueuePtr PGByteQueueCopy(PGByteQueuePtr dest, PGByteQueuePtr src);
-
-FOUNDATION_EXPORT void PGByteQueueNormalize(PGByteQueuePtr q);
-
-FOUNDATION_EXPORT NSUInteger PGByteQueueEnsureRoom(PGByteQueuePtr q, NSUInteger delta);
-
-FOUNDATION_EXPORT NSUInteger PGByteQueueResize(PGByteQueuePtr q, NSUInteger spaceNeeded);
-
-FOUNDATION_EXPORT BOOL PGByteQueueCompare(PGByteQueuePtr q1, PGByteQueuePtr q2);
-
-FOUNDATION_EXPORT void PGByteQueueDestroy(PGByteQueuePtr q, BOOL secure);
-
-FOUNDATION_EXPORT void PGByteQueueQueue(PGByteQueuePtr q, NSByte byte) PG_OVERLOADABLE;
-
-FOUNDATION_EXPORT void PGByteQueueQueue(PGByteQueuePtr q, const NSByte *buffer, NSUInteger length) PG_OVERLOADABLE;
-
-FOUNDATION_EXPORT void PGByteQueueRequeue(PGByteQueuePtr q, NSByte byte) PG_OVERLOADABLE;
-
-FOUNDATION_EXPORT void PGByteQueueRequeue(PGByteQueuePtr q, const NSByte *buffer, NSUInteger length) PG_OVERLOADABLE;
-
-FOUNDATION_EXPORT NSInteger PGByteQueueDequeue(PGByteQueuePtr q) PG_OVERLOADABLE;
-
-FOUNDATION_EXPORT NSUInteger PGByteQueueDequeue(PGByteQueuePtr q, NSByte *buffer, NSUInteger maxLength) PG_OVERLOADABLE;
-
-FOUNDATION_EXPORT NSInteger PGByteQueuePop(PGByteQueuePtr q) PG_OVERLOADABLE;
-
-FOUNDATION_EXPORT NSUInteger PGByteQueuePop(PGByteQueuePtr q, NSByte *buffer, NSUInteger maxLength) PG_OVERLOADABLE;
-
-FOUNDATION_EXPORT NSString *PGByteQueueGetNSString(PGByteQueue *q, NSStringEncoding encoding) PG_OVERLOADABLE;
-
-FOUNDATION_EXPORT NSString *PGByteQueueGetNSString(PGByteQueue *q, NSStringEncoding encoding, NSUInteger length) PG_OVERLOADABLE;
-
-FOUNDATION_EXPORT NSData *PGByteQueueGetNSData(PGByteQueue *q, NSUInteger length) PG_OVERLOADABLE;
-
-FOUNDATION_EXPORT NSData *PGByteQueueGetNSData(PGByteQueue *q) PG_OVERLOADABLE;
+/****************************************************************************************************************
+ * BYTE BUFFERS
+ ***************************************************************************************************************/
+#pragma mark BYTE BUFFERS
 
 typedef struct {
     NSByte     *bytes;
@@ -107,6 +62,72 @@ FOUNDATION_EXPORT NSUInteger PGByteBufferHash(PGByteBufferPtr b);
 FOUNDATION_EXPORT NSData *PGByteBufferGetNSData(PGByteBufferPtr b, NSUInteger maxLength) PG_OVERLOADABLE;
 
 FOUNDATION_EXPORT NSData *PGByteBufferGetNSData(PGByteBufferPtr b) PG_OVERLOADABLE;
+
+/****************************************************************************************************************
+ * BYTE QUEUES
+ ***************************************************************************************************************/
+#pragma mark BYTE QUEUES
+
+typedef struct {
+    NSUInteger qinit; // The initial size of the queue.
+    NSUInteger qsize; // The current size of the queue.
+    NSUInteger qhead;
+    NSUInteger qtail;
+    NSUInteger aux1;
+    NSUInteger aux2;
+    NSByte     *qbuffer;
+}                        PGByteQueue;
+typedef PGByteQueue      *PGByteQueuePtr;
+
+#define PGByteQueueCount(q)         ((((q)->qtail < (q)->qhead) ? ((q)->qtail + (q)->qsize) : (q)->qtail) - (q)->qhead)
+#define PGByteQueueRoomRemaining(q) ((((q)->qtail < (q)->qhead) ? ((q)->qhead - (q)->qtail) : ((q)->qsize - (q)->qtail + (q)->qhead)) - 1)
+
+FOUNDATION_EXPORT PGByteQueuePtr PGByteQueueCreate(NSUInteger initialSize);
+
+FOUNDATION_EXPORT PGByteQueuePtr PGByteQueueCopy(PGByteQueuePtr dest, PGByteQueuePtr src);
+
+FOUNDATION_EXPORT void PGByteQueueNormalize(PGByteQueuePtr q);
+
+FOUNDATION_EXPORT PGByteQueuePtr PGByteQueueEnsureRoom(PGByteQueuePtr q, NSUInteger delta);
+
+FOUNDATION_EXPORT BOOL PGByteQueueCompare(PGByteQueuePtr q1, PGByteQueuePtr q2);
+
+FOUNDATION_EXPORT void PGByteQueueDestroy(PGByteQueuePtr q, BOOL secure);
+
+FOUNDATION_EXPORT void PGByteQueueQueue(PGByteQueuePtr q, NSByte byte) PG_OVERLOADABLE;
+
+/********************************************************************************************************//**
+ * This method will throw a NULL pointer exception if either 'q' or 'buffer' is NULL unless length is zero.
+ *
+ * @param q the queue to receive the bytes.
+ * @param buffer the bytes to queue.
+ * @param length the number of bytes to queue.
+ *//********************************************************************************************************/
+FOUNDATION_EXPORT void PGByteQueueQueue(PGByteQueuePtr q, const NSByte *buffer, NSUInteger length) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT void PGByteQueueRequeue(PGByteQueuePtr q, NSByte byte) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT void PGByteQueueRequeue(PGByteQueuePtr q, const NSByte *buffer, NSUInteger length) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT NSInteger PGByteQueueDequeue(PGByteQueuePtr q) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT NSUInteger PGByteQueueDequeue(PGByteQueuePtr q, NSByte *buffer, NSUInteger maxLength) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT NSInteger PGByteQueuePop(PGByteQueuePtr q) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT NSUInteger PGByteQueuePop(PGByteQueuePtr q, NSByte *buffer, NSUInteger maxLength) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT PGByteBufferPtr PGByteQueueGetBytes(PGByteQueuePtr q, NSUInteger length) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT PGByteBufferPtr PGByteQueueGetBytes(PGByteQueuePtr q) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT NSString *PGByteQueueGetNSString(PGByteQueuePtr q, NSStringEncoding encoding) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT NSString *PGByteQueueGetNSString(PGByteQueuePtr q, NSStringEncoding encoding, NSUInteger length) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT NSData *PGByteQueueGetNSData(PGByteQueuePtr q, NSUInteger length) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT NSData *PGByteQueueGetNSData(PGByteQueuePtr q) PG_OVERLOADABLE;
 
 NS_ASSUME_NONNULL_END
 
