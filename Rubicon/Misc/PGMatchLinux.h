@@ -3,10 +3,10 @@
  *    FILENAME: PGMatchLinux.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 12/30/16 11:03 AM
+ *        DATE: 08/30/18 11:03 AM
  * DESCRIPTION:
  *
- * Copyright © 2016  Project Galen. All rights reserved.
+ * Copyright © 2018  Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
