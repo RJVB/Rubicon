@@ -79,7 +79,7 @@ FOUNDATION_EXPORT NSString *_Nullable PGValidateDate(NSString *dateString);
 
 FOUNDATION_EXPORT NSString *_Nullable PGValidateTime(NSString *timeString);
 
-FOUNDATION_EXPORT NSByte *PGMemoryReverse(NSByte *buffer, NSUInteger length);
+FOUNDATION_EXPORT NSByte *PGMemReverse(NSByte *buffer, NSUInteger length);
 
 FOUNDATION_EXPORT voidp PGMemDup(cvoidp src, size_t size);
 
@@ -239,20 +239,30 @@ NS_INLINE voidp PGRealloc(voidp _Nullable _ptr, size_t _sz) {
     return PGTestPtr(_ptr ? realloc(_ptr, _sz) : malloc(_sz));
 }
 
-NS_INLINE voidp PGMemMove(voidp dest, cvoidp src, size_t length) {
-    return (length ? memmove(dest, src, length) : dest);
-}
-
 NS_INLINE voidp PGMemCopy(voidp dest, cvoidp src, size_t length) {
     return (length ? memcpy(dest, src, length) : dest);
+}
+
+NS_INLINE voidp PGMemPCopy(voidp dest, cvoidp src, size_t length) {
+    return (length ? (memcpy(dest, src, length) + length) : dest);
+}
+
+NS_INLINE size_t PGMemLCopy(voidp dest, cvoidp src, size_t length) {
+    if(length) memcpy(dest, src, length);
+    return length;
+}
+
+NS_INLINE voidp PGMemMove(voidp dest, cvoidp src, size_t length) {
+    return (length ? memmove(dest, src, length) : dest);
 }
 
 NS_INLINE voidp PGMemPMove(voidp dest, cvoidp src, size_t length) {
     return (length ? (memmove(dest, src, length) + length) : dest);
 }
 
-NS_INLINE voidp PGMemPCopy(voidp dest, cvoidp src, size_t length) {
-    return (length ? (memcpy(dest, src, length) + length) : dest);
+NS_INLINE size_t PGMemLMove(void *dest, const void *src, size_t length) {
+    if(length) memmove(dest, src, length);
+    return length;
 }
 
 NS_INLINE voidp PGMemShift(voidp src, NSInteger delta, NSUInteger length) {
@@ -269,11 +279,6 @@ NS_INLINE NSInteger PGMemCmp(cvoidp p1, cvoidp p2, NSUInteger length) {
 
 NS_INLINE BOOL PGMemEqu(cvoidp p1, cvoidp p2, NSUInteger length) {
     return ((length == 0) || (memcmp(p1, p2, length) == 0));
-}
-
-NS_INLINE size_t memlmove(void *dest, const void *src, size_t length) {
-    if(length) memmove(dest, src, length);
-    return length;
 }
 
 NS_INLINE NSComparisonResult PGCompareCStrings(const char *_Nullable s1, const char *_Nullable s2) {

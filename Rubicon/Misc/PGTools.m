@@ -235,15 +235,17 @@ NSURL *PGTemporaryFile(NSString *filenamePostfix, NSError **error) {
     return nil;
 }
 
-NSByte *PGMemoryReverse(NSByte *buffer, NSUInteger length) {
-    if(buffer && length > 1) {
+NSByte *PGMemReverse(NSByte *buffer, NSUInteger length) {
+    NSUInteger len = (length / 2);
+
+    if(buffer && len) {
         NSByte *a = buffer;
         NSByte *b = (buffer + length);
 
-        while((b - a) > 1) {
-            NSByte t = *a;
-            *(a++) = *(--b);
-            *b     = t;
+        for(int i = 0; i < len; ++i) {
+            NSByte x = *(--b);
+            *b     = *a;
+            *(a++) = x;
         }
     }
 

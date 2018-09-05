@@ -22,149 +22,65 @@
 
 #import "PGInternal.h"
 
-#pragma mark SUPPORT
+/****************************************************************************************************************
+ * SUPPORT MACROS
+ ***************************************************************************************************************/
+#pragma mark SUPPORT MACROS
 
-#define __pg_b_cmp(b1, l1, b2, l2) (((b1) == (b2)) || ((b1) && (b2) && ((l1) == (l2)) && PGMemEqu((b1), (b2), (l1))))
-#define __qhead(q)             ((q)->qhead)
-#define __qtail(q)             ((q)->qtail)
-#define __qsize(q)             ((q)->qsize)
-#define __qempty(q)            (__qhead(q) == __qtail(q))
-#define __qwrpd(q)             (__qtail(q) < __qhead(q))
-#define __qnorm(q)             (__qhead(q) <= __qtail(q))
-#define __qheadsz(q)           (__qsize(q) - __qhead(q))
-#define __qtailsz(q)           (__qsize(q) - __qtail(q))
-#define __qnormsz(q)           (__qtail(q) - __qhead(q))
-#define __qbuf(q)              ((q)->qbuffer)
-#define __qbufcell(q, i)       __qbuf(q)[i]
-#define __qbufoff(q, d)        (__qbuf(q) + (d))
-#define __qbufhead(q)          __qbufoff(q, __qhead(q))
-#define __qbufsize(q)          __qbufoff(q, __qsize(q))
-#define __pg_ringinc(i, d, s)  ((i) = (((i) + (d)) % (s)))
-#define __pg_ringdec(i, d, s)  ((i) = ((d) ? ((((i) < (d)) ? ((s) + (i)) : (i)) - (d)) : (i)))
+#define __pg_inc(i, j, k) (((i) + (j)) % (k))
+#define __pg_dec(i, j, k) ((j) ? ((((j) <= (i)) ? (i) : ((i) + (k))) - (j)) : (i))
 
-NS_INLINE BOOL __qcmp4(const PGByteQueuePtr q1, const PGByteQueuePtr q2) {
-    NSByte     *p1head = __qbufhead(q1);
-    NSByte     *p2head = __qbufhead(q2);
-    NSUInteger top2    = __qheadsz(q2);
-    NSUInteger topd    = (__qhead(q2) - __qhead(q1));
+/****************************************************************************************************************
+ * SUPPORT FUNCTION PROTOTYPES
+ ***************************************************************************************************************/
+#pragma mark SUPPORT FUNCTIONS PROTOTYPES
 
-    return (PGMemEqu(p1head, p2head, top2) && PGMemEqu((p1head + top2), __qbuf(q2), topd) && PGMemEqu(__qbuf(q1), __qbufoff(q2, topd), (__qtail(q2) - topd)));
+BOOL __pg_q_compare(const PGByteQueue *q1, const PGByteQueue *q2);
+
+NSUInteger __pg_q_write(PGByteQueue *q, NSUInteger idx, const NSByte *buffer, NSUInteger length);
+
+NSUInteger __pg_q_read(NSByte *buffer, NSUInteger length, const PGByteQueue *q) PG_OVERLOADABLE;
+
+NSUInteger __pg_q_read(NSByte *buffer, NSUInteger length, const PGByteQueue *q, BOOL reverse) PG_OVERLOADABLE;
+
+NSUInteger __pg_q_read(NSByte *buffer, NSUInteger length, const PGByteQueue *q, NSUInteger idx) PG_OVERLOADABLE;
+
+NSUInteger __pg_q_read(NSByte *buffer, NSUInteger length, const PGByteQueue *q, NSUInteger idx, BOOL reverse) PG_OVERLOADABLE;
+
+BOOL __pg_q_normalize(PGByteQueuePtr q, BOOL force);
+
+NSUInteger __pg_q_hardunwrap(PGByteQueuePtr q, NSUInteger newsize);
+
+NS_INLINE NSUInteger __pg_q_resize(PGByteQueuePtr q, NSUInteger newSize) {
+    q->qbuffer = PGRealloc(q->qbuffer, newSize);
+    q->qsize   = newSize;
+    return PGByteQueueCount(q);
 }
 
-NS_INLINE BOOL __qcmp3(const PGByteQueuePtr q1, const PGByteQueuePtr q2) {
-    return (PGMemEqu(__qbufhead(q1), __qbufhead(q2), __qheadsz(q1)) && PGMemEqu(__qbuf(q1), __qbuf(q2), __qtail(q1)));
+NS_INLINE NSUInteger __pg_q_inctail(PGByteQueuePtr q, NSUInteger delta) {
+    if(delta) {
+        NSUInteger t = q->qtail;
+        q->qtail = __pg_inc(t, delta, q->qsize);
+        return t;
+    }
+    return q->qtail;
 }
 
-NS_INLINE BOOL __qcmp2(const PGByteQueuePtr q1, const PGByteQueuePtr q2) {
-    NSByte     *ph1 = __qbufhead(q1);
-    NSUInteger qt2  = __qheadsz(q2);
-
-    return (PGMemEqu(ph1, __qbufhead(q2), qt2) && PGMemEqu((ph1 + qt2), __qbuf(q2), __qtail(q2)));
+NS_INLINE NSUInteger __pg_q_dechead(PGByteQueuePtr q, NSUInteger delta) {
+    return (q->qhead = __pg_dec(q->qhead, delta, q->qsize));
 }
 
-NS_INLINE BOOL __qcmp1(const PGByteQueuePtr q1, const PGByteQueuePtr q2) {
-    return PGMemEqu(__qbufhead(q1), __qbufhead(q2), __qnormsz(q1));
+NS_INLINE NSUInteger __pg_q_inchead(PGByteQueuePtr q, NSUInteger delta) {
+    if(delta) {
+        NSUInteger h = q->qhead;
+        q->qhead = __pg_inc(h, delta, q->qsize);
+        return h;
+    }
+    return q->qhead;
 }
 
-NS_INLINE BOOL __qcmp0(const PGByteQueuePtr q1, const PGByteQueuePtr q2) {
-    if(__qempty(q1)) return YES;
-    else if(__qnorm(q1) && __qnorm(q2)) return __qcmp1(q1, q2);
-    else if(__qnorm(q1)) return __qcmp2(q1, q2);
-    else if(__qnorm(q2)) return __qcmp2(q2, q1);
-    else if((__qhead(q1) == __qhead(q2))) return __qcmp3(q1, q2);
-    else if((__qhead(q1) < __qhead(q2))) return __qcmp4(q1, q2);
-    else return __qcmp4(q2, q1);
-}
-
-NS_INLINE NSUInteger __qunwrap1(NSByte *buffptr, NSUInteger head, NSUInteger tail, NSUInteger topsz) {
-    memmove((buffptr + topsz), buffptr, tail);
-    memmove(buffptr, (buffptr + head), topsz);
-    return (tail + topsz);
-}
-
-NS_INLINE NSUInteger __qunwrap2(NSByte *buffptr, NSUInteger head, NSUInteger tail, NSUInteger topsz) {
-    NSByte *freeptr = (buffptr + tail);
-    memmove(freeptr, (buffptr + head), topsz);
-    memmove((freeptr + topsz), buffptr, tail);
-    memmove(buffptr, freeptr, (topsz + tail));
-    return (tail + topsz);
-}
-
-NS_INLINE NSUInteger __qunwrap3(NSByte *p, NSUInteger h, NSUInteger t, NSUInteger z) {
-    NSByte     *p1 = (p + h), *p2 = (p + z), *p3 = p, *p4 = p;
-    NSUInteger s1  = z, s2 = t;
-
-    /* @f:0 */ if(t < z) { p3 = p1; p4 = p2; p1 = p2 = p; s1 = s2; s2 = z; } /* @f:1 */
-
-    NSByte *tbuff = PGMalloc(s1);
-    memcpy(tbuff, p1, s1);
-    memmove(p2, p3, s2);
-    memcpy(p4, tbuff, s1);
-    free(tbuff);
-    return (z + t);
-}
-
-NS_INLINE NSUInteger __qunwrap4(NSByte *p, NSUInteger h, NSUInteger t, NSUInteger z) {
-    return memlmove(p, (p + h), (t + z));
-}
-
-NS_INLINE NSUInteger __qnorm_wrapped(NSByte *p, NSUInteger h, NSUInteger t, NSUInteger s) {
-    NSUInteger z = (s - h);
-    return (t ? ((MIN(z, t) <= (h - t)) ? ((z <= t) ? __qunwrap1 : __qunwrap2) : __qunwrap3) : __qunwrap4)(p, h, t, z);
-}
-
-NS_INLINE NSUInteger __qnorm_unwrapped(NSByte *p, NSUInteger h, NSUInteger t, NSUInteger s) {
-    return memlmove(p, (p + h), (t - h));
-}
-
-NS_INLINE NSUInteger __qnormalize(NSByte *p, NSUInteger h, NSUInteger t, NSUInteger s) {
-    return (h ? (h == t) ? 0 : ((h < t) ? __qnorm_unwrapped : __qnorm_wrapped)(p, h, t, s) : t);
-}
-
-NS_INLINE NSUInteger __qinc_tail(PGByteQueuePtr q, NSUInteger delta) {
-    NSUInteger t = __qtail(q);
-    if(delta) __pg_ringinc(__qtail(q), delta, __qsize(q));
-    return t;
-}
-
-NS_INLINE NSUInteger __qdec_tail(PGByteQueuePtr q, NSUInteger delta) {
-    return __pg_ringdec(__qtail(q), delta, __qsize(q));
-}
-
-NS_INLINE NSUInteger __qinc_head(PGByteQueuePtr q, NSUInteger delta) {
-    NSUInteger h = __qhead(q);
-    if(delta) __pg_ringinc(__qhead(q), delta, __qsize(q));
-    return h;
-}
-
-NS_INLINE NSUInteger __qdec_head(PGByteQueuePtr q, NSUInteger delta) {
-    return __pg_ringdec(__qhead(q), delta, __qsize(q));
-}
-
-NS_INLINE NSUInteger __qxqueue(PGByteQueuePtr q, const NSByte *buffer, NSUInteger length) {
-    if(length) memcpy(__qbufoff(q, __qinc_tail(q, length)), buffer, length);
-    return length;
-}
-
-NS_INLINE NSUInteger __qxdequeue(PGByteQueuePtr q, NSByte *buffer, NSUInteger length) {
-    if(length) memcpy(buffer, __qbufoff(q, __qinc_head(q, length)), length);
-    return length;
-}
-
-NS_INLINE void __qequeue(PGByteQueuePtr q, NSByte byte) PG_OVERLOADABLE {
-    /* An empty queue is going to have room for at least one byte. */
-    __qtail(q) = 1;
-    __qbufcell(q, (__qhead(q) = 0)) = byte;
-}
-
-NS_INLINE void __qequeue(PGByteQueuePtr q, const NSByte *buffer, NSUInteger length)  PG_OVERLOADABLE {
-    __qhead(q) = __qtail(q) = 0;
-    __qxqueue(q, buffer, length);
-}
-
-NS_INLINE NSUInteger __qxrequeue(PGByteQueuePtr q, const NSByte *buffer, NSUInteger length) {
-    if(length) memcpy(__qbufoff(q, __qdec_head(q, length)), buffer, length);
-    return length;
+NS_INLINE NSUInteger __pg_q_dectail(PGByteQueuePtr q, NSUInteger delta) {
+    return (q->qtail = __pg_dec(q->qtail, delta, q->qsize));
 }
 
 /****************************************************************************************************************
@@ -173,23 +89,34 @@ NS_INLINE NSUInteger __qxrequeue(PGByteQueuePtr q, const NSByte *buffer, NSUInte
 #pragma mark BYTE BUFFERS
 
 PGByteBufferPtr PGByteBufferCreate(NSUInteger size) PG_OVERLOADABLE {
-    if(size == 0) PGThrowInvArgException(PGErrorMsgZeroLengthBuffer);
-    PGByteBufferPtr bbuf = PGCalloc(1, sizeof(PGByteBuffer));
-    bbuf->bytes = malloc((bbuf->size = size));
-    if(bbuf->bytes) return bbuf;
-    PGThrowOutOfMemoryException;
+    if(size) {
+        PGByteBufferPtr _b = PGCalloc(1, sizeof(PGByteBuffer));
+        _b->bytes = PGMalloc(_b->size = size);
+        if(_b->bytes) return _b;
+        free(_b);
+        PGThrowOutOfMemoryException;
+    }
+    PGThrowInvArgException(PGErrorMsgZeroLengthBuffer);
 }
 
-PGByteBufferPtr PGByteBufferCreate(NSByte *b, NSUInteger length) PG_OVERLOADABLE {
-    PGByteBufferPtr bbuf = PGByteBufferCreate(length);
-    memcpy(bbuf->bytes, b, (bbuf->length = length));
-    return bbuf;
+PGByteBufferPtr PGByteBufferCreate(NSByte *bytes, NSUInteger length) PG_OVERLOADABLE {
+    if(bytes && length) {
+        PGByteBufferPtr _b = PGByteBufferCreate(length);
+        memmove(_b->bytes, bytes, (_b->length = length));
+        return _b;
+    }
+    else if(length) PGThrowNullPointerException;
+    PGThrowInvArgException(PGErrorMsgZeroLengthBuffer);
 }
 
 PGByteBufferPtr PGByteBufferCreate(NSData *data, NSUInteger length) PG_OVERLOADABLE {
-    PGByteBufferPtr bbuf = PGByteBufferCreate(length);
-    if((bbuf->length = MIN(data.length, length))) [data getBytes:bbuf->bytes length:bbuf->length];
-    return bbuf;
+    if(data && data.length && length) {
+        PGByteBufferPtr _b = PGByteBufferCreate(MIN(data.length, length));
+        [data getBytes:_b->bytes length:(_b->length = _b->size)];
+        return _b;
+    }
+    else if(!data) PGThrowNullPointerException;
+    PGThrowInvArgException(PGErrorMsgZeroLengthBuffer);
 }
 
 PGByteBufferPtr PGByteBufferCreate(NSData *data) PG_OVERLOADABLE {
@@ -197,25 +124,29 @@ PGByteBufferPtr PGByteBufferCreate(NSData *data) PG_OVERLOADABLE {
 }
 
 PGByteBufferPtr PGByteBufferCopy(PGByteBufferPtr b) {
-    if(!b) PGThrowNullPointerException;
-    PGByteBufferPtr bbuf = PGByteBufferCreate(b->size);
-    bbuf->length = b->length;
-    bbuf->aux1   = b->aux1;
-    bbuf->aux2   = b->aux2;
-    memcpy(bbuf->bytes, b->bytes, bbuf->length);
-    return bbuf;
+    if(b) {
+        PGByteBufferPtr _b = PGByteBufferCreate(MAX(b->size, b->length));
+        memmove(_b->bytes, b->bytes, (_b->length = MIN(b->size, b->length)));
+        _b->aux1 = b->aux1;
+        _b->aux2 = b->aux2;
+        return _b;
+    }
+    PGThrowNullPointerException;
 }
 
 void PGByteBufferDestroy(PGByteBufferPtr bb, BOOL secure) {
     if(bb) {
-        PGFreeBuffer(bb->bytes, bb->size, secure);
+        if(bb->bytes) {
+            if(secure) getrandom(bb->bytes, bb->size, 0);
+            free(bb->bytes);
+        }
         memset(bb, 0, sizeof(PGByteBuffer));
         free(bb);
     }
 }
 
 BOOL PGByteBufferCompare(PGByteBufferPtr b1, PGByteBufferPtr b2) {
-    return ((b1 == b2) || (b1 && b2 && __pg_b_cmp(b1->bytes, b1->length, b2->bytes, b2->length)));
+    return ((b1 == b2) || (b1 && b2 && (b1->length == b2->length) && ((b1->bytes == b2->bytes) || (b1->bytes && b2->bytes && PGMemEqu(b1->bytes, b2->bytes, b1->length)))));
 }
 
 NSUInteger PGByteBufferHash(PGByteBufferPtr b) {
@@ -223,13 +154,28 @@ NSUInteger PGByteBufferHash(PGByteBufferPtr b) {
 }
 
 NSData *PGByteBufferGetNSData(PGByteBufferPtr b, NSUInteger maxLength) PG_OVERLOADABLE {
-    if(!b) PGThrowNullPointerException;
-    NSUInteger cc = MIN(b->size, MIN(b->length, maxLength));
-    return (cc ? [[NSData alloc] initWithBytes:b->bytes length:cc] : [NSData new]);
+    if(b) {
+        NSUInteger available = MIN(b->length, maxLength);
+        return (available ? [[NSData alloc] initWithBytes:b->bytes length:available] : [NSData new]);
+    }
+
+    PGThrowNullPointerException;
 }
 
 NSData *PGByteBufferGetNSData(PGByteBufferPtr b) PG_OVERLOADABLE {
-    return PGByteBufferGetNSData(b, (b ? MIN(b->length, b->size) : 0));
+    return PGByteBufferGetNSData(b, NSUIntegerMax);
+}
+
+PGByteBufferPtr PGByteBufferResize(PGByteBufferPtr b, NSUInteger size) {
+    if(!b) PGThrowNullPointerException;
+    if(!size) PGThrowInvArgException(PGErrorMsgZeroLengthBuffer);
+
+    if(b->size != size) {
+        b->bytes  = PGRealloc(b->bytes, size);
+        b->length = MIN(b->length, (b->size = size));
+    }
+
+    return b;
 }
 
 /****************************************************************************************************************
@@ -237,240 +183,343 @@ NSData *PGByteBufferGetNSData(PGByteBufferPtr b) PG_OVERLOADABLE {
  ***************************************************************************************************************/
 #pragma mark BYTE QUEUES
 
+const NSUInteger PGByteQueueMinSize            = 5;
+const NSUInteger PGByteQueueDefaultInitialSize = (64 * 1024);
+
 PGByteQueuePtr PGByteQueueCreate(NSUInteger initialSize) {
-    if(initialSize == 0) PGThrowInvArgException(PGErrorMsgZeroLengthBuffer);
-    PGByteQueuePtr q = PGCalloc(1, sizeof(PGByteQueue));
-    __qbuf(q)        = malloc(__qsize(q) = q->qinit = MAX(initialSize, 2)); // Enough to hold at least one byte...
-    if(__qbuf(q)) return q;
-    free(q);
-    PGThrowOutOfMemoryException;
+    if(initialSize) {
+        PGByteQueuePtr q = PGCalloc(1, sizeof(PGByteQueue));
+        q->qbuffer = malloc(q->qinit = q->qsize = MAX(PGByteQueueMinSize, initialSize));
+        if(q->qbuffer) return q;
+        free(q);
+        PGThrowOutOfMemoryException;
+    }
+    PGThrowInvArgException(PGErrorMsgZeroLengthBuffer);
 }
 
 PGByteQueuePtr PGByteQueueCopy(PGByteQueuePtr dest, PGByteQueuePtr src) {
-    if(!src) PGThrowNullPointerException;
+    if(src && src->qbuffer) {
+        if(src->qsize) {
+            NSUInteger srclen = PGByteQueueCount(src);
 
-    if(dest) {
-        __qhead(dest) = __qtail(dest) = 0;
-        PGByteQueueEnsureRoom(dest, PGByteQueueCount(src));
-    }
-    else {
-        dest = PGByteQueueCreate(__qsize(src));
-        dest->qinit = src->qinit;
-    }
+            if(dest) {
+                dest->qhead = dest->qtail = 0;
+                PGByteQueueEnsureRoom(dest, srclen);
+            }
+            else {
+                dest = PGByteQueueCreate(src->qsize);
+                dest->qinit = src->qinit;
+            }
 
-    if(PGByteQueueCount(src)) {
-        NSByte *srchead = __qbufhead(src);
-        __qtail(dest) = PGByteQueueCount(src);
-
-        if(__qnorm(src)) {
-            memcpy(__qbuf(dest), srchead, __qnormsz(src));
+            dest->qtail = __pg_q_read(dest->qbuffer, srclen, src);
+            return dest;
         }
-        else {
-            NSUInteger cc = __qheadsz(src);
-            memcpy(__qbuf(dest), srchead, cc);
-            if(__qtail(src)) memcpy(__qbufoff(dest, cc), __qbuf(src), __qtail(src));
-        }
+        PGThrowInvArgException(PGErrorMsgZeroLengthBuffer);
     }
-
-    return dest;
+    PGThrowNullPointerException;
 }
 
-/******************************************************************************************//**
- * A normalized queue is NOT wrapped and has all of it's data starting at the beginning of
- * the queue buffer.
- *
- * @param q the queue to normalize.
- *//******************************************************************************************/
-void PGByteQueueNormalize(PGByteQueuePtr q) {
-    /* Sanity check */
-    if(!q) PGThrowNullPointerException;
-    __qtail(q) = __qnormalize(__qbuf(q), __qhead(q), __qtail(q), __qsize(q));
-    __qhead(q) = 0;
+#define __pg_q_growthfactor ((double)(1.5))
+#define __pg_q_nextsize(sz) ((NSUInteger)floor(((double)(sz)) * __pg_q_growthfactor))
+
+void PGByteQueueShrink(PGByteQueuePtr q) {
+    if(q) {
+        NSUInteger cs = PGByteQueueCount(q);
+        NSUInteger ns = q->qinit;
+
+        while(ns <= cs) ns = __pg_q_nextsize(ns);
+        if(ns < q->qsize) (__pg_q_normalize(q, NO) ? __pg_q_resize : __pg_q_hardunwrap)(q, ns);
+    }
+
+    PGThrowNullPointerException;
 }
 
 PGByteQueuePtr PGByteQueueEnsureRoom(PGByteQueuePtr q, NSUInteger delta) {
-    /* Sanity check */
-    if(!q) PGThrowNullPointerException;
+    if(q) {
+        if(q->qhead && (q->qhead == q->qtail)) q->qhead = q->qtail = 0;
 
-    /* Sanity check */
-    if(delta) {
-        /* Get the current queue buffer size.
-         * This variable will also hold the new size. */
-        NSUInteger ns     = __qsize(q);
-        /* Get the size needed. (current_byte_count + delta) */
-        NSUInteger needed = (PGByteQueueCount(q) + delta);
+        if(delta) {
+            NSUInteger dsize = (PGByteQueueCount(q) + delta);
+            NSUInteger osize = q->qsize;
+            NSUInteger nsize = osize;
 
-        /* Do we have enough room? */
-        if(ns <= needed) {
-            /* No? Double the size and check again. */
-            do { ns *= 2; } while(ns <= needed);
+            if(nsize <= dsize) {
+                do { nsize = __pg_q_nextsize(nsize); } while(nsize <= dsize);
+                __pg_q_resize(q, nsize);
 
-            /* Reallocate the queue buffer to the newer size. */
-            __qbuf(q) = PGRealloc(__qbuf(q), ns);
-
-            /* Do we need to unwrap the data? */
-            if(__qwrpd(q)) {
-                if(__qtail(q)) memmove(__qbufsize(q), __qbuf(q), __qtail(q));
-                __qtail(q) += __qsize(q);
+                if(q->qtail < q->qhead) {
+                    NSUInteger tsz   = (osize - q->qhead);
+                    NSUInteger nhead = (nsize - tsz);
+                    memmove((q->qbuffer + nhead), (q->qbuffer + q->qhead), tsz);
+                    q->qhead = nhead;
+                }
             }
-
-            /* Update the queue's size field. */
-            __qsize(q) = ns;
         }
+
+        return q;
     }
 
-    /* Return the queue size. */
-    return q;
+    PGThrowNullPointerException;
 }
 
 BOOL PGByteQueueCompare(PGByteQueuePtr q1, PGByteQueuePtr q2) {
-    return ((q1 == q2) ? YES : ((q1 && q2 && __qbuf(q1) && __qbuf(q2) && (PGByteQueueCount(q1) == PGByteQueueCount(q2))) ? __qcmp0(q1, q2) : NO));
+    return ((q1 == q2) || (q1 && q2 && (PGByteQueueCount(q1) == PGByteQueueCount(q2)) && ((q1->qhead == q1->qtail) || __pg_q_compare(q1, q2))));
 }
 
 void PGByteQueueDestroy(PGByteQueuePtr q, BOOL secure) {
     if(q) {
-        PGFreeBuffer(__qbuf(q), __qsize(q), secure);
+        if(q->qbuffer) {
+            if(secure) getrandom(q->qbuffer, q->qsize, 0);
+            free(q->qbuffer);
+        }
         memset(q, 0, sizeof(PGByteQueue));
         free(q);
     }
 }
 
 void PGByteQueueQueue(PGByteQueuePtr q, NSByte byte) PG_OVERLOADABLE {
-    if(!q) PGThrowNullPointerException; else if(__qempty(q)) __qequeue(q, byte); else __qbufcell(q, __qinc_tail(PGByteQueueEnsureRoom(q, 1), 1)) = byte;
+    PGByteQueueEnsureRoom(q, 1);
+    q->qbuffer[__pg_q_inctail(q, 1)] = byte;
 }
 
 /********************************************************************************************************//**
- * Unless 'length' is zero, this method will throw a NULL pointer exception if either 'q' or 'buffer'
- * is NULL.
+ * This method will throw a NULL pointer exception if either 'q' or 'buffer' is NULL unless length is zero.
  *
  * @param q the queue to receive the bytes.
  * @param buffer the bytes to queue.
  * @param length the number of bytes to queue.
  *//********************************************************************************************************/
 void PGByteQueueQueue(PGByteQueuePtr q, const NSByte *buffer, NSUInteger length) PG_OVERLOADABLE {
-    if(q && buffer && length) {
-        PGByteQueueEnsureRoom(q, length);
-
-        if(__qempty(q)) {
-            __qequeue(q, buffer, length);
-        }
-        else if(__qwrpd(q)) {
-            __qxqueue(q, buffer, length);
-        }
-        else {
-            NSUInteger len = __qxqueue(q, buffer, MIN(length, __qtailsz(q)));
-            __qxqueue(q, (buffer + len), (length - len));
-        }
-    }
-    else if(length) PGThrowNullPointerException;
+    if(buffer && length) __pg_q_write(q, __pg_q_inctail(PGByteQueueEnsureRoom(q, length), length), buffer, length); else if(length) PGThrowNullPointerException;
 }
 
 void PGByteQueueRequeue(PGByteQueuePtr q, NSByte byte) PG_OVERLOADABLE {
-    if(!q) PGThrowNullPointerException; else if(__qempty(q)) __qequeue(q, byte); else __qbufcell(q, __qdec_head(PGByteQueueEnsureRoom(q, 1), 1)) = byte;
+    PGByteQueueEnsureRoom(q, 1);
+    q->qbuffer[__pg_q_dechead(q, 1)] = byte;
 }
 
 void PGByteQueueRequeue(PGByteQueuePtr q, const NSByte *buffer, NSUInteger length) PG_OVERLOADABLE {
-    if(q && buffer && length) {
-        PGByteQueueEnsureRoom(q, length);
-
-        if(__qempty(q)) {
-            __qequeue(q, buffer, length);
-        }
-        else if(__qwrpd(q)) {
-            __qxrequeue(q, buffer, length);
-        }
-        else {
-            NSUInteger len = MIN(length, __qhead(q));
-            NSUInteger rem = (length - len);
-            __qxrequeue(q, (buffer + rem), len);
-            __qxrequeue(q, buffer, rem);
-        }
-    }
-    else if(length) PGThrowNullPointerException;
+    if(buffer && length) __pg_q_write(q, __pg_q_dechead(PGByteQueueEnsureRoom(q, length), length), buffer, length); else if(length) PGThrowNullPointerException;
 }
 
 NSInteger PGByteQueueDequeue(PGByteQueuePtr q) PG_OVERLOADABLE {
-    if(!q) PGThrowNullPointerException; else return (__qempty(q) ? EOF : __qbufcell(q, __qinc_head(q, 1)));
+    if(q) return ((q->qhead == q->qtail) ? EOF : q->qbuffer[__pg_q_inchead(q, 1)]);
+    PGThrowNullPointerException;
 }
 
 NSUInteger PGByteQueueDequeue(PGByteQueuePtr q, NSByte *buffer, NSUInteger maxLength) PG_OVERLOADABLE {
-    if(q && buffer && maxLength) {
+    if(q && buffer) {
         NSUInteger length = MIN(maxLength, PGByteQueueCount(q));
-
-        if(length) {
-            if(__qnorm(q)) {
-                __qxdequeue(q, buffer, length);
-            }
-            else {
-                NSUInteger len = __qxdequeue(q, buffer, MIN(length, __qheadsz(q)));
-                __qxdequeue(q, (buffer + len), (length - len));
-            }
-        }
-
-        return length;
+        return __pg_q_read(buffer, length, q, __pg_q_inchead(q, length));
     }
-    else if(maxLength) PGThrowNullPointerException;
-    return 0;
+
+    PGThrowNullPointerException;
 }
 
 NSInteger PGByteQueuePop(PGByteQueuePtr q) PG_OVERLOADABLE {
-    /* Sanity check */
-    if(!q) PGThrowNullPointerException;
-    return (__qempty(q) ? EOF : __qbufcell(q, __qdec_tail(q, 1)));
+    if(q) return ((q->qhead == q->qtail) ? EOF : q->qbuffer[__pg_q_dectail(q, 1)]);
+    PGThrowNullPointerException;
+}
+
+NSUInteger PGByteQueuePop(PGByteQueuePtr q, NSByte *buffer, NSUInteger maxLength, BOOL reverse) PG_OVERLOADABLE {
+    if(q && buffer) {
+        NSUInteger length = MIN(maxLength, PGByteQueueCount(q));
+        return __pg_q_read(buffer, length, q, __pg_q_dectail(q, length), reverse);
+    }
+    PGThrowNullPointerException;
 }
 
 NSUInteger PGByteQueuePop(PGByteQueuePtr q, NSByte *buffer, NSUInteger maxLength) PG_OVERLOADABLE {
-    /* Sanity check */
-    if(!q) PGThrowNullPointerException;
-    if(__qempty(q)) return 0;
-    return 0;
+    return PGByteQueuePop(q, buffer, maxLength, NO);
 }
 
-PGByteBufferPtr PGByteQueueGetBytes(PGByteQueuePtr q, NSUInteger length) PG_OVERLOADABLE {
-    /* Sanity check */
-    if(!q) PGThrowNullPointerException;
-    NSUInteger cc = MIN(PGByteQueueCount(q), length);
-    if(cc == 0) return NULL;
-    PGByteBufferPtr b = PGByteBufferCreate(cc);
-    b->length = PGByteQueueDequeue(q, b->bytes, b->size);
-    return b;
+PGByteBufferPtr PGByteQueueGetByteBuffer(PGByteQueuePtr q, NSUInteger length) PG_OVERLOADABLE {
+    if(q) {
+        NSUInteger len = MIN(length, PGByteQueueCount(q));
+        PGByteBufferPtr b = PGByteBufferCreate(MAX(1, len));
+        b->length = __pg_q_read(b->bytes, len, q);
+        return b;
+    }
+    PGThrowNullPointerException;
 }
 
-PGByteBufferPtr PGByteQueueGetBytes(PGByteQueuePtr q) PG_OVERLOADABLE {
-    return PGByteQueueGetBytes(q, NSUIntegerMax);
+PGByteBufferPtr PGByteQueueGetByteBuffer(PGByteQueuePtr q) PG_OVERLOADABLE {
+    return PGByteQueueGetByteBuffer(q, NSUIntegerMax);
 }
 
 NSString *PGByteQueueGetNSString(PGByteQueuePtr q, NSStringEncoding encoding) PG_OVERLOADABLE {
-    /* Sanity check */
-    if(!q) PGThrowNullPointerException;
+    if(q) {
+        NSUInteger length = PGByteQueueCount(q);
 
-    NSUInteger cc = PGByteQueueCount(q);
-    if(cc == 0) return @"";
+        if(length) {
+            NSByte *buffer = PGMalloc(length);
+            __pg_q_read(buffer, length, q);
+            return [[NSString alloc] initWithBytesNoCopy:buffer length:length encoding:encoding freeWhenDone:YES];
+        }
 
-    PGByteBufferPtr b  = PGByteQueueGetBytes(q, cc);
-    NSString        *s = [[NSString alloc] initWithBytesNoCopy:b->bytes length:b->length encoding:encoding freeWhenDone:YES];
+        return @"";
+    }
 
-    free(b);
-    return s;
+    PGThrowNullPointerException;
 }
 
 NSString *PGByteQueueGetNSString(PGByteQueuePtr q, NSStringEncoding encoding, NSUInteger length) PG_OVERLOADABLE {
-    if(length == 0) return @"";
-    NSString *s = PGByteQueueGetNSString(q, encoding);
-    return ((s.length <= length) ? s : [s substringToIndex:length]);
+    NSString *str = PGByteQueueGetNSString(q, encoding);
+    return ((length < str.length) ? [str substringWithRange:NSMakeRange(0, length)] : str);
+}
+
+NSString *PGByteQueueGetNSString(PGByteQueuePtr q) PG_OVERLOADABLE {
+    return PGByteQueueGetNSString(q, NSUTF8StringEncoding);
 }
 
 NSData *PGByteQueueGetNSData(PGByteQueuePtr q, NSUInteger length) PG_OVERLOADABLE {
-    /* Sanity check */
-    if(!q) PGThrowNullPointerException;
-    NSUInteger cc = MIN(length, PGByteQueueCount(q));
-    if(cc == 0) return [NSData new];
-    PGByteBufferPtr b  = PGByteQueueGetBytes(q, cc);
-    NSData          *d = [[NSData alloc] initWithBytesNoCopy:b->bytes length:b->length freeWhenDone:YES];
-    free(b);
-    return d;
+    if(q) {
+        NSUInteger len = MIN(length, PGByteQueueCount(q));
+
+        if(len) {
+            NSByte *buffer = PGMalloc(len);
+            __pg_q_read(buffer, len, q);
+            return [[NSData alloc] initWithBytesNoCopy:buffer length:len freeWhenDone:YES];
+        }
+
+        return PGGetEmptyNSDataSingleton();
+    }
+
+    PGThrowNullPointerException;
 }
 
 NSData *PGByteQueueGetNSData(PGByteQueuePtr q) PG_OVERLOADABLE {
     return PGByteQueueGetNSData(q, NSUIntegerMax);
+}
+
+/****************************************************************************************************************
+ * SUPPORT FUNCTIONS
+ ***************************************************************************************************************/
+#pragma mark SUPPORT FUNCTIONS
+
+NS_INLINE void __pg_q_reverse_read(NSByte *buffer, NSUInteger length, const PGByteQueue *q, NSUInteger idx) {
+    while(length) {
+        buffer[--length] = q->qbuffer[idx];
+        idx = __pg_inc(idx, 1, q->qsize);
+    }
+}
+
+NS_INLINE void __pg_q_forward_read(NSByte *buffer, NSUInteger length, const PGByteQueue *q, NSUInteger idx) {
+    NSUInteger l1 = MIN(length, (q->qsize - idx));
+    PGMemCopy(buffer, (q->qbuffer + idx), l1);
+    PGMemCopy((buffer + l1), q->qbuffer, (length - l1));
+}
+
+NS_INLINE void __pg_q_normunwrap1(const PGByteQueue *q, NSUInteger begsize, NSUInteger endsize, NSUInteger bytecnt) {
+    NSByte *bfree = (q->qbuffer + begsize);
+    memmove(bfree, (q->qbuffer + q->qhead), endsize); // Move the free space to the end of the buffer.
+    memmove((bfree + endsize), q->qbuffer, begsize);  // Move the beginning part to the free space.
+    memmove(q->qbuffer, bfree, bytecnt);              // Move everything down to the beginning.
+}
+
+NS_INLINE void __pg_q_normunwrap2(const PGByteQueue *q, NSUInteger begsize, NSUInteger endsize) {
+    memmove((q->qbuffer + endsize), q->qbuffer, begsize);  // Move enough of the free space to the beginning for the end part to fit.
+    memmove(q->qbuffer, (q->qbuffer + q->qhead), endsize); // Move the end part to the beginning.
+}
+
+NS_INLINE NSUInteger __pg_q_normunwrap3(PGByteQueuePtr q, NSUInteger begsize, NSUInteger endsize, NSUInteger newsize) {
+    NSByte *buffer = PGMalloc(newsize);
+    memcpy(buffer, (q->qbuffer + q->qhead), endsize);
+    memcpy((buffer + endsize), q->qbuffer, begsize);
+    free(q->qbuffer);
+    q->qbuffer = buffer;
+    return (begsize + endsize);
+}
+
+NS_INLINE BOOL __pg_q_normunwrap(PGByteQueuePtr q, NSUInteger bytecnt, BOOL force) {
+    NSUInteger freesize = (q->qhead - q->qtail);
+    NSUInteger endsize  = (q->qsize - q->qhead);
+    NSUInteger begsize  = (q->qtail);
+
+    if(begsize <= freesize) __pg_q_normunwrap1(q, begsize, endsize, bytecnt);
+    else if(endsize <= freesize) __pg_q_normunwrap2(q, begsize, endsize);
+    else if(force) __pg_q_normunwrap3(q, begsize, endsize, q->qsize);
+    else return NO;
+    return YES;
+}
+
+NS_INLINE BOOL __pg_q_cmp1(const NSByte *q1data, const NSByte *q2data, const PGByteQueue *q2, NSUInteger q2tsz) {
+    return (PGMemEqu(q1data, q2data, q2tsz) && PGMemEqu((q1data + q2tsz), q2->qbuffer, q2->qtail));
+}
+
+NS_INLINE BOOL __pg_q_cmp2(const PGByteQueue *q1, const PGByteQueue *q2, const NSByte *q1data, const NSByte *q2data, NSUInteger q1tsz, NSUInteger q2tsz) {
+    NSUInteger tdiff = (q1tsz - q2tsz);
+    return PGMemEqu(q1data, q2data, q2tsz) && PGMemEqu((q1data + q2tsz), q2->qbuffer, tdiff) && PGMemEqu(q1->qbuffer, (q2->qbuffer + tdiff), q1->qtail);
+}
+
+BOOL __pg_q_compare(const PGByteQueue *q1, const PGByteQueue *q2) {
+    BOOL       q1norm  = (q1->qhead < q1->qtail);
+    BOOL       q2norm  = (q2->qhead < q2->qtail);
+    NSByte     *q1data = (q1->qbuffer + q1->qhead);
+    NSByte     *q2data = (q2->qbuffer + q2->qhead);
+    NSUInteger q1tsz   = (q1->qsize - q1->qhead);
+    NSUInteger q2tsz   = (q2->qsize - q2->qhead);
+
+    /*@f:0*/ if(q1norm && q2norm) return PGMemEqu(q1data, q2data, (q1->qtail - q1->qhead));
+    else     if(q1norm)           return __pg_q_cmp1(q1data, q2data, q2, q2tsz);
+    else     if(q2norm)           return __pg_q_cmp1(q2data, q1data, q1, q1tsz);
+    else     if(q1tsz == q2tsz)   return (PGMemEqu(q1data, q2data, q1tsz) && PGMemEqu(q1->qbuffer, q2->qbuffer, q1->qtail));
+    else     if(q1tsz > q2tsz)    return __pg_q_cmp2(q1, q2, q1data, q2data, q1tsz, q2tsz);
+    else                          return __pg_q_cmp2(q2, q1, q2data, q1data, q2tsz, q1tsz); /*@f:1*/
+}
+
+NSUInteger __pg_q_write(PGByteQueue *q, NSUInteger idx, const NSByte *buffer, NSUInteger length) {
+    NSUInteger l1 = MIN(length, (q->qsize - idx));
+    /*
+     * At this point we know for sure that we have enough room between
+     * the head and the tail no matter how they're positioned and the
+     * space we are going to write to will either be wrapped or not.
+     *
+     * 'l1' is going to be either equal to or less than 'length'. If 'l1'
+     * is equal to 'length' then the space is not wrapped and the second
+     * call to PGMemCopy(...) will do nothing.
+     */
+    PGMemCopy((q->qbuffer + idx), buffer, l1);
+    PGMemCopy(q->qbuffer, (buffer + l1), (length - l1));
+    return length;
+}
+
+NSUInteger __pg_q_read(NSByte *buffer, NSUInteger length, const PGByteQueue *q, NSUInteger idx, BOOL reverse) PG_OVERLOADABLE {
+    if(length) (reverse ? __pg_q_reverse_read : __pg_q_forward_read)(buffer, length, q, idx);
+    return length;
+}
+
+NSUInteger __pg_q_read(NSByte *buffer, NSUInteger length, const PGByteQueue *q, NSUInteger idx) PG_OVERLOADABLE {
+    return __pg_q_read(buffer, length, q, idx, NO);
+}
+
+NSUInteger __pg_q_read(NSByte *buffer, NSUInteger length, const PGByteQueue *q) PG_OVERLOADABLE {
+    return __pg_q_read(buffer, length, q, q->qhead, NO);
+}
+
+NSUInteger __pg_q_read(NSByte *buffer, NSUInteger length, const PGByteQueue *q, BOOL reverse) PG_OVERLOADABLE {
+    return __pg_q_read(buffer, length, q, q->qhead, reverse);
+}
+
+BOOL __pg_q_normalize(PGByteQueuePtr q, BOOL force) {
+    BOOL       success = YES;
+    NSUInteger bytecnt = PGByteQueueCount(q);
+
+    if(bytecnt) {
+        if(q->qhead < q->qtail) memmove(q->qbuffer, (q->qbuffer + q->qhead), bytecnt);
+        else success = __pg_q_normunwrap(q, bytecnt, force);
+    }
+
+    if(success) {
+        q->qhead = 0;
+        q->qtail = bytecnt;
+    }
+
+    return success;
+}
+
+NSUInteger __pg_q_hardunwrap(PGByteQueuePtr q, NSUInteger newsize) {
+    q->qtail = __pg_q_normunwrap3(q, q->qtail, (q->qsize - q->qhead), newsize);
+    q->qhead = 0;
+    return q->qtail;
 }

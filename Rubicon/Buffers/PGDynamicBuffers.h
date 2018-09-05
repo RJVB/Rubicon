@@ -23,9 +23,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-FOUNDATION_EXPORT const NSUInteger PGDynByteQueueDefaultInitialSize;
-FOUNDATION_EXPORT const NSUInteger PGDynByteQueueMinSize;
-
 typedef NSInteger (^PGDynamicByteBufferOpBlock)(NSByte *buffer, NSUInteger size, NSUInteger *pHead, NSUInteger *pTail, NSError **error);
 
 @interface PGDynamicByteQueue : NSObject<NSCopying, NSLocking>

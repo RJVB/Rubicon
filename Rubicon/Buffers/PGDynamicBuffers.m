@@ -18,9 +18,6 @@
 #import "PGDynamicBuffers.h"
 #import "PGDynamicBufferTools.h"
 
-const NSUInteger PGDynByteQueueMinSize            = ((NSUInteger)(5));
-const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
-
 @interface PGDynamicByteQueue()
 
     @property(readonly) NSUInteger     roomRemaining;
@@ -41,7 +38,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
         self = [super init];
 
         if(self) {
-            _q = PGByteQueueCreate(PGDynByteQueueDefaultInitialSize);
+            _q = PGByteQueueCreate(PGByteQueueDefaultInitialSize);
         }
 
         return self;
@@ -58,7 +55,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
     }
 
     -(instancetype)initWithNSData:(NSData *)nsData {
-        self = [self initWithInitialSize:MAX(PGDynByteQueueMinSize, nsData.length + 1)];
+        self = [self initWithInitialSize:MAX(PGByteQueueMinSize, nsData.length + 1)];
 
         if(self) {
             PGByteQueuePtr q = self.q;
@@ -70,7 +67,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
     }
 
     -(instancetype)initWithBytes:(const NSByte *)bytes length:(NSUInteger)length {
-        self = [self initWithInitialSize:MAX(PGDynByteQueueMinSize, length + 1)];
+        self = [self initWithInitialSize:MAX(PGByteQueueMinSize, length + 1)];
 
         if(self) {
             if(!bytes) PGThrowNullPointerException;
@@ -85,7 +82,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
     }
 
     -(instancetype)initWithByteQueue:(PGByteQueuePtr)q {
-        self = [self initWithInitialSize:(q ? q->qsize : PGDynByteQueueMinSize)];
+        self = [self initWithInitialSize:(q ? q->qsize : PGByteQueueMinSize)];
 
         if(self) {
             if(!q) PGThrowNullPointerException;
@@ -120,7 +117,7 @@ const NSUInteger PGDynByteQueueDefaultInitialSize = ((NSUInteger)(64 * 1024));
     }
 
     -(void)_unwrapQueue:(NSUInteger)newSize {
-        PGByteQueueNormalize(self.q);
+        PGByteQueueShrink(self.q);
     }
 
     -(BOOL)_isEqualToQueue:(PGDynamicByteQueue *)other {
