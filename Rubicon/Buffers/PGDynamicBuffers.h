@@ -29,18 +29,17 @@ typedef NSInteger (^PGDynamicByteBufferOpBlock)(NSByte *buffer, NSUInteger size,
 
     @property(readonly) NSUInteger count;
     @property(readonly) BOOL       isEmpty;
-    @property /*     */ BOOL       willShrink;
     @property /*     */ BOOL       secure;
 
     -(instancetype)init NS_DESIGNATED_INITIALIZER;
 
     -(instancetype)initWithInitialSize:(NSUInteger)initialSize NS_DESIGNATED_INITIALIZER;
 
-    -(instancetype)initWithNSData:(NSData *)nsData;
+    -(instancetype)initWithNSData:(NSData *)nsData NS_DESIGNATED_INITIALIZER;
 
-    -(instancetype)initWithBytes:(const NSByte *)bytes length:(NSUInteger)length;
+    -(instancetype)initWithBytes:(const void *)bytes length:(NSUInteger)length NS_DESIGNATED_INITIALIZER;
 
-    -(instancetype)initWithQueue:(PGDynamicByteQueue *)q;
+    -(instancetype)initWithQueue:(PGDynamicByteQueue *)q NS_DESIGNATED_INITIALIZER;
 
     -(void)dealloc;
 

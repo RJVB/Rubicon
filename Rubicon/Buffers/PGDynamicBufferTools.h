@@ -38,6 +38,7 @@ typedef struct {
     NSUInteger size;
     NSUInteger aux1;
     NSUInteger aux2;
+    BOOL       secure;
 }                                  PGByteBuffer;
 typedef PGByteBuffer               *PGByteBufferPtr;
 
@@ -46,6 +47,14 @@ typedef struct {
     NSUInteger   length;
 }                                  PGByteBufferList;
 typedef PGByteBufferList           *PGByteBufferListPtr;
+
+FOUNDATION_EXPORT PGByteBufferPtr PGByteBufferCreate(NSUInteger size, BOOL secure) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT PGByteBufferPtr PGByteBufferCreate(NSByte *bytes, NSUInteger length, BOOL secure) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT PGByteBufferPtr PGByteBufferCreate(NSData *data, NSUInteger length, BOOL secure) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT PGByteBufferPtr PGByteBufferCreate(NSData *data, BOOL secure) PG_OVERLOADABLE;
 
 FOUNDATION_EXPORT PGByteBufferPtr PGByteBufferCreate(NSUInteger size) PG_OVERLOADABLE;
 
@@ -59,7 +68,7 @@ FOUNDATION_EXPORT PGByteBufferPtr PGByteBufferResize(PGByteBufferPtr b, NSUInteg
 
 FOUNDATION_EXPORT PGByteBufferPtr PGByteBufferCopy(PGByteBufferPtr b);
 
-FOUNDATION_EXPORT void PGByteBufferDestroy(PGByteBufferPtr bb, BOOL secure);
+FOUNDATION_EXPORT void PGByteBufferDestroy(PGByteBufferPtr bb);
 
 FOUNDATION_EXPORT BOOL PGByteBufferCompare(PGByteBufferPtr b1, PGByteBufferPtr b2);
 
@@ -78,13 +87,14 @@ FOUNDATION_EXPORT const NSUInteger PGByteQueueDefaultInitialSize;
 FOUNDATION_EXPORT const NSUInteger PGByteQueueMinSize;
 
 typedef struct {
+    NSByte     *qbuffer;
     NSUInteger qinit; // The initial size of the queue.
     NSUInteger qsize; // The current size of the queue.
     NSUInteger qhead;
     NSUInteger qtail;
     NSUInteger aux1;
     NSUInteger aux2;
-    NSByte     *qbuffer;
+    BOOL       secure;
 }                                  PGByteQueue;
 typedef PGByteQueue                *PGByteQueuePtr;
 
@@ -93,7 +103,19 @@ NS_INLINE NSUInteger PGByteQueueCount(const PGByteQueuePtr q)         { return (
 NS_INLINE NSUInteger PGByteQueueRoomRemaining(const PGByteQueuePtr q) { return (q ? (q->qsize - PGByteQueueCount(q) - 1) : 0); }
 //@f:1
 
-FOUNDATION_EXPORT PGByteQueuePtr PGByteQueueCreate(NSUInteger initialSize);
+FOUNDATION_EXPORT PGByteQueuePtr PGByteQueueCreate(NSUInteger initialSize, BOOL secure) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT PGByteQueuePtr PGByteQueueCreate(NSData *data, BOOL secure) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT PGByteQueuePtr PGByteQueueCreate(const void *buffer, NSUInteger length, BOOL secure) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT PGByteQueuePtr PGByteQueueCreate(NSUInteger initialSize) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT PGByteQueuePtr PGByteQueueCreate(NSData *data) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT PGByteQueuePtr PGByteQueueCreate(const void *buffer, NSUInteger length) PG_OVERLOADABLE;
+
+FOUNDATION_EXPORT PGByteQueuePtr PGByteQueueCreate(PGByteQueuePtr q) PG_OVERLOADABLE;
 
 FOUNDATION_EXPORT PGByteQueuePtr PGByteQueueCopy(PGByteQueuePtr dest, PGByteQueuePtr src);
 
@@ -103,7 +125,7 @@ FOUNDATION_EXPORT PGByteQueuePtr PGByteQueueEnsureRoom(PGByteQueuePtr q, NSUInte
 
 FOUNDATION_EXPORT BOOL PGByteQueueCompare(PGByteQueuePtr q1, PGByteQueuePtr q2);
 
-FOUNDATION_EXPORT void PGByteQueueDestroy(PGByteQueuePtr q, BOOL secure);
+FOUNDATION_EXPORT void PGByteQueueDestroy(PGByteQueuePtr q);
 
 FOUNDATION_EXPORT void PGByteQueueQueue(PGByteQueuePtr q, NSByte byte) PG_OVERLOADABLE;
 

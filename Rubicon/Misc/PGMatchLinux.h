@@ -27,6 +27,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+__BEGIN_DECLS
+
+int getrandom_dev(void *buffer, size_t length, char blocking);
+
+int getentropy_pseudo(void *buffer, size_t size);
+
+__END_DECLS
+
 #if defined(__APPLE__)
 
     #include <Availability.h>

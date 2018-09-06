@@ -183,6 +183,8 @@
 		1117DFCF95D4A9E8F308BF65 /* PGDOMProcessingInstruction.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DB903F8D620254A9E1DE /* PGDOMProcessingInstruction.m */; };
 		1117DFF42523DD75441A975B /* PGXMLParserAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D4093F1F5017DBD7CA6B /* PGXMLParserAttribute.m */; };
 		8331476120B97A9B00BA6172 /* libxml2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 8331476020B97A9B00BA6172 /* libxml2.tbd */; };
+		8353A99621419B190017D1DE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8353A99521419B190017D1DE /* main.m */; };
+		8353A99C21419B440017D1DE /* Rubicon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83CC448C1E0B037700DDE50D /* Rubicon.framework */; };
 		838950C120CEF2FD00997982 /* CommonBaseClass.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D1C50288D6AC04C60456 /* CommonBaseClass.h */; };
 		838950C220CEF2FD00997982 /* PGXMLParserDelegateTest.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DC143F7A3F3F8BBA3A2A /* PGXMLParserDelegateTest.h */; };
 		83CC44961E0B037700DDE50D /* Rubicon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83CC448C1E0B037700DDE50D /* Rubicon.framework */; };
@@ -191,6 +193,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		8353A99A21419B270017D1DE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CC44831E0B037600DDE50D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 83CC448B1E0B037600DDE50D;
+			remoteInfo = Rubicon;
+		};
 		83CC44971E0B037700DDE50D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 83CC44831E0B037600DDE50D /* Project object */;
@@ -199,6 +208,18 @@
 			remoteInfo = Rubicon;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8353A99121419B190017D1DE /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1117D0018483764220700B13 /* CommonBaseClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonBaseClass.m; sourceTree = "<group>"; };
@@ -388,6 +409,8 @@
 		1117DFE6672AA459ED019B08 /* PGDOMAttributeMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDOMAttributeMap.m; sourceTree = "<group>"; };
 		1117DFECC181D5FC0A05066D /* PGDOMDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDOMDocument.h; sourceTree = "<group>"; };
 		8331476020B97A9B00BA6172 /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
+		8353A99321419B190017D1DE /* TypeSizes */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TypeSizes; sourceTree = BUILT_PRODUCTS_DIR; };
+		8353A99521419B190017D1DE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		83CC448C1E0B037700DDE50D /* Rubicon.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Rubicon.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		83CC448F1E0B037700DDE50D /* Rubicon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Rubicon.h; sourceTree = "<group>"; };
 		83CC44951E0B037700DDE50D /* RubiconTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RubiconTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -395,6 +418,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		8353A99021419B190017D1DE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8353A99C21419B440017D1DE /* Rubicon.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		83CC44881E0B037600DDE50D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -800,6 +831,14 @@
 			path = CommandLine;
 			sourceTree = "<group>";
 		};
+		8353A99421419B190017D1DE /* TypeSizes */ = {
+			isa = PBXGroup;
+			children = (
+				8353A99521419B190017D1DE /* main.m */,
+			);
+			path = TypeSizes;
+			sourceTree = "<group>";
+		};
 		839778FF20694997007D3746 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -813,6 +852,7 @@
 			children = (
 				83CC448E1E0B037700DDE50D /* Rubicon */,
 				83CC44991E0B037700DDE50D /* RubiconTests */,
+				8353A99421419B190017D1DE /* TypeSizes */,
 				83CC448D1E0B037700DDE50D /* Products */,
 				1117DCDB154DA26365CAEF76 /* SupportingFiles */,
 				839778FF20694997007D3746 /* Frameworks */,
@@ -824,6 +864,7 @@
 			children = (
 				83CC448C1E0B037700DDE50D /* Rubicon.framework */,
 				83CC44951E0B037700DDE50D /* RubiconTests.xctest */,
+				8353A99321419B190017D1DE /* TypeSizes */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -969,6 +1010,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		8353A99221419B190017D1DE /* TypeSizes */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8353A99921419B190017D1DE /* Build configuration list for PBXNativeTarget "TypeSizes" */;
+			buildPhases = (
+				8353A98F21419B190017D1DE /* Sources */,
+				8353A99021419B190017D1DE /* Frameworks */,
+				8353A99121419B190017D1DE /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8353A99B21419B270017D1DE /* PBXTargetDependency */,
+			);
+			name = TypeSizes;
+			productName = TypeSizes;
+			productReference = 8353A99321419B190017D1DE /* TypeSizes */;
+			productType = "com.apple.product-type.tool";
+		};
 		83CC448B1E0B037600DDE50D /* Rubicon */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 83CC44A01E0B037700DDE50D /* Build configuration list for PBXNativeTarget "Rubicon" */;
@@ -1015,6 +1074,11 @@
 				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = "Project Galen";
 				TargetAttributes = {
+					8353A99221419B190017D1DE = {
+						CreatedOnToolsVersion = 9.4.1;
+						DevelopmentTeam = Q5XWZ7S7E9;
+						ProvisioningStyle = Automatic;
+					};
 					83CC448B1E0B037600DDE50D = {
 						CreatedOnToolsVersion = 8.2;
 						DevelopmentTeam = Q5XWZ7S7E9;
@@ -1042,6 +1106,7 @@
 			targets = (
 				83CC448B1E0B037600DDE50D /* Rubicon */,
 				83CC44941E0B037700DDE50D /* RubiconTests */,
+				8353A99221419B190017D1DE /* TypeSizes */,
 			);
 		};
 /* End PBXProject section */
@@ -1065,6 +1130,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		8353A98F21419B190017D1DE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8353A99621419B190017D1DE /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		83CC44871E0B037600DDE50D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1170,6 +1243,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		8353A99B21419B270017D1DE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 83CC448B1E0B037600DDE50D /* Rubicon */;
+			targetProxy = 8353A99A21419B270017D1DE /* PBXContainerItemProxy */;
+		};
 		83CC44981E0B037700DDE50D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 83CC448B1E0B037600DDE50D /* Rubicon */;
@@ -1178,6 +1256,37 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		8353A99721419B190017D1DE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Q5XWZ7S7E9;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		8353A99821419B190017D1DE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Q5XWZ7S7E9;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		83CC449E1E0B037700DDE50D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1364,6 +1473,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		8353A99921419B190017D1DE /* Build configuration list for PBXNativeTarget "TypeSizes" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8353A99721419B190017D1DE /* Debug */,
+				8353A99821419B190017D1DE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		83CC44861E0B037600DDE50D /* Build configuration list for PBXProject "Rubicon" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
