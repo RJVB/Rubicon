@@ -78,19 +78,14 @@ ssize_t __getrandom_getentropy(void *buffer, size_t length) {
 ssize_t getrandom(void *buffer, size_t length, unsigned int flags) {
     if(buffer) {
         if(length) {
-            if(flags == -1) {
-                return __getrandom_getentropy(buffer, length);
+            char blkread = ((flags & GRND_NONBLOCK) == GRND_NONBLOCK);
+            char blksrc  = ((flags & GRND_RANDOM) == GRND_RANDOM);
+            if(blkread || pg_getrandom_strict) {
+                char *src   = randsrc(blksrc);
+                int  oflags = (blkread ? O_NONBLOCK : 0);
+                return __getrandom_dev(buffer, length, src, oflags);
             }
-            else {
-                char blkread = ((flags & GRND_NONBLOCK) == GRND_NONBLOCK);
-                char blksrc  = ((flags & GRND_RANDOM) == GRND_RANDOM);
-                if(blkread || pg_getrandom_strict) {
-                    char *src   = randsrc(blksrc);
-                    int  oflags = (blkread ? O_NONBLOCK : 0);
-                    return __getrandom_dev(buffer, length, src, oflags);
-                }
-                return __getrandom_getentropy(buffer, length);
-            }
+            return __getrandom_getentropy(buffer, length);
         }
         return 0;
     }

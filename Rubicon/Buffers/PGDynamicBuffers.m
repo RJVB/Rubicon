@@ -26,7 +26,7 @@
 
     -(BOOL)_isEqualToQueue:(PGDynamicByteQueue *)other;
 
-    -(NSInteger)performOperation:(PGDynamicByteBufferOpBlock)opBlock byteQueue:(PGByteQueuePtr)byteQueue error:(NSError **)error;
+    -(NSInteger)_performOperation:(PGDynamicByteBufferOpBlock)opBlock byteQueue:(PGByteQueuePtr)byteQueue error:(NSError **)error;
 
 @end
 
@@ -104,14 +104,14 @@
 
     -(BOOL)secure {
         [self lock];
-        BOOL s = (_q ? _q->secure : NO);
+        BOOL s = (_q ? _q->qsecure : NO);
         [self unlock];
         return s;
     }
 
     -(void)setSecure:(BOOL)secure {
         [self lock];
-        if(_q) _q->secure = secure;
+        if(_q) _q->qsecure = secure;
         [self unlock];
     }
 
@@ -131,6 +131,15 @@
 
     -(NSUInteger)hash {
         return 0;
+    }
+
+    -(void)clear {
+        [self lock];
+        @try {
+            _q->qhead = _q->qtail = 0;
+            PGByteQueueShrink(_q);
+        }
+        @finally { [self unlock]; }
     }
 
     -(void)queue:(NSByte)byte {
@@ -173,37 +182,45 @@
         @try { return PGByteQueuePop(_q, buffer, length); } @finally { [self unlock]; }
     }
 
-    -(NSInteger)performOperation:(PGDynamicByteBufferOpBlock)opBlock byteQueue:(PGByteQueuePtr)byteQueue error:(NSError **)error {
-        return opBlock(byteQueue->qbuffer, byteQueue->qsize, &byteQueue->qhead, &byteQueue->qtail, error);
+    -(NSInteger)_performOperation:(PGDynamicByteBufferOpBlock)opBlock byteQueue:(PGByteQueuePtr)byteQueue error:(NSError **)error {
+        NSError   *e = nil;
+        NSInteger i  = opBlock(byteQueue->qbuffer, byteQueue->qsize, &byteQueue->qhead, &byteQueue->qtail, &e);
+        if(error) *error = e;
+        if(!e) PGByteQueueShrink(byteQueue);
+        return i;
     }
 
     -(NSInteger)performOperation:(PGDynamicByteBufferOpBlock)opBlock restoreOnExceptionOrError:(BOOL)restoreFlag error:(NSError **)error {
         NSError   *e = nil;
         NSInteger i  = 0;
 
-        if(restoreFlag) {
-            PGByteQueuePtr tq = PGByteQueueCreate(_q);
+        [self lock];
+        @try {
+            if(restoreFlag) {
+                PGByteQueuePtr tq = PGByteQueueCreate(_q);
 
-            @try {
-                i = [self performOperation:opBlock byteQueue:_q error:&e];
+                @try {
+                    i = [self _performOperation:opBlock byteQueue:_q error:&e];
 
-                if(e) {
+                    if(e) {
+                        PGByteQueueDestroy(_q);
+                        _q = tq;
+                    }
+                    else {
+                        PGByteQueueDestroy(tq);
+                    }
+                }
+                @catch(NSException *ex) {
                     PGByteQueueDestroy(_q);
                     _q = tq;
-                }
-                else {
-                    PGByteQueueDestroy(tq);
+                    @throw ex;
                 }
             }
-            @catch(NSException *ex) {
-                PGByteQueueDestroy(_q);
-                _q = tq;
-                @throw ex;
+            else {
+                i = [self _performOperation:opBlock byteQueue:_q error:&e];
             }
         }
-        else {
-            i = [self performOperation:opBlock byteQueue:_q error:&e];
-        }
+        @finally { [self unlock]; }
 
         if(error) *error = e;
         return i;
@@ -211,7 +228,7 @@
 
     -(NSData *)getNSData {
         [self lock];
-        @try { return PGByteQueueGetNSData(_q); } @finally { [self unlock]; }
+        @try { return PGByteQueueGetNSData(_q, NSUIntegerMax); } @finally { [self unlock]; }
     }
 
     -(NSData *)getNSData:(NSUInteger)length {
@@ -221,7 +238,7 @@
 
     -(NSString *)getNSString {
         [self lock];
-        @try { return PGByteQueueGetNSString(_q, NSUTF8StringEncoding); } @finally { [self unlock]; }
+        @try { return PGByteQueueGetNSString(_q, NSUTF8StringEncoding, NSUIntegerMax); } @finally { [self unlock]; }
     }
 
     -(NSString *)getNSStringOfLength:(NSUInteger)length {
@@ -231,7 +248,7 @@
 
     -(NSString *)getNSString:(NSStringEncoding)encoding {
         [self lock];
-        @try { return PGByteQueueGetNSString(_q, encoding); } @finally { [self unlock]; }
+        @try { return PGByteQueueGetNSString(_q, encoding, NSUIntegerMax); } @finally { [self unlock]; }
     }
 
     -(NSString *)getNSString:(NSStringEncoding)encoding length:(NSUInteger)length {
@@ -241,7 +258,7 @@
 
     -(char *)getUTF8String {
         [self lock];
-        @try { return strdup(PGByteQueueCount(_q) ? PGByteQueueGetNSString(_q, NSUTF8StringEncoding).UTF8String : ""); } @finally { [self unlock]; }
+        @try { return strdup(PGByteQueueCount(_q) ? PGByteQueueGetNSString(_q, NSUTF8StringEncoding, NSUIntegerMax).UTF8String : ""); } @finally { [self unlock]; }
     }
 
     -(char *)getUTF8String:(NSUInteger)length {

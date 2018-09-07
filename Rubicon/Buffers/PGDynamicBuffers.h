@@ -49,6 +49,8 @@ typedef NSInteger (^PGDynamicByteBufferOpBlock)(NSByte *buffer, NSUInteger size,
 
     -(NSUInteger)hash;
 
+    -(void)clear;
+
     -(void)queue:(NSByte)byte;
 
     -(void)queue:(const NSByte *)buffer length:(NSUInteger)length;
