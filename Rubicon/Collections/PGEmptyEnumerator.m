@@ -30,12 +30,10 @@
     }
 
     +(instancetype)emptyEnumerator {
-        static PGEmptyEnumerator *_enum = nil;
-
-        @synchronized([PGEmptyEnumerator class]) {
-            if(_enum == nil) _enum = [self new];
-            return _enum;
-        }
+        static dispatch_once_t   _enumPred = 0;
+        static PGEmptyEnumerator *_enum    = nil;
+        dispatch_once(&_enumPred, ^{ _enum = [self new]; });
+        return _enum;
     }
 
     -(id)nextObject {

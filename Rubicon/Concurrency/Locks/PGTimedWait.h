@@ -30,8 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGTimedWait : NSObject
 
-    @property(atomic, readonly, copy) PGTimeSpec *absTime;
-    @property(atomic, readonly) volatile BOOL    didTimeOut;
+    @property(readonly, copy) PGTimeSpec *absTime;
+    @property(readonly) BOOL             didTimeOut;
 
     -(instancetype)initWithTimeout:(PGTimeSpec *)absTime;
 

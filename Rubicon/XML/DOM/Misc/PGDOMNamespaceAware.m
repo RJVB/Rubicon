@@ -157,9 +157,9 @@
 
     +(NSRegularExpression *)validationRegex {
         static NSRegularExpression *_regex     = nil;
-        static dispatch_once_t     _regex_pred = 0;
+        static dispatch_once_t     _regex_once = 0;
 
-        dispatch_once(&_regex_pred, ^{
+        dispatch_once(&_regex_once, ^{
             PGLogger *logger   = [PGLogger sharedInstanceWithClass:[PGDOMNamespaceAware class]];
             NSError  *error    = nil;
             NSString *strRegex = [NSString stringWithUTF8String:PGXML_NCNAME];

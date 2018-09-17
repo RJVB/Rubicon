@@ -54,15 +54,13 @@
 
     +(PGDOMImplementationList *)instance {
         static NSMutableDictionary<NSString *, PGDOMImplementationList *> *_instanceMap = nil;
-
-        @synchronized([PGDOMImplementationList class]) {
-            NSString                *_className = NSStringFromClass([self class]);
-            PGDOMImplementationList *_instance  = nil;
-
+        __block PGDOMImplementationList                                   *_instance    = nil;
+        dispatch_sync(PGSharedSerialQueue(), ^{
+            NSString *_className = NSStringFromClass([self class]);
             if(_instanceMap == nil) _instanceMap = [[NSMutableDictionary alloc] initWithCapacity:5]; else _instance = _instanceMap[_className];
             if(_instance == nil) _instanceMap[_className] = _instance = [(PGDOMImplementationList *)[[self class] alloc] init];
-            return _instance;
-        }
+        });
+        return _instance;
     }
 
 @end

@@ -53,6 +53,25 @@ static const char *ASCII_REPL2[] = {
         "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~", "␡"
 };
 
+NS_INLINE NSUInteger __pg_hash_end(const NSUInteger *wbuffer, NSUInteger hash, NSUInteger endBytes) {
+    if(endBytes) {
+        NSUInteger endWord = 0;
+        memcpy(&endWord, wbuffer, endBytes);
+        hash = ((hash * 31u) + endWord);
+    }
+
+    return hash;
+}
+
+NS_INLINE NSUInteger __pg_hash_main(const NSUInteger *wbuffer, NSUInteger hash, NSUInteger maxLength, NSUInteger wordCount) {
+    if(wordCount) { while(wordCount--) hash = ((hash * 31u) + (*(wbuffer++))); }
+    return __pg_hash_end(wbuffer, hash, (maxLength % sizeof(NSUInteger)));
+}
+
+NS_INLINE NSUInteger __pg_hash(const NSUInteger *wbuffer, NSUInteger hash, NSUInteger maxLength) {
+    return __pg_hash_main(wbuffer, hash, maxLength, (maxLength / sizeof(NSUInteger)));
+}
+
 NSBitmapImageRep *PGCreateARGBImage(NSFloat width, NSFloat height) {
     NSInteger iWidth  = (NSInteger)ceil(width);
     NSInteger iHeight = (NSInteger)ceil(height);
@@ -72,8 +91,7 @@ NSBitmapImageRep *PGCreateARGBImage(NSFloat width, NSFloat height) {
 }
 
 BOOL PGSaveImageAsPNG(NSBitmapImageRep *image, NSString *filename, NSError **error) {
-    NSData *pngData = [image representationUsingType:NSPNGFileType properties:@{}];
-    return [pngData writeToFile:filename options:0 error:error];
+    return [[image representationUsingType:NSPNGFileType properties:@{}] writeToFile:filename options:0 error:error];
 }
 
 size_t PGCopyString(char **ptr, const char *str) {
@@ -413,34 +431,15 @@ char *__pg_cleanstr(const char *str, size_t len, char includeSpaces) {
     return NULL;
 }
 
-NSUInteger PGHashEnding(NSUInteger hash, const void *buffer, size_t length) {
-    if(length) {
-        NSUInteger r = 0;
-        memcpy(&r, buffer, length);
-        hash = ((hash * 31u) + r);
-    }
-
-    return hash;
-}
-
-NSUInteger PGHashMain(NSUInteger hash, const void *buffer, size_t length) {
-    NSUInteger       m  = (length / sizeof(NSUInteger));
-    NSUInteger       o  = (length % sizeof(NSUInteger));
-    const NSUInteger *p = buffer;
-
-    if(m) { while(m--) hash = ((hash * 31u) + (*(p++))); }
-    return PGHashEnding(hash, p, o);
-}
-
 NSUInteger PGHash(const void *buffer, size_t length) {
-    return (buffer ? (length ? PGHashMain((31u + length), buffer, MIN(length, 4096)) : 1) : 0);
+    return ((buffer && length) ? __pg_hash(buffer, (31u + length), MIN(length, 4096)) : (length ? 0 : 1));
 }
 
-char *PG_OVERLOADABLE PGCleanStr(const char *str, size_t len, char includeSpaces) {
+char *PGCleanStr(const char *str, size_t len, char includeSpaces) PG_OVERLOADABLE {
     return __pg_cleanstr(str, len, includeSpaces);
 }
 
-NSUInteger PG_OVERLOADABLE PGCStringHash(const char *str, size_t len) {
+NSUInteger PGCStringHash(const char *str, size_t len) PG_OVERLOADABLE {
     return PGHash((voidp const)str, len);
 }
 
@@ -450,4 +449,15 @@ NSData *PGGetEmptyNSDataSingleton() {
 
     dispatch_once(&__singletonCreated, ^{ __singletonEmptyNSData = [NSData new]; });
     return __singletonEmptyNSData;
+}
+
+dispatch_queue_t PGSharedSerialQueue() {
+    static dispatch_once_t  _serialQOnce = 0;
+    static dispatch_queue_t _serialQueue = nil;
+
+    dispatch_once(&_serialQOnce, ^{
+        _serialQueue = dispatch_queue_create(PGSharedSerialQueueLabel, DISPATCH_QUEUE_SERIAL);
+    });
+
+    return _serialQueue;
 }

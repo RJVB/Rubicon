@@ -31,12 +31,12 @@ typedef TimeSpec        *PTimeSpec;
 typedef struct timeval  TimeVal;
 typedef TimeVal         *PTimeVal;
 
-#define PG_NANOS_PER_SECOND   UINT64_C(1000000000)
-#define PG_NANOS_PER_MILLI    UINT64_C(1000000)
-#define PG_NANOS_PER_MICRO    UINT64_C(1000)
-#define PG_MICROS_PER_SECOND  UINT64_C(1000000)
-#define PG_MICROS_PER_MILLI   UINT64_C(1000)
-#define PG_MILLIS_PER_SECOND  UINT64_C(1000)
+#define PG_NANOS_PER_SECOND   UINT32_C(1000000000)
+#define PG_NANOS_PER_MILLI    UINT32_C(1000000)
+#define PG_NANOS_PER_MICRO    UINT32_C(1000)
+#define PG_MICROS_PER_SECOND  UINT32_C(1000000)
+#define PG_MICROS_PER_MILLI   UINT32_C(1000)
+#define PG_MILLIS_PER_SECOND  UINT32_C(1000)
 
 #define PG_DAYS_PER_YEAR      UINT32_C(365)
 #define PG_HOURS_PER_DAY      UINT32_C(24)
@@ -67,6 +67,29 @@ typedef TimeVal         *PTimeVal;
 
 #define I64(i) ((NSLong)(i))
 #define D64(d) ((NSFloat)(d))
+
+#define PGTimeSpecZero(ts) (((ts).tv_sec == 0) && ((ts).tv_nsec == 0))
+
+/**
+ * Calculate the difference between two times. This function will populate the timespec structure passed in "diff" with the difference
+ * in absolute values for seconds and nanoseconds. This function will also return a value to indicate if the two times are the same
+ * (0), if "older" represents a time that occurred before "newer" (1), or if "older" represents a time that occurred after "newer"
+ * (-1). In essence "older" is subtracted from "newer" then the sign is returned and the absolute values are put in "diff".
+ *
+ * @param older the first time presumed to be the older of the two (smaller values).
+ * @param newer the second time presumed to be the newer of the two (larger values).
+ * @param diff  the difference between the two in absolute values - seconds and nanoseconds. If this value is NULL then only the sign
+ *              is returned.
+ * @return 0    if the times are the same, 1 if "older" represents a time before "newer", -1 if "older" represents a time after
+ *              "newer".
+ */
+FOUNDATION_EXPORT NSInteger PGTimeSpecDiff(PTimeSpec older, PTimeSpec newer, PTimeSpec diff);
+
+FOUNDATION_EXPORT NSInteger PGTimeSpecAdd(PTimeSpec ts1, PTimeSpec ts2, PTimeSpec result);
+
+FOUNDATION_EXPORT NSInteger PGRemainingTimeFromAbsoluteTime(PTimeSpec abstime, PTimeSpec result);
+
+FOUNDATION_EXPORT NSInteger PGRealTimePlusTimeSpec(PTimeSpec ts, PTimeSpec result);
 
 /**
  * Convert a time value to a long long int containing the number of nanoseconds.

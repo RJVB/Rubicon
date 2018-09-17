@@ -80,3 +80,87 @@ int clock_gettime(int clk_id, PTimeSpec tp) {
 
 #endif
 #endif
+
+NS_INLINE void __pg_tsdiff(PTimeSpec ts1, PTimeSpec ts2, PTimeSpec r) {
+    long ts1ns = ts1->tv_nsec;
+    long ts2ns = ts2->tv_nsec;
+
+    r->tv_sec = (ts2->tv_sec - ts1->tv_sec);
+    if(ts2ns < ts1ns) {
+        --r->tv_sec;
+        ts2ns += PG_NANOS_PER_SECOND;
+    }
+    r->tv_nsec = (ts2ns - ts1ns);
+}
+
+NSInteger PGTimeSpecDiff(PTimeSpec older, PTimeSpec newer, PTimeSpec diff) {
+    BOOL sames = (older->tv_sec == newer->tv_sec);
+
+    if(sames && (older->tv_nsec == newer->tv_nsec)) {
+        if(diff) memset(diff, 0, sizeof(TimeSpec));
+        return 0;
+    }
+    else {
+        BOOL      secsorder  = older->tv_sec < newer->tv_sec;
+        BOOL      nsecsorder = older->tv_nsec < newer->tv_nsec;
+        NSInteger sign       = (sames ? (nsecsorder ? 1 : -1) : (secsorder ? 1 : -1));
+        // +-------+------------+-----------+-------+
+        // | sames | nsecsorder | secsorder |  sign |
+        // +-------+------------+-----------+-------+
+        // |  YES  |    YES     |     x     |   1   |
+        // |  YES  |    YES     |     x     |   1   |
+        // |  YES  |     NO     |     x     |  -1   |
+        // |  YES  |     NO     |     x     |  -1   |
+        // |   NO  |     x      |    YES    |   1   |
+        // |   NO  |     x      |    YES    |   1   |
+        // |   NO  |     x      |     NO    |  -1   |
+        // |   NO  |     x      |     NO    |  -1   |
+        // +-------+------------+-----------+-------+
+        if(diff) {
+            memset(diff, 0, sizeof(TimeSpec));
+
+            if(sign) {
+                if(sames) diff->tv_nsec = (nsecsorder ? (newer->tv_nsec - older->tv_nsec) : (older->tv_nsec - newer->tv_nsec));
+                else if(secsorder) __pg_tsdiff(older, newer, diff);
+                else __pg_tsdiff(newer, older, diff);
+            }
+        }
+
+        return sign;
+    }
+}
+
+NSInteger PGTimeSpecAdd(PTimeSpec ts1, PTimeSpec ts2, PTimeSpec result) {
+    if(ts1 && ts2 && result) {
+        long nanos = (ts1->tv_nsec + ts2->tv_nsec);
+        result->tv_sec  = (ts1->tv_sec + ts2->tv_sec + (nanos / PG_NANOS_PER_SECOND));
+        result->tv_nsec = (nanos % PG_NANOS_PER_SECOND);
+        return 0;
+    }
+
+    errno = EFAULT;
+    return -1;
+}
+
+NSInteger PGRealTimePlusTimeSpec(PTimeSpec ts, PTimeSpec result) {
+    if(result && ts) {
+        TimeSpec tnow;
+        clock_gettime(CLOCK_REALTIME, &tnow);
+        return PGTimeSpecAdd(ts, &tnow, result);
+    }
+
+    errno = EFAULT;
+    return -1;
+}
+
+NSInteger PGRemainingTimeFromAbsoluteTime(PTimeSpec abstime, PTimeSpec result) {
+    if(abstime && result) {
+        TimeSpec ts;
+        if(clock_gettime(CLOCK_REALTIME, &ts)) return -1;
+        if(PGTimeSpecDiff(&ts, abstime, result) < 0) memset(result, 0, sizeof(TimeSpec));
+        return 0;
+    }
+
+    errno = EFAULT;
+    return -1;
+}

@@ -42,9 +42,9 @@ FOUNDATION_EXPORT const NSByte UTF8_4ByteMarkerMask;
 #define PGThrowOutOfMemoryException @throw [NSException exceptionWithName:NSMallocException reason:@"Out of memory" userInfo:nil]
 #define PGThrowNullPointerException PGThrowInvArgException(@"NULL Pointer")
 
-#define PGSETIFNIL(l, f, v)  PGBLKOPEN if((f)  == nil) { @synchronized(l) { if((f)  == nil) (f) = (v); }} PGBLKCLOSE
-#define PGSETIFNULL(l, f, v) PGBLKOPEN if((f) == NULL) { @synchronized(l) { if((f) == NULL) (f) = (v); }} PGBLKCLOSE
-#define PGSETIFZERO(l, f, v) PGBLKOPEN if((f)  == (0)) { @synchronized(l) { if((f)  == (0)) (f) = (v); }} PGBLKCLOSE
+#define PGSETIFNIL(l, f, v)  dispatch_sync(PGSharedSerialQueue(), ^{ if((f)  == nil) (f) = (v); })
+#define PGSETIFNULL(l, f, v) dispatch_sync(PGSharedSerialQueue(), ^{ if((f) == NULL) (f) = (v); })
+#define PGSETIFZERO(l, f, v) dispatch_sync(PGSharedSerialQueue(), ^{ if((f)  == (0)) (f) = (v); })
 
 #define PG_BRDG_CAST(t)  (__bridge t *)
 
@@ -57,6 +57,10 @@ FOUNDATION_EXPORT const NSByte UTF8_4ByteMarkerMask;
         #error "CLANG Overloadable Attribute must be supported."
     #endif
 #endif
+
+#define PGSharedSerialQueueLabel "com.projectgalen.sharedSerialQueue"
+
+FOUNDATION_EXPORT dispatch_queue_t PGSharedSerialQueue();
 
 FOUNDATION_EXPORT NSData *PGGetEmptyNSDataSingleton(void);
 

@@ -27,6 +27,16 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#if defined(__APPLE__)
+
+    #ifndef TEMP_FAILURE_RETRY
+
+        #define TEMP_FAILURE_RETRY(expression) ({ long int __result; do __result = (long int) (expression); while (__result == -1L && errno == EINTR); __result; })
+
+    #endif
+
+#endif
+
 __BEGIN_DECLS
 
 int getrandom_dev(void *buffer, size_t length, char blocking);

@@ -30,10 +30,7 @@
         self = [super init];
 
         if(self) {
-            TimeVal timeVal;
-            gettimeofday(&timeVal, NULL);
-            _timeSpec.tv_sec  = timeVal.tv_sec;
-            _timeSpec.tv_nsec = (timeVal.tv_usec * ((NSInteger)PG_NANOS_PER_MICRO));
+            clock_gettime(CLOCK_REALTIME, &_timeSpec);
         }
 
         return self;
@@ -153,6 +150,11 @@
         return _timeSpec;
     }
 
+    -(TimeVal)toUnixTimeVal {
+        TimeVal tv = { .tv_sec = _timeSpec.tv_sec, .tv_usec = (int32_t)(_timeSpec.tv_nsec / PG_NANOS_PER_MICRO) };
+        return tv;
+    }
+
     -(PGTimeSpec *)sleep {
         TimeSpec ts = _timeSpec;
         TimeSpec rm = { .tv_sec = 0, .tv_nsec = 0 };
@@ -164,12 +166,12 @@
             }
             else if(errno == EINVAL) {
                 NSString     *reason   = PGFormat(@"Bad value for nanosecond field: %@", @(_timeSpec.tv_nsec));
-                NSDictionary *userInfo = @{ NSLocalizedDescriptionKey:reason };
+                NSDictionary *userInfo = @{ NSLocalizedDescriptionKey: reason };
                 @throw [NSException exceptionWithName:NSInvalidArgumentException reason:reason userInfo:userInfo];
             }
             else {
                 NSString     *reason   = PGFormat(@"Unknown error: %@", PGStrError(errno));
-                NSDictionary *userInfo = @{ NSLocalizedDescriptionKey:reason };
+                NSDictionary *userInfo = @{ NSLocalizedDescriptionKey: reason };
                 @throw [NSException exceptionWithName:NSInvalidArgumentException reason:reason userInfo:userInfo];
             }
         }
@@ -178,20 +180,9 @@
     }
 
     -(PGTimeSpec *)remainingTimeFromAbsoluteTime {
-        struct timeval currentTime; /* Time now */
-        NSLong         dSeconds, dNanoSeconds;
-
-        gettimeofday(&currentTime, NULL);
-        dSeconds     = (_timeSpec.tv_sec - currentTime.tv_sec);
-        dNanoSeconds = (_timeSpec.tv_nsec - (currentTime.tv_usec * PG_NANOS_PER_MICRO));
-
-        while(dNanoSeconds < 0) {
-            dNanoSeconds += PG_NANOS_PER_SECOND;
-            dSeconds--;
-        }
-
-        BOOL timedOut = ((dSeconds < 0) || ((dSeconds == 0) && (dNanoSeconds < 0)));
-        return (timedOut ? nil : [PGTimeSpec timeSpecWithSeconds:dSeconds andNanos:dNanoSeconds]);
+        TimeSpec ts;
+        if(PGRemainingTimeFromAbsoluteTime(_timeSpec, &ts)) PGThrow(PGErrorMsgUnknowError, PGStrError(errno));
+        return [PGTimeSpec timeSpecWithTimeSpec:&ts];
     }
 
 @end

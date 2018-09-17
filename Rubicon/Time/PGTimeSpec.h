@@ -66,6 +66,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(TimeSpec)toUnixTimeSpec;
 
+    -(TimeVal)toUnixTimeVal;
+
     -(PGTimeSpec *)sleep;
 
     -(PGTimeSpec *)remainingTimeFromAbsoluteTime;

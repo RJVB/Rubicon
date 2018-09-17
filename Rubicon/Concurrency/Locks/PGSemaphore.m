@@ -67,13 +67,13 @@
     }
 
     -(void)close {
-        @synchronized(self) {
+        dispatch_sync(PGSharedSerialQueue(), ^{
             if(self.isOpen) {
-                sem_close(_semaphore);
-                _semaphore = SEM_FAILED;
+                sem_close(self->_semaphore);
+                self->_semaphore = SEM_FAILED;
                 sem_unlink(self.name.UTF8String);
             }
-        }
+        });
     }
 
     -(void)post {

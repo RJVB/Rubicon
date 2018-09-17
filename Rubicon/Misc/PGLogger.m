@@ -156,32 +156,28 @@ NS_INLINE void writeString(NSString *str, NSOutputStream *ostream, WriteFunc wri
     }
 
     -(NSString *)domain {
-        if(_domain == nil) { @synchronized(self) { if(_domain == nil) _domain = self.pinfo.arguments.firstObject.lastPathComponent; }}
+        PGSETIFNIL(self, self->_domain, self.pinfo.arguments.firstObject.lastPathComponent);
         return _domain;
     }
 
     -(void)setDomain:(NSString *)domain {
-        @synchronized(self) {
-            _domain = domain.copy;
-        }
+        dispatch_sync(PGSharedSerialQueue(), ^{ self->_domain = domain.copy; });
     }
 
     -(NSProcessInfo *)pinfo {
-        if(_pinfo == nil) { @synchronized(self) { if(_pinfo == nil) _pinfo = NSProcessInfo.processInfo; }}
+        PGSETIFNIL(self, self->_pinfo, NSProcessInfo.processInfo);
         return _pinfo;
     }
 
     -(NSDateFormatter *)dtfmt {
-        if(_dtfmt == nil) {
-            @synchronized(self) {
-                if(_dtfmt == nil) {
-                    _dtfmt = [[NSDateFormatter alloc] init];
-                    _dtfmt.locale     = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
-                    _dtfmt.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ";
-                    _dtfmt.timeZone   = NSTimeZone.systemTimeZone;
-                }
+        dispatch_sync(PGSharedSerialQueue(), ^{
+            if(self->_dtfmt == nil) {
+                self->_dtfmt            = [[NSDateFormatter alloc] init];
+                self->_dtfmt.locale     = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+                self->_dtfmt.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ";
+                self->_dtfmt.timeZone   = NSTimeZone.systemTimeZone;
             }
-        }
+        });
         return _dtfmt;
     }
 
