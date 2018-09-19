@@ -19,11 +19,11 @@
 
 #import "PGTools.h"
 
-#if !defined(__PG_INCLUDE_ENTROPY__) || !defined(__PG_INCLUDE_RANDOM__)
+#if !defined(__PG_INCLUDE_ENTROPY__) || !defined(__PG_DEFINE_GETRANDOM__)
 
     #include <sys/random.h>
 
-#endif /* !defined(__PG_INCLUDE_ENTROPY__) || !defined(__PG_INCLUDE_RANDOM__) */
+#endif /* !defined(__PG_INCLUDE_ENTROPY__) || !defined(__PG_DEFINE_GETRANDOM__) */
 
 #define RubiconBundle [NSBundle bundleWithIdentifier:@"com.projectgalen.Rubicon"]
 

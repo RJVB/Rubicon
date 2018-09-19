@@ -25,7 +25,6 @@
 #ifndef __Rubicon_PGDefines_H_
 #define __Rubicon_PGDefines_H_
 
-#import <Rubicon/PGMatchLinux.h>
 #import <Rubicon/GNUstep.h>
 #import <Rubicon/PGCString.h>
 

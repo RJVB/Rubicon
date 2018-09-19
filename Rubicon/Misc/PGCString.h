@@ -33,7 +33,7 @@
 #ifndef RUBICON_PGCSTRING_H
 #define RUBICON_PGCSTRING_H
 
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -154,7 +154,7 @@ BOOL rotateBuffer(uint8_t *buffer, BOOL left, NSUInteger delta, NSUInteger lengt
     }
 
     -(void)lock {
-        PGSETIFNIL(self, _lock, [NSRecursiveLock new]);
+        PGSETIFNIL(self, self->_lock, [NSRecursiveLock new]);
         [_lock lock];
     }
 

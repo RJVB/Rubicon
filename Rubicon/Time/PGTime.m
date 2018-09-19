@@ -20,13 +20,31 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *//************************************************************************/
+
 #import "PGInternal.h"
 
-#if defined(__APPLE__)
+#if defined(__MACH_TIME_IMP__) && (__MACH_TIME_IMP__)
+
+#import <mach/mach_time.h>
+#import <sys/time.h>
+
+static dispatch_once_t    machTimeFlag     = 0;
 mach_timebase_info_data_t machTimebaseInfo = { 0, 0 };
 NSFloat                   machTimeFactor   = 0;
 
-#if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 101200)
+NSLong PGSystemCPUTime(NSLong delta) {
+    dispatch_once(&machTimeFlag, ^{
+        mach_timebase_info(&machTimebaseInfo);
+        machTimeFactor = (D64(machTimebaseInfo.numer) / D64(machTimebaseInfo.denom));
+    });
+    return (I64(D64(mach_absolute_time()) * machTimeFactor) + delta);
+}
+
+NSLong PGSystemRealTime(NSLong delta) {
+    TimeVal tv;
+    gettimeofday(&tv, NULL);
+    return (PGTimeValToNanos(&tv) + delta);
+}
 
 /**
  * Get the current system clock monotonic time.
@@ -56,15 +74,16 @@ NS_INLINE int clock_gettime_realtime(PTimeSpec tp) {
 /**
  * Duplicates to some degree the same function as the Linux version.
  */
-int clock_gettime(int clk_id, PTimeSpec tp) {
+int clock_gettime(clockid_t clk_id, PTimeSpec tp) {
     if(tp) {
         switch(clk_id) {
             case CLOCK_MONOTONIC:
-            case CLOCK_MONOTONIC_COARSE:
+            case CLOCK_MONOTONIC_RAW_APPROX:
             case CLOCK_MONOTONIC_RAW:
+            case CLOCK_PROCESS_CPUTIME_ID:
+            case CLOCK_THREAD_CPUTIME_ID:
                 return clock_gettime_monotonic(tp);
             case CLOCK_REALTIME:
-            case CLOCK_REALTIME_COARSE:
                 return clock_gettime_realtime(tp);
             default:
                 errno = EINVAL;
@@ -78,8 +97,29 @@ int clock_gettime(int clk_id, PTimeSpec tp) {
     return -1;
 }
 
-#endif
-#endif
+#else
+
+NSLong PGSystemRealTime(NSLong delta) {
+    TimeSpec tm = { 0, 0 };
+
+    if(clock_gettime(CLOCK_REALTIME, &tm)) {
+        @throw [NSException exceptionWithName:NSGenericException reason:PGStrError(errno) userInfo:nil];
+    }
+
+    return (PGTimeSpecToNanos(&tm) + delta);
+}
+
+NSLong PGSystemCPUTime(NSLong delta) {
+    TimeSpec tm = { 0, 0 };
+
+    if(clock_gettime(CLOCK_MONOTONIC_RAW, &tm)) {
+        @throw [NSException exceptionWithName:NSGenericException reason:PGStrError(errno) userInfo:nil];
+    }
+
+    return (PGTimeSpecToNanos(&tm) + delta);
+}
+
+#endif /* defined(__MACH_TIME_IMP__) && (__MACH_TIME_IMP__) */
 
 NS_INLINE void __pg_tsdiff(PTimeSpec ts1, PTimeSpec ts2, PTimeSpec r) {
     long ts1ns = ts1->tv_nsec;
@@ -164,3 +204,4 @@ NSInteger PGRemainingTimeFromAbsoluteTime(PTimeSpec abstime, PTimeSpec result) {
     errno = EFAULT;
     return -1;
 }
+

@@ -36,7 +36,7 @@ int main(int argc, const char *argv[]) {
         nanosleep(&sl, NULL);
         clock_gettime(CLOCK_REALTIME, &ts2);
 
-        PGTimeSpecDiff(ts1, ts2, &tr);
+        PGTimeSpecDiff(&ts1, &ts2, &tr);
 
         printf("2> Seconds %11li; Nanos %9li\n", ts2.tv_sec, ts2.tv_nsec);
         printf("1> Seconds %11li; Nanos %9li\n", ts1.tv_sec, ts1.tv_nsec);

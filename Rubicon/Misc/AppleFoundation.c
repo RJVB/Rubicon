@@ -21,17 +21,14 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *//************************************************************************/
 
-#include "PGMatchLinux.h"
-#include <errno.h>
-#include <fcntl.h>
+#include "AppleFoundation.h"
 #include <math.h>
-#include <sys/time.h>
 
 int __ret_errno(int _errno, int _ret);
 
 int __getrandom_dev(void *buffer, size_t length, const char *rndsrc, int openflags);
 
-#if defined(__PG_INCLUDE_ENTROPY__) && (__PG_INCLUDE_ENTROPY__)
+#if defined(__PG_DEFINE_GETENTROPY__) && (__PG_DEFINE_GETENTROPY__)
 // #if defined(DEBUG) && (DEBUG)
 
 unsigned char pg_getentropy_pseudo = 0;
@@ -49,9 +46,9 @@ int getentropy(void *buffer, size_t size) {
 
     #include <sys/random.h>
 
-#endif /* defined(__PG_INCLUDE_ENTROPY__) && (__PG_INCLUDE_ENTROPY__) */
+#endif /* defined(__PG_DEFINE_GETENTROPY__) && (__PG_DEFINE_GETENTROPY__) */
 
-#if defined(__PG_INCLUDE_RANDOM__) && (__PG_INCLUDE_RANDOM__)
+#if defined(__PG_DEFINE_GETRANDOM__) && (__PG_DEFINE_GETRANDOM__)
 
 #define PGGetEntropyPageSize   ((size_t)(256))
 #define randsrc(b)             ((b) ? "/dev/random" : "/dev/urandom")
@@ -92,7 +89,7 @@ ssize_t getrandom(void *buffer, size_t length, unsigned int flags) {
     return __ret_errno(EFAULT, ERRRETVAL);
 }
 
-#endif /* defined(__PG_INCLUDE_RANDOM__) && (__PG_INCLUDE_RANDOM__) */
+#endif /* defined(__PG_DEFINE_GETRANDOM__) && (__PG_DEFINE_GETRANDOM__) */
 
 int __ret_errno(int _errno, int _ret) {
     errno = _errno;
@@ -138,3 +135,53 @@ int getentropy_pseudo(void *buffer, size_t size) {
     for(size_t i = 0; i < size; ++i) *(bbuf++) = (uint8_t)(((unsigned long)(floor(erand48(rstate) * 256.0))) & 0x00ff);
     return 0;
 }
+
+#if defined(__PG_DEFINE_CLOCK_NANOSLEEP__) && (__PG_DEFINE_CLOCK_NANOSLEEP__)
+
+int clock_nanosleep(clockid_t clk_id, int flags, struct timespec *rqtp, struct timespec *rmtp) {
+    if((flags & TIMER_ABSTIME) == TIMER_ABSTIME) {
+        struct timespec ts;
+
+        /*
+         * Make sure we got a value.
+         */
+        if(!rqtp) return __ret_errno(EFAULT, -1);
+
+        /*
+         * Make sure the nano seconds are in the proper range.
+         */
+        if(rqtp->tv_nsec < 0 || rqtp->tv_nsec > 999999999) return __ret_errno(EINVAL, -1);
+
+        /*
+         * Get the current real-time.
+         */
+        if(clock_gettime(CLOCK_REALTIME, &ts)) return -1;
+
+        /*
+         * See if we've already passed the wanted time.
+         */
+        if((ts.tv_sec > rqtp->tv_sec) || ((ts.tv_sec == rqtp->tv_sec) && (ts.tv_nsec >= rqtp->tv_nsec))) return 0;
+
+        /*
+         * Calculate the remaining time.
+         */
+        struct timespec t1 = { .tv_sec = (rqtp->tv_sec - ts.tv_sec), .tv_nsec = (rqtp->tv_nsec - ts.tv_nsec) };
+
+        /*
+         * Look for underflow.
+         */
+        if(t1.tv_nsec < 0) {
+            t1.tv_sec--;
+            t1.tv_nsec += 1000000000;
+        }
+
+        /*
+         * Sleep...
+         */
+        return nanosleep(&t1, rmtp);
+    }
+
+    return nanosleep(rqtp, rmtp);
+}
+
+#endif // defined(__PG_DEFINE_CLOCK_NANOSLEEP__) && (__PG_DEFINE_CLOCK_NANOSLEEP__)

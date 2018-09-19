@@ -184,14 +184,6 @@ NS_INLINE NSComparisonResult PGCompareTimeVals(PTimeVal tv1, PTimeVal tv2) {
     return (n1 < n2 ? NSOrderedAscending : (n1 > n2 ? NSOrderedDescending : NSOrderedSame));
 }
 
-#ifdef __APPLE__
-
-#import <mach/mach_time.h>
-#import <sys/time.h>
-
-FOUNDATION_EXPORT mach_timebase_info_data_t machTimebaseInfo;
-FOUNDATION_EXPORT NSFloat                   machTimeFactor;
-
 /**
  * Get the current system cpu time in nano seconds. Generally speaking this is the number of
  * nanoseconds that have elapsed since the system was powered on or rebooted.
@@ -199,14 +191,7 @@ FOUNDATION_EXPORT NSFloat                   machTimeFactor;
  * @param delta additional nanoseconds to add to the time read from the system clock.
  * @return The value of the system clock plus any additional time.
  */
-NS_INLINE NSLong PGSystemCPUTime(NSLong delta) {
-    if(machTimebaseInfo.denom == 0) {
-        mach_timebase_info(&machTimebaseInfo);
-        machTimeFactor = (D64(machTimebaseInfo.numer) / D64(machTimebaseInfo.denom));
-    }
-
-    return (I64(D64(mach_absolute_time()) * machTimeFactor) + delta);
-}
+NSLong PGSystemCPUTime(NSLong delta);
 
 /**
  * Get the current time in nano seconds. This time represents the number of nanoseconds since the
@@ -215,62 +200,32 @@ NS_INLINE NSLong PGSystemCPUTime(NSLong delta) {
  * @param delta additional nanoseconds to add to the time read from the system clock.
  * @return The value of the system clock plus any additional time.
  */
-NS_INLINE NSLong PGSystemRealTime(NSLong delta) {
-    TimeVal tv;
-    gettimeofday(&tv, NULL);
-    return (PGTimeValToNanos(&tv) + delta);
-}
+NSLong PGSystemRealTime(NSLong delta);
 
-#if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 101200)
+#if defined(__APPLE__) && defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 101200)
+
+#define __MACH_TIME_IMP__ 1
+
+typedef enum {
+    CLOCK_REALTIME             = 0,
+    CLOCK_MONOTONIC            = 6,
+    CLOCK_MONOTONIC_RAW        = 4,
+    CLOCK_MONOTONIC_RAW_APPROX = 5,
+    CLOCK_UPTIME_RAW           = 8,
+    CLOCK_UPTIME_RAW_APPROX    = 9,
+    CLOCK_PROCESS_CPUTIME_ID   = 12,
+    CLOCK_THREAD_CPUTIME_ID    = 16
+} clockid_t;
 
 /**
  * And, of course, for some reason, Mac OS X didn't have this function or it's associated defines
  * until version 10.12.
  */
-int clock_gettime(int clk_id, PTimeSpec tp);
+int clock_gettime(clockid_t clk_id, PTimeSpec tp);
 
-#define CLOCK_REALTIME           (0)
-#define CLOCK_MONOTONIC          (1)
-#define CLOCK_MONOTONIC_RAW      (4)
-#define CLOCK_REALTIME_COARSE    (5)
-#define CLOCK_MONOTONIC_COARSE   (6)
+#elif defined(__MACH_TIME_IMP__)
 
-#endif
-#else
-/**************************************************************************************************//**
- * Get the current time in nano seconds. This time represents the number of nanoseconds since the
- * epoch (Midnight, January 1, 1970, UTC).
- *
- * @param delta additional nanoseconds to add to the time read from the system clock.
- * @return The value of the system clock plus any additional time.
- */
-NS_INLINE NSLong PGSystemRealTime(NSLong delta) {
-    TimeSpec tm = { 0, 0 };
+    #undef __MACH_TIME_IMP__
 
-    if(clock_gettime(CLOCK_REALTIME, &tm)) {
-        @throw [NSException exceptionWithName:NSGenericException reason:errnoAsNSString(errno) userInfo:nil];
-    }
-
-    return (PGTimeSpecToNanos(&tm) + delta);
-}
-
-/**
- * Get the current system cpu time in nano seconds. Generally speaking this is the number of
- * nanoseconds that have elapsed since the system was powered on or rebooted.
- *
- * @param delta additional nanoseconds to add to the time read from the system clock.
- * @return The value of the system clock plus any additional time.
- */
-NS_INLINE NSLong PGSystemCPUTime(NSLong delta) {
-    TimeSpec tm = { 0, 0 };
-
-    if(clock_gettime(CLOCK_MONOTONIC_RAW, &tm)) {
-        @throw [NSException exceptionWithName:NSGenericException reason:errnoAsNSString(errno) userInfo:nil];
-    }
-
-    return (PGTimeSpecToNanos(&tm) + delta);
-}
-
-#endif
-
-#endif //__Rubicon_PGTime_H_
+#endif /* defined(__APPLE__) && defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (MAC_OS_X_VERSION_MAX_ALLOWED < 101200) */
+#endif /* defined(__Rubicon_PGTime_H_) */

@@ -159,13 +159,13 @@
 
     -(PGDOMNodeList<PGDOMNode *> *)childNodes {
         PGDOMSyncData;
-        PGSETIFNIL(self, _childNodes, [[PGDOMNodeList alloc] initWithOwnerNode:self]);
+        PGSETIFNIL(self, self->_childNodes, [[PGDOMNodeList alloc] initWithOwnerNode:self]);
         return _childNodes;
     }
 
     -(PGDOMNamedNodeMap<PGDOMAttr *> *)attributes {
         PGDOMSyncData;
-        PGSETIFNIL(self, _attributes, [self createNewAttributeMap]);
+        PGSETIFNIL(self, self->_attributes, [self createNewAttributeMap]);
         return _attributes;
     }
 
@@ -278,7 +278,7 @@
         PGDOMCheckRO;
 
         if(data) {
-            PGSETIFNIL(self, _userData, [NSMutableDictionary new]);
+            PGSETIFNIL(self, self->_userData, [NSMutableDictionary new]);
             self.userData[key] = [UserDataHolder holderWithKey:key data:data handler:handler];
         }
         else if(oldData) {

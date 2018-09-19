@@ -271,7 +271,7 @@
     }
 
     -(void)lock {
-        PGSETIFNIL(self, _lck, [NSRecursiveLock new]);
+        PGSETIFNIL(self, self->_lck, [NSRecursiveLock new]);
         [_lck lock];
     }
 

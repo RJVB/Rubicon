@@ -27,75 +27,55 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *//************************************************************************/
+
 #import "PGInternal.h"
-#include <pthread.h>
+#import <pthread.h>
 
-void ignoreSignal(int _signal);
+#define ZEROTHREAD(t) ((t) = ((pthread_t)(0)))
+#define NSLEEP(at)    (clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, at, NULL) != 0)
 
-void threadCleanup(voidp obj);
+static void ignoreSignal(int _signal);
 
-#define setErr(f, v) do { if(f) (*(f)) = (v); } while(0)
+static void threadCleanup(voidp obj);
 
-NS_INLINE BOOL getRemainingTime(TimeSpec *remtime, TimeSpec *abstime, TimeSpec *waittime, NSInteger *errorNo) {
-    if(PGRemainingTimeFromAbsoluteTime(abstime, remtime)) {
-        setErr(errorNo, errno);
-        return YES;
-    }
-
-    if((remtime->tv_sec == 0) && (remtime->tv_nsec < waittime->tv_nsec)) waittime->tv_nsec = remtime->tv_nsec;
-    setErr(errorNo, 0);
-    return NO;
-}
-
-NS_INLINE BOOL sleepSome(PTimeSpec waittime, NSInteger *errorNo) {
-    if(nanosleep(waittime, NULL)) {
-        setErr(errorNo, errno);
-        return (errno != EINTR);
-    }
-
-    setErr(errorNo, 0);
-    return NO;
-}
+static voidp threadWait(voidp obj);
 
 @interface PGTimedWait()
 
     @property(copy) PGTimeSpec *absTime;
     @property /* */ BOOL       didTimeOut;
-    @property /* */ NSThread   *nsThread2;
+    @property /* */ BOOL       completed;
 
     -(void)cleanup;
+
+    -(voidp)wait;
 
 @end
 
 @implementation PGTimedWait {
         pthread_t       _thread1;
         pthread_t       _thread2;
-        pthread_mutex_t _mlock;
+        NSRecursiveLock *_rlock;
     }
 
     @synthesize absTime = _absTime;
     @synthesize didTimeOut = _didTimeOut;
-    @synthesize nsThread2 = _nsThread2;
+    @synthesize completed = _completed;
 
     -(instancetype)initWithTimeout:(PGTimeSpec *)absTime {
         self = [super init];
 
         if(self) {
             self.didTimeOut = NO;
+            self.completed  = NO;
             self.absTime    = [absTime copy];
-            //_mlock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
+
+            _rlock = [NSRecursiveLock new];
+            ZEROTHREAD(_thread1);
+            ZEROTHREAD(_thread2);
         }
 
         return self;
-    }
-
-    -(NSInteger)signalAction {
-        struct sigaction sigAction;
-        sigAction.sa_handler = ignoreSignal;
-        sigAction.sa_flags   = 0;
-        sigemptyset(&sigAction.sa_mask);
-        NSInteger success = sigaction(SIGUSR2, &sigAction, NULL);
-        return (success ? success : pthread_kill(_thread1, SIGUSR2));
     }
 
     -(BOOL)action:(id *)results {
@@ -112,40 +92,65 @@ NS_INLINE BOOL sleepSome(PTimeSpec waittime, NSInteger *errorNo) {
 #pragma clang diagnostic ignored "-Wreturn-stack-address"
 
     -(BOOL)timedAction:(id *)results {
-        pthread_mutex_lock(&_mlock);
+        [_rlock lock];
+
         @try {
-            BOOL        success       = NO;
-            NSException *exception    = nil;
-            id          actionResults = nil;
-            int         savedState    = 0;
-            void        *me           = PG_BRDG_CAST(void)self;
-
-            if(TEMP_FAILURE_RETRY(nanosleep(NULL, NULL))) return NO;
-
-            self.didTimeOut = 0;
+            self.didTimeOut = NO;
+            self.completed  = NO;
             _thread1 = pthread_self();
 
+            NSException      *exception    = nil;
+            voidp            udata         = PG_BRDG_CAST(void)self;
+            BOOL             success       = NO;
+            int              savedState    = 0;
+            int              ignoredState  = 0;
+            id               actionResults = nil;
+            struct sigaction oldSigAction;
+            struct sigaction newSigAction;
+
+            newSigAction.sa_handler = ignoreSignal;
+            newSigAction.sa_flags   = 0;
+            sigemptyset(&newSigAction.sa_mask);
+
             pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &savedState);
-            pthread_cleanup_push(threadCleanup, me);
+            pthread_cleanup_push(threadCleanup, udata);
 
-                pthread_setcancelstate(savedState, NULL);
-                if(self.nsThread2) {
-                    [self.nsThread2 start];
-                    @try { success = [self action:&actionResults]; } @catch(NSException *caughtException) { exception = caughtException; }
-                }
+                success = (sigaction(SIGUSR2, &newSigAction, &oldSigAction) == 0);
+                if(success) success = (pthread_create(&_thread2, NULL, threadWait, udata) == 0);
 
-            pthread_cleanup_pop(1);
-            if(exception && !success) @throw exception;
+                pthread_setcancelstate(savedState, &ignoredState);
+
+                if(success) { @try { success = [self action:&actionResults]; } @catch(NSException *caughtException) { exception = caughtException; }}
+                self.completed = YES;
+
+            pthread_cleanup_pop(YES);
+
+            if(exception) @throw exception;
             PGSetReference(results, actionResults);
             return success;
         }
-        @finally { pthread_mutex_unlock(&_mlock); }
+        @finally {
+            [_rlock unlock];
+        }
     }
 
 #pragma clang diagnostic pop
 
     -(void)cleanup {
-        if(!self.didTimeOut) [self.nsThread2 cancel];
+        if(!self.didTimeOut) pthread_cancel(_thread2);
+    }
+
+    -(voidp)wait {
+        TimeSpec at = self.absTime.toUnixTimeSpec;
+
+        while((!self.completed) && NSLEEP(&at) && (errno == EINTR)) /* Do Nothing. */;
+
+        if((!self.completed) && (pthread_kill(_thread1, 0) == 0)) {
+            self.didTimeOut = YES;
+            return ((voidp)(long)(pthread_kill(_thread1, SIGUSR2)));
+        }
+
+        return NULL;
     }
 
 @end
@@ -161,7 +166,9 @@ void ignoreSignal(int _signal) {
 #pragma clang diagnostic pop
 
 void threadCleanup(voidp obj) {
-    PGTimedWait *__unsafe_unretained timedWait = (PG_BRDG_CAST(PGTimedWait)obj);
-    [timedWait cleanup];
+    [(PG_BRDG_CAST(PGTimedWait)obj) cleanup];
 }
 
+voidp threadWait(voidp obj) {
+    return [(PG_BRDG_CAST(PGTimedWait)obj) wait];
+}

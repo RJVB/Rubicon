@@ -20,6 +20,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *//************************************************************************/
+#import <AppKit/AppKit.h>
 #import "PGInternal.h"
 
 const NSByte UTF8_2ByteMarker     = 0b11000000;

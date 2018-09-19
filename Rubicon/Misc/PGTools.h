@@ -31,6 +31,7 @@ FOUNDATION_EXPORT const NSByte UTF8_3ByteMarkerMask;
 FOUNDATION_EXPORT const NSByte UTF8_4ByteMarkerMask;
 
 @class NSStream;
+@class NSBitmapImageRep;
 
 /*
  * Definitions for standard 32-bit RGBA color model.
@@ -46,7 +47,8 @@ FOUNDATION_EXPORT const NSByte UTF8_4ByteMarkerMask;
 #define PGSETIFNULL(l, f, v) dispatch_sync(PGSharedSerialQueue(), ^{ if((f) == NULL) (f) = (v); })
 #define PGSETIFZERO(l, f, v) dispatch_sync(PGSharedSerialQueue(), ^{ if((f)  == (0)) (f) = (v); })
 
-#define PG_BRDG_CAST(t)  (__bridge t *)
+#define PG_BRDG_CAST(t)      (__bridge t *)
+#define PG_UNSAFE(classname) classname *__unsafe_unretained
 
 #ifndef PG_HASOVERLOADABLE
     #define PG_HASOVERLOADABLE __has_extension(attribute_overloadable)
@@ -60,7 +62,7 @@ FOUNDATION_EXPORT const NSByte UTF8_4ByteMarkerMask;
 
 #define PGSharedSerialQueueLabel "com.projectgalen.sharedSerialQueue"
 
-FOUNDATION_EXPORT dispatch_queue_t PGSharedSerialQueue();
+FOUNDATION_EXPORT dispatch_queue_t PGSharedSerialQueue(void);
 
 FOUNDATION_EXPORT NSData *PGGetEmptyNSDataSingleton(void);
 

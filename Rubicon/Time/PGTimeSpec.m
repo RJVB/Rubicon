@@ -181,7 +181,7 @@
 
     -(PGTimeSpec *)remainingTimeFromAbsoluteTime {
         TimeSpec ts;
-        if(PGRemainingTimeFromAbsoluteTime(_timeSpec, &ts)) PGThrow(PGErrorMsgUnknowError, PGStrError(errno));
+        if(PGRemainingTimeFromAbsoluteTime(&_timeSpec, &ts)) PGThrow(PGErrorMsgUnknowError, PGStrError(errno));
         return [PGTimeSpec timeSpecWithTimeSpec:&ts];
     }
 
