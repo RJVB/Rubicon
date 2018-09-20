@@ -34,25 +34,6 @@
 #import <Rubicon/PGBase64OutputStream.h>
 #import <Rubicon/PGCString.h>
 #import <Rubicon/PGCmdLine.h>
-#import <Rubicon/PGDOMAttr.h>
-#import <Rubicon/PGDOMCDataSection.h>
-#import <Rubicon/PGDOMComment.h>
-#import <Rubicon/PGDOMDocument.h>
-#import <Rubicon/PGDOMDocumentFragment.h>
-#import <Rubicon/PGDOMDTD.h>
-#import <Rubicon/PGDOMDTDEntity.h>
-#import <Rubicon/PGDOMDTDNotation.h>
-#import <Rubicon/PGDOMElement.h>
-#import <Rubicon/PGDOMEntityReference.h>
-#import <Rubicon/PGDOMImplementation.h>
-#import <Rubicon/PGDOMImplementationList.h>
-#import <Rubicon/PGDOMLocator.h>
-#import <Rubicon/PGDOMNamedNodeMap.h>
-#import <Rubicon/PGDOMNode.h>
-#import <Rubicon/PGDOMNodeList.h>
-#import <Rubicon/PGDOMProcessingInstruction.h>
-#import <Rubicon/PGDOMText.h>
-#import <Rubicon/PGDOMUserDataHandler.h>
 #import <Rubicon/PGDynamicBuffers.h>
 #import <Rubicon/PGDynamicBufferTools.h>
 #import <Rubicon/PGEmptyEnumerator.h>
@@ -73,8 +54,6 @@
 #import <Rubicon/PGStreamTee.h>
 #import <Rubicon/PGTimeSpec.h>
 #import <Rubicon/PGTimedWait.h>
-#import <Rubicon/PGXMLParser.h>
-#import <Rubicon/PGXMLParserDelegate.h>
 #import <Rubicon/sem_timedwait.h>
 
 FOUNDATION_EXPORT double              RubiconVersionNumber;

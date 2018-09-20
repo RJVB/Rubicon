@@ -20,7 +20,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *//************************************************************************/
-#import "PGXMLParser.h"
+#import "PGDefines.h"
 
 NSString *const PGErrorDomain          = @"com.projectgalen.Rubicon";
 NSString *const PGXMLParserErrorDomain = @"com.projectgalen.Rubicon.PGXMLParser";
