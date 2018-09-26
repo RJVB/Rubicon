@@ -31,8 +31,12 @@
     }
 
     -(NSError *)makeError {
+        return [self makeError:PGErrorDomain];
+    }
+
+    -(NSError *)makeError:(NSErrorDomain)domain {
         NSDictionary *ui = @{ NSLocalizedDescriptionKey: self.description, PGUnderlyingExceptionKey: self };
-        return [NSError errorWithDomain:PGErrorDomain code:PGErrorCodeExceptionAsError userInfo:ui];
+        return [NSError errorWithDomain:domain code:PGErrorCodeExceptionAsError userInfo:ui];
     }
 
 @end

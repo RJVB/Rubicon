@@ -77,4 +77,6 @@ NS_INLINE NSString *_Nullable PGLocalizedString(NSString *_Nonnull key) {
 #import "PGTime.h"
 #import "PGTimeSpec.h"
 
+#import "PGSAX.h"
+
 #endif //RUBICON_PGINTERNAL_H

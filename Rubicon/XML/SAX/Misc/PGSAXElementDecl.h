@@ -1,13 +1,11 @@
 /************************************************************************//**
  *     PROJECT: Rubicon
- *      TARGET: TypeSizes
- *    FILENAME: main.m
+ *    FILENAME: PGSAXElementContent.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 08/30/18 11:03 AM
- * DESCRIPTION:
+ *        DATE: 9/20/18
  *
- * Copyright © 2018  Project Galen. All rights reserved.
+ * Copyright © 2018 Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,17 +20,16 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *//************************************************************************/
 
-#import <Rubicon/Rubicon.h>
+#ifndef __RUBICON_PGSAXELEMENTDECL_H__
+#define __RUBICON_PGSAXELEMENTDECL_H__
 
-int main(int argc, const char *argv[]) {
-    @autoreleasepool {
-        const char *s1 = "a";
-        const char *s2 = "b";
-        int        c1  = strcmp(s1, s2);
-        int        c2  = strcmp(s2, s1);
+#import <Rubicon/PGTools.h>
 
-        printf("strcmp(\"%s\", \"%s\") = %d\n", s1, s2, c1);
-        printf("strcmp(\"%s\", \"%s\") = %d\n", s2, s1, c2);
-    }
-    return 0;
-}
+NS_ASSUME_NONNULL_BEGIN
+
+@interface PGSAXElementDecl : NSObject
+@end
+
+NS_ASSUME_NONNULL_END
+
+#endif // __RUBICON_PGSAXELEMENTDECL_H__

@@ -65,5 +65,7 @@
 #import <Rubicon/PGTime.h>
 #import <Rubicon/PGTimeSpec.h>
 
+#import <Rubicon/PGSAX.h>
+
 FOUNDATION_EXPORT double              RubiconVersionNumber;
 FOUNDATION_EXPORT const unsigned char RubiconVersionString[];

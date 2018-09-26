@@ -36,6 +36,7 @@
 #include <errno.h>
 #include <string.h>
 #include <time.h>
+#include <Rubicon/PGCStringCache.h>
 
 __BEGIN_DECLS
 

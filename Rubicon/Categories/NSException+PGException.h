@@ -33,6 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(NSError *)makeError;
 
+    -(NSError *)makeError:(NSErrorDomain)domain;
+
 @end
 
 NS_ASSUME_NONNULL_END

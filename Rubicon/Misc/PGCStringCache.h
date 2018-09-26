@@ -1,13 +1,11 @@
 /************************************************************************//**
  *     PROJECT: Rubicon
- *      TARGET: TypeSizes
- *    FILENAME: main.m
+ *    FILENAME: PGCStringCache.h
  *         IDE: AppCode
  *      AUTHOR: Galen Rhodes
- *        DATE: 08/30/18 11:03 AM
- * DESCRIPTION:
+ *        DATE: 9/21/18
  *
- * Copyright © 2018  Project Galen. All rights reserved.
+ * Copyright © 2018 Project Galen. All rights reserved.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,17 +20,26 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *//************************************************************************/
 
-#import <Rubicon/Rubicon.h>
+#ifndef __RUBICON_PGCStringCache_h_
+#define __RUBICON_PGCStringCache_h_
 
-int main(int argc, const char *argv[]) {
-    @autoreleasepool {
-        const char *s1 = "a";
-        const char *s2 = "b";
-        int        c1  = strcmp(s1, s2);
-        int        c2  = strcmp(s2, s1);
+#include <stdlib.h>
 
-        printf("strcmp(\"%s\", \"%s\") = %d\n", s1, s2, c1);
-        printf("strcmp(\"%s\", \"%s\") = %d\n", s2, s1, c2);
-    }
-    return 0;
-}
+#define CSTRINGS_INIT_LENGTH 10
+
+typedef struct _cstring_ {
+    char   **cStrings;
+    size_t cStringsSize;
+    size_t cStringsStart;
+    size_t cStringsEnd;
+} CString;
+
+__BEGIN_DECLS
+
+int storeCString(CString *cstrs, const char *str);
+
+void destroyCString(CString *cstrs);
+
+__END_DECLS
+
+#endif /* __RUBICON_PGCStringCache_h_ */
