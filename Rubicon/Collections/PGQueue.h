@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PGQueue<__covariant T> : NSObject<NSLocking, NSCopying, NSFastEnumeration>
 
-    @property(atomic, readonly) NSUInteger count;
+    @property(readonly) NSUInteger count;
 
     -(instancetype)init;
 

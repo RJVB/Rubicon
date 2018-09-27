@@ -25,11 +25,15 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Woverriding-method-mismatch"
 
+NSUInteger fastEnumImpl(NSFastEnumerationState *state, PGLinkedListNode *head, __unsafe_unretained id buffer[], NSUInteger len);
+
+NSUInteger fastEnumInit(NSFastEnumerationState *state, unsigned long *modCnt, PGLinkedListNode *head, __unsafe_unretained id buffer[], NSUInteger len);
+
 @interface PGQueue<__covariant T>()
 
-    @property(atomic, readwrite) NSUInteger            count;
-    @property(atomic, readwrite) PGLinkedListNode<T>   *queueHead;
-    @property(nonatomic, readonly) PGLinkedListNode<T> *queueTail;
+    @property(readwrite) /**/ NSUInteger          count;
+    @property(readwrite) /**/ PGLinkedListNode<T> *queueHead;
+    @property(readonly) /* */ PGLinkedListNode<T> *queueTail;
 
     -(void)_queue:(id)item;
 
@@ -220,7 +224,11 @@
 
     -(NSEnumerator *)objectEnumerator {
         [self lock];
-        @try { return (self.queueHead ? [PGNestedEnumerator enumeratorWithOwner:self andEnumerator:self.queueHead.objectEnumerator] : [PGEmptyEnumerator emptyEnumerator]); }
+        @try {
+            return (self.queueHead ?
+                    (NSEnumerator *)[PGNestedEnumerator enumeratorWithOwner:self andEnumerator:self.queueHead.objectEnumerator] :
+                    (NSEnumerator *)[PGEmptyEnumerator emptyEnumerator]);
+        }
         @finally { [self unlock]; }
     }
 
@@ -228,8 +236,8 @@
         [self lock];
         @try {
             return (self.queueHead ?
-                    [PGNestedEnumerator enumeratorWithOwner:self andEnumerator:self.queueHead.previousNode.reverseObjectEnumerator] :
-                    [PGEmptyEnumerator emptyEnumerator]);
+                    (NSEnumerator *)[PGNestedEnumerator enumeratorWithOwner:self andEnumerator:self.queueHead.previousNode.reverseObjectEnumerator] :
+                    (NSEnumerator *)[PGEmptyEnumerator emptyEnumerator]);
         }
         @finally { [self unlock]; }
     }
@@ -247,11 +255,11 @@
     }
 
     -(void)lock {
-        [self lock];
+        [_lock lock];
     }
 
     -(void)unlock {
-        [self unlock];
+        [_lock unlock];
     }
 
     -(void)dealloc {
@@ -310,38 +318,48 @@
     }
 
     -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained _Nullable[_Nonnull])buffer count:(NSUInteger)len {
-        NSUInteger count = 0;
         [self lock];
-
         @try {
-            PGLinkedListNode *__unsafe_unretained nextNode = nil;
-
-            switch(state->state) {
-                case 0:
-                    state->state        = 1;
-                    state->mutationsPtr = &_modifiedCount;
-                    state->extra[0] = ((unsigned long)(__bridge voidp)self.queueHead);
-                    // Fall through to case 1...
-                case 1:nextNode = (__bridge PGLinkedListNode *)(voidp)state->extra[0];
-
-                    while((state->state == 1) && (count < len)) {
-                        buffer[count++] = nextNode.data;
-                        nextNode = nextNode.nextNode;
-                        if(nextNode == self.queueHead) state->state = 2;
-                    }
-
-                    // Probably don't have to do this but OCD.
-                    state->extra[0] = ((state->state == 1) ? ((unsigned long)(__bridge voidp)nextNode) : 0);
-                    break;
-                default:
-                    break;
+            switch(state->state) { // @f:0
+                case 0: return fastEnumInit(state, &_modifiedCount, self.queueHead, buffer, len);
+                case 1: return fastEnumImpl(state, self.queueHead, buffer, len);
+                default: return 0; // @f:1
             }
         }
         @finally { [self unlock]; }
-
-        return count;
     }
 
 @end
+
+NS_INLINE PGLinkedListNode *fastEnumNext(NSFastEnumerationState *state, PGLinkedListNode *head, PGLinkedListNode *nextNode) {
+    /*
+     * Did we go full circle?
+     */
+    if(nextNode == head) {
+        state->state = 2;
+        return nil;
+    }
+    return nextNode;
+}
+
+NSUInteger fastEnumImpl(NSFastEnumerationState *state, PGLinkedListNode *head, __unsafe_unretained id buffer[], NSUInteger len) {
+    NSUInteger                  count = 0;
+    PG_UNSAFE(PGLinkedListNode) nextNode = (PG_BRDG_CAST(PGLinkedListNode)(state->extra[0]));
+
+    while(nextNode && (count < len)) {
+        buffer[count++] = nextNode.data;
+        nextNode = fastEnumNext(state, head, nextNode.nextNode);
+    }
+
+    state->extra[0] = (PG_BRDG_UNCAST(unsigned long)(nextNode));
+    return count;
+}
+
+NSUInteger fastEnumInit(NSFastEnumerationState *state, unsigned long *modCnt, PGLinkedListNode *head, __unsafe_unretained id buffer[], NSUInteger len) {
+    state->state        = 1;
+    state->mutationsPtr = modCnt;
+    state->extra[0] = (PG_BRDG_UNCAST(unsigned long)head);
+    return fastEnumImpl(state, head, buffer, len);
+}
 
 #pragma clang diagnostic pop

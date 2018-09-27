@@ -33,7 +33,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 #define FOO(t, f)              (*((t)(f)))
-#define CASTASPARSER(p)        ((__bridge PGSAXParser *)(p))
+#define CASTASPARSER(p)        (PG_BRDG_CAST(PGSAXParser)(p))
 #define PGSAX_PUSH_BUFFER_SIZE (65536)
 
 /* @f:0 */
