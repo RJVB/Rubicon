@@ -310,7 +310,7 @@
                     state->extra[0] = (PG_BRDG_UNCAST(unsigned long)self.stackTop);
                     // Fall through to the case 1....
                 case 1:
-                    nextNode = PG_BRDG_CAST(PGLinkedListNode)state->extra[0];
+                    nextNode = PG_BRDG_CAST(PGLinkedListNode)(void *)state->extra[0];
 
                     while((state->state == 1) && (count < len)) {
                         buffer[count++] = nextNode.data;

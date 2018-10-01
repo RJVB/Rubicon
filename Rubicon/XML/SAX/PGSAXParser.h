@@ -33,6 +33,13 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(instancetype)init NS_DESIGNATED_INITIALIZER;
 
+    -(instancetype)initWithInputStream:(NSInputStream *)inputStream baseURI:(NSURL *)baseURI;
+
+    -(instancetype)initWithURL:(NSURL *)url;
+
+    -(instancetype)initWithFilename:(NSString *)filename;
+
+    -(BOOL)parse:(NSError **)error;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1117D01D8A0978C8861CA463 /* PGSAXElementDecl.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DBCAAF337DFD75320A1D /* PGSAXElementDecl.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1117D01D8A0978C8861CA463 /* PGSAXElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DBCAAF337DFD75320A1D /* PGSAXElement.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D05733B3E04B9910044A /* NSError+PGError.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D9DC70BE474C3D16B0BA /* NSError+PGError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D069BAC9E03BD3EEA723 /* PGLinkedListNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D5CB94B0DCEFCB4DAFB5 /* PGLinkedListNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D071ACCE10329E438EB4 /* PGDefines.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D54FB85F0E618EB2B3A0 /* PGDefines.m */; };
@@ -27,7 +27,7 @@
 		1117D23456658A8B033643FC /* PGDynamicBuffers.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DB8C2ABF14B8E1144CA4 /* PGDynamicBuffers.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D2530B431C6076D92CCC /* PGCStringCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117DA1B708620B079546108 /* PGCStringCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D281A7EABA7B9B955261 /* PGSAXEntity.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D6543E3176AF5D5603CD /* PGSAXEntity.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		1117D2EF4627B183860D61B6 /* PGSAXElementDecl.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DBCF36DE89540371740B /* PGSAXElementDecl.m */; };
+		1117D2EF4627B183860D61B6 /* PGSAXElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DBCF36DE89540371740B /* PGSAXElement.m */; };
 		1117D32860952F856FF6E22E /* PGSAXLocator.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D5D52E3B9B692D351737 /* PGSAXLocator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D33D6B042F8608A1153C /* PGCmdLineOption.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D28F0D0CEFBEAE726655 /* PGCmdLineOption.m */; };
 		1117D3724C2A43950E8FB710 /* PGTime.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D5A22062D907B9F4DBE6 /* PGTime.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -45,7 +45,6 @@
 		1117D51D09137676EB5C1E49 /* PGCString.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DFB8457BA6D1F10E5B23 /* PGCString.m */; };
 		1117D5567CE2BE5127E3E524 /* PGCmdLineDefines.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D091DA0A584D2A16E5E6 /* PGCmdLineDefines.m */; };
 		1117D568385D863CC434E5C3 /* PGTimedReadLock.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DAD7F761481916EB3AEE /* PGTimedReadLock.m */; };
-		1117D592340DD61282D05C0D /* PGSAXEntityDecl.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D1565CBC4B4032C6BCAB /* PGSAXEntityDecl.h */; };
 		1117D63E9D2E4D166A347214 /* NSString+PGString.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D82A3FCEF61B52811265 /* NSString+PGString.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117D64603782901A7E2A4C2 /* PGFilterInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D7789FB0B9CCBF6A9247 /* PGFilterInputStream.m */; };
 		1117D671A9EE61407CCCF5BB /* PGNestedEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D98CC9D8896CA6643ADA /* PGNestedEnumerator.m */; };
@@ -109,7 +108,6 @@
 		1117DD877864305D7FEE9CD9 /* NSObject+PGObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117DF8222D67F4383089DCF /* NSObject+PGObject.m */; };
 		1117DDB86452C586CB24951D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1117D5FC5AC2445232A672C5 /* Localizable.strings */; };
 		1117DDC3041B0A7943C0B1B1 /* PGLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D69770D8622C9FB013E0 /* PGLogger.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		1117DDC5D7BE7C98C10300B7 /* PGSAXEntityDecl.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D105BD31AEC02F93E592 /* PGSAXEntityDecl.m */; };
 		1117DDD72FA8AA7253705501 /* PGCmdLineOption.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D63913915F49F3D8C125 /* PGCmdLineOption.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1117DDFF0E70F976E626B860 /* PGLinkedListNodeEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1117D7D139A66E60784824DE /* PGLinkedListNodeEnumerator.m */; };
 		1117DE54512876B454A00C72 /* PGTools.h in Headers */ = {isa = PBXBuildFile; fileRef = 1117D96AC9AAF96394E7BA36 /* PGTools.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -175,9 +173,7 @@
 		1117D0AF6BE265A96DA07535 /* NSRegularExpression+PGRegularExpression.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSRegularExpression+PGRegularExpression.m"; sourceTree = "<group>"; };
 		1117D0BE395B9D1B4A80AAEA /* PGInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGInternal.m; sourceTree = "<group>"; };
 		1117D0DB44E51C55A0A69ADC /* PGRedBlackNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGRedBlackNode.h; sourceTree = "<group>"; };
-		1117D105BD31AEC02F93E592 /* PGSAXEntityDecl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGSAXEntityDecl.m; sourceTree = "<group>"; };
 		1117D10686AEC4A9ACF2FBD3 /* PGMutableBinaryTreeDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGMutableBinaryTreeDictionary.h; sourceTree = "<group>"; };
-		1117D1565CBC4B4032C6BCAB /* PGSAXEntityDecl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGSAXEntityDecl.h; sourceTree = "<group>"; };
 		1117D17B840C1359BFFB4EC5 /* PGSAXEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGSAXEntity.m; sourceTree = "<group>"; };
 		1117D197529716B32098E317 /* NSObject+PGObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+PGObject.h"; sourceTree = "<group>"; };
 		1117D1C50288D6AC04C60456 /* CommonBaseClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonBaseClass.h; sourceTree = "<group>"; };
@@ -268,10 +264,10 @@
 		1117DB4FEBB7782769750FB9 /* Rubicon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Rubicon.m; sourceTree = "<group>"; };
 		1117DB8C2ABF14B8E1144CA4 /* PGDynamicBuffers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDynamicBuffers.h; sourceTree = "<group>"; };
 		1117DB8E835887B11294D70F /* PGCmdLine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGCmdLine.m; sourceTree = "<group>"; };
-		1117DBCAAF337DFD75320A1D /* PGSAXElementDecl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGSAXElementDecl.h; sourceTree = "<group>"; };
+		1117DBCAAF337DFD75320A1D /* PGSAXElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGSAXElement.h; sourceTree = "<group>"; };
 		1117DBCB8D70DB67DE4B6825 /* fetch_and_config.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = fetch_and_config.sh; sourceTree = "<group>"; };
 		1117DBCD5B839FF190BD56CC /* PGRWLockCounts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGRWLockCounts.h; sourceTree = "<group>"; };
-		1117DBCF36DE89540371740B /* PGSAXElementDecl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGSAXElementDecl.m; sourceTree = "<group>"; };
+		1117DBCF36DE89540371740B /* PGSAXElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGSAXElement.m; sourceTree = "<group>"; };
 		1117DBEB3654905B02DBFB7D /* PGLinkedListNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGLinkedListNode.m; sourceTree = "<group>"; };
 		1117DC0934B0E763DA6F459C /* PGTimedWait.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTimedWait.h; sourceTree = "<group>"; };
 		1117DC143F7A3F3F8BBA3A2A /* PGXMLParserDelegateTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGXMLParserDelegateTest.h; sourceTree = "<group>"; };
@@ -577,16 +573,14 @@
 			children = (
 				1117D35A664E9201E0F075A6 /* PGSAXLocator.m */,
 				1117D5D52E3B9B692D351737 /* PGSAXLocator.h */,
-				1117DBCF36DE89540371740B /* PGSAXElementDecl.m */,
-				1117DBCAAF337DFD75320A1D /* PGSAXElementDecl.h */,
+				1117DBCF36DE89540371740B /* PGSAXElement.m */,
+				1117DBCAAF337DFD75320A1D /* PGSAXElement.h */,
 				1117D6543E3176AF5D5603CD /* PGSAXEntity.h */,
 				1117D17B840C1359BFFB4EC5 /* PGSAXEntity.m */,
 				1117D75D982463A45D2AD9A9 /* PGSAXAttribute.m */,
 				1117D301E33FB2E2014A2615 /* PGSAXAttribute.h */,
 				1117D282D9B01143BD199523 /* PGSAXNamespace.m */,
 				1117D20C75FB3859F1E241D3 /* PGSAXNamespace.h */,
-				1117D105BD31AEC02F93E592 /* PGSAXEntityDecl.m */,
-				1117D1565CBC4B4032C6BCAB /* PGSAXEntityDecl.h */,
 			);
 			path = Misc;
 			sourceTree = "<group>";
@@ -757,7 +751,7 @@
 				1117DB55116BA45C02D357F8 /* PGEmptyEnumerator.h in Headers */,
 				1117DBE1D60DD5C3445A159C /* PGSAXParser.h in Headers */,
 				1117DDC3041B0A7943C0B1B1 /* PGLogger.h in Headers */,
-				1117D01D8A0978C8861CA463 /* PGSAXElementDecl.h in Headers */,
+				1117D01D8A0978C8861CA463 /* PGSAXElement.h in Headers */,
 				1117DA8772DE599BAF065F40 /* PGFilterOutputStream.h in Headers */,
 				1117D21AA2999DE380255307 /* PGSimpleBuffer.h in Headers */,
 				1117DA0BC598AF33FAA9CCD5 /* PGTimedReadLock.h in Headers */,
@@ -779,7 +773,6 @@
 				1117DF916C52E657068836C7 /* AppleFoundation.h in Headers */,
 				1117D3DE606750A8F8139EFF /* PGDynamicBufferTools.h in Headers */,
 				1117D281A7EABA7B9B955261 /* PGSAXEntity.h in Headers */,
-				1117D592340DD61282D05C0D /* PGSAXEntityDecl.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -966,14 +959,13 @@
 				1117DB430C0E3EE6F4CB28D5 /* AppleFoundation.c in Sources */,
 				1117D71459ADAAAE2C16E596 /* PGSAX.m in Sources */,
 				1117D1186F352B1177B88FCF /* PGSAXLocator.m in Sources */,
-				1117D2EF4627B183860D61B6 /* PGSAXElementDecl.m in Sources */,
+				1117D2EF4627B183860D61B6 /* PGSAXElement.m in Sources */,
 				1117DF6F162F430EF3E739F8 /* PGSAXEntity.m in Sources */,
 				1117D1D5263BA711801608AB /* PGSAXParser.m in Sources */,
 				1117D73C41BABC3700FFB94D /* PGSAXAttribute.m in Sources */,
 				1117DAF2629172190A1AED41 /* PGSAXNamespace.m in Sources */,
 				1117DA6A94171CB60061FD31 /* PGCStringCache.c in Sources */,
 				1117DED8968C7419637A3957 /* PGSAXParserTools.m in Sources */,
-				1117DDC5D7BE7C98C10300B7 /* PGSAXEntityDecl.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

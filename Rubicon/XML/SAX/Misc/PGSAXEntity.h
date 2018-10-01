@@ -28,6 +28,23 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface PGSAXEntity : NSObject
+
+    @property(readonly) NSString  *name;
+    @property(readonly) NSString  *content;
+    @property(readonly) NSString  *systemId;
+    @property(readonly) NSString  *publicId;
+    @property(readonly) NSInteger type;
+
+    -(instancetype)initWithName:(NSString *)name content:(NSString *)content type:(NSInteger)type systemId:(NSString *)systemId publicId:(NSString *)publicId;
+
+    -(BOOL)isEqual:(id)other;
+
+    -(BOOL)isEqualToEntity:(PGSAXEntity *)entity;
+
+    -(NSUInteger)hash;
+
+    +(instancetype)entityWithName:(NSString *)name content:(NSString *)content type:(NSInteger)type systemId:(NSString *)systemId publicId:(NSString *)publicId;
+
 @end
 
 NS_ASSUME_NONNULL_END

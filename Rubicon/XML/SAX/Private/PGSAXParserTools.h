@@ -32,12 +32,25 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#pragma mark Declarations
+
 #define FOO(t, f)              (*((t)(f)))
 #define CASTASPARSER(p)        (PG_BRDG_CAST(PGSAXParser)(p))
 #define PGSAX_PUSH_BUFFER_SIZE (65536)
+#define SAX_ENTITY_KEY         @"%@⌘%@"
+
+typedef struct _pgsax_simple_buffer PGSAXSimpleBuffer;
+struct _pgsax_simple_buffer {
+    char *buffer;
+    int  length;
+};
+typedef PGSAXParser *__unsafe_unretained BridgedParserPtr;
+
+typedef NSInteger (*t_fRead)(id, SEL, uint8_t *, NSUInteger);
+
+#pragma mark Delegate Method Function Types
 
 /* @f:0 */
-typedef PGSAXParser *__unsafe_unretained BridgedParserPtr;
 typedef void (*t_funcInternalSubset)(id, SEL, PGSAXParser *, NSString *_Nullable, NSString *_Nullable, NSString *_Nullable);
 typedef void (*t_funcExternalSubset)(id, SEL, PGSAXParser *, NSString *_Nullable, NSString *_Nullable, NSString *_Nullable);
 typedef BOOL (*t_funcIsStandalone)(id, SEL, PGSAXParser *);
@@ -48,7 +61,7 @@ typedef NSString *_Nullable (*t_funcGetParameterEntity)(id, SEL, PGSAXParser *, 
 typedef NSData   *_Nullable (*t_funcResolveEntity)(id, SEL, PGSAXParser *, NSString *_Nullable, NSString *_Nullable);
 typedef void (*t_funcEntityDecl)(id, SEL, PGSAXParser *, NSString *_Nullable, int, NSString *_Nullable, NSString *_Nullable, NSString *_Nullable);
 typedef void (*t_funcNotationDecl)(id, SEL, PGSAXParser *, NSString *_Nullable, NSString *_Nullable, NSString *_Nullable);
-typedef void (*t_funcAttributeDecl)(id, SEL, PGSAXParser *, NSString *_Nullable, NSString *_Nullable, int, int, NSString *_Nullable, NSArray *);
+typedef void (*t_funcAttributeDecl)(id, SEL, PGSAXParser *, PGSAXAttributeDecl *);
 typedef void (*t_funcElementDecl)(id, SEL, PGSAXParser *, NSString *_Nullable, int, PGSAXElementDecl *_Nullable);
 typedef void (*t_funcUnparsedEntityDecl)(id, SEL, PGSAXParser *, NSString *_Nullable, NSString *_Nullable, NSString *_Nullable, NSString *_Nullable);
 typedef void (*t_funcSetDocumentLocator)(id, SEL, PGSAXParser *, PGSAXLocator *_Nullable);
@@ -69,54 +82,60 @@ typedef void (*t_funcXmlStructuredError)(id, SEL, PGSAXParser *, NSString *_Null
 typedef void (*t_funcWarning)(id, SEL, PGSAXParser *, NSString *_Nullable);
 typedef void (*t_funcError)(id, SEL, PGSAXParser *, NSString *_Nullable);
 typedef void (*t_funcFatalError)(id, SEL, PGSAXParser *, NSString *_Nullable);
-typedef NSInteger (*t_fRead)(id, SEL, uint8_t *, NSUInteger);
 /* @f:1 */
+
+#pragma mark Private Parser Category
 
 @interface PGSAXParser()
 
-    @property(retain) /**/ NSMutableDictionary<NSString *, NSString *> *entities;
+    @property(retain) /*          */ NSMutableDictionary<NSString *, PGSAXEntity *> *entities;
 
-    @property /*        */ IMP funcInternalSubset;
-    @property /*        */ IMP funcExternalSubset;
-    @property /*        */ IMP funcIsStandalone;
-    @property /*        */ IMP funcHasInternalSubset;
-    @property /*        */ IMP funcHasExternalSubset;
-    @property /*        */ IMP funcGetEntity;
-    @property /*        */ IMP funcGetParameterEntity;
-    @property /*        */ IMP funcResolveEntity;
-    @property /*        */ IMP funcEntityDecl;
-    @property /*        */ IMP funcNotationDecl;
-    @property /*        */ IMP funcAttributeDecl;
-    @property /*        */ IMP funcElementDecl;
-    @property /*        */ IMP funcUnparsedEntityDecl;
-    @property /*        */ IMP funcSetDocumentLocator;
-    @property /*        */ IMP funcStartDocument;
-    @property /*        */ IMP funcEndDocument;
-    @property /*        */ IMP funcStartElement;
-    @property /*        */ IMP funcEndElement;
-    @property /*        */ IMP funcReference;
-    @property /*        */ IMP funcCharacters;
-    @property /*        */ IMP funcIgnorableWhitespace;
-    @property /*        */ IMP funcProcessingInstruction;
-    @property /*        */ IMP funcComment;
-    @property /*        */ IMP funcCdataBlock;
-    @property /*        */ IMP funcStartElementNS;
-    @property /*        */ IMP funcEndElementNS;
-    @property /*        */ IMP funcXmlStructuredError;
-    @property /*        */ IMP funcWarning;
-    @property /*        */ IMP funcError;
-    @property /*        */ IMP funcFatalError;
+    @property(nullable) /*        */ IMP funcInternalSubset;
+    @property(nullable) /*        */ IMP funcExternalSubset;
+    @property(nullable) /*        */ IMP funcIsStandalone;
+    @property(nullable) /*        */ IMP funcHasInternalSubset;
+    @property(nullable) /*        */ IMP funcHasExternalSubset;
+    @property(nullable) /*        */ IMP funcGetEntity;
+    @property(nullable) /*        */ IMP funcGetParameterEntity;
+    @property(nullable) /*        */ IMP funcResolveEntity;
+    @property(nullable) /*        */ IMP funcEntityDecl;
+    @property(nullable) /*        */ IMP funcNotationDecl;
+    @property(nullable) /*        */ IMP funcAttributeDecl;
+    @property(nullable) /*        */ IMP funcElementDecl;
+    @property(nullable) /*        */ IMP funcUnparsedEntityDecl;
+    @property(nullable) /*        */ IMP funcSetDocumentLocator;
+    @property(nullable) /*        */ IMP funcStartDocument;
+    @property(nullable) /*        */ IMP funcEndDocument;
+    @property(nullable) /*        */ IMP funcStartElement;
+    @property(nullable) /*        */ IMP funcEndElement;
+    @property(nullable) /*        */ IMP funcReference;
+    @property(nullable) /*        */ IMP funcCharacters;
+    @property(nullable) /*        */ IMP funcIgnorableWhitespace;
+    @property(nullable) /*        */ IMP funcProcessingInstruction;
+    @property(nullable) /*        */ IMP funcComment;
+    @property(nullable) /*        */ IMP funcCdataBlock;
+    @property(nullable) /*        */ IMP funcStartElementNS;
+    @property(nullable) /*        */ IMP funcEndElementNS;
+    @property(nullable) /*        */ IMP funcXmlStructuredError;
+    @property(nullable) /*        */ IMP funcWarning;
+    @property(nullable) /*        */ IMP funcError;
+    @property(nullable) /*        */ IMP funcFatalError;
 
-    @property /*        */ BOOL              hasAlreadyRun;
-    @property(retain) /**/ NSInputStream     *inputStream;
-    @property(copy) /*  */ NSString          *filename;
-    @property(retain) /**/ NSRecursiveLock   *rlock;
-    @property(retain) /**/ id<PGSAXDelegate> workingDelegate;
-    @property /*        */ xmlParserCtxtPtr  ctx;
-    @property /*        */ xmlSAXHandlerPtr  saxHandler;
-    @property /*        */ char              *utf8Filename;
+    @property /*                  */ BOOL              hasAlreadyRun;
+    @property(retain) /*          */ NSInputStream     *inputStream;
+    @property(nullable, copy) /*  */ NSString          *filename;
+    @property(retain) /*          */ NSRecursiveLock   *rlock;
+    @property(nullable, retain) /**/ id<PGSAXDelegate> workingDelegate;
+    @property(nullable) /*        */ xmlParserCtxtPtr  ctx;
+    @property(nullable) /*        */ char              *utf8Filename;
 
-/* @f:0 */
+    -(PGSAXSimpleBuffer *)createTempBuffer:(int)length;
+
+    -(PGSAXEntity *)getLocalEntity:(NSString *)name;
+
+    -(PGSAXEntity *)getLocalParameterEntity:(NSString *)name;
+
+    /* @f:0 */
 
     -(void)internalSubset:(nullable NSString *)name externalID:(nullable NSString *)externalId systemID:(nullable NSString *)systemId;
 
@@ -134,13 +153,15 @@ typedef NSInteger (*t_fRead)(id, SEL, uint8_t *, NSUInteger);
 
     -(nullable NSData *)resolveEntity:(nullable NSString *)publicId systemID:(nullable NSString *)systemId;
 
+    -(PGSAXEntity *)storeEntity:(NSString *)name type:(int)type publicID:(nullable NSString *)publicId systemID:(nullable NSString *)systemId content:(NSString *)content;
+
     -(void)entityDecl:(nullable NSString *)name type:(int)type publicID:(nullable NSString *)publicId systemID:(nullable NSString *)systemId content:(nullable NSString *)content;
 
     -(void)notationDecl:(nullable NSString *)name publicID:(nullable NSString *)publicId systemID:(nullable NSString *)systemId;
 
-    -(void)attributeDecl:(nullable NSString *)elem fullname:(nullable NSString *)fname type:(int)type def:(int)def defaultValue:(nullable NSString *)defval tree:(NSArray *)tree;
+    -(void)attributeDecl:(PGSAXAttributeDecl *)attrdecl;
 
-    -(void)elementDecl:(nullable NSString *)name type:(int)type content:(nullable PGSAXElementDecl *)content;
+    -(void)elementDecl:(NSString *)name type:(int)type content:(PGSAXElementDecl *)content;
 
     -(void)unparsedEntityDecl:(nullable NSString *)name publicID:(nullable NSString *)pubid systemID:(nullable NSString *)sysid notationName:(nullable NSString *)notnam;
 
@@ -170,7 +191,7 @@ typedef NSInteger (*t_fRead)(id, SEL, uint8_t *, NSUInteger);
 
     -(void)endElementNS:(nullable NSString *)localname prefix:(nullable NSString *)prefix URI:(nullable NSString *)URI;
 
-    -(void)xmlStructuredError:(nullable NSString *)msg;
+    -(void)structuredError:(nullable NSString *)msg;
 
     -(void)warning:(nullable NSString *)msg;
 
@@ -181,6 +202,8 @@ typedef NSInteger (*t_fRead)(id, SEL, uint8_t *, NSUInteger);
 /* @f:1 */
 
 @end
+
+#pragma mark Utility Class Categories
 
 @interface NSString(PGSAX)
 
@@ -212,9 +235,28 @@ typedef NSInteger (*t_fRead)(id, SEL, uint8_t *, NSUInteger);
 
 @end
 
+@interface PGSAXElementDecl()
+
+    -(instancetype)initWithXmlElementContent:(xmlElementContentPtr)elemContent;
+
+    +(instancetype)declWithXmlElementContent:(xmlElementContentPtr)elemContent;
+@end
+
+@interface PGSAXEntity()
+
+    @property(readonly) xmlEntityPtr xmlEntity;
+
+@end
+
 /* @f:0 */
-FOUNDATION_EXPORT BOOL pushParseXML(PGSAXParser *parser, id<PGSAXDelegate> delegate, NSInputStream *instr, NSError **error);
-FOUNDATION_EXPORT void postParseCleanup(PGSAXParser *parser);
+#pragma mark Utility Function Declarations
+
+FOUNDATION_EXPORT void populateSelectorFields(void);
+FOUNDATION_EXPORT xmlSAXHandlerPtr createSAXHandler(xmlSAXHandlerPtr saxh);
+FOUNDATION_EXPORT NSArray<NSString *> *errorDomainXlat(int errorDomain);
+FOUNDATION_EXPORT NSString *errorLevelXlat(xmlErrorLevel level);
+
+#pragma mark Call Back Function Declarations
 
 FOUNDATION_EXPORT int __hasInternalSubsetSAX(void *ctx);
 FOUNDATION_EXPORT int __hasExternalSubsetSAX(void *ctx);
@@ -248,37 +290,39 @@ FOUNDATION_EXPORT void __fatalErrorSAX(void *ctx, const char *msg, ...);
 FOUNDATION_EXPORT int __isStandaloneSAX(void *ctx);
 /* @f:1 */
 
-FOUNDATION_EXPORT static SEL _selInternalSubset;
-FOUNDATION_EXPORT static SEL _selExternalSubset;
-FOUNDATION_EXPORT static SEL _selIsStandalone;
-FOUNDATION_EXPORT static SEL _selHasInternalSubset;
-FOUNDATION_EXPORT static SEL _selHasExternalSubset;
-FOUNDATION_EXPORT static SEL _selGetEntity;
-FOUNDATION_EXPORT static SEL _selGetParameterEntity;
-FOUNDATION_EXPORT static SEL _selResolveEntity;
-FOUNDATION_EXPORT static SEL _selEntityDecl;
-FOUNDATION_EXPORT static SEL _selNotationDecl;
-FOUNDATION_EXPORT static SEL _selAttributeDecl;
-FOUNDATION_EXPORT static SEL _selElementDecl;
-FOUNDATION_EXPORT static SEL _selUnparsedEntityDecl;
-FOUNDATION_EXPORT static SEL _selSetDocumentLocator;
-FOUNDATION_EXPORT static SEL _selStartDocument;
-FOUNDATION_EXPORT static SEL _selEndDocument;
-FOUNDATION_EXPORT static SEL _selStartElement;
-FOUNDATION_EXPORT static SEL _selEndElement;
-FOUNDATION_EXPORT static SEL _selReference;
-FOUNDATION_EXPORT static SEL _selCharacters;
-FOUNDATION_EXPORT static SEL _selIgnorableWhitespace;
-FOUNDATION_EXPORT static SEL _selProcessingInstruction;
-FOUNDATION_EXPORT static SEL _selComment;
-FOUNDATION_EXPORT static SEL _selCdataBlock;
-FOUNDATION_EXPORT static SEL _selStartElementNS;
-FOUNDATION_EXPORT static SEL _selEndElementNS;
-FOUNDATION_EXPORT static SEL _selXmlStructuredError;
-FOUNDATION_EXPORT static SEL _selWarning;
-FOUNDATION_EXPORT static SEL _selError;
-FOUNDATION_EXPORT static SEL _selFatalError;
-FOUNDATION_EXPORT static SEL _selStreamRead;
+#pragma mark Delegate Method Selectors
+
+FOUNDATION_EXPORT SEL _selInternalSubset;
+FOUNDATION_EXPORT SEL _selExternalSubset;
+FOUNDATION_EXPORT SEL _selIsStandalone;
+FOUNDATION_EXPORT SEL _selHasInternalSubset;
+FOUNDATION_EXPORT SEL _selHasExternalSubset;
+FOUNDATION_EXPORT SEL _selGetEntity;
+FOUNDATION_EXPORT SEL _selGetParameterEntity;
+FOUNDATION_EXPORT SEL _selResolveEntity;
+FOUNDATION_EXPORT SEL _selEntityDecl;
+FOUNDATION_EXPORT SEL _selNotationDecl;
+FOUNDATION_EXPORT SEL _selAttributeDecl;
+FOUNDATION_EXPORT SEL _selElementDecl;
+FOUNDATION_EXPORT SEL _selUnparsedEntityDecl;
+FOUNDATION_EXPORT SEL _selSetDocumentLocator;
+FOUNDATION_EXPORT SEL _selStartDocument;
+FOUNDATION_EXPORT SEL _selEndDocument;
+FOUNDATION_EXPORT SEL _selStartElement;
+FOUNDATION_EXPORT SEL _selEndElement;
+FOUNDATION_EXPORT SEL _selReference;
+FOUNDATION_EXPORT SEL _selCharacters;
+FOUNDATION_EXPORT SEL _selIgnorableWhitespace;
+FOUNDATION_EXPORT SEL _selProcessingInstruction;
+FOUNDATION_EXPORT SEL _selComment;
+FOUNDATION_EXPORT SEL _selCdataBlock;
+FOUNDATION_EXPORT SEL _selStartElementNS;
+FOUNDATION_EXPORT SEL _selEndElementNS;
+FOUNDATION_EXPORT SEL _selXmlStructuredError;
+FOUNDATION_EXPORT SEL _selWarning;
+FOUNDATION_EXPORT SEL _selError;
+FOUNDATION_EXPORT SEL _selFatalError;
+FOUNDATION_EXPORT SEL _selStreamRead;
 
 NS_ASSUME_NONNULL_END
 

@@ -344,7 +344,7 @@ NS_INLINE PGLinkedListNode *fastEnumNext(NSFastEnumerationState *state, PGLinked
 
 NSUInteger fastEnumImpl(NSFastEnumerationState *state, PGLinkedListNode *head, __unsafe_unretained id buffer[], NSUInteger len) {
     NSUInteger                  count = 0;
-    PG_UNSAFE(PGLinkedListNode) nextNode = (PG_BRDG_CAST(PGLinkedListNode)(state->extra[0]));
+    PG_UNSAFE(PGLinkedListNode) nextNode = (PG_BRDG_CAST(PGLinkedListNode)(void *)(state->extra[0]));
 
     while(nextNode && (count < len)) {
         buffer[count++] = nextNode.data;

@@ -56,13 +56,11 @@
     }
 
     -(NSString *)publicId {
-        const xmlChar *str = _locator->getPublicId(_ctx);
-        return ((_locator && _locator->getPublicId) ? [NSString stringFromXMLString:str] : nil);
+        return nil; // ((_locator && _locator->getPublicId) ? [NSString stringFromXMLString:_locator->getPublicId(_ctx)] : nil);
     }
 
     -(NSString *)systemId {
-        const xmlChar *str = _locator->getSystemId(_ctx);
-        return ((_locator && _locator->getSystemId) ? [NSString stringFromXMLString:str] : nil);
+        return nil; // ((_locator && _locator->getSystemId) ? [NSString stringFromXMLString:_locator->getSystemId(_ctx)] : nil);
     }
 
     -(NSUInteger)lineNumber {

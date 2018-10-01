@@ -27,7 +27,33 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger, PGSAXElementContentType) {
+    PGSAX_ELEM_CONTENT_PCDATA = 1, PGSAX_ELEM_CONTENT_ELEMENT, PGSAX_ELEM_CONTENT_SEQ, PGSAX_ELEM_CONTENT_OR,
+};
+
+typedef NS_ENUM(NSInteger, PGSAXElementContentOccur) {
+    PGSAX_ELEM_CONTENT_ONCE = 1, PGSAX_ELEM_CONTENT_OPT, PGSAX_ELEM_CONTENT_MULT, PGSAX_ELEM_CONTENT_PLUS
+};
+
+@interface PGSAXElement : NSObject
+@end
+
 @interface PGSAXElementDecl : NSObject
+
+    @property(readonly) NSString                 *name;
+    @property(readonly) NSString                 *prefix;
+    @property(readonly) PGSAXElementContentType  contentType;
+    @property(readonly) PGSAXElementContentOccur contentOccur;
+    @property(readonly) PGSAXElementDecl         *child1;
+    @property(readonly) PGSAXElementDecl         *child2;
+    @property(readonly) PGSAXElementDecl         *parent;
+
+    -(BOOL)isEqual:(id)other;
+
+    -(BOOL)isEqualToDecl:(PGSAXElementDecl *)decl;
+
+    -(NSUInteger)hash;
+
 @end
 
 NS_ASSUME_NONNULL_END

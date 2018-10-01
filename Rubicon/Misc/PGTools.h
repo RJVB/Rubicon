@@ -47,7 +47,7 @@ FOUNDATION_EXPORT const NSByte UTF8_4ByteMarkerMask;
 #define PGSETIFNULL(l, f, v) dispatch_sync(PGSharedSerialQueue(), ^{ if((f) == NULL) (f) = (v); })
 #define PGSETIFZERO(l, f, v) dispatch_sync(PGSharedSerialQueue(), ^{ if((f)  == (0)) (f) = (v); })
 
-#define PG_BRDG_CAST(t)      (__bridge t *)(void *)
+#define PG_BRDG_CAST(t)      (__bridge t *)
 #define PG_BRDG_UNCAST(t)    (t)(__bridge void *)
 #define PG_UNSAFE(c)         c *__unsafe_unretained
 

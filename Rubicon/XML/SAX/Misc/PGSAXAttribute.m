@@ -82,16 +82,13 @@
             NSUInteger                       j   = 0;
 
             for(NSUInteger i = 0; i < length; ++i) {
-                BOOL          d     = (i >= dl);
-                const xmlChar *str  = atts[j++];
-                NSString      *l    = [NSString stringFromXMLString:str];
-                const xmlChar *str1 = atts[j++];
-                NSString      *p    = [NSString stringFromXMLString:str1];
-                const xmlChar *str2 = atts[j++];
-                NSString      *u    = [NSString stringFromXMLString:str2];
-                const xmlChar *vs   = atts[j++];
-                const xmlChar *ve   = atts[j++];
-                NSString      *v    = ((vs && (ve > vs)) ? [NSString stringFromXMLString:vs args:(ve - vs)] : @"");
+                BOOL          d   = (i >= dl);
+                NSString      *l  = [NSString stringFromXMLString:atts[j++]];
+                NSString      *p  = [NSString stringFromXMLString:atts[j++]];
+                NSString      *u  = [NSString stringFromXMLString:atts[j++]];
+                const xmlChar *vs = atts[j++];
+                const xmlChar *ve = atts[j++];
+                NSString      *v  = ((vs && (ve > vs)) ? [NSString stringFromXMLString:vs length:(int)(ve - vs)] : @"");
 
                 [at addObject:[self attributeWithLocalname:l prefix:p uri:u value:v defaulted:d]];
             }
@@ -99,6 +96,47 @@
             return at;
         }
         return @[];
+    }
+
+@end
+
+@implementation PGSAXAttributeDecl {
+    }
+
+    @synthesize element = _element;
+    @synthesize fullname = _fullname;
+    @synthesize attrType = _attrType;
+    @synthesize attrDefault = _attrDefault;
+    @synthesize defaultValue = _defaultValue;
+    @synthesize valueList = _valueList;
+
+    -(instancetype)initWithElement:(NSString *)element
+                          fullname:(NSString *)fullname
+                          attrType:(PGSAXAttributeType)attrType
+                       attrDefault:(PGSAXAttributeDefault)attrDefault
+                      defaultValue:(NSString *)defaultValue
+                         valueList:(NSArray<NSString *> *)valueList {
+        self = [super init];
+
+        if(self) {
+            _element      = element;
+            _fullname     = fullname;
+            _attrType     = attrType;
+            _attrDefault  = attrDefault;
+            _defaultValue = defaultValue;
+            _valueList    = valueList;
+        }
+
+        return self;
+    }
+
+    +(instancetype)declWithElement:(NSString *)element
+                          fullname:(NSString *)fullname
+                          attrType:(PGSAXAttributeType)attrType
+                       attrDefault:(PGSAXAttributeDefault)attrDefault
+                      defaultValue:(NSString *)defaultValue
+                         valueList:(NSArray<NSString *> *)valueList {
+        return [[self alloc] initWithElement:element fullname:fullname attrType:attrType attrDefault:attrDefault defaultValue:defaultValue valueList:valueList];
     }
 
 @end

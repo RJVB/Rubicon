@@ -26,7 +26,7 @@
 #import <Rubicon/PGTools.h>
 #import <Rubicon/PGSAXLocator.h>
 #import <Rubicon/PGSAXEntity.h>
-#import "PGSAXElementDecl.h"
+#import "PGSAXElement.h"
 #import <Rubicon/PGSAXAttribute.h>
 #import <Rubicon/PGSAXNamespace.h>
 
@@ -60,7 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(void)notationDecl:(PGSAXParser *)parser name:(nullable NSString *)name publicID:(nullable NSString *)publicId systemID:(nullable NSString *)systemId;
 
-    -(void)attributeDecl:(PGSAXParser *)parser elem:(nullable NSString *)elem fullname:(nullable NSString *)fullname type:(int)type def:(int)def defaultValue:(nullable NSString *)defaultValue tree:(NSArray *)tree;
+    -(void)attributeDecl:(PGSAXParser *)parser attrDecl:(PGSAXAttributeDecl *)attrdecl;
 
     -(void)elementDecl:(PGSAXParser *)parser name:(nullable NSString *)name type:(int)type content:(nullable PGSAXElementDecl *)content;
 
@@ -92,7 +92,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     -(void)endElementNS:(PGSAXParser *)parser localname:(nullable NSString *)localname prefix:(nullable NSString *)prefix URI:(nullable NSString *)URI;
 
-    -(void)xmlStructuredError:(PGSAXParser *)parser msg:(nullable NSString *)msg;
+    -(void)structuredError:(PGSAXParser *)parser msg:(nullable NSString *)msg;
 
     -(void)warning:(PGSAXParser *)parser msg:(nullable NSString *)msg;
 

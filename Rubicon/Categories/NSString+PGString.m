@@ -558,7 +558,7 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
         return [self enumerateOverCharactersWithBlock:enumBlock range:self.range];
     }
 
-    -(BOOL)enumerateOverCharactersWithBlock:(PGCharEnumBlock)enumBlock range:(NSRange)range {
+    -(BOOL)enumerateOverCharactersWithBlock:(PGCharEnumBlock __attribute__((noescape)))enumBlock range:(NSRange)range {
         if(range.length) {
             NSRange       i = [self rangeOfComposedCharacterSequencesForRange:range]; // Make sure we're not slicing composed character sequences.
             NSUInteger    j = i.location;
@@ -582,8 +582,7 @@ NS_INLINE NSString *substringBetween(NSString *string, NSUInteger idxFrom, NSUIn
 
     -(NSString *)stringByFilteringWithRegexPattern:(NSString *)pattern
                                       regexOptions:(NSRegularExpressionOptions)regexOptions
-                                      matchOptions:(NSMatchingOptions)matchOptions
-                                  replacementBlock:(PGRegexFilterBlock)replBlock
+                                      matchOptions:(NSMatchingOptions)matchOptions replacementBlock:(PGRegexFilterBlock __attribute__((noescape)))replBlock
                                              error:(NSError **)error {
         NSError             *err   = nil;
         NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:regexOptions error:&err];

@@ -22,6 +22,8 @@
 
 #import "PGSAXParserTools.h"
 
+#pragma mark Utility Class Categories
+
 @implementation NSString(PGSAX)
 
     +(NSString *)stringFromXMLString:(const xmlChar *)xmlStr {
@@ -44,37 +46,186 @@
 
 @end
 
-static SEL _selInternalSubset;
-static SEL _selExternalSubset;
-static SEL _selIsStandalone;
-static SEL _selHasInternalSubset;
-static SEL _selHasExternalSubset;
-static SEL _selGetEntity;
-static SEL _selGetParameterEntity;
-static SEL _selResolveEntity;
-static SEL _selEntityDecl;
-static SEL _selNotationDecl;
-static SEL _selAttributeDecl;
-static SEL _selElementDecl;
-static SEL _selUnparsedEntityDecl;
-static SEL _selSetDocumentLocator;
-static SEL _selStartDocument;
-static SEL _selEndDocument;
-static SEL _selStartElement;
-static SEL _selEndElement;
-static SEL _selReference;
-static SEL _selCharacters;
-static SEL _selIgnorableWhitespace;
-static SEL _selProcessingInstruction;
-static SEL _selComment;
-static SEL _selCdataBlock;
-static SEL _selStartElementNS;
-static SEL _selEndElementNS;
-static SEL _selXmlStructuredError;
-static SEL _selWarning;
-static SEL _selError;
-static SEL _selFatalError;
-static SEL _selStreamRead;
+#pragma mark Utility Functions
+
+NS_INLINE PGSAXSimpleBuffer *bufferForNSData(BridgedParserPtr p, NSData *data) {
+    PGSAXSimpleBuffer *sb = [p createTempBuffer:(int)data.length];
+    [data getBytes:sb->buffer length:(NSUInteger)sb->length];
+    return sb;
+}
+
+NS_INLINE NSString *bar(const char *msg, va_list args) {
+    size_t sz   = 4096; // 4K should be more than enough.
+    char   *tmp = PGCalloc(1, sz);
+
+    @try {
+        vsnprintf(tmp, (sz - 1), msg, args);
+        return [NSString stringWithUTF8String:tmp];
+    }
+    @finally { free(tmp); }
+}
+
+xmlSAXHandlerPtr createSAXHandler(xmlSAXHandlerPtr saxh) {
+    saxh->initialized           = XML_SAX2_MAGIC;
+    saxh->internalSubset        = __internalSubsetSAX;
+    saxh->externalSubset        = __externalSubsetSAX;
+    saxh->isStandalone          = __isStandaloneSAX;
+    saxh->hasInternalSubset     = __hasInternalSubsetSAX;
+    saxh->hasExternalSubset     = __hasExternalSubsetSAX;
+    saxh->getEntity             = __getEntitySAX;
+    saxh->getParameterEntity    = __getParameterEntitySAX;
+    saxh->resolveEntity         = __resolveEntitySAX;
+    saxh->entityDecl            = __entityDeclSAX;
+    saxh->notationDecl          = __notationDeclSAX;
+    saxh->attributeDecl         = __attributeDeclSAX;
+    saxh->elementDecl           = __elementDeclSAX;
+    saxh->unparsedEntityDecl    = __unparsedEntityDeclSAX;
+    saxh->setDocumentLocator    = __setDocumentLocatorSAX;
+    saxh->startDocument         = __startDocumentSAX;
+    saxh->endDocument           = __endDocumentSAX;
+    saxh->startElement          = __startElementSAX;
+    saxh->endElement            = __endElementSAX;
+    saxh->reference             = __referenceSAX;
+    saxh->characters            = __charactersSAX;
+    saxh->ignorableWhitespace   = __ignorableWhitespaceSAX;
+    saxh->processingInstruction = __processingInstructionSAX;
+    saxh->comment               = __commentSAX;
+    saxh->cdataBlock            = __cdataBlockSAX;
+    saxh->startElementNs        = __startElementNsSAX2;
+    saxh->endElementNs          = __endElementNsSAX2;
+    saxh->serror                = __xmlStructuredError2;
+    saxh->warning               = __warningSAX;
+    saxh->error                 = __errorSAX;
+    saxh->fatalError            = __fatalErrorSAX; /* unused error() get all the errors */
+    return saxh;
+}
+
+void populateSelectorFields(void) {
+    static dispatch_once_t __selectorOnce = 0;
+    dispatch_once(&__selectorOnce, ^{
+        _selInternalSubset        = @selector(internalSubset:name:externalID:systemID:);
+        _selExternalSubset        = @selector(externalSubset:name:externalID:systemID:);
+        _selIsStandalone          = @selector(isStandalone:);
+        _selHasInternalSubset     = @selector(hasInternalSubset:);
+        _selHasExternalSubset     = @selector(hasExternalSubset:);
+        _selGetEntity             = @selector(getEntity:name:);
+        _selGetParameterEntity    = @selector(getParameterEntity:name:);
+        _selResolveEntity         = @selector(resolveEntity:publicID:systemID:);
+        _selEntityDecl            = @selector(entityDecl:name:type:publicID:systemID:content:);
+        _selNotationDecl          = @selector(notationDecl:name:publicID:systemID:);
+        _selAttributeDecl         = @selector(attributeDecl:attrDecl:);
+        _selElementDecl           = @selector(elementDecl:name:type:content:);
+        _selUnparsedEntityDecl    = @selector(unparsedEntityDecl:name:publicID:systemID:notationName:);
+        _selSetDocumentLocator    = @selector(setDocumentLocator:location:);
+        _selStartDocument         = @selector(startDocument:);
+        _selEndDocument           = @selector(endDocument:);
+        _selStartElement          = @selector(startElement:name:attributes:);
+        _selEndElement            = @selector(endElement:name:);
+        _selReference             = @selector(reference:name:);
+        _selCharacters            = @selector(characters:value:);
+        _selIgnorableWhitespace   = @selector(ignorableWhitespace:value:);
+        _selProcessingInstruction = @selector(processingInstruction:target:data:);
+        _selComment               = @selector(comment:value:);
+        _selCdataBlock            = @selector(cdataBlock:value:);
+        _selStartElementNS        = @selector(startElementNS:localname:prefix:URI:namespaces:attributes:);
+        _selEndElementNS          = @selector(endElementNS:localname:prefix:URI:);
+        _selXmlStructuredError    = @selector(structuredError:msg:);
+        _selWarning               = @selector(warning:msg:);
+        _selError                 = @selector(error:msg:);
+        _selFatalError            = @selector(fatalError:msg:);
+        _selStreamRead            = @selector(read:maxLength:);
+    });
+}
+
+NSString *errorLevelXlat(xmlErrorLevel level) {
+    switch(level) {
+        case XML_ERR_WARNING:
+            return @"Warning";
+        case XML_ERR_ERROR:
+            return @"Error";
+        case XML_ERR_FATAL:
+            return @"Fatal";
+        default:
+            return @"None";
+    }
+}
+
+NSArray<NSString *> *errorDomainXlat(int errorDomain) {
+    switch(errorDomain) {
+        case XML_FROM_NONE:
+            return @[ @"None", @"" ];
+        case XML_FROM_PARSER:
+            return @[ @"Parser", @"XML parser" ];
+        case XML_FROM_TREE:
+            return @[ @"Tree", @"Tree module" ];
+        case XML_FROM_NAMESPACE:
+            return @[ @"Namespace", @"XML Namespace module" ];
+        case XML_FROM_DTD:
+            return @[ @"DTD", @"XML DTD validation with parser context" ];
+        case XML_FROM_HTML:
+            return @[ @"HTML", @"HTML parser" ];
+        case XML_FROM_MEMORY:
+            return @[ @"Memory", @"Memory allocator" ];
+        case XML_FROM_OUTPUT:
+            return @[ @"Output", @"Serialization code" ];
+        case XML_FROM_IO:
+            return @[ @"IO", @"Input/Output stack" ];
+        case XML_FROM_FTP:
+            return @[ @"FTP", @"FTP module" ];
+        case XML_FROM_HTTP:
+            return @[ @"HTTP", @"HTTP module" ];
+        case XML_FROM_XINCLUDE:
+            return @[ @"XInclude", @"XInclude processing" ];
+        case XML_FROM_XPATH:
+            return @[ @"XPath", @"XPath module" ];
+        case XML_FROM_XPOINTER:
+            return @[ @"XPointer", @"XPointer module" ];
+        case XML_FROM_REGEXP:
+            return @[ @"Regexp", @"Regular expressions module" ];
+        case XML_FROM_DATATYPE:
+            return @[ @"Datatype", @"W3C XML Schemas Datatype module" ];
+        case XML_FROM_SCHEMASP:
+            return @[ @"Schemas Parser", @"W3C XML Schemas parser module" ];
+        case XML_FROM_SCHEMASV:
+            return @[ @"Schemas Validation", @"W3C XML Schemas validation module" ];
+        case XML_FROM_RELAXNGP:
+            return @[ @"Relaxng Parser", @"Relax-NG parser module" ];
+        case XML_FROM_RELAXNGV:
+            return @[ @"Relaxng Validation", @"Relax-NG validator module" ];
+        case XML_FROM_CATALOG:
+            return @[ @"Catalog", @"Catalog module" ];
+        case XML_FROM_C14N:
+            return @[ @"C14N", @"Canonicalization module" ];
+        case XML_FROM_XSLT:
+            return @[ @"XSLT", @"XSLT engine from libxslt" ];
+        case XML_FROM_VALID:
+            return @[ @"Validation", @"XML DTD validation with valid context" ];
+        case XML_FROM_CHECK:
+            return @[ @"Check", @"Error checking module" ];
+        case XML_FROM_WRITER:
+            return @[ @"Writer", @"XMLwriter module" ];
+        case XML_FROM_MODULE:
+            return @[ @"Module", @"Dynamically loaded module module" ];
+        case XML_FROM_I18N:
+            return @[ @"I18N", @"Module handling character conversion" ];
+        case XML_FROM_SCHEMATRONV:
+            return @[ @"Schematron", @"Schematron validator module" ];
+        case XML_FROM_BUFFER:
+            return @[ @"Buffer", @"Buffers module" ];
+        case XML_FROM_URI:
+            return @[ @"URI", @"URI module" ];
+        default:
+            return @[ @"Unknown", @"" ];
+    }
+}
+
+// @f:0
+#pragma mark Call Back Functions
+
+int __isStandaloneSAX(void *ctx) {
+    BridgedParserPtr p = CASTASPARSER(ctx);
+    return ([p isStandalone] ? 1 : 0);
+}
 
 int __hasInternalSubsetSAX(void *ctx) {
     BridgedParserPtr p = CASTASPARSER(ctx);
@@ -86,7 +237,6 @@ int __hasExternalSubsetSAX(void *ctx) {
     return ([p hasExternalSubset] ? 1 : 0);
 }
 
-// @f:0
 void __startElementNsSAX2(void *ctx, const xmlChar *localname, const xmlChar *prefix, const xmlChar *URI, int nb_namespaces, const xmlChar **namespaces, int nb_attributes, int nb_defaulted, const xmlChar **attributes) { // @f:1
     BridgedParserPtr          p   = CASTASPARSER(ctx);
     NSArray<PGSAXNamespace *> *ns = [PGSAXNamespace namespacesFromArray:namespaces length:(NSUInteger)nb_namespaces];
@@ -97,12 +247,6 @@ void __startElementNsSAX2(void *ctx, const xmlChar *localname, const xmlChar *pr
 void __endElementNsSAX2(void *ctx, const xmlChar *localname, const xmlChar *prefix, const xmlChar *URI) {
     BridgedParserPtr p = CASTASPARSER(ctx);
     [p endElementNS:[NSString stringFromXMLString:localname] prefix:[NSString stringFromXMLString:prefix] URI:[NSString stringFromXMLString:URI]];
-}
-
-void __xmlStructuredError2(void *userData, xmlErrorPtr error) {
-    BridgedParserPtr p      = CASTASPARSER(userData);
-    NSString         *nsMsg = @""; // TODO: BUILD...
-    [p xmlStructuredError:nsMsg];
 }
 
 void __internalSubsetSAX(void *ctx, const xmlChar *name, const xmlChar *ExternalID, const xmlChar *SystemID) {
@@ -116,24 +260,39 @@ void __externalSubsetSAX(void *ctx, const xmlChar *name, const xmlChar *External
 }
 
 xmlEntityPtr __getEntitySAX(void *ctx, const xmlChar *name) {
-    BridgedParserPtr p    = CASTASPARSER(ctx);
-    NSString         *str = [p getEntity:[NSString stringFromXMLString:name]];
-    /* TODO: Convert */
-    return NULL;
+    BridgedParserPtr p          = CASTASPARSER(ctx);
+    NSString         *nsName    = [NSString stringFromXMLString:name];
+    NSString         *nsContent = [p getEntity:nsName];
+    PGSAXEntity      *entity    = nil;
+
+    if(nsContent) entity     = [p storeEntity:nsName type:-XML_INTERNAL_GENERAL_ENTITY publicID:NULL systemID:NULL content:nsContent];
+    if(entity == nil) entity = [p getLocalEntity:nsName];
+    return entity.xmlEntity;
 }
 
 xmlEntityPtr __getParameterEntitySAX(void *ctx, const xmlChar *name) {
-    BridgedParserPtr p    = CASTASPARSER(ctx);
-    NSString         *str = [p getParameterEntity:[NSString stringFromXMLString:name]];
-    /* TODO: Convert */
-    return NULL;
+    BridgedParserPtr p          = CASTASPARSER(ctx);
+    NSString         *nsName    = [NSString stringFromXMLString:name];
+    NSString         *nsContent = [p getParameterEntity:nsName];
+    PGSAXEntity      *entity    = nil;
+
+    if(nsContent) entity     = [p storeEntity:nsName type:-XML_INTERNAL_PARAMETER_ENTITY publicID:NULL systemID:NULL content:nsContent];
+    if(entity == nil) entity = [p getLocalParameterEntity:nsName];
+    return entity.xmlEntity;
 }
 
 xmlParserInputPtr __resolveEntitySAX(void *ctx, const xmlChar *publicId, const xmlChar *systemId) {
     BridgedParserPtr p     = CASTASPARSER(ctx);
     NSData           *data = [p resolveEntity:[NSString stringFromXMLString:publicId] systemID:[NSString stringFromXMLString:systemId]];
-    /* TODO: Convert */
-    return NULL;
+
+    if(data.length) {
+        PGSAXSimpleBuffer       *sb   = bufferForNSData(p, data);
+        xmlParserInputBufferPtr inbuf = xmlParserInputBufferCreateMem(sb->buffer, sb->length, XML_CHAR_ENCODING_UTF8);
+        xmlParserInputPtr       pinp  = xmlNewIOInputStream(p.ctx, inbuf, XML_CHAR_ENCODING_UTF8);
+        return pinp;
+    }
+
+    return xmlLoadExternalEntity((const char *)systemId, (const char *)systemId, p.ctx);
 }
 
 void __entityDeclSAX(void *ctx, const xmlChar *name, int type, const xmlChar *publicId, const xmlChar *systemId, xmlChar *content) {
@@ -151,20 +310,28 @@ void __notationDeclSAX(void *ctx, const xmlChar *name, const xmlChar *publicId, 
 }
 
 void __attributeDeclSAX(void *ctx, const xmlChar *elem, const xmlChar *fullname, int type, int def, const xmlChar *defaultValue, xmlEnumerationPtr tree) {
-    BridgedParserPtr p       = CASTASPARSER(ctx);
-    NSArray          *nsTree = nil; // TODO: Populate
-    [p attributeDecl:[NSString stringFromXMLString:elem]
-            fullname:[NSString stringFromXMLString:fullname]
-                type:type
-                 def:def
-        defaultValue:[NSString stringFromXMLString:defaultValue]
-                tree:nsTree];
+    BridgedParserPtr           p       = CASTASPARSER(ctx);
+    NSMutableArray<NSString *> *values = [NSMutableArray new];
+
+    PGLog(@"Inside Callback> %@", @"__attributeDeclSAX");
+    while(tree) {
+        NSString *enumValue = [NSString stringFromXMLString:tree->name];
+        PGLog(@"        AttribEnum: \"%@\"", enumValue);
+        [values addObject:enumValue];
+        tree = tree->next;
+    }
+
+    [p attributeDecl:[PGSAXAttributeDecl declWithElement:[NSString stringFromXMLString:elem]
+                                                fullname:[NSString stringFromXMLString:fullname]
+                                                attrType:(PGSAXAttributeType)type
+                                             attrDefault:(PGSAXAttributeDefault)def
+                                            defaultValue:[NSString stringFromXMLString:defaultValue]
+                                               valueList:values]];
 }
 
 void __elementDeclSAX(void *ctx, const xmlChar *name, int type, xmlElementContentPtr content) {
-    BridgedParserPtr p     = CASTASPARSER(ctx);
-    PGSAXElementDecl *elem = nil; // TODO: Create...
-    [p elementDecl:[NSString stringFromXMLString:name] type:type content:elem];
+    BridgedParserPtr p = CASTASPARSER(ctx);
+    [p elementDecl:[NSString stringFromXMLString:name] type:type content:[PGSAXElementDecl declWithXmlElementContent:content]];
 }
 
 void __unparsedEntityDeclSAX(void *ctx, const xmlChar *name, const xmlChar *publicId, const xmlChar *systemId, const xmlChar *notationName) {
@@ -176,9 +343,8 @@ void __unparsedEntityDeclSAX(void *ctx, const xmlChar *name, const xmlChar *publ
 }
 
 void __setDocumentLocatorSAX(void *ctx, xmlSAXLocatorPtr loc) {
-    BridgedParserPtr p        = CASTASPARSER(ctx);
-    PGSAXLocator     *locator = [[PGSAXLocator alloc] initWithLocator:loc context:ctx];
-    [p setDocumentLocator:locator];
+    BridgedParserPtr p = CASTASPARSER(ctx);
+    [p setDocumentLocator:[[PGSAXLocator alloc] initWithLocator:loc context:ctx]];
 }
 
 void __startDocumentSAX(void *ctx) {
@@ -231,17 +397,6 @@ void __cdataBlockSAX(void *ctx, const xmlChar *value, int len) {
     [p cdataBlock:[NSString stringFromXMLString:value length:len]];
 }
 
-NS_INLINE NSString *bar(const char *msg, va_list args) {
-    size_t sz   = 4096; // 4K should be more than enough.
-    char   *tmp = PGCalloc(1, sz);
-
-    @try {
-        vsnprintf(tmp, (sz - 1), msg, args);
-        return [NSString stringWithUTF8String:tmp];
-    }
-    @finally { free(tmp); }
-}
-
 void __warningSAX(void *ctx, const char *msg, ...) {
     BridgedParserPtr p = CASTASPARSER(ctx);
     va_list          args;
@@ -269,244 +424,48 @@ void __fatalErrorSAX(void *ctx, const char *msg, ...) {
     [p fatalError:nsMsg];
 }
 
-int __isStandaloneSAX(void *ctx) {
-    BridgedParserPtr p = CASTASPARSER(ctx);
-    return ([p isStandalone] ? 1 : 0);
+void __xmlStructuredError2(void *userData, xmlErrorPtr error) {
+    BridgedParserPtr p = CASTASPARSER(userData);
+    [p structuredError:[NSString stringWithFormat:@"[%@][%@][%@][%@:%@] %@",
+                                                  errorLevelXlat(error->level),
+                                                  errorDomainXlat(error->domain)[0],
+                                                  @(error->code),
+                                                  @(error->line),
+                                                  @(error->int2),
+                                                  [NSString stringWithUTF8String:error->message].trim]];
 }
 
-BOOL chunkParse(xmlParserCtxtPtr ctx, const void *buffer, NSInputStream *instr, IMP fRead, NSError **error) {
-    NSInteger length;
-    BOOL      success, eof;
+#pragma mark Delegate Method Selectors
 
-    do {
-        eof     = ((length = FOO(t_fRead, fRead)(instr, _selStreamRead, buffer, PGSAX_PUSH_BUFFER_SIZE)) <= 0);
-        success = (xmlParseChunk(ctx, buffer, (int)(eof ? 0 : length), eof) == 0);
-    }
-    while(success && !eof);
-
-    if(length < 0) PGSetReference(error, instr.streamError);
-    return (success && (length == 0));
-}
-
-BOOL openInputStream(NSInputStream *instr, NSError **error) {
-    if(instr.streamStatus == NSStreamStatusNotOpen) [instr open];
-
-    for(;;) {
-        switch(instr.streamStatus) {
-            case NSStreamStatusOpening:
-                break;
-            case NSStreamStatusOpen:
-            case NSStreamStatusReading:
-            case NSStreamStatusWriting:
-                PGSetReference(error, nil);
-                return YES;
-            case NSStreamStatusAtEnd:
-                PGSetError(error, XMLParser, UnexpectedEndOfInput);
-                return NO;
-            case NSStreamStatusClosed:
-                PGSetError(error, XMLParser, InputStreamClosed);
-                return NO;
-            case NSStreamStatusError:
-                PGSetReference(error, instr.streamError);
-                return NO;
-            default:
-                return NO;
-        }
-    }
-}
-
-xmlSAXHandlerPtr populateSAXHandler() {
-    xmlSAXHandlerPtr saxh = PGCalloc(1, sizeof(xmlSAXHandler));
-    saxh->initialized           = XML_SAX2_MAGIC;
-    saxh->internalSubset        = __internalSubsetSAX;
-    saxh->externalSubset        = __externalSubsetSAX;
-    saxh->isStandalone          = __isStandaloneSAX;
-    saxh->hasInternalSubset     = __hasInternalSubsetSAX;
-    saxh->hasExternalSubset     = __hasExternalSubsetSAX;
-    saxh->getEntity             = __getEntitySAX;
-    saxh->getParameterEntity    = __getParameterEntitySAX;
-    saxh->resolveEntity         = __resolveEntitySAX;
-    saxh->entityDecl            = __entityDeclSAX;
-    saxh->notationDecl          = __notationDeclSAX;
-    saxh->attributeDecl         = __attributeDeclSAX;
-    saxh->elementDecl           = __elementDeclSAX;
-    saxh->unparsedEntityDecl    = __unparsedEntityDeclSAX;
-    saxh->setDocumentLocator    = __setDocumentLocatorSAX;
-    saxh->startDocument         = __startDocumentSAX;
-    saxh->endDocument           = __endDocumentSAX;
-    saxh->startElement          = __startElementSAX;
-    saxh->endElement            = __endElementSAX;
-    saxh->reference             = __referenceSAX;
-    saxh->characters            = __charactersSAX;
-    saxh->ignorableWhitespace   = __ignorableWhitespaceSAX;
-    saxh->processingInstruction = __processingInstructionSAX;
-    saxh->comment               = __commentSAX;
-    saxh->cdataBlock            = __cdataBlockSAX;
-    saxh->startElementNs        = __startElementNsSAX2;
-    saxh->endElementNs          = __endElementNsSAX2;
-    saxh->serror                = __xmlStructuredError2;
-    saxh->warning               = __warningSAX;
-    saxh->error                 = __errorSAX;
-    saxh->fatalError            = __fatalErrorSAX; /* unused error() get all the errors */
-    return saxh;
-}
-
-void populateSelectorFields() {
-    static dispatch_once_t __selectorOnce = 0;
-    dispatch_once(&__selectorOnce, ^{
-        _selInternalSubset        = @selector(internalSubset:name:externalID:systemID:);
-        _selExternalSubset        = @selector(externalSubset:name:externalID:systemID:);
-        _selIsStandalone          = @selector(isStandalone:);
-        _selHasInternalSubset     = @selector(hasInternalSubset:);
-        _selHasExternalSubset     = @selector(hasExternalSubset:);
-        _selGetEntity             = @selector(getEntity:name:);
-        _selGetParameterEntity    = @selector(getParameterEntity:name:);
-        _selResolveEntity         = @selector(resolveEntity:publicID:systemID:);
-        _selEntityDecl            = @selector(entityDecl:name:type:publicID:systemID:content:);
-        _selNotationDecl          = @selector(notationDecl:name:publicID:systemID:);
-        _selAttributeDecl         = @selector(attributeDecl:elem:fullname:type:def:defaultValue:tree:);
-        _selElementDecl           = @selector(elementDecl:name:type:content:);
-        _selUnparsedEntityDecl    = @selector(unparsedEntityDecl:name:publicID:systemID:notationName:);
-        _selSetDocumentLocator    = @selector(setDocumentLocator:location:);
-        _selStartDocument         = @selector(startDocument:);
-        _selEndDocument           = @selector(endDocument:);
-        _selStartElement          = @selector(startElement:name:attributes:);
-        _selEndElement            = @selector(endElement:name:);
-        _selReference             = @selector(reference:name:);
-        _selCharacters            = @selector(characters:value:);
-        _selIgnorableWhitespace   = @selector(ignorableWhitespace:value:);
-        _selProcessingInstruction = @selector(processingInstruction:target:data:);
-        _selComment               = @selector(comment:value:);
-        _selCdataBlock            = @selector(cdataBlock:value:);
-        _selStartElementNS        = @selector(startElementNS:localname:prefix:URI:namespaces:attributes:);
-        _selEndElementNS          = @selector(endElementNS:localname:prefix:URI:);
-        _selXmlStructuredError    = @selector(xmlStructuredError:msg:);
-        _selWarning               = @selector(warning:msg:);
-        _selError                 = @selector(error:msg:);
-        _selFatalError            = @selector(fatalError:msg:);
-        _selStreamRead            = @selector(read:maxLength:);
-    });
-}
-
-void populateFunctionFields(PGSAXParser *parser, id<PGSAXDelegate> delegate) {
-    parser.funcInternalSubset        = ((delegate && [delegate respondsToSelector:_selInternalSubset]) ? [delegate methodForSelector:_selInternalSubset] : NULL);
-    parser.funcExternalSubset        = ((delegate && [delegate respondsToSelector:_selExternalSubset]) ? [delegate methodForSelector:_selExternalSubset] : NULL);
-    parser.funcIsStandalone          = ((delegate && [delegate respondsToSelector:_selIsStandalone]) ? [delegate methodForSelector:_selIsStandalone] : NULL);
-    parser.funcHasInternalSubset     = ((delegate && [delegate respondsToSelector:_selHasInternalSubset]) ? [delegate methodForSelector:_selHasInternalSubset] : NULL);
-    parser.funcHasExternalSubset     = ((delegate && [delegate respondsToSelector:_selHasExternalSubset]) ? [delegate methodForSelector:_selHasExternalSubset] : NULL);
-    parser.funcGetEntity             = ((delegate && [delegate respondsToSelector:_selGetEntity]) ? [delegate methodForSelector:_selGetEntity] : NULL);
-    parser.funcGetParameterEntity    = ((delegate && [delegate respondsToSelector:_selGetParameterEntity]) ? [delegate methodForSelector:_selGetParameterEntity] : NULL);
-    parser.funcResolveEntity         = ((delegate && [delegate respondsToSelector:_selResolveEntity]) ? [delegate methodForSelector:_selResolveEntity] : NULL);
-    parser.funcEntityDecl            = ((delegate && [delegate respondsToSelector:_selEntityDecl]) ? [delegate methodForSelector:_selEntityDecl] : NULL);
-    parser.funcNotationDecl          = ((delegate && [delegate respondsToSelector:_selNotationDecl]) ? [delegate methodForSelector:_selNotationDecl] : NULL);
-    parser.funcAttributeDecl         = ((delegate && [delegate respondsToSelector:_selAttributeDecl]) ? [delegate methodForSelector:_selAttributeDecl] : NULL);
-    parser.funcElementDecl           = ((delegate && [delegate respondsToSelector:_selElementDecl]) ? [delegate methodForSelector:_selElementDecl] : NULL);
-    parser.funcUnparsedEntityDecl    = ((delegate && [delegate respondsToSelector:_selUnparsedEntityDecl]) ? [delegate methodForSelector:_selUnparsedEntityDecl] : NULL);
-    parser.funcSetDocumentLocator    = ((delegate && [delegate respondsToSelector:_selSetDocumentLocator]) ? [delegate methodForSelector:_selSetDocumentLocator] : NULL);
-    parser.funcStartDocument         = ((delegate && [delegate respondsToSelector:_selStartDocument]) ? [delegate methodForSelector:_selStartDocument] : NULL);
-    parser.funcEndDocument           = ((delegate && [delegate respondsToSelector:_selEndDocument]) ? [delegate methodForSelector:_selEndDocument] : NULL);
-    parser.funcStartElement          = ((delegate && [delegate respondsToSelector:_selStartElement]) ? [delegate methodForSelector:_selStartElement] : NULL);
-    parser.funcEndElement            = ((delegate && [delegate respondsToSelector:_selEndElement]) ? [delegate methodForSelector:_selEndElement] : NULL);
-    parser.funcReference             = ((delegate && [delegate respondsToSelector:_selReference]) ? [delegate methodForSelector:_selReference] : NULL);
-    parser.funcCharacters            = ((delegate && [delegate respondsToSelector:_selCharacters]) ? [delegate methodForSelector:_selCharacters] : NULL);
-    parser.funcIgnorableWhitespace   = ((delegate && [delegate respondsToSelector:_selIgnorableWhitespace]) ? [delegate methodForSelector:_selIgnorableWhitespace] : NULL);
-    parser.funcProcessingInstruction = ((delegate && [delegate respondsToSelector:_selProcessingInstruction]) ? [delegate methodForSelector:_selProcessingInstruction] : NULL);
-    parser.funcComment               = ((delegate && [delegate respondsToSelector:_selComment]) ? [delegate methodForSelector:_selComment] : NULL);
-    parser.funcCdataBlock            = ((delegate && [delegate respondsToSelector:_selCdataBlock]) ? [delegate methodForSelector:_selCdataBlock] : NULL);
-    parser.funcStartElementNS        = ((delegate && [delegate respondsToSelector:_selStartElementNS]) ? [delegate methodForSelector:_selStartElementNS] : NULL);
-    parser.funcEndElementNS          = ((delegate && [delegate respondsToSelector:_selEndElementNS]) ? [delegate methodForSelector:_selEndElementNS] : NULL);
-    parser.funcXmlStructuredError    = ((delegate && [delegate respondsToSelector:_selXmlStructuredError]) ? [delegate methodForSelector:_selXmlStructuredError] : NULL);
-    parser.funcWarning               = ((delegate && [delegate respondsToSelector:_selWarning]) ? [delegate methodForSelector:_selWarning] : NULL);
-    parser.funcError                 = ((delegate && [delegate respondsToSelector:_selError]) ? [delegate methodForSelector:_selError] : NULL);
-    parser.funcFatalError            = ((delegate && [delegate respondsToSelector:_selFatalError]) ? [delegate methodForSelector:_selFatalError] : NULL);
-}
-
-xmlParserCtxtPtr createPushContextForDelegate(PGSAXParser *parser, id<PGSAXDelegate> delegate, NSString *filename, const void *buffer, NSUInteger length) {
-    parser.workingDelegate = delegate;
-    parser.utf8Filename    = strdup(filename ? filename.UTF8String : "");
-
-    populateSelectorFields();
-    populateFunctionFields(parser, delegate);
-    parser.saxHandler = populateSAXHandler();
-
-    xmlParserCtxtPtr ctx = xmlCreatePushParserCtxt(parser.saxHandler, PG_BRDG_CAST(void)parser, buffer, (int)length, parser.utf8Filename);
-    return ctx;
-}
-
-BOOL pushParse(PGSAXParser *parse, id<PGSAXDelegate> delegate, NSInputStream *instr, NSError **error) {
-    BOOL   success = NO;
-    NSByte *buffer = PGMalloc(PGSAX_PUSH_BUFFER_SIZE);
-
-    @try {
-        IMP       fRead  = [instr methodForSelector:_selStreamRead];
-        NSInteger length = FOO(t_fRead, fRead)(instr, _selStreamRead, buffer, PGSAX_PUSH_BUFFER_SIZE);
-
-        if(length > 0) {
-            parse.ctx = createPushContextForDelegate(parse, delegate, parse.filename, buffer, (NSUInteger)length);
-            if(parse.ctx) success = chunkParse(parse.ctx, buffer, instr, fRead, error);
-            else { PGSetError(error, XMLParser, XMLParserUnknownError); }
-        }
-        else if(length == 0) PGSetError(error, XMLParser, UnexpectedEndOfInput);
-        else PGSetReference(error, instr.streamError);
-    }
-    @finally {
-        free(buffer);
-        postParseCleanup(parse);
-        parse.hasAlreadyRun = YES;
-    }
-
-    return success;
-}
-
-BOOL pushParseXML(PGSAXParser *parser, id<PGSAXDelegate> delegate, NSInputStream *instr, NSError **error) {
-    BOOL success = NO;
-    if(delegate && instr) success = (openInputStream(instr, error) && pushParse(parser, delegate, instr, error));
-    else if(delegate) PGSetError(error, XMLParser, NoInputStream);
-    else { PGSetError(error, XMLParser, NoDelegate); }
-    return success;
-}
-
-void postParseCleanup(PGSAXParser *parser) {
-    if(parser.ctx) xmlFreeParserCtxt(parser.ctx);
-    if(parser.saxHandler) free(parser.saxHandler);
-    if(parser.utf8Filename) free(parser.utf8Filename);
-
-    parser.ctx          = NULL;
-    parser.saxHandler   = NULL;
-    parser.utf8Filename = NULL;
-
-    parser.workingDelegate           = nil;
-    parser.funcInternalSubset        = nil;
-    parser.funcExternalSubset        = nil;
-    parser.funcIsStandalone          = nil;
-    parser.funcHasInternalSubset     = nil;
-    parser.funcHasExternalSubset     = nil;
-    parser.funcGetEntity             = nil;
-    parser.funcGetParameterEntity    = nil;
-    parser.funcResolveEntity         = nil;
-    parser.funcEntityDecl            = nil;
-    parser.funcNotationDecl          = nil;
-    parser.funcAttributeDecl         = nil;
-    parser.funcElementDecl           = nil;
-    parser.funcUnparsedEntityDecl    = nil;
-    parser.funcSetDocumentLocator    = nil;
-    parser.funcStartDocument         = nil;
-    parser.funcEndDocument           = nil;
-    parser.funcStartElement          = nil;
-    parser.funcEndElement            = nil;
-    parser.funcReference             = nil;
-    parser.funcCharacters            = nil;
-    parser.funcIgnorableWhitespace   = nil;
-    parser.funcProcessingInstruction = nil;
-    parser.funcComment               = nil;
-    parser.funcCdataBlock            = nil;
-    parser.funcStartElementNS        = nil;
-    parser.funcEndElementNS          = nil;
-    parser.funcXmlStructuredError    = nil;
-    parser.funcWarning               = nil;
-    parser.funcError                 = nil;
-    parser.funcFatalError            = nil;
-
-    [parser.entities removeAllObjects];
-}
+SEL _selInternalSubset;
+SEL _selExternalSubset;
+SEL _selIsStandalone;
+SEL _selHasInternalSubset;
+SEL _selHasExternalSubset;
+SEL _selGetEntity;
+SEL _selGetParameterEntity;
+SEL _selResolveEntity;
+SEL _selEntityDecl;
+SEL _selNotationDecl;
+SEL _selAttributeDecl;
+SEL _selElementDecl;
+SEL _selUnparsedEntityDecl;
+SEL _selSetDocumentLocator;
+SEL _selStartDocument;
+SEL _selEndDocument;
+SEL _selStartElement;
+SEL _selEndElement;
+SEL _selReference;
+SEL _selCharacters;
+SEL _selIgnorableWhitespace;
+SEL _selProcessingInstruction;
+SEL _selComment;
+SEL _selCdataBlock;
+SEL _selStartElementNS;
+SEL _selEndElementNS;
+SEL _selXmlStructuredError;
+SEL _selWarning;
+SEL _selError;
+SEL _selFatalError;
+SEL _selStreamRead;
 
