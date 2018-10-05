@@ -23,6 +23,17 @@
 #ifndef __Rubicon_NSArray_PGArray__H_
 #define __Rubicon_NSArray_PGArray__H_
 
+#if defined(__APPLE__)
+    #include <Availability.h>
+    #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && defined(MAC_OS_X_VERSION_10_10) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10)
+        #define HAS_PARAMETRISED_CLASS __has_feature(objc_generics)
+    #endif
+#else
+    #define HAS_PARAMETRISED_CLASS 1
+#endif
+
+#if defined(HAS_PARAMETRISED_CLASS) && HAS_PARAMETRISED_CLASS
+
 #import <Rubicon/PGTools.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -68,3 +79,5 @@ NS_ASSUME_NONNULL_BEGIN
 NS_ASSUME_NONNULL_END
 
 #endif // __Rubicon_NSArray_PGArray__H_
+
+#endif // objc_generics

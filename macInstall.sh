@@ -22,7 +22,8 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #################################################################################
 
-PDIR=$(dirname $(readlink -f "$0"))
+#PDIR=$(dirname $(readlink -f "$0"))
+PDIR="`dirname $0`"
 PROJECT=`find "${PDIR}" -name "*.xcodeproj" -exec basename -s .xcodeproj {} \;`
 DSTROOT="${HOME}"
 INSTALL_PATH="Library/Frameworks"
@@ -36,7 +37,7 @@ echo "Frameworks Install Path: \"${DSTROOT}/${INSTALL_PATH}\""
 rm -fr "${FULL_FINAL_PATH}"
 
 xcodebuild -project "${PROJECT}.xcodeproj" -target "${PROJECT}" -configuration Release \
-    clean build install DSTROOT="${DSTROOT}/" INSTALL_PATH="/${INSTALL_PATH}" SKIP_INSTALL=No \
+    clean build DSTROOT="${DSTROOT}/" INSTALL_PATH="/${INSTALL_PATH}" \
     > "${PDIR}/Build.log"
 
 res="$?"

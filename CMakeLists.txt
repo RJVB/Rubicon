@@ -2,57 +2,84 @@ cmake_minimum_required(VERSION 3.5.2)
 
 project (Rubicon VERSION "0.1.0.1")
 
-find_library(Rubicon_libDispatch    NAMES "dispatch"     DOC "Location of libdispatch.")
-find_library(Rubicon_libObjc2       NAMES "objc2" "objc" DOC "Location of libobjc.")
-find_library(Rubicon_libGNUstepBase NAMES "gnustep-base" DOC "Location of libgnustep-base.")
-find_library(Rubicon_libGNUstepGUI  NAMES "gnustep-gui"  DOC "Location of libgnustep-gui.")
+include(FeatureSummary)
+include(CheckFunctionExists)
 
-if(NOT Rubicon_libObjc2)
-	message(FATAL_ERROR "Unable to locate the required library objc or objc2.")
-endif()
+if(NOT APPLE)
+    find_library(Rubicon_libDispatch    NAMES "dispatch"     DOC "Location of libdispatch.")
+    find_library(Rubicon_libObjc2       NAMES "objc2" "objc" DOC "Location of libobjc.")
+    find_library(Rubicon_libGNUstepBase NAMES "gnustep-base" DOC "Location of libgnustep-base.")
+    find_library(Rubicon_libGNUstepGUI  NAMES "gnustep-gui"  DOC "Location of libgnustep-gui.")
 
-if(Rubicon_libDispatch)
-	add_definitions("-DNF_DISPATCH=1")
+    if(NOT Rubicon_libObjc2)
+        message(FATAL_ERROR "Unable to locate the required library objc or objc2.")
+    endif()
+
+    if(Rubicon_libDispatch)
+        add_definitions("-DNF_DISPATCH=1")
+    else()
+        add_definitions("-DNF_DISPATCH=0")
+        message(WARNING "Unable to locate the required library for Grand Central Dispatch.  Will continue without support for Grand Central Dispatch.")
+    endif()
+
+    find_program(Rubicon_GNUstepConfig "gnustep-config")
+    if(Rubicon_GNUstepConfig)
+        execute_process(COMMAND "${Rubicon_GNUstepConfig}" "--variable=CC"  OUTPUT_VARIABLE objc_c_compiler   OUTPUT_STRIP_TRAILING_WHITESPACE)
+        execute_process(COMMAND "${Rubicon_GNUstepConfig}" "--variable=CXX" OUTPUT_VARIABLE objc_cxx_compiler OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+        set(CMAKE_C_COMPILER   "${objc_c_compiler}"   CACHE STRING "" FORCE)
+        set(CMAKE_CXX_COMPILER "${objc_cxx_compiler}" CACHE STRING "" FORCE)
+    else()
+        message(WARNING "Unable to locate gnustep-config. Proceeding with default compiler.")
+    endif()
+
+    if(Rubicon_libGNUstepBase)
+        if(Rubicon_libGNUstepGUI)
+            if(Rubicon_GNUstepConfig)
+                execute_process(COMMAND "${Rubicon_GNUstepConfig}" "--objc-flags" OUTPUT_VARIABLE objc_def_flags      OUTPUT_STRIP_TRAILING_WHITESPACE)
+                execute_process(COMMAND "${Rubicon_GNUstepConfig}" "--gui-libs"   OUTPUT_VARIABLE objc_def_link_flags OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+                set(objc_flags      "${objc_def_flags} -fobjc-runtime=gnustep-1.8.1 -fblocks -fobjc-arc -fobjc-arc-exceptions -DOS_OBJECT_HAVE_OBJC_SUPPORT=0")
+                set(objc_link_flags "${objc_def_link_flags}")
+            else()
+                set(objc_defs       "-DOS_OBJECT_HAVE_OBJC_SUPPORT=0 -DGNUSTEP -DGNUSTEP_BASE_LIBRARY=1 -DGNU_GUI_LIBRARY=1 -DGNU_RUNTIME=1 -DGNUSTEP_BASE_LIBRARY=1 -D_NATIVE_OBJC_EXCEPTIONS -D_NONFRAGILE_ABI")
+
+                set(comm_feats      "-pthread -fexceptions -fobjc-nonfragile-abi -fgnu-runtime")
+                set(objc_feats      "-fno-strict-aliasing -fobjc-exceptions -fobjc-runtime=gnustep-1.8.1 -fblocks -fobjc-arc -fobjc-arc-exceptions -fPIC -fconstant-string-class=NSConstantString")
+                set(objc_warn       "-Wall -DGSWARN -DGSDIAGNOSE -Wno-import")
+                set(objc_incld      "-I. -I/home/odroid/GNUstep/Library/Headers -I/usr/include")
+
+                set(objc_flags      "-MMD -MP -std=gnu99 ${comm_feats} ${objc_feats} ${objc_defs} ${objc_warn} ${objc_incld}")
+                set(objc_link_flags "-rdynamic ${comm_feats}")
+            endif()
+        else()
+            message(FATAL_ERROR "Unable to locate the required library gnustep-gui.")
+        endif()
+    else()
+        message(FATAL_ERROR "Unable to locate the required library gnustep-base.")
+    endif()
 else()
-	add_definitions("-DNF_DISPATCH=0")
-	message(WARNING "Unable to locate the required library for Grand Central Dispatch.  Will continue without support for Grand Central Dispatch.")
-endif()
+    # APPLE version.
+    # We don't really need any of these, but fetch them anyway:
+    find_library(Rubicon_libDispatch
+        NAMES "dispatch"
+        HINTS "/usr/lib/system"
+        DOC "Location of libdispatch.")
+    find_library(Rubicon_libObjc2
+        NAMES "objc2" "objc"
+        DOC "Location of libobjc.")
+    find_library(Rubicon_libGNUstepBase
+        NAMES "Foundation"
+        DOC "Location of the Foundation.framework (equivalent of GNUstep-base)")
+    find_library(Rubicon_libGNUstepGUI
+        NAMES "Cocoa"
+        DOC "Location of the Cocoa.framework (equivalent of GNUstep-gui)")
+    set(comm_feats "-pthread -fexceptions -fobjc-nonfragile-abi")
+    set(objc_feats "-fno-strict-aliasing -fobjc-exceptions -fblocks -fobjc-arc -fobjc-arc-exceptions -fPIC")
+    set(objc_warn  "-Wall -Wno-import")
 
-find_program(Rubicon_GNUstepConfig "gnustep-config")
-if(Rubicon_GNUstepConfig)
-	execute_process(COMMAND "${Rubicon_GNUstepConfig}" "--variable=CC"  OUTPUT_VARIABLE objc_c_compiler   OUTPUT_STRIP_TRAILING_WHITESPACE)
-	execute_process(COMMAND "${Rubicon_GNUstepConfig}" "--variable=CXX" OUTPUT_VARIABLE objc_cxx_compiler OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-	set(CMAKE_C_COMPILER   "${objc_c_compiler}"   CACHE STRING "" FORCE)
-	set(CMAKE_CXX_COMPILER "${objc_cxx_compiler}" CACHE STRING "" FORCE)
-else()
-	message(WARNING "Unable to locate gnustep-config. Proceeding with default compiler.")
-endif()
-
-if(Rubicon_libGNUstepBase)
-	if(Rubicon_libGNUstepGUI)
-		if(Rubicon_GNUstepConfig)
-			execute_process(COMMAND "${Rubicon_GNUstepConfig}" "--objc-flags" OUTPUT_VARIABLE objc_def_flags      OUTPUT_STRIP_TRAILING_WHITESPACE)
-			execute_process(COMMAND "${Rubicon_GNUstepConfig}" "--gui-libs"   OUTPUT_VARIABLE objc_def_link_flags OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-			set(objc_flags      "${objc_def_flags} -fobjc-runtime=gnustep-1.8.1 -fblocks -fobjc-arc -fobjc-arc-exceptions -DOS_OBJECT_HAVE_OBJC_SUPPORT=0")
-			set(objc_link_flags "${objc_def_link_flags}")
-		else()
-			set(objc_defs       "-DOS_OBJECT_HAVE_OBJC_SUPPORT=0 -DGNUSTEP -DGNUSTEP_BASE_LIBRARY=1 -DGNU_GUI_LIBRARY=1 -DGNU_RUNTIME=1 -DGNUSTEP_BASE_LIBRARY=1 -D_NATIVE_OBJC_EXCEPTIONS -D_NONFRAGILE_ABI")
-
-			set(comm_feats      "-pthread -fexceptions -fobjc-nonfragile-abi -fgnu-runtime")
-			set(objc_feats      "-fno-strict-aliasing -fobjc-exceptions -fobjc-runtime=gnustep-1.8.1 -fblocks -fobjc-arc -fobjc-arc-exceptions -fPIC -fconstant-string-class=NSConstantString")
-			set(objc_warn       "-Wall -DGSWARN -DGSDIAGNOSE -Wno-import")
-			set(objc_incld      "-I. -I/home/odroid/GNUstep/Library/Headers -I/usr/include")
-
-			set(objc_flags      "-MMD -MP -std=gnu99 ${comm_feats} ${objc_feats} ${objc_defs} ${objc_warn} ${objc_incld}")
-			set(objc_link_flags "-rdynamic ${comm_feats}")
-		endif()
-	else()
-		message(FATAL_ERROR "Unable to locate the required library gnustep-gui.")
-	endif()
-else()
-	message(FATAL_ERROR "Unable to locate the required library gnustep-base.")
+    set(objc_flags "-MMD -MP -std=gnu99 ${comm_feats} ${objc_feats} ${objc_defs} ${objc_warn} ${objc_incld}")
+    set(objc_link_flags "${comm_feats}")
 endif()
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -68,8 +95,8 @@ include_directories(${incdir})
 #
 ####################################################################################################################
 #
-add_subdirectory("${CMAKE_PROJECT_NAME}Test")
-get_directory_property(incdir2 DIRECTORY "${CMAKE_PROJECT_NAME}Test" INCLUDE_DIRECTORIES)
+add_subdirectory("${CMAKE_PROJECT_NAME}Tests")
+get_directory_property(incdir2 DIRECTORY "${CMAKE_PROJECT_NAME}Tests" INCLUDE_DIRECTORIES)
 include_directories(${incdir2})
 #
 ####################################################################################################################
@@ -89,3 +116,5 @@ set(CPACK_PACKAGE_VERSION_MAJOR			"${Rubicon_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR			"${Rubicon_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH			"${Rubicon_VERSION_PATCH}")
 include (CPack)
+
+FEATURE_SUMMARY(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)

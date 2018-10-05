@@ -22,6 +22,7 @@
  *//******************************************************************************************************************************/
 #import "PGInternal.h"
 
+#ifdef HAS_PARAMETRISED_CLASS
 @implementation PGNestedEnumerator {
         id           _owner;
         NSEnumerator *_enumerator;
@@ -81,3 +82,4 @@
     }
 
 @end
+#endif

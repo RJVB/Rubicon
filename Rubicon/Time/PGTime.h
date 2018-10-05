@@ -206,7 +206,7 @@ NSLong PGSystemRealTime(NSLong delta);
 
 #define __MACH_TIME_IMP__ 1
 
-typedef enum {
+typedef enum clockid_t {
     CLOCK_REALTIME             = 0,
     CLOCK_MONOTONIC            = 6,
     CLOCK_MONOTONIC_RAW        = 4,

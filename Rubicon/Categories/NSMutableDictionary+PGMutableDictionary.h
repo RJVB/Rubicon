@@ -21,6 +21,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+#ifdef HAS_PARAMETRISED_CLASS
 NS_ASSUME_NONNULL_BEGIN
 
 @interface NSMutableDictionary<K, V>(PGMutableDictionary)
@@ -32,3 +33,4 @@ NS_ASSUME_NONNULL_BEGIN
 NS_ASSUME_NONNULL_END
 
 #endif //RUBICON_NSMUTABLEDICTIONARY_PGMUTABLEDICTIONARY_H
+#endif

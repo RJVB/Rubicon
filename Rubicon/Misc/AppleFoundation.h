@@ -46,6 +46,23 @@ int getentropy_pseudo(void *buffer, size_t size);
 
 __END_DECLS
 
+#import <Foundation/NSObjCRuntime.h>
+#if !__has_feature(nullability)
+#   define nullable                     /**/
+#endif
+#if !__has_feature(nullability) || !defined(NS_ASSUME_NONNULL_BEGIN)
+#   define NS_ASSUME_NONNULL_BEGIN      /**/
+#   define NS_ASSUME_NONNULL_END        /**/
+#   define _Nullable                    /**/
+#endif
+#ifndef NS_DESIGNATED_INITIALIZER
+#   if __has_attribute(objc_designated_initializer)
+#       define NS_DESIGNATED_INITIALIZER __attribute__((objc_designated_initializer))
+#   else
+#       define NS_DESIGNATED_INITIALIZER
+#   endif
+#endif
+
 /* @f:0 */
 #if defined(__APPLE__)
 
@@ -112,7 +129,7 @@ __BEGIN_DECLS
     #define TIMER_ABSTIME 1
 #endif
 
-int clock_nanosleep(clockid_t clk_id, int flags, struct timespec *rqtp, struct timespec *rmtp);
+int clock_nanosleep(enum clockid_t clk_id, int flags, struct timespec *rqtp, struct timespec *rmtp);
 
 __END_DECLS
 

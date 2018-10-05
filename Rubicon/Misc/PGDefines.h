@@ -28,12 +28,26 @@
 #import <Rubicon/GNUstep.h>
 #import <Rubicon/PGCString.h>
 
+#if defined(__APPLE__)
+    #include <Availability.h>
+    #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && defined(MAC_OS_X_VERSION_10_10) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10)
+        #define HAS_PARAMETRISED_CLASS __has_feature(objc_generics)
+    #endif
+#else
+    #define HAS_PARAMETRISED_CLASS 1
+#endif
+
 typedef const void                 *cvoidp;
 typedef void                       *voidp;
 typedef long long                  NSLong;
 typedef uint8_t                    NSByte;
+#if defined(HAS_PARAMETRISED_CLASS) && HAS_PARAMETRISED_CLASS
 typedef NSArray<NSString *>        *NSStrArray;
 typedef NSMutableArray<NSString *> *NSMutableStrArray;
+#else
+typedef NSArray                     *NSStrArray;
+typedef NSMutableArray              *NSMutableStrArray;
+#endif
 
 #ifndef PGBLKOPEN
     #define PGBLKOPEN  do {
@@ -63,6 +77,14 @@ static const NSUInteger NSUNotFound = NSUIntegerMax;
     #define PGMaxSemaphoreNameLength 30
 #else
     #define PGMaxSemaphoreNameLength 251
+#endif
+
+#ifdef __APPLE__
+    #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && (!defined(MAC_OS_X_VERSION_10_12) || (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12))
+        typedef NSString *NSErrorDomain;
+        typedef NSString *NSExceptionName;
+        typedef NSString *NSNotificationName;
+    #endif
 #endif
 
 FOUNDATION_EXPORT NSErrorDomain const PGErrorDomain;

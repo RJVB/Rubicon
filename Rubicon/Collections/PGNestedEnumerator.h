@@ -25,6 +25,7 @@
 
 #import "PGTools.h"
 
+#ifdef HAS_PARAMETRISED_CLASS
 NS_ASSUME_NONNULL_BEGIN
 
 @interface PGNestedEnumerator<__covariant T> : NSEnumerator<T>
@@ -38,3 +39,4 @@ NS_ASSUME_NONNULL_BEGIN
 NS_ASSUME_NONNULL_END
 
 #endif //__Rubicon_PGNestedEnumerator_H_
+#endif //HAS_PARAMETRISED_CLASS
